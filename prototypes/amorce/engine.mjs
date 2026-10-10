@@ -1,4 +1,5 @@
 import initialize from './runtime-loader.mjs';
+import {piperEvents} from './piper-events.mjs?v=20261010-label-fast1';
 let worker,module,initializing;
 async function prepare(language){
  if(!['fr','en'].includes(language))throw new Error('UNSUPPORTED_LANGUAGE');
@@ -37,16 +38,10 @@ export async function synthesizePhonemes(phonemes,language='fr'){
 export async function piperInput(text){
  if(typeof text!=='string'||!text.trim())throw new Error('EMPTY_LABEL');
  await prepare('fr');worker.set_voice('fr');
- const reference=collect(text),pointer=worker.convert_to_phonemes(text,true).ptr;
+ const pointer=worker.convert_to_phonemes(text,true).ptr;
  let end=pointer;while(module.HEAPU8[end])end++;
  const punctuation=Array.from(text.matchAll(/[,.!?;:]+/gu),m=>m[0]);let clause=0;
  let phonemes=new TextDecoder().decode(module.HEAPU8.subarray(pointer,end)).replaceAll('_','').replace(/\([a-z-]+\)/gu,'').replace(/ *\| */gu,()=>`${punctuation[clause++]||','} `).normalize('NFD');
  const finalPunctuation=text.trim().match(/[,.!?;:]+$/u)?.[0];if(finalPunctuation&&!/[,.!?;:]$/u.test(phonemes))phonemes+=finalPunctuation;
- let cursor=0;const source=[],offsets=[];
- for(const event of reference.events.filter(e=>e.type==='phoneme'&&e.id?.trim())){
-  const phone=event.id.normalize('NFD'),offset=phonemes.indexOf(phone,cursor);
-  if(offset<0)throw new Error('PIPER_PHONEME_ALIGNMENT_FAILED');
-  source.push(event);offsets.push(Array.from(phonemes.slice(0,offset)).length);cursor=offset+phone.length;
- }
- return {text:phonemes,source,offsets};
+ return piperEvents(phonemes);
 }

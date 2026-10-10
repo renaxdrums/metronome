@@ -999,7 +999,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     #songPane > .song-actions > .btn:last-child,
     .song-block-body .song-actions .btn { color: #ffaf78; background: #211812; border-color: #654026; }
     .song-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .song-back::after { content: "Retour"; }
+    .song-back::after { content: none; }
     #songPane > .btn:not(.song-back) {
       width: 100%; margin-top: 10px; color: var(--cyan);
       border-color: #28717d; background: #102126; white-space: normal;
@@ -1252,7 +1252,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   }
 </style>
   <link rel="stylesheet" href="song-entry.css?v=20261007-entries">
-  <link rel="stylesheet" href="navigation-index.css?v=20261008-selected-icons">
+  <link rel="stylesheet" href="navigation-index.css?v=20261010-song-toolbar1">
 <style>
 .orange-ui-icon { width: 14px; height: 14px; display: inline-block; vertical-align: -2px; margin-right: 6px; fill: none; stroke: var(--orange); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
     .mobile-tabs button.active .orange-ui-icon { stroke: #000; opacity: 1; visibility: visible; }
@@ -1926,13 +1926,13 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     // Dedicated short, pitched percussion; independent of the selected bank.
     function playCountIn(time,accent) {
       const oscillator=audioCtx.createOscillator(),gain=audioCtx.createGain();
-      oscillator.type='triangle';oscillator.frequency.setValueAtTime(accent?1800:1200,time);
-      oscillator.frequency.exponentialRampToValueAtTime(accent?650:450,time+.065);
-      gain.gain.setValueAtTime(Math.max(.0001,masterVolume*.85),time);
-      gain.gain.exponentialRampToValueAtTime(.0001,time+.09);
+      oscillator.type='sine';oscillator.frequency.setValueAtTime(accent?2400:1800,time);
+      gain.gain.setValueAtTime(.0001,time);
+      gain.gain.linearRampToValueAtTime(Math.max(.0001,masterVolume*(accent?.42:.34)),time+.001);
+      gain.gain.exponentialRampToValueAtTime(.0001,time+.035);
       oscillator.connect(gain);gain.connect(getAudioMixDestination(audioCtx));
       scheduledVoiceSources.add(oscillator);oscillator.onended=()=>{scheduledVoiceSources.delete(oscillator);oscillator.disconnect();gain.disconnect();};
-      oscillator.start(time);oscillator.stop(time+.1);
+      oscillator.start(time);oscillator.stop(time+.045);
     }
 
     function playClick(type, time, isFirstOfMeasure, context = {}) {

@@ -101,9 +101,9 @@
     if(preparingAmorce)return;
     const current=loaded?.song?.amorce?song()||loaded.song:(!songsRoot.hidden&&songView==='detail'?song():null);
     if(!isPlaying&&current?.amorce){
-      const epoch=++songStartEpoch;preparingAmorce=true;playBtn.textContent='Préparation…';
+      const epoch=++songStartEpoch;preparingAmorce=true;updateTrainButton();playBtn.textContent='Préparation…';
       try{await initAudio();if(epoch!==songStartEpoch)return;const plan=await RENAX_AMORCE.prepare(current);await prepareAllVoiceAudio();if(epoch!==songStartEpoch)return;loadSong(null,plan);RENAX_AMORCE.install(plan);preparingAmorce=false;const result=await originalStart();syncDirectSongPlay();return result;}
-      catch(error){if(epoch!==songStartEpoch)return;loadSong();preparingAmorce=false;await originalStart();status('Lecture sans guide vocal : '+error.message);const note=songPane.querySelector('.song-note');if(note)note.textContent='Le morceau joue sans guide vocal. Réessaie le guide après la lecture.';syncDirectSongPlay();return;}finally{if(epoch===songStartEpoch){preparingAmorce=false;syncSongTransport();}}
+      catch(error){if(epoch!==songStartEpoch)return;loadSong();preparingAmorce=false;await originalStart();status('Lecture sans guide vocal : '+error.message);const note=songPane.querySelector('.song-note');if(note)note.textContent='Le morceau joue sans guide vocal. Réessaie le guide après la lecture.';syncDirectSongPlay();return;}finally{if(epoch===songStartEpoch){preparingAmorce=false;updateTrainButton();syncSongTransport();}}
     }
     if(!isPlaying&&loaded?.preview)loadSong();
     if(!isPlaying&&!loaded&&!songsRoot.hidden&&songView==='detail'&&song())loadSong();
@@ -430,6 +430,6 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       if(songView==='detail'&&!targetSong)songView='playlist';
       openSectionId=null;render();tab(state.pane==='songs'?'songs':'sequence');
     },
-    get library(){return library;},get loaded(){return loaded;}};
+    get preparing(){return preparingAmorce;},get library(){return library;},get loaded(){return loaded;}};
   try{RENAX_STORAGE.write(library);}catch{status('Sauvegarde locale impossible : exporte ta bibliothèque.');}
 })();

@@ -1,6 +1,6 @@
 // Retain a bounded set of French announcements across page opens. Failure of
 // browser storage must never prevent playback or a fresh synthesis.
-const revision='siwis-c10ece1a-scales-default-levels-v2',limit=64;
+const revision='siwis-c10ece1a-scales-default-levels-v3-exact-ipa',limit=64;
 let database;
 function open(){if(!database)database=new Promise(resolve=>{try{const request=indexedDB.open('renax-piper-announcements',1);request.onupgradeneeded=()=>request.result.createObjectStore('audio',{keyPath:'key'});request.onsuccess=()=>resolve(request.result);request.onerror=()=>resolve(null);request.onblocked=()=>resolve(null);}catch{resolve(null);}});return database;}
 const key=text=>JSON.stringify([revision,text]);

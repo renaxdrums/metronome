@@ -2545,16 +2545,18 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         const tools=document.createElement('div');tools.className='sequence-card-tools';
         const handle=document.createElement('button');handle.type='button';handle.className='sequence-drag';
         handle.textContent='⠿';handle.title='Déplacer la mesure';handle.setAttribute('aria-label','Déplacer la mesure '+(i+1)+' : flèches haut et bas');
-        handle.draggable=true;
+        handle.draggable=false;
         handle.onclick=e=>e.stopPropagation();
         handle.addEventListener('dragstart',e=>{draggedSequenceMeasure=m;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(i));});
         handle.addEventListener('dragend',()=>{draggedSequenceMeasure=null;measureListEl.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target'));});
         handle.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();const target=measures[measures.indexOf(m)+(e.key==='ArrowUp'?-1:1)];if(target){moveSequenceMeasure(m,target);measureListEl.children[measures.indexOf(m)]?.querySelector('.sequence-drag')?.focus();}}});
         handle.addEventListener('pointerdown',e=>{
-          if(e.pointerType==='mouse'||e.button!==0)return;
+          if(e.button!==0)return;
           e.preventDefault();e.stopPropagation();handle.setPointerCapture(e.pointerId);
-          const up=event=>{if(event.pointerId!==e.pointerId)return;handle.removeEventListener('pointerup',up);const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('#measureList .measure-card');if(target)moveSequenceMeasure(m,measures[Array.from(measureListEl.children).indexOf(target)]);};
-          handle.addEventListener('pointerup',up);
+          const mark=event=>{const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('#measureList .measure-card');measureListEl.querySelectorAll('.measure-card').forEach(c=>c.classList.toggle('drop-target',c===target&&c!==card));};
+          const cleanup=()=>{handle.removeEventListener('pointermove',mark);handle.removeEventListener('pointerup',up);handle.removeEventListener('pointercancel',cleanup);measureListEl.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target'));};
+          const up=event=>{if(event.pointerId!==e.pointerId)return;cleanup();const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('#measureList .measure-card');if(target)moveSequenceMeasure(m,measures[Array.from(measureListEl.children).indexOf(target)]);};
+          handle.addEventListener('pointermove',mark);handle.addEventListener('pointerup',up);handle.addEventListener('pointercancel',cleanup);
         });
         card.addEventListener('dragover',e=>{if(draggedSequenceMeasure){e.preventDefault();e.dataTransfer.dropEffect='move';card.classList.add('drop-target');}});
         card.addEventListener('dragleave',()=>card.classList.remove('drop-target'));

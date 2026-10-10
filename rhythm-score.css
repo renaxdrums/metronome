@@ -11,7 +11,7 @@
 .panel-visu.score-view #sequencerContainer{display:none;}
 .panel-visu.score-view .rhythm-score{display:block;}
 .rhythm-score svg{display:block;width:100%;height:auto;margin-top:8px;}
-.rhythm-score .score-active-head path{fill:#1683ff!important;stroke:#1683ff!important;}
+
 
 @media(min-width:601px) and (max-width:1100px) and (min-height:501px){
  .main-grid>.panel-visu.mobile-active{grid-template-rows:auto auto minmax(0,1fr) auto;}
@@ -31,7 +31,7 @@
 .score-view-switch button[hidden],.rhythm-editor[hidden],.score-pulse[hidden]{display:none;}
 .rhythm-score{max-height:calc(100% - var(--score-controls-height,75px));}
 .rhythm-score .vf-notehead path{fill:var(--note-state-color,#111);stroke:var(--note-state-color,#111);}
-.rhythm-score .score-active-head path{fill:var(--cyan)!important;stroke:var(--cyan)!important;}
+
 .rhythm-score .score-selected{filter:drop-shadow(0 0 2px rgba(0,229,255,.35));}
 .rhythm-score [data-event]{cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;}
 .rhythm-score [data-event]:focus-visible{outline:2px solid var(--orange);}
@@ -43,7 +43,7 @@
 @media(prefers-reduced-motion:reduce){.score-pulse.pulsing span,.score-pulse.pulsing:before,.score-pulse.pulsing:after{animation-duration:.05s;}}
 
 
-.rhythm-score .score-active-head{filter:drop-shadow(0 0 3px var(--cyan));}
+
 
 /* Independent, compact notation toolbar. */
 .score-tools-panel{display:flex;align-items:flex-start;gap:12px;align-self:stretch;flex-shrink:0;max-height:42%;margin-bottom:10px;min-height:0;}

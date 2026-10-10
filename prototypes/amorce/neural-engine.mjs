@@ -1,5 +1,5 @@
-import {readAnnouncement,saveAnnouncement} from './piper-cache.mjs?v=20261009-piper-fast2';
-import {synthesize as phoneticReference,piperInput} from './engine.mjs?v=20261009-piper-fast2';
+import {readAnnouncement,saveAnnouncement} from './piper-cache.mjs?v=20261010-label-fast1';
+import {synthesize as phoneticReference,piperInput} from './engine.mjs?v=20261010-label-fast1';
 import {phonemeInput} from './neural-core.mjs?v=20261009-levels';
 let worker,sequence=0;const pending=new Map();
 let frenchWorker,frenchSequence=0;const frenchPending=new Map();
@@ -14,7 +14,7 @@ async function french(text){
 }
 
 async function generate(text,language='fr'){
- if(language==='fr'){const saved=await readAnnouncement(text);if(saved)return {...saved,persistentCacheHit:true};const result=await french(text);await saveAnnouncement(text,result);return result;}
+ if(language==='fr'){const saved=await readAnnouncement(text);if(saved)return {...saved,persistentCacheHit:true};const result=await french(text);saveAnnouncement(text,result).catch(()=>{});return result;}
  const reference=await phoneticReference(text,language),input=phonemeInput(reference.events);
  if(!worker){
   worker=new Worker(new URL('./neural-worker.mjs?v=20261009-male-restored',import.meta.url),{type:'module'});
@@ -27,6 +27,7 @@ async function generate(text,language='fr'){
 
 const cache=new Map();
 export function synthesize(text,language='fr'){
+ text=text.trim().replace(/\s+/gu,' ');
  const key=JSON.stringify([text,language]);
  if(cache.has(key))return cache.get(key);
  const started=performance.now();

@@ -32,7 +32,7 @@
 .rhythm-score{max-height:calc(100% - var(--score-controls-height,75px));}
 .rhythm-score .vf-notehead path{fill:var(--note-state-color,#111);stroke:var(--note-state-color,#111);}
 .rhythm-score .score-active-head path{fill:var(--cyan)!important;stroke:var(--cyan)!important;}
-.rhythm-score .score-selected{filter:drop-shadow(0 0 3px rgba(255,107,0,.65));}
+.rhythm-score .score-selected{filter:drop-shadow(0 0 2px rgba(0,229,255,.35));}
 .rhythm-score [data-event]{cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;}
 .rhythm-score [data-event]:focus-visible{outline:2px solid var(--orange);}
 .score-pulse{height:22px;position:relative;width:70px;margin:6px auto 0;}

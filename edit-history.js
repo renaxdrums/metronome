@@ -15,9 +15,9 @@
  function sync(){undo.disabled=!history.length;undo.setAttribute('aria-disabled',String(undo.disabled));}
  function commit(){clearTimeout(pending);pending=null;if(restoring)return;const next=snapshot();if(signature(next)!==signature(baseline)){history.push(baseline);baseline=next;}else baseline=next;sync();}
  function queue(){if(restoring)return;clearTimeout(pending);pending=setTimeout(commit,200);}
- document.addEventListener('change',queue);
- document.addEventListener('input',e=>{if(e.target.matches('#volumeSlider,#bpmSlider,.measure-tempo-input,.training-fields input'))queue();});
- document.addEventListener('click',e=>{if(!e.target.closest('#undoBtn,#playBtn,#trainBtn'))queue();});
+ document.addEventListener('change',queue,true);
+ document.addEventListener('input',e=>{if(e.target.matches('#volumeSlider,#bpmSlider,.measure-tempo-input,.training-fields input'))queue();},true);
+ document.addEventListener('click',e=>{if(!e.target.closest('#undoBtn,#playBtn,#trainBtn'))queue();},true);
  window.addEventListener('renax-library-edited',queue);
  document.addEventListener('pointerup',()=>{if(pending)queue();});
  undo.onclick=()=>{

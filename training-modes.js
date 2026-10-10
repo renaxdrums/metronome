@@ -112,6 +112,6 @@
     return {bpm:Math.round(run.lowBpm+(run.highBpm-run.lowBpm)*curveLevel(run.curve,p)),done:p>=1};
   }
   function finish(bpm){runStatus.textContent=mode==='steps'?'Limite de '+bpm+' BPM atteinte — entraînement arrêté.':'Entraînement terminé.';runStatus.hidden=false;}
-  window.RENAX_TRAINING={get mode(){return mode;},prepare,at,update,finish,begin(){runStatus.hidden=true;}};update();
+  window.RENAX_TRAINING={get mode(){return mode;},get editState(){return {mode,curve};},restoreEditState(state){if(state){mode=state.mode==='steps'?'steps':'progressive';curve=profiles.some(p=>p[0]===state.curve)?state.curve:'linear-up';}duration.max=durationUnit.value==='seconds'?'3600':'60';update();},prepare,at,update,finish,begin(){runStatus.hidden=true;}};update();
 })();
 

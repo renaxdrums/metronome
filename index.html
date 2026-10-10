@@ -1278,6 +1278,32 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 .reset-undo-tools #undoBtn:disabled{opacity:.35;cursor:default;}
 .reset-undo-tools button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
 </style>
+
+<style id="sequence-edit-transport">
+#measureList .measure-card{position:relative;padding-right:52px;min-height:108px;}
+.sequence-card-tools{position:absolute;right:8px;top:7px;bottom:7px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:5px;}
+.sequence-card-tools button,.sequence-more summary{display:grid;place-items:center;width:30px;height:28px;padding:0;background:#191a21;border:1px solid #353641;border-radius:7px;color:var(--orange);cursor:pointer;}
+.sequence-card-tools button:focus-visible,.sequence-more summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+.sequence-card-tools .sequence-drag{font-size:20px;cursor:grab;color:var(--text-muted);touch-action:none;}
+.sequence-preview-play svg{width:15px;height:15px;fill:currentColor;}
+.sequence-preview-play[aria-pressed="true"]{color:var(--cyan);border-color:var(--cyan);}
+.sequence-card-tools button:disabled{opacity:.4;cursor:default;}
+.sequence-more{position:relative;}
+.sequence-more summary{list-style:none;font-size:20px;line-height:1;}
+.sequence-more summary::-webkit-details-marker{display:none;}
+.sequence-more-actions{position:absolute;right:35px;bottom:0;padding:5px;border:1px solid #3b3b46;background:#191a21;border-radius:8px;z-index:20;box-shadow:0 8px 24px #0008;}
+.sequence-more-actions button{width:auto;padding:0 12px;font:600 12px var(--font);}
+#measureList .drop-target{border-top:3px solid var(--cyan);}
+#playBtn{position:relative;width:58px!important;min-width:58px!important;height:58px!important;min-height:58px!important;padding:0!important;border-radius:50%!important;background:linear-gradient(145deg,#ff922e,#ff6b00)!important;border:1px solid #ffad61!important;box-shadow:0 4px 14px #0007,inset 0 1px 0 #ffffff45!important;font-size:0!important;transition:transform .15s,box-shadow .15s;}
+#playBtn:hover{transform:translateY(-1px);box-shadow:0 5px 20px #ff6b0033,inset 0 1px 0 #ffffff55!important;}
+#playBtn:active{transform:translateY(1px);}
+#playBtn:focus-visible{outline:2px solid var(--cyan);outline-offset:4px;}
+#playBtn::before{content:'';display:block;position:absolute;left:23px;top:18px;width:0;height:0;border-left:16px solid #141418;border-top:10px solid transparent;border-bottom:10px solid transparent;}
+#playBtn.btn-cyan{background:linear-gradient(145deg,#33edff,#00bfd6)!important;border-color:#6af3ff!important;}
+#playBtn.btn-cyan::before{left:19px;top:19px;width:18px;height:18px;border:0;border-radius:3px;background:#141418;}
+#playBtn:disabled{opacity:.5;transform:none;}
+@media(prefers-reduced-motion:reduce){#playBtn{transition:none;}}
+</style>
 </head>
 <body>
 
@@ -2473,6 +2499,79 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       }
     }
 
+
+    let loopedMeasure = null;
+    let draggedSequenceMeasure = null;
+    function sequenceTransportIcon(playing) {
+      return playing ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l12-7Z"/></svg>';
+    }
+    function finishSequenceEdit(selected) {
+      activeMeasureIndex = Math.max(0, measures.indexOf(selected));
+      playingMeasureIndex = activeMeasureIndex;
+      currentStepInMeasure = 0; polyEventIndex = 0;
+      measureCountSel.value = String(measures.length);
+      syncNumbox(measureCountSel);
+      renderSequencerList(); renderActiveMeasure();
+      measureCountSel.dispatchEvent(new Event('change', {bubbles:true}));
+    }
+    function removeSequenceMeasure(m) {
+      if (playbackStarting || measures.length <= 1) return;
+      const index=measures.indexOf(m); if(index<0)return;
+      const selected=measures[activeMeasureIndex];
+      stopMetronome();
+      measures.splice(index,1);
+      finishSequenceEdit(selected===m ? measures[Math.min(index,measures.length-1)] : selected);
+    }
+    function moveSequenceMeasure(m, target) {
+      if(playbackStarting)return;
+      const from=measures.indexOf(m),to=measures.indexOf(target);
+      if(from<0||to<0||from===to)return;
+      const selected=measures[activeMeasureIndex];
+      stopMetronome();
+      measures.splice(from,1); measures.splice(to,0,m);
+      finishSequenceEdit(selected);
+    }
+    async function previewSequenceMeasure(m) {
+      if(playbackStarting || training.engaged || window.RENAX_SONGS?.preparing)return;
+      if(isPlaying&&loopedMeasure===m){stopMetronome();return;}
+      stopMetronome();
+      loopedMeasure=m;
+      try { await startMetronome(); }
+      catch(error){loopedMeasure=null; renderSequencerList(); console.warn('Lecture de la mesure indisponible',error);}
+    }
+    function decorateSequenceCards() {
+      measureListEl.querySelectorAll('.measure-card').forEach((card,i)=>{
+        const m=measures[i]; if(!m)return;
+        const tools=document.createElement('div');tools.className='sequence-card-tools';
+        const handle=document.createElement('button');handle.type='button';handle.className='sequence-drag';
+        handle.textContent='⠿';handle.title='Déplacer la mesure';handle.setAttribute('aria-label','Déplacer la mesure '+(i+1)+' : flèches haut et bas');
+        handle.draggable=true;
+        handle.onclick=e=>e.stopPropagation();
+        handle.addEventListener('dragstart',e=>{draggedSequenceMeasure=m;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(i));});
+        handle.addEventListener('dragend',()=>{draggedSequenceMeasure=null;measureListEl.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target'));});
+        handle.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();const target=measures[measures.indexOf(m)+(e.key==='ArrowUp'?-1:1)];if(target){moveSequenceMeasure(m,target);measureListEl.children[measures.indexOf(m)]?.querySelector('.sequence-drag')?.focus();}}});
+        handle.addEventListener('pointerdown',e=>{
+          if(e.pointerType==='mouse'||e.button!==0)return;
+          e.preventDefault();e.stopPropagation();handle.setPointerCapture(e.pointerId);
+          const up=event=>{if(event.pointerId!==e.pointerId)return;handle.removeEventListener('pointerup',up);const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('#measureList .measure-card');if(target)moveSequenceMeasure(m,measures[Array.from(measureListEl.children).indexOf(target)]);};
+          handle.addEventListener('pointerup',up);
+        });
+        card.addEventListener('dragover',e=>{if(draggedSequenceMeasure){e.preventDefault();e.dataTransfer.dropEffect='move';card.classList.add('drop-target');}});
+        card.addEventListener('dragleave',()=>card.classList.remove('drop-target'));
+        card.addEventListener('drop',e=>{if(!draggedSequenceMeasure)return;e.preventDefault();e.stopPropagation();const source=draggedSequenceMeasure;draggedSequenceMeasure=null;moveSequenceMeasure(source,m);});
+        const play=document.createElement('button');play.type='button';play.className='sequence-preview-play';
+        const playing=isPlaying&&loopedMeasure===m;
+        play.innerHTML=sequenceTransportIcon(playing);play.setAttribute('aria-label',playing?'Arrêter la mesure '+(i+1):'Écouter la mesure '+(i+1)+' en boucle');play.title=play.getAttribute('aria-label');play.setAttribute('aria-pressed',String(playing));play.disabled=playbackStarting||training.engaged;
+        play.onclick=e=>{e.stopPropagation();previewSequenceMeasure(m);};
+        const menu=document.createElement('details');menu.className='sequence-more';
+        const summary=document.createElement('summary');summary.textContent='⋯';summary.setAttribute('aria-label','Options de la mesure '+(i+1));
+        menu.addEventListener('click',e=>e.stopPropagation());menu.addEventListener('keydown',e=>e.stopPropagation());
+        const actions=document.createElement('div');actions.className='sequence-more-actions';
+        const del=document.createElement('button');del.type='button';del.textContent='Supprimer';del.disabled=measures.length<=1||playbackStarting;del.onclick=e=>{e.stopPropagation();removeSequenceMeasure(m);};
+        actions.append(del);menu.append(summary,actions);tools.append(handle,play,menu);card.append(tools);
+      });
+    }
+
     function renderSequencerList() {
       measureListEl.innerHTML = '';
       measures.forEach((m, i) => {
@@ -2781,9 +2880,9 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         if (sIdx >= measureTotalSteps(m)) {
           scheduledMeasureLayouts.delete(model);
           currentStepInMeasure = 0;
-          playingMeasureIndex = (playingMeasureIndex + 1) % measures.length;
+          playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : (playingMeasureIndex + 1) % measures.length;
           advanceSilentCycle();
-          if(typeof songAtEnd==='function' && songAtEnd())return;
+          if(!loopedMeasure && typeof songAtEnd==='function' && songAtEnd())return;
           continue;
         }
 
@@ -2812,9 +2911,9 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         if (currentStepInMeasure >= measureTotalSteps(m)) {
           scheduledMeasureLayouts.delete(model);
           currentStepInMeasure = 0;
-          playingMeasureIndex = (playingMeasureIndex + 1) % measures.length;
+          playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : (playingMeasureIndex + 1) % measures.length;
           advanceSilentCycle();
-          if(typeof songAtEnd==='function' && songAtEnd())return;
+          if(!loopedMeasure && typeof songAtEnd==='function' && songAtEnd())return;
         }
       }
       timerID = setTimeout(scheduler, lookahead);
@@ -2973,8 +3072,9 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 
     const renderSequencerListMetronome = renderSequencerList;
     renderSequencerList = function() {
-      if (appMode === 'polyrhythm') return renderPolyrhythmList();
-      return renderSequencerListMetronome();
+      if (appMode === 'polyrhythm') renderPolyrhythmList();
+      else renderSequencerListMetronome();
+      decorateSequenceCards();
     };
 
     const renderActiveMeasureMetronome = renderActiveMeasure;
@@ -3025,7 +3125,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         const nextU=(polyEventIndex+1<events.length)?events[polyEventIndex+1].u:1;
         nextNoteTime += Math.max(.001,(nextU-e.u)*cycleSec);
         polyEventIndex++;
-        if(polyEventIndex>=events.length){ polyEventIndex=0; playingMeasureIndex=(playingMeasureIndex+1)%measures.length; }
+        if(polyEventIndex>=events.length){ polyEventIndex=0; playingMeasureIndex=loopedMeasure&&measures.includes(loopedMeasure)?measures.indexOf(loopedMeasure):(playingMeasureIndex+1)%measures.length; }
       }
       timerID=setTimeout(scheduler,lookahead);
     }
@@ -3075,10 +3175,10 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       }
       if (isPlaying) return;
       isPlaying = true;
-      playingMeasureIndex = 0;
+      playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : 0;
       currentStepInMeasure = 0;
       polyEventIndex = 0;
-      activeMeasureIndex = 0;
+      activeMeasureIndex = playingMeasureIndex;
       resetSilentCycle();
       scheduledMeasureLayouts = new WeakMap();
       renderSequencerList();
@@ -3103,6 +3203,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     }
 
     function stopMetronome({ keepTrainingMode = false } = {}) {
+      loopedMeasure = null;
       if (!isPlaying) return;
       isPlaying = false;
       updateTrainButton();
@@ -3375,6 +3476,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     });
 
     measureCountSel.addEventListener('change', () => {
+      if (loopedMeasure) stopMetronome();
       const n = Math.max(1, Math.min(8, parseInt(measureCountSel.value)));
       if (appMode === 'polyrhythm') {
         while (measures.length < n) measures.push(createPolyMeasure(5, 4, tempo));
@@ -3584,5 +3686,8 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   <script src="navigation-history.js?v=20261008-semantic-back"></script>
   <script src="rhythm-score.js?v=20261010-long-pulse1"></script>
   <script src="edit-history.js?v=20261010-undo2"></script>
+<script>
+(()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const label=playing?'Arrêter':(playBtn.textContent.trim()||'Démarrer');playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();
+</script>
 </body>
 </html>

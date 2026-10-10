@@ -1259,7 +1259,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 </style>
   <link rel="stylesheet" href="mobile-landscape.css?v=20261008-landscape">
   <link rel="stylesheet" href="training-modes.css?v=20261010-duration-unit1">
-  <link rel="stylesheet" href="rhythm-score.css?v=20261010-long-pulse1">
+  <link rel="stylesheet" href="rhythm-score.css?v=20261011-selection-play1">
 
 <style>
   /* Center the main transport independently of the compact reset control. */
@@ -3771,7 +3771,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   <script src="training-modes.js?v=20261010-undo1"></script>
   <script src="compact-controls.js?v=20261009-header-icons"></script>
   <script src="navigation-history.js?v=20261008-semantic-back"></script>
-  <script src="rhythm-score.js?v=20261011-blue-selection1"></script>
+  <script src="rhythm-score.js?v=20261011-selection-play1"></script>
   <script src="edit-history.js?v=20261010-undo2"></script>
 <script>
 (()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();

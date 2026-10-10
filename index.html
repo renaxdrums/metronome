@@ -1303,7 +1303,6 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 #playBtn.btn-cyan{background:rgba(0,229,255,.18)!important;border-color:var(--cyan)!important;}
 #playBtn.btn-cyan::before{width:10px;height:10px;border:0;border-radius:1px;background:var(--cyan);}
 #playBtn:disabled{opacity:.45;}
-#playBtn .transport-inner-line{position:absolute;inset:4px;border:1px solid rgba(255,107,0,.7);border-radius:3px;pointer-events:none;}
 @media(prefers-reduced-motion:reduce){#playBtn{transition:none;}}
 </style>
 </head>
@@ -3775,7 +3774,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   <script src="rhythm-score.js?v=20261010-long-pulse1"></script>
   <script src="edit-history.js?v=20261010-undo2"></script>
 <script>
-(()=>{const sync=()=>{if(!playBtn.querySelector('.transport-inner-line')){const line=document.createElement('span');line.className='transport-inner-line';line.setAttribute('aria-hidden','true');playBtn.append(line);}const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();
+(()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();
 </script>
 </body>
 </html>

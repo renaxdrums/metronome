@@ -3199,7 +3199,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       playhead.startTime = performance.now();
       clearProgressTrail();
       scheduler();
-      } finally { playbackStarting = false; updateTrainButton(); }
+      } finally { playbackStarting = false; updateTrainButton(); renderSequencerList(); }
     }
 
     function stopMetronome({ keepTrainingMode = false } = {}) {

@@ -1980,6 +1980,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     }
 
     let isPlaying = false;
+    let playbackStarting = false;
     let tempo = 120;
     let measures = [];
     let metronomeMeasures = [];
@@ -3062,7 +3063,10 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     polyDenominatorInput.addEventListener('change',updateActivePolyRatio);
 
     async function startMetronome() {
-      if (isPlaying) return;
+      if (isPlaying || playbackStarting) return;
+      playbackStarting = true;
+      updateTrainButton();
+      try {
       await initAudio();
       try {
         await ensureVoiceMetronomeReady(currentBank);
@@ -3095,11 +3099,13 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       playhead.startTime = performance.now();
       clearProgressTrail();
       scheduler();
+      } finally { playbackStarting = false; updateTrainButton(); }
     }
 
     function stopMetronome({ keepTrainingMode = false } = {}) {
       if (!isPlaying) return;
       isPlaying = false;
+      updateTrainButton();
       clearTimeout(timerID);
       timerID = null;
       for (const src of scheduledVoiceSources) src.stop();
@@ -3141,6 +3147,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     });
 
     function startTraining() {
+      if (!training.engaged && (isPlaying || playbackStarting || window.RENAX_SONGS?.preparing)) return;
       let dur = parseFloat(trainDurationInput.value);
       if (!Number.isFinite(dur) || dur <= 0) dur = 3;
       dur = Math.max(1, Math.min(Number(trainDurationInput.max) || 60, dur));
@@ -3228,6 +3235,9 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     }
 
     function updateTrainButton() {
+      const blocked = !training.engaged && (isPlaying || playbackStarting || window.RENAX_SONGS?.preparing);
+      trainBtn.disabled = !!blocked;
+      trainBtn.title = blocked ? 'Arrête la lecture avant de démarrer l’entraînement' : '';
       window.RENAX_TRAINING?.update();
       if (training.engaged) {
         trainBtn.textContent = "Arrêter l'entraînement";
@@ -3245,6 +3255,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     }
 
     trainBtn.addEventListener('click', () => {
+      if (trainBtn.disabled) return;
       if (training.engaged) {
         if (isPlaying) stopMetronome({ keepTrainingMode: true });
         endTraining();

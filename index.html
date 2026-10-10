@@ -1294,14 +1294,15 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 .sequence-more-actions{position:absolute;right:35px;bottom:0;padding:5px;border:1px solid #3b3b46;background:#191a21;border-radius:8px;z-index:20;box-shadow:0 8px 24px #0008;}
 .sequence-more-actions button{width:auto;padding:0 12px;font:600 12px var(--font);}
 #measureList .drop-target{border-top:3px solid var(--cyan);}#measureList .measure-card{touch-action:none;}#measureList .dragging{border-color:var(--orange);cursor:grabbing;} .sequence-drag-placeholder{border:1px dashed var(--orange);border-radius:8px;background:#ff6b0010;}
-#playBtn{position:relative;width:58px!important;min-width:58px!important;height:58px!important;min-height:58px!important;padding:0!important;border-radius:50%!important;background:linear-gradient(145deg,#ff922e,#ff6b00)!important;border:1px solid #ffad61!important;box-shadow:0 4px 14px #0007,inset 0 1px 0 #ffffff45!important;font-size:0!important;transition:transform .15s,box-shadow .15s;}
-#playBtn:hover{transform:translateY(-1px);box-shadow:0 5px 20px #ff6b0033,inset 0 1px 0 #ffffff55!important;}
-#playBtn:active{transform:translateY(1px);}
-#playBtn:focus-visible{outline:2px solid var(--cyan);outline-offset:4px;}
-#playBtn::before{content:'';display:block;position:absolute;left:23px;top:18px;width:0;height:0;border-left:16px solid #141418;border-top:10px solid transparent;border-bottom:10px solid transparent;}
-#playBtn.btn-cyan{background:linear-gradient(145deg,#33edff,#00bfd6)!important;border-color:#6af3ff!important;}
-#playBtn.btn-cyan::before{left:19px;top:19px;width:18px;height:18px;border:0;border-radius:3px;background:#141418;}
-#playBtn:disabled{opacity:.5;transform:none;}
+#playBtn{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:9px;width:auto!important;min-width:116px!important;height:42px!important;min-height:42px!important;padding:10px 18px!important;border-radius:7px!important;background:rgba(0,229,255,.08)!important;border:1px solid rgba(0,229,255,.65)!important;box-shadow:none!important;color:var(--text)!important;font-size:0!important;line-height:1.35;transition:background .15s,border-color .15s;}
+#playBtn::before{content:'';position:static;display:block;flex:none;width:0;height:0;border-left:10px solid var(--cyan);border-top:6px solid transparent;border-bottom:6px solid transparent;}
+#playBtn::after{content:attr(data-transport-label);font:600 11px/1.35 var(--font);letter-spacing:.3px;text-transform:none;}
+#playBtn:hover{background:rgba(0,229,255,.14)!important;border-color:var(--cyan)!important;transform:none;box-shadow:none!important;}
+#playBtn:active{background:rgba(0,229,255,.22)!important;}
+#playBtn:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(0,229,255,.24)!important;}
+#playBtn.btn-cyan{background:rgba(0,229,255,.18)!important;border-color:var(--cyan)!important;}
+#playBtn.btn-cyan::before{width:10px;height:10px;border:0;border-radius:1px;background:var(--cyan);}
+#playBtn:disabled{opacity:.45;}
 @media(prefers-reduced-motion:reduce){#playBtn{transition:none;}}
 </style>
 </head>
@@ -3729,7 +3730,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   <script src="rhythm-score.js?v=20261010-long-pulse1"></script>
   <script src="edit-history.js?v=20261010-undo2"></script>
 <script>
-(()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const label=playing?'Arrêter':(playBtn.textContent.trim()||'Démarrer');playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();
+(()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();
 </script>
 </body>
 </html>

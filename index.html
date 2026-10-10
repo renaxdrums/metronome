@@ -1260,6 +1260,16 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   <link rel="stylesheet" href="mobile-landscape.css?v=20261008-landscape">
   <link rel="stylesheet" href="training-modes.css?v=20261010-duration-unit1">
   <link rel="stylesheet" href="rhythm-score.css?v=20261010-long-pulse1">
+
+<style>
+  /* Center the main transport independently of the compact reset control. */
+  .visu-bottom{align-self:stretch;width:100%;}
+  .visu-bottom .footer-center{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);width:100%;gap:8px;}
+  .visu-bottom .footer-center #playBtn,
+  .visu-bottom .footer-center #playBtn[data-song-transport="true"]{grid-column:2;justify-self:center;width:auto;min-width:104px;}
+  .visu-bottom .footer-center #panicBtn{grid-column:3;justify-self:end;width:64px;min-width:64px;padding-inline:8px;}
+  @media(max-width:1100px){footer>.visu-bottom{flex:1;}.visu-bottom .footer-center #playBtn{min-width:104px;}}
+</style>
 </head>
 <body>
 

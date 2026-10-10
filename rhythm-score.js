@@ -16,7 +16,7 @@
  const frozen=new WeakMap(),scheduling=getSchedulingMeasure;
  getSchedulingMeasure=function(m){const result=scheduling(m),saved=frozen.get(m);if(saved&&saved.layout===scheduledMeasureLayouts.get(m))return {...result,beatStates:saved.states};frozen.delete(m);return result;};
  function save(model){const m=measures[activeMeasureIndex];if(isPlaying&&!frozen.has(m)&&scheduledMeasureLayouts.has(m)){const current=scheduling(m);frozen.set(m,{layout:scheduledMeasureLayouts.get(m),states:current.beatStates.map(s=>[...s])});}core.commitModel(m,model);lastKey='';renderActiveMeasure();refreshMeasurePreviews();refreshBeatEditor();draw();renderEditor();layout();}
- function selectEvent(index){if(!editing)return;selected=index;selectedMeasure=measures[activeMeasureIndex];const m=selectedMeasure,event=core.editorModel(m).events[index];if(event)save(core.changeEvent(m,index,{state:(event.state+1)%4}));}
+ function selectEvent(index){if(!editing)return;const m=measures[activeMeasureIndex],event=core.editorModel(m).events[index];if(!event)return;const alreadySelected=selected===index&&selectedMeasure===m;selected=index;selectedMeasure=m;if(alreadySelected){save(core.changeEvent(m,index,{state:(event.state+1)%4}));}else{lastKey='';draw();renderEditor();layout();}}
 
  function button(text,fn,parent=editor){const b=document.createElement('button');b.type='button';b.textContent=text;b.onclick=fn;parent.append(b);return b;}
  function attempt(fn){try{fn();}catch(error){message.textContent=error.message;}}

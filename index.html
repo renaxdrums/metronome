@@ -1314,7 +1314,11 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 .tempo-step-button:disabled{opacity:.35;cursor:default}
 .tempo-step-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 @media(pointer:coarse){.tempo-step-button{flex-basis:40px;width:40px;height:44px}}
-</style><style id="circular-view-legend">body:has(.panel-visu:not(.score-view)) .visu-bottom > .legend{display:none!important}</style></head>
+</style><style id="circular-view-legend">body:has(.panel-visu:not(.score-view)) .visu-bottom > .legend{display:none!important}</style><style>
+.panel-visu .visu-toolbar #trainTimer{margin-left:auto;flex:0 0 auto;font-size:24px;font-weight:700;line-height:1.2;letter-spacing:.5px;font-variant-numeric:tabular-nums;opacity:1;color:var(--cyan);}
+@media(max-width:600px){.panel-visu .visu-toolbar #trainTimer{font-size:20px;}}
+</style>
+</head>
 <body>
 
   <header>
@@ -1446,7 +1450,6 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 
       <div class="panel-title with-timer">
         <span><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17V7M7 17v-4M11 17V9M15 17v-7M19 17V5M3 17h18"/></svg>VISUALISATION</span>
-        <span class="train-timer" id="trainTimer">0:00</span>
       </div>
 
       <div class="score-view-switch" id="scoreViewSwitch" role="group" aria-label="Vue de visualisation"><button id="scoreMetronomeBtn" type="button" class="active" aria-label="Vue métronome circulaire" aria-pressed="true" aria-controls="sequencerContainer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 20h10L14 4h-4L7 20ZM12 16l6-9M9 20v-3h6v3"/></svg>Métronome</button><button id="scorePartitionBtn" type="button" aria-label="Vue partition" aria-pressed="false" aria-controls="rhythmScore"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17V5l9-2v12"/><ellipse cx="6.5" cy="17.5" rx="2.5" ry="1.8"/><ellipse cx="15.5" cy="15.5" rx="2.5" ry="1.8"/></svg>Partition</button></div>
@@ -1511,6 +1514,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
             </select>
           </div>
         </div>
+        <span class="train-timer" id="trainTimer">0:00</span>
       </div>
 
       <div class="sequencer-wrapper">

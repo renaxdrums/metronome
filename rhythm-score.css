@@ -115,4 +115,6 @@ html,body,body *{scrollbar-width:thin!important;scrollbar-color:rgba(0,229,255,.
 @media(max-height:500px){.score-duration-tools{grid-template-rows:repeat(2,30px);}.score-duration-tools button{height:30px;}.score-duration-tools button svg{width:23px;height:23px;}}
 
 .score-tools-panel .rhythm-editor{container-type:inline-size;}
-@container(min-width:430px){.score-duration-tools{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:42px;gap:3px;}}
+
+
+@media(min-width:601px) and (min-height:501px){.score-duration-tools{grid-template-rows:repeat(2,46px);gap:6px;}.score-duration-tools button{height:46px;background:#1b1c23;}.score-duration-tools button svg{width:32px;height:32px;}}

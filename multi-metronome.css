@@ -53,3 +53,11 @@
 .multi-empty-message{color:var(--text-muted);text-align:center;font-size:12px;padding:20px 5px}
 @media(max-width:1100px){.multi-mode-tabs button{min-height:40px;font-size:12px}.multi-track{padding:12px}.multi-beats{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}}
 
+
+.multi-modal-overlay{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:20px;background:#0009}
+.multi-modal{width:min(360px,100%);box-sizing:border-box;padding:20px;border:1px solid #008e9f;border-radius:10px;background:#1c1e27;box-shadow:0 18px 60px #0009}
+.multi-modal h3{font-size:14px;font-weight:600;margin:0 0 16px;color:var(--text)}
+.multi-modal input{width:100%;box-sizing:border-box;height:40px;padding:8px 10px;border:1px solid var(--border);color:var(--text);font-size:13px}
+.multi-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.multi-modal-actions button{padding:9px 15px;border:1px solid var(--border);border-radius:6px;background:#282b35;color:var(--text);font-size:12px;cursor:pointer}
+.multi-modal-actions button:last-child{border-color:var(--cyan);background:rgba(0,207,232,.10)}

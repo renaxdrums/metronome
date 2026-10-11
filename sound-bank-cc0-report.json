@@ -57,36 +57,52 @@
   ],
   "additionalBanks": {
     "license": "CC0-1.0",
-    "source": "Original mathematical synthesis for RENAX; no Ableton audio copied.",
+    "source": "https://stash.reaper.fm/40824/Metronomes.zip",
+    "commonAttackRms": 0.075,
+    "denseAbsolutePeakBound": 0.4337739500626868,
     "samples": [
       {
         "key": "proDigital",
         "name": "Clic studio",
-        "peak": 0.5150834026992475,
+        "path": "Synth_Sine_A_lo.wav",
+        "url": "https://stash.reaper.fm/40824/Metronomes.zip#Synth_Sine_A_lo.wav",
+        "sha256": "bf0dc0e2e9b62c61df46adce4c93039e7c8f8c9a668a5bfbf9b55c03eecb9436",
         "attackRms": 0.075,
-        "seconds": 0.045
+        "peak": 0.12879291574684357,
+        "seconds": 0.12
       },
       {
         "key": "proQuartz",
-        "name": "Clic quartz",
-        "peak": 0.627664485446299,
-        "attackRms": 0.075,
-        "seconds": 0.045
+        "name": "Métronome quartz",
+        "path": "Perc_MetronomeQuartz_lo.wav",
+        "url": "https://stash.reaper.fm/40824/Metronomes.zip#Perc_MetronomeQuartz_lo.wav",
+        "sha256": "110cb49276835b749fb1b719a31cb865c0617989205fe0e31229876df98e31db",
+        "attackRms": 0.07500000000000001,
+        "peak": 0.5033043380703841,
+        "seconds": 0.12
       },
       {
         "key": "proTick",
-        "name": "Clic précis",
-        "peak": 0.7052461223484073,
+        "name": "Tick sec",
+        "path": "Synth_Tick_A_lo.wav",
+        "url": "https://stash.reaper.fm/40824/Metronomes.zip#Synth_Tick_A_lo.wav",
+        "sha256": "49c925abe4da67836d961227d12a883594399cec3b3c73c23ea75e3e262cd908",
         "attackRms": 0.075,
-        "seconds": 0.045
+        "peak": 0.23264702917249838,
+        "seconds": 0.12
       },
       {
         "key": "proSoft",
-        "name": "Clic doux",
-        "peak": 0.43700309417598093,
-        "attackRms": 0.075,
-        "seconds": 0.045
+        "name": "Bloc électronique",
+        "path": "Synth_Block_A_lo.wav",
+        "url": "https://stash.reaper.fm/40824/Metronomes.zip#Synth_Block_A_lo.wav",
+        "sha256": "71f135f2bd3d90c6da5fba42445e61f4b9ee7d01600d7752fd9e8101ff04bf74",
+        "attackRms": 0.07500000000000001,
+        "peak": 0.25837851828597175,
+        "seconds": 0.12
       }
-    ]
+    ],
+    "author": "Ludwig Peter Müller",
+    "licenseEvidence": "Credits.txt: Free to use under the license \"Creative Commons CC0 1.0 Universal\""
   }
 }

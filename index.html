@@ -1829,7 +1829,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 
         // La voix reste à sa hauteur naturelle : aucune accélération/pitch liée au tempo.
         // Le timing du métronome reste piloté par Web Audio, indépendamment de la durée du sample.
-        const attack = VOICE_ATTACK_SECONDS[gender][beatNumber] || 0;
+        const attack = Number.isFinite(context.voiceAnchorSeconds) ? context.voiceAnchorSeconds : (VOICE_ATTACK_SECONDS[gender][beatNumber] || 0);
         const sourceTime = time - attack;
         // If a callback was delayed, skip only the elapsed pre-roll rather than
         // shifting this beat or every following beat. Normal scheduling is ahead.
@@ -3843,7 +3843,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     prepareAllVoiceAudio().catch(() => {});
   </script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
-  <script src="amorce-song.js?v=20261010-label-fast1"></script>
+  <script src="amorce-song.js?v=20261011-guide-count-sync1"></script>
   <script src="songs-index2.js?v=20261011-back-icon2"></script>
   <script type="module" src="cloud-backup.js?v=20261009-account-colors"></script>
   <script>

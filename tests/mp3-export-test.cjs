@@ -20,6 +20,7 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
   });
   await p.reload();await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
   await p.getByRole('tab',{name:'Morceaux',exact:true}).click();await p.getByRole('button',{name:'Playlist',exact:true}).click();
+  await p.getByRole('button',{name:'Ouvrir la playlist Morceaux',exact:true}).click();
   await p.locator('#mp3ExportOpen').click();
   await p.locator('#mp3ExportDialog').waitFor({state:'visible'});
   assert.deepStrictEqual(await p.locator('#mp3ExportSong option').allTextContents(),fixtures.map(s=>s.name));

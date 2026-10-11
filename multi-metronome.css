@@ -59,3 +59,6 @@
 .multi-track-body[hidden]{display:none!important}
 .multi-collapsed .multi-track-head{margin-bottom:0}
 .multi-track .measure-preview{margin-top:4px}
+
+.multi-preset-status{color:var(--text-muted);font-size:10px;line-height:1.5;overflow-wrap:anywhere;margin-top:-3px}
+.multi-preset-status[hidden]{display:none}

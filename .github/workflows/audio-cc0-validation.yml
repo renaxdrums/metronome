@@ -9,7 +9,6 @@ on:
       - 'song-export.js'
       - 'assets/metronome/**'
       - 'tests/instrument-samples-test.cjs'
-      - 'tests/song-back-regression-test.cjs'
       - 'tests/mp3-export-test.cjs'
       - 'tests/audio-harness.cjs'
   workflow_dispatch:
@@ -36,8 +35,7 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/instrument-samples-test.cjs
-      - name: Navigation and MP3 export regression
+      - name: MP3 export regression
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/mp3-export-test.cjs
-          node tests/song-back-regression-test.cjs

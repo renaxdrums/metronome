@@ -35,3 +35,5 @@ input:not([type=range]):focus-visible,select:focus-visible,.numbox-button:focus-
 /* Apply the approved UI face consistently, preserving SVG musical notation. */
 body :not(svg):not(svg *){font-family:var(--font)!important;}
 input,select,.train-timer,.measure-sig,.volume-value{font-variant-numeric:tabular-nums;}
+
+.measure-card input.measure-tempo-input{font-family:var(--font)!important;}

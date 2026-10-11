@@ -15,7 +15,7 @@
       --text-muted: #7a7a8a;
       --orange: #ff6b00;
       --cyan: #00e5ff;
-      --yellow: #ffea00;
+      --yellow: #168a45;
       --grey: #2a2a35;
       --grey-hover: #3a3a45;
       --font: 'Inter', sans-serif;
@@ -391,7 +391,7 @@
     .step.editing { outline: 2px solid var(--orange); outline-offset: 3px; }
     .step[data-state="0"] { background: var(--grey); border-color: transparent; }
     .step[data-state="1"] { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
-    .step[data-state="2"] { background: var(--yellow); border-color: var(--yellow); box-shadow: 0 0 8px rgba(255, 234, 0, 0.4); }
+    .step[data-state="2"] { background: var(--yellow); border-color: var(--yellow); box-shadow: 0 0 8px rgba(22, 138, 69, 0.4); }
     .step[data-state="3"] { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 8px rgba(255, 107, 0, 0.4); }
 
     .step.active {
@@ -400,7 +400,7 @@
       z-index: 10; filter: brightness(1.5);
     }
     .step.active[data-state="1"] { box-shadow: 0 0 22px 4px rgba(0, 229, 255, 0.75), 0 0 42px 8px rgba(0, 229, 255, 0.35); }
-    .step.active[data-state="2"] { box-shadow: 0 0 22px 4px rgba(255, 234, 0, 0.75), 0 0 42px 8px rgba(255, 234, 0, 0.35); }
+    .step.active[data-state="2"] { box-shadow: 0 0 22px 4px rgba(22, 138, 69, 0.75), 0 0 42px 8px rgba(22, 138, 69, 0.35); }
     .step.active[data-state="3"] { box-shadow: 0 0 22px 4px rgba(255, 107, 0, 0.75), 0 0 42px 8px rgba(255, 107, 0, 0.35); }
     .step.active[data-state="0"] { box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.25); }
 
@@ -557,7 +557,7 @@
     .poly-dot { cursor:pointer; }
     .poly-dot[data-state="0"] { background:var(--grey); border-color:rgba(255,255,255,.16); box-shadow:none; }
     .poly-dot[data-state="1"] { background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 8px rgba(0,229,255,.40); }
-    .poly-dot[data-state="2"] { background:var(--yellow); border-color:var(--yellow); box-shadow:0 0 8px rgba(255,234,0,.40); }
+    .poly-dot[data-state="2"] { background:var(--yellow); border-color:var(--yellow); box-shadow:0 0 8px rgba(22,138,69,.40); }
     .poly-dot[data-state="3"] { background:var(--orange); border-color:var(--orange); box-shadow:0 0 8px rgba(255,107,0,.40); }
 
     .poly-dot.active { filter:brightness(1.65); border-color:#fff; }
@@ -2524,7 +2524,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     const pctx = canvas.getContext('2d');
     let particles = [];
     let pulses = [];
-    const STEP_RGB = { 1: [0, 229, 255], 2: [255, 234, 0], 3: [255, 107, 0], 0: [140, 150, 170] };
+    const STEP_RGB = { 1: [0, 229, 255], 2: [22, 138, 69], 3: [255, 107, 0], 0: [140, 150, 170] };
 
     function clearParticleCanvas() {
       pctx.save();

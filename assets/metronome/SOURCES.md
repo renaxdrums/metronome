@@ -23,7 +23,7 @@ Licence sources:
 
 - Each WAV is decoded and attack-aligned by an RMS window. No preroll is added to the beat grid. Peak alignment tolerance is checked separately from audio-interface latency.
 - Every instrumental one-shot uses a **single constant gain** based on 45 ms attack RMS, target 0.115, with a **constant-gain** peak-headroom constraint of 0.78. This is not a compressor, peak limiter, clipper, maximizer or waveshaper. No transient is digitally flattened.
-- The five instrumental bank busses have the **same** linear gain, 0.43, at 100% main volume. State-1/2/3 intentional accents are retained by factors 0.78/0.91/1.00, and the first pulse by 1.12.
+- The five instrumental bank busses have the **same** linear gain, 0.28, at 100% main volume. State-1/2/3 intentional accents are retained by factors 0.78/0.91/1.00, and the first pulse by 1.12.
 - The selected sound's release is reduced with a linear 6 ms fade at its tail to avoid overlapping excess resonance. The attack is not faded.
 - The original safety limiter remains byte-for-byte unchanged at -0.1 dBFS. Normal mixes are prepared with headroom to avoid touching it; abnormal or unforeseen overlaps can still trigger it.
 - The same sample data are loaded ahead of playback and ahead of MP3 offline rendering. Selection during playback triggers loading without changing the rhythm scheduler; until ready, the original oscillator is the safety fallback.

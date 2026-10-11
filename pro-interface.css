@@ -1,0 +1,25 @@
+/* RENAX: restrained graphite surfaces and readable interface typography. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+:root{--font:'Poppins',sans-serif;--bg:#0b0c10;--panel:#14151b;--border:#30313b;--text:#ededf3;--text-muted:#a1a3b3}
+body{font-family:var(--font);-webkit-font-smoothing:antialiased;background:#0b0c10;color:var(--text)}
+header{background:#0c0d11;border-bottom:1px solid #30313b}
+.brand-logo{width:37px!important;height:46px!important;object-fit:contain;mix-blend-mode:screen}
+.brand-name{font-weight:700;letter-spacing:.5px}
+.panel{background:linear-gradient(160deg,#17181f,#121319);border:1px solid #30313b;border-radius:12px;box-shadow:0 5px 18px #0002}
+.panel-title{font-weight:600;letter-spacing:1px;color:#aeb0bd}
+.control-group>label,.volume-row,.training-row label{letter-spacing:.3px;line-height:1.5}
+button,input,select,textarea{font-family:var(--font)}
+button{letter-spacing:.15px}
+input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#282a34;border-color:#3c3e4b;border-radius:7px}
+input:not([type=range]):focus-visible,select:focus-visible,.numbox-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.measure-card,.song-section,.song-card,.playlist-choice{border-radius:9px;background:#181a22}
+.song-tabs button,.mode-switch button,#modeSwitch button{font-weight:600;letter-spacing:.1px;border-radius:8px}
+.song-detail-toolbar button{font-weight:500;letter-spacing:0}
+.measure-card .measure-header,.song-section-header{font-weight:600}
+.song-hint,.song-status,.score-editor-hint{color:#a7a9b7;line-height:1.55}
+.btn:not(#playBtn):not(#trainBtn):not(.song-back){border-radius:7px}
+#playBtn,#trainBtn{font-family:var(--font);font-weight:600;letter-spacing:.15px}
+.numbox-option,.sound-bank-cards .numbox-option{font-family:var(--font)!important;font-weight:500!important;letter-spacing:0}
+@media(min-width:1101px){.panel-title{font-size:11px}.control-group>label{font-size:10px}.song-hint,.song-status{font-size:12px}}
+@media(max-width:1100px){.brand-logo{width:29px!important;height:36px!important}.panel{border-radius:9px}.song-tabs button,#modeSwitch button{font-size:12px}.numbox-button{font-size:12px}}
+

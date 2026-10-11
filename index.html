@@ -3415,7 +3415,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       scheduledMeasureLayouts = new WeakMap();
       renderSequencerList();
       renderActiveMeasure();
-      const voiceLead = appMode === 'metronome' && (SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active) ? VOICE_MAX_ATTACK_SECONDS : 0;
+      const voiceLead = appMode === 'metronome' && (SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active) ? Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds || 0) : 0;
       nextNoteTime = audioCtx.currentTime + 0.05 + voiceLead;
       window.RENAX_AMORCE?.begin(audioCtx,nextNoteTime);
       playBtn.textContent = 'STOP';

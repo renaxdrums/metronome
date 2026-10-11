@@ -40,3 +40,11 @@
 .training-section .training-duration-row{display:flex;align-items:center;gap:8px;}
 .training-section .training-duration-row input{flex:1;min-width:0;}
 .training-section .training-duration-row #trainDurationUnit{flex:0 0 96px;width:96px;min-width:0;}
+
+/* One shared height for the duration value and its unit selector. */
+.training-section .training-duration-row{--duration-control-height:32px;align-items:center;}
+.training-section .training-duration-row #trainDuration,
+.training-section .training-duration-row #trainDurationUnit,
+.training-section .training-duration-row .numbox-button{box-sizing:border-box;height:var(--duration-control-height)!important;min-height:var(--duration-control-height)!important;max-height:var(--duration-control-height)!important;margin:0;padding-top:0!important;padding-bottom:0!important;border-radius:6px;}
+@media(max-width:1100px){.training-section .training-duration-row{--duration-control-height:44px;}}
+@media(orientation:landscape) and (pointer:coarse) and (max-width:1100px) and (max-height:600px){.training-section .training-duration-row{--duration-control-height:32px;}}

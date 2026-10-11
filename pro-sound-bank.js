@@ -12,8 +12,13 @@ let volume=state===3?.55:state===2?.50:.45;if(isFirst||context.isOtherStrongBeat
 source.connect(gain);gain.connect(dest);scheduledVoiceSources.add(source);source.onended=()=>{scheduledVoiceSources.delete(source);source.disconnect();gain.disconnect();};source.start(time);
 }};
 BANK_GAINS[sample.key]=.8;
-const option=document.createElement('option');option.value=sample.key;option.textContent=sample.name;option.title='Sample acoustique · CC0 · Versilian Studios';menu.append(option);
+if(sample.key!=='proShaker'){const option=document.createElement('option');option.value=sample.key;option.textContent=sample.name;option.title='Sample acoustique · CC0 · Versilian Studios';menu.append(option);}
 }
+// Preserve saved Beep identifiers while replacing the arcade sound.
+SOUND_BANKS.beep=SOUND_BANKS.proShaker;
+BANK_GAINS.beep=BANK_GAINS.proShaker;
+const names={clic:'Clic bois',cloche:'Cowbell',claves:'Claves',clic808:'Kit TR-808',beep:'Shaker acoustique',voiceMale:'Voix masculine EN',voiceFemale:'Voix féminine EN'};
+for(const option of menu.options){if(names[option.value])option.textContent=names[option.value];}
 numboxWidgets.get(menu)?.rebuild();
 window.RENAX_PRO_SOUNDS={keys:samples.map(s=>s.key),license:'CC0-1.0',source:'https://versilian-studios.com/vsco-community/'};
 })();

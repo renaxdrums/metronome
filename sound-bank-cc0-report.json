@@ -1,0 +1,58 @@
+{
+  "license": "CC0-1.0",
+  "source": "https://versilian-studios.com/vsco-community/",
+  "commonAttackRms": 0.075,
+  "denseAbsolutePeakBound": 0.5228174912667037,
+  "samples": [
+    {
+      "key": "proClaves",
+      "name": "Claves acoustiques",
+      "path": "Percussion/Claves1_Hit_v2_rr1_Sum.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Claves1_Hit_v2_rr1_Sum.wav",
+      "sha256": "ae0493fa57d0d1dd57693e8639dfe5fd9675b520a1c0c0eb45cf992f2a23ca9c",
+      "attackRms": 0.075,
+      "peak": 0.4947768438406186,
+      "seconds": 0.12
+    },
+    {
+      "key": "proCowbell",
+      "name": "Cowbell acoustique",
+      "path": "Percussion/Cowbell1_Hit_v2_rr1_Sum.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Cowbell1_Hit_v2_rr1_Sum.wav",
+      "sha256": "7d9f6e6b6b36fd792aead29df0268c53255b95a886aaf765e57b7593562ff9a6",
+      "attackRms": 0.075,
+      "peak": 0.3716410374921353,
+      "seconds": 0.12
+    },
+    {
+      "key": "proTriangle",
+      "name": "Triangle \u00e9touff\u00e9",
+      "path": "Percussion/Triangle3-HitFM_v2_rr1_Sum.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Triangle3-HitFM_v2_rr1_Sum.wav",
+      "sha256": "5cc303f5aecd373bee11ca30176a69a80e1a8b7a4fb506218109cb12cad530a6",
+      "attackRms": 0.075,
+      "peak": 0.5029526350459833,
+      "seconds": 0.12
+    },
+    {
+      "key": "proShaker",
+      "name": "Shaker acoustique",
+      "path": "VSCO 1 Percussion/varWood/Camo's Shaker/shake1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/VSCO%201%20Percussion/varWood/Camo%27s%20Shaker/shake1.wav",
+      "sha256": "025ee4e9e80349cf1d593b02c39e14f17f643fd7f078da49e9b33989c53c0878",
+      "attackRms": 0.075,
+      "peak": 0.3968355211894664,
+      "seconds": 0.12
+    },
+    {
+      "key": "proGuiro",
+      "name": "Guiro percussif",
+      "path": "Percussion/Guiro-Hit_v1_rr1_Sum.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Guiro-Hit_v1_rr1_Sum.wav",
+      "sha256": "9416a82940edb5bb966f38508d3b8cd5d07392759e4eaa88c6b050fe4b9ab23c",
+      "attackRms": 0.07500000000000001,
+      "peak": 0.35508413853598814,
+      "seconds": 0.12
+    }
+  ]
+}

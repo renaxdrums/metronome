@@ -1,0 +1,34 @@
+/* Sound-bank cards: direct press/drag, touch hold, persistent order. */
+(()=>{
+ const select=document.getElementById('soundBank'),wrap=select.closest('.numbox-custom');if(!wrap)return;
+ const list=wrap.querySelector('.numbox-menu'),toggle=wrap.querySelector('.numbox-button'),storageKey='renax.soundBankOrder.v1';
+ wrap.classList.add('sound-bank-cards');let drag=null,suppressUntil=0;
+ const style=document.createElement('style');style.textContent=`
+ .sound-bank-cards{width:100%!important;min-width:0}
+ .sound-bank-cards .numbox-menu{position:fixed!important;z-index:10000!important;padding:8px!important;background:#17171d!important;border:1px solid #3d3d47;border-radius:8px;box-shadow:0 12px 30px #0009;overflow:auto!important;overscroll-behavior:contain;max-height:none!important;box-sizing:border-box}
+ .sound-bank-cards .numbox-option{display:flex!important;align-items:center;gap:12px;width:100%;min-height:44px!important;margin:0 0 6px!important;padding:10px 12px!important;background:#24242c!important;border:1px solid #3b3b45!important;border-radius:7px;color:var(--text)!important;text-align:left;font:600 12px/1.3 var(--font);cursor:grab;touch-action:pan-y;user-select:none}
+ .sound-bank-cards .numbox-option:last-child{margin-bottom:0!important}
+ .sound-bank-cards .numbox-option:hover{background:#303039!important;border-color:#656570!important}
+ .sound-bank-cards .numbox-option.active{background:#303038!important;border-color:var(--orange)!important}
+ .sound-bank-cards .numbox-option svg{width:19px;height:19px;flex:0 0 19px;fill:none;stroke:var(--orange);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+ .sound-bank-cards .numbox-option span{pointer-events:none}
+ .sound-bank-cards .numbox-option.dragging{opacity:.55;border-color:var(--orange)!important;cursor:grabbing;touch-action:none}
+ .sound-bank-cards .numbox-option:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+ `;document.head.append(style);
+ function reorder(keys){const selected=select.value,options=[...select.options];options.sort((a,b)=>{const ai=keys.indexOf(a.value),bi=keys.indexOf(b.value);return(ai<0?999:ai)-(bi<0?999:bi)});for(const o of options)select.append(o);select.value=selected;numboxWidgets.get(select)?.rebuild();}
+ try{const saved=JSON.parse(localStorage.getItem(storageKey)||'null');if(Array.isArray(saved))reorder(saved);}catch{}
+ function save(){const keys=[...list.querySelectorAll('.numbox-option')].map(x=>x.dataset.value);try{localStorage.setItem(storageKey,JSON.stringify(keys));}catch{}reorder(keys);}
+ function icon(key){if(/voice/i.test(key))return '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>';if(/water/i.test(key))return '<path d="M12 2C9 7 5 10 5 14a7 7 0 0 0 14 0c0-4-4-7-7-12Z"/>';if(/stick|claves/i.test(key))return '<path d="m4 3 15 17M20 3 5 20M3 4l2-2M19 2l2 2"/>';if(/cowbell|cloche/i.test(key))return '<path d="M8 4h8l4 16H4L8 4ZM5 16h14"/>';if(/triangle/i.test(key))return '<path d="m11 3-9 17h20L13 4M18 13l-5 4"/>';return '<path d="M3 12h3l3-8 6 16 3-8h3"/>';}
+ function decorate(){for(const item of list.querySelectorAll('.numbox-option')){if(item.dataset.bankCard)return;item.dataset.bankCard='1';const label=item.textContent;item.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+icon(item.dataset.value)+'</svg><span></span>';item.querySelector('span').textContent=label;item.title='Appuyer et glisser pour déplacer · Alt + flèche pour réordonner';item.setAttribute('aria-label',label);
+ item.addEventListener('click',e=>{if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();}},true);
+ item.addEventListener('pointerdown',e=>{if(e.button!==0)return;drag={item,id:e.pointerId,x:e.clientX,y:e.clientY,active:false,touch:e.pointerType==='touch',timer:null};if(drag.touch)drag.timer=setTimeout(()=>activate(),260);});
+ item.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const dist=Math.hypot(e.clientX-drag.x,e.clientY-drag.y);if(!drag.active){if(drag.touch&&dist>8){clearTimeout(drag.timer);drag=null;return;}if(!drag.touch&&dist>6)activate();}if(!drag?.active)return;e.preventDefault();const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.numbox-option');if(target&&target!==drag.item&&list.contains(target)){const r=target.getBoundingClientRect();list.insertBefore(drag.item,e.clientY<r.top+r.height/2?target:target.nextSibling);}const bounds=list.getBoundingClientRect();if(e.clientY<bounds.top+35)list.scrollTop-=12;else if(e.clientY>bounds.bottom-35)list.scrollTop+=12;});
+ item.addEventListener('pointerup',finish);item.addEventListener('pointercancel',()=>finish(null));
+ item.addEventListener('keydown',e=>{if(!e.altKey||!['ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const sibling=e.key==='ArrowUp'?item.previousElementSibling:item.nextElementSibling;if(!sibling)return;const key=item.dataset.value;list.insertBefore(item,e.key==='ArrowUp'?sibling:sibling.nextSibling);save();list.querySelector('[data-value="'+key+'"]')?.focus();});
+ }}
+ function activate(){if(!drag)return;drag.active=true;drag.item.classList.add('dragging');drag.item.setPointerCapture(drag.id);}
+ function finish(event){if(!drag)return;const active=drag.active;clearTimeout(drag.timer);drag.item.classList.remove('dragging');if(drag.item.hasPointerCapture(drag.id))drag.item.releasePointerCapture(drag.id);drag=null;if(active){suppressUntil=Date.now()+400;if(event)save();}}
+ function position(){if(!wrap.classList.contains('open'))return;const r=toggle.getBoundingClientRect(),width=Math.min(Math.max(r.width,250),innerWidth-16),below=innerHeight-r.bottom-8,above=r.top-8;const down=below>=Math.min(300,above),height=Math.min(420,Math.max(80,down?below:above));list.style.width=width+'px';list.style.height=height+'px';list.style.left=Math.min(Math.max(8,r.left),innerWidth-width-8)+'px';list.style.top=(down?r.bottom+4:r.top-height-4)+'px';}
+ new MutationObserver(decorate).observe(list,{childList:true});new MutationObserver(position).observe(wrap,{attributes:true,attributeFilter:['class']});window.addEventListener('resize',position);document.addEventListener('scroll',position,true);decorate();
+})();
+

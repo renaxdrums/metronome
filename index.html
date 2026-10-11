@@ -1258,7 +1258,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     .mobile-tabs button.active .orange-ui-icon { stroke: #000; opacity: 1; visibility: visible; }
 </style>
   <link rel="stylesheet" href="mobile-landscape.css?v=20261008-landscape">
-  <link rel="stylesheet" href="training-modes.css?v=20261011-duration-height1">
+  <link rel="stylesheet" href="training-modes.css?v=20261011-training-play1">
   <link rel="stylesheet" href="rhythm-score.css?v=20261011-tools-two-rows1">
 
 <style>
@@ -3423,6 +3423,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     }
 
     function updateTrainButton() {
+      trainBtn.setAttribute('aria-pressed',String(training.engaged));
       const blocked = !training.engaged && (isPlaying || playbackStarting || window.RENAX_SONGS?.preparing);
       trainBtn.disabled = !!blocked;
       trainBtn.title = blocked ? 'Arrête la lecture avant de démarrer l’entraînement' : '';

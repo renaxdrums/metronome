@@ -1305,7 +1305,16 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 #playBtn:disabled{opacity:.45;}
 @media(prefers-reduced-motion:reduce){#playBtn{transition:none;}}
 </style>
-</head>
+<style>
+.tempo-slider-row{display:flex;align-items:center;gap:6px;width:100%}
+.tempo-slider-row #bpmSlider{flex:1;min-width:0;width:auto;margin:0}
+.tempo-step-button{display:flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:32px;padding:0;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.025);color:var(--orange);cursor:pointer}
+.tempo-step-button svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tempo-step-button:hover{border-color:var(--orange);background:rgba(255,111,0,.08)}
+.tempo-step-button:disabled{opacity:.35;cursor:default}
+.tempo-step-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+@media(pointer:coarse){.tempo-step-button{flex-basis:40px;width:40px;height:44px}}
+</style></head>
 <body>
 
   <header>
@@ -1339,7 +1348,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       <div class="control-group">
         <label><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 20h10L14 4h-4L7 20Z M12 16l6-9 M9 20v-3h6v3"/></svg>Tempo (noire)</label>
         <div class="tempo-display" id="bpmDisplay">120 <span>BPM</span></div>
-        <input type="range" id="bpmSlider" min="20" max="300" value="120">
+        <div class="tempo-slider-row"><button type="button" id="tempoDecrease" class="tempo-step-button" aria-label="Diminuer le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><input type="range" id="bpmSlider" min="20" max="300" value="120"><button type="button" id="tempoIncrease" class="tempo-step-button" aria-label="Augmenter le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
         <button class="tap-tempo-btn" id="tapBtn" type="button">
           <span><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 13V5a2 2 0 0 1 4 0v7l3-1 4 3-2 7H9l-5-7a2 2 0 0 1 3-2l2 1Z"/></svg>TAP TEMPO</span>
           <span class="key-hint">NUM 0</span>
@@ -3777,5 +3786,11 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 <script>
 (()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();
 </script>
-</body>
+<script>(()=>{
+const decrease=document.getElementById('tempoDecrease'),increase=document.getElementById('tempoIncrease');
+function sync(){const value=Number(bpmSlider.value),locked=training.engaged||bpmSlider.disabled;decrease.disabled=locked||value<=Number(bpmSlider.min);increase.disabled=locked||value>=Number(bpmSlider.max);}
+function adjust(delta){if(training.engaged||bpmSlider.disabled)return;const next=Math.max(Number(bpmSlider.min),Math.min(Number(bpmSlider.max),Number(bpmSlider.value)+delta));if(next!==Number(bpmSlider.value)){bpmSlider.value=String(next);bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));}sync();}
+decrease.addEventListener('click',()=>adjust(-1));increase.addEventListener('click',()=>adjust(1));bpmSlider.addEventListener('input',sync);
+new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});new MutationObserver(sync).observe(trainBtn,{attributes:true,attributeFilter:['aria-pressed','class']});sync();
+})();</script></body>
 </html>

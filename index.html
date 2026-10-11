@@ -1348,7 +1348,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       <div class="control-group">
         <label><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 20h10L14 4h-4L7 20Z M12 16l6-9 M9 20v-3h6v3"/></svg>Tempo (noire)</label>
         <div class="tempo-display" id="bpmDisplay">120 <span>BPM</span></div>
-        <div class="tempo-slider-row"><button type="button" id="tempoDecrease" class="tempo-step-button" aria-label="Diminuer le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><input type="range" id="bpmSlider" min="20" max="300" value="120"><button type="button" id="tempoIncrease" class="tempo-step-button" aria-label="Augmenter le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
+        <div class="tempo-slider-row"><button type="button" id="tempoDecrease" class="tempo-step-button" aria-label="Diminuer le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><input type="range" id="bpmSlider" min="2" max="999" value="120"><button type="button" id="tempoIncrease" class="tempo-step-button" aria-label="Augmenter le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
         <button class="tap-tempo-btn" id="tapBtn" type="button">
           <span><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 13V5a2 2 0 0 1 4 0v7l3-1 4 3-2 7H9l-5-7a2 2 0 0 1 3-2l2 1Z"/></svg>TAP TEMPO</span>
           <span class="key-hint">NUM 0</span>
@@ -1392,12 +1392,12 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         </div>
         <div class="training-row">
           <span class="row-label">Début</span>
-          <input type="number" id="trainStart" min="20" max="300" step="1" value="80" inputmode="numeric">
+          <input type="number" id="trainStart" min="2" max="999" step="1" value="80" inputmode="numeric">
           <span class="unit">BPM</span>
         </div>
         <div class="training-row">
           <span class="row-label">Fin</span>
-          <input type="number" id="trainEnd" min="20" max="300" step="1" value="140" inputmode="numeric">
+          <input type="number" id="trainEnd" min="2" max="999" step="1" value="140" inputmode="numeric">
           <span class="unit">BPM</span>
         </div>
         <button class="btn-train" id="trainBtn" type="button">Démarrer l'entraînement</button>
@@ -2066,7 +2066,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       const beatSubdivisions = Array(numerator).fill(defaultSubdivision);
       const beatStates = [];
       for (let b = 0; b < numerator; b++) beatStates.push(defaultSubdivision === 2 ? [1, 0] : [1]);
-      return { numerator, denominator, tempo: Math.max(20, Math.min(300, Math.round(measureTempo || 120))), beatSubdivisions, beatStates };
+      return { numerator, denominator, tempo: Math.max(2, Math.min(999, Math.round(measureTempo || 120))), beatSubdivisions, beatStates };
     }
 
     function measureTotalSteps(m) { return m.beatSubdivisions.reduce((a, b) => a + b, 0); }
@@ -2690,7 +2690,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         const tempoInput = document.createElement('input');
         tempoInput.type = 'number';
         tempoInput.className = 'measure-tempo-input';
-        tempoInput.min = '20'; tempoInput.max = '300'; tempoInput.step = '1';
+        tempoInput.min = '2'; tempoInput.max = '999'; tempoInput.step = '1';
         tempoInput.value = String(m.tempo);
         tempoInput.inputMode = 'numeric';
         tempoInput.setAttribute('aria-label', `Tempo mesure ${i + 1}`);
@@ -2702,7 +2702,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         const commitMeasureTempo = (rawValue, normalizeField = false) => {
           const parsed = parseInt(rawValue, 10);
           if (!Number.isFinite(parsed)) return;
-          const v = Math.max(20, Math.min(300, parsed));
+          const v = Math.max(2, Math.min(999, parsed));
           m.tempo = v;
           if (normalizeField) tempoInput.value = String(v);
           if (i === activeMeasureIndex && !training.engaged) syncTempoUI(m);
@@ -3054,7 +3054,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       return {
         numerator: n,
         denominator: d,
-        tempo: Math.max(20, Math.min(300, Math.round(measureTempo || 120))),
+        tempo: Math.max(2, Math.min(999, Math.round(measureTempo || 120))),
         isPolyrhythm: true,
         outerStates: Array(n).fill(3),
         innerStates: Array(d).fill(1)
@@ -3150,10 +3150,10 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         ratio.append(n,slash,d);
         const tempoRow=document.createElement('div'); tempoRow.className='measure-tempo-row';
         const tempoLabel=document.createElement('span'); tempoLabel.className='measure-tempo-label'; tempoLabel.textContent='TEMPO';
-        const tempoInput=document.createElement('input'); tempoInput.type='number'; tempoInput.className='measure-tempo-input'; tempoInput.min='20'; tempoInput.max='300'; tempoInput.step='1'; tempoInput.value=m.tempo; tempoInput.inputMode='numeric';
+        const tempoInput=document.createElement('input'); tempoInput.type='number'; tempoInput.className='measure-tempo-input'; tempoInput.min='2'; tempoInput.max='999'; tempoInput.step='1'; tempoInput.value=m.tempo; tempoInput.inputMode='numeric';
         const unit=document.createElement('span'); unit.className='measure-tempo-unit'; unit.textContent='BPM';
         tempoInput.addEventListener('click',stop); tempoInput.addEventListener('keydown',stop);
-        tempoInput.addEventListener('change',()=>{ const v=Math.max(20,Math.min(300,parseInt(tempoInput.value)||m.tempo)); m.tempo=v; tempoInput.value=v; if(i===activeMeasureIndex&&!training.engaged) syncTempoUI(m); });
+        tempoInput.addEventListener('change',()=>{ const v=Math.max(2, Math.min(999,parseInt(tempoInput.value)||m.tempo)); m.tempo=v; tempoInput.value=v; if(i===activeMeasureIndex&&!training.engaged) syncTempoUI(m); });
         tempoRow.append(tempoLabel,tempoInput,unit);
         const preview=document.createElement('div'); preview.className='poly-card-preview';
         const ob=document.createElement('div'); ob.className='outer-mini'; ob.style.width=`${Math.min(100,m.numerator*8)}px`;
@@ -3350,8 +3350,8 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       dur = Math.max(1, Math.min(Number(trainDurationInput.max) || 60, dur));
       trainDurationInput.value = dur;
 
-      let a = Math.max(20, Math.min(300, parseInt(trainStartInput.value) || 80));
-      let b = Math.max(20, Math.min(300, parseInt(trainEndInput.value) || 140));
+      let a = Math.max(2, Math.min(999, parseInt(trainStartInput.value) || 80));
+      let b = Math.max(2, Math.min(999, parseInt(trainEndInput.value) || 140));
       trainStartInput.value = a; trainEndInput.value = b;
 
       let sBpm, eBpm;
@@ -3479,7 +3479,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         for (let i = 1; i < tapTimes.length; i++) intervals.push(tapTimes[i] - tapTimes[i - 1]);
         const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
         const newBpm = Math.round(60000 / avg);
-        if (newBpm >= 20 && newBpm <= 300) {
+        if (newBpm >= 2 && newBpm <= 999) {
           if(tempo!==newBpm)resetCustomizationTimer();
           tempo = newBpm;
           const m = measures[activeMeasureIndex];
@@ -3707,7 +3707,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   </script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
   <script src="amorce-song.js?v=20261010-label-fast1"></script>
-  <script src="songs-index2.js?v=20261011-songs-stop1"></script>
+  <script src="songs-index2.js?v=20261011-tempo-2-999"></script>
   <script type="module" src="cloud-backup.js?v=20261009-account-colors"></script>
   <script>
     // Index 2 : ouvrir les morceaux de la playlist avec les sections repliées.
@@ -3778,7 +3778,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     arrange();desktop.addEventListener('change',arrange);
   })();
   </script>
-  <script src="training-modes.js?v=20261010-undo1"></script>
+  <script src="training-modes.js?v=20261011-tempo-2-999"></script>
   <script src="compact-controls.js?v=20261011-full-subdivision-menu1"></script>
   <script src="navigation-history.js?v=20261011-reload-view1"></script>
   <script src="rhythm-score.js?v=20261011-vivid-tools1"></script>

@@ -20,7 +20,7 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
   });
   await p.reload();await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
   await p.getByRole('tab',{name:'Morceaux',exact:true}).click();await p.getByRole('button',{name:'Playlist',exact:true}).click();
-  await p.getByRole('button',{name:'EXPORT MP3',exact:true}).click();
+  await p.locator('#mp3ExportOpen').click();
   await p.locator('#mp3ExportDialog').waitFor({state:'visible'});
   assert.deepStrictEqual(await p.locator('#mp3ExportSong option').allTextContents(),fixtures.map(s=>s.name));
   await p.screenshot({path:path.join(out,'mp3-export-dialog.png')});
@@ -71,7 +71,7 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
     const stillRunning=isPlaying,sameContext=audioCtx===originalCtx,sameMeasures=measures===originalMeasures;stopMetronome();playClick=original;
     return {stillRunning,sameContext,sameMeasures,events:exportLiveEvents};
   },fixtures[2]);assert(running.stillRunning&&running.sameContext&&running.sameMeasures);assert(running.events.length>4);for(let i=1;i<running.events.length;i++)assert(Math.abs(running.events[i].time-running.events[i-1].time-.5)<1e-9);
-  await p.setViewportSize({width:390,height:844});await p.locator('#mobileTabs button[data-tab=seq]').click();await p.getByRole('button',{name:'EXPORT MP3',exact:true}).click();const bounds=await p.locator('#mp3ExportDialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=390);await p.screenshot({path:path.join(out,'mp3-export-mobile.png')});await p.getByRole('button',{name:'Fermer',exact:true}).click();
+  await p.setViewportSize({width:390,height:844});await p.locator('#mobileTabs button[data-tab=seq]').click();await p.locator('#mp3ExportOpen').click();const bounds=await p.locator('#mp3ExportDialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=390);await p.screenshot({path:path.join(out,'mp3-export-mobile.png')});await p.getByRole('button',{name:'Fermer',exact:true}).click();
   assert.deepStrictEqual(errors,[]);
   const report={playlistButton:true,allSongsInSelect:true,multipleSelections:true,destination:{method:'File System Access API contract stub, writes to actual chosen-destination directory; native OS dialog not automated',pickerOptions,writes:writes.map(f=>path.basename(f)),cancel:true},defaultFilenames:true,liveStateUnchanged:true,running,noPerBlockVolume:true,limiter,silent,errors,exports};save('mp3-export-results.json',report);console.log('MP3 export tests passed');
  }finally{await r.browser.close();r.server?.close();}

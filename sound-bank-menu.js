@@ -1,6 +1,6 @@
 /* Sound-bank cards: direct press/drag, touch hold, persistent order. */
-(()=>{
- const select=document.getElementById('soundBank'),wrap=select.closest('.numbox-custom');if(!wrap)return;
+(()=>{function init(){
+ const select=document.getElementById('soundBank'),wrap=select.closest('.numbox-custom');if(!wrap)return false;if(wrap.classList.contains('sound-bank-cards'))return true;
  const list=wrap.querySelector('.numbox-menu'),toggle=wrap.querySelector('.numbox-button'),storageKey='renax.soundBankOrder.v1';
  wrap.classList.add('sound-bank-cards');let drag=null,suppressUntil=0;
  const style=document.createElement('style');style.textContent=`
@@ -30,5 +30,6 @@
  function finish(event){if(!drag)return;const active=drag.active;clearTimeout(drag.timer);drag.item.classList.remove('dragging');if(drag.item.hasPointerCapture(drag.id))drag.item.releasePointerCapture(drag.id);drag=null;if(active){suppressUntil=Date.now()+400;if(event)save();}}
  function position(){if(!wrap.classList.contains('open'))return;const r=toggle.getBoundingClientRect(),width=Math.min(Math.max(r.width,250),innerWidth-16),below=innerHeight-r.bottom-8,above=r.top-8;const down=below>=Math.min(300,above),height=Math.min(420,Math.max(80,down?below:above));list.style.width=width+'px';list.style.height=height+'px';list.style.left=Math.min(Math.max(8,r.left),innerWidth-width-8)+'px';list.style.top=(down?r.bottom+4:r.top-height-4)+'px';}
  new MutationObserver(decorate).observe(list,{childList:true});new MutationObserver(position).observe(wrap,{attributes:true,attributeFilter:['class']});window.addEventListener('resize',position);document.addEventListener('scroll',position,true);decorate();
+return true;}
+if(!init()){const observer=new MutationObserver(()=>{if(init())observer.disconnect();});observer.observe(document.body,{childList:true,subtree:true});}
 })();
-

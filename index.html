@@ -2063,13 +2063,16 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         const src = audioCtx.createBufferSource();
         const gain = audioCtx.createGain();
         src.buffer = sample.buffer;
+        const pitch = isFirst ? Math.pow(2,1/12) : 1;
+        src.playbackRate.setValueAtTime(pitch,time);
+        const playbackDuration=sample.duration/pitch;
         const stateGain = state === 1 ? 0.78 : state === 2 ? 0.91 : 1;
         const accentGain = isFirst ? 1.12 : context.isOtherStrongBeat ? 1.08 : 1;
         gain.gain.setValueAtTime(sample.gain * stateGain * accentGain, time);
         // Short click-free release; the entire transient remains untouched.
-        const fadeTime = Math.min(0.006, sample.duration / 5);
-        gain.gain.setValueAtTime(sample.gain * stateGain * accentGain, time + sample.duration - fadeTime);
-        gain.gain.linearRampToValueAtTime(0, time + sample.duration);
+        const fadeTime = Math.min(0.006, playbackDuration / 5);
+        gain.gain.setValueAtTime(sample.gain * stateGain * accentGain, time + playbackDuration - fadeTime);
+        gain.gain.linearRampToValueAtTime(0, time + playbackDuration);
         src.connect(gain);
         gain.connect(dest);
         scheduledVoiceSources.add(src);

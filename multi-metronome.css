@@ -37,18 +37,6 @@
 .multi-bank-row select{flex:1;min-width:0;width:100%;height:32px;padding:3px 6px;font-size:11px}
 .multi-mute{display:grid;place-items:center;flex:0 0 30px;width:30px;height:32px;padding:5px;background:#22242d;border:1px solid var(--border);border-radius:6px;cursor:pointer}
 .multi-mute[aria-pressed=true]{opacity:.45}
-.multi-edit{margin-top:10px;width:100%;height:29px;border:1px solid #373b46;border-radius:5px;background:transparent;color:var(--text-muted);font-size:10px;cursor:pointer}
-.multi-edit[aria-expanded=true]{color:var(--cyan);border-color:#008a99}
-.multi-workspace{border-top:1px solid var(--border);margin-top:12px;padding-top:10px;cursor:default}
-.multi-signature{display:flex;gap:10px;margin-bottom:10px}
-.multi-signature label{display:flex;align-items:center;gap:6px;flex:1;color:var(--text-muted);font-size:10px}
-.multi-signature select{min-width:0;width:100%;height:30px;padding:3px;font-size:11px}
-.multi-beats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:7px}
-.multi-beat{min-width:0;padding:6px;background:#11141a;border:1px solid #2d303b;border-radius:6px}
-.multi-beat select{width:100%;min-width:0;height:27px;margin-bottom:6px;font-size:10px;padding:3px}
-.multi-pads{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
-.multi-pads button{height:24px;min-width:0;padding:0;border:1px solid #4a4d59;border-radius:3px;font-size:10px;color:#111;cursor:pointer;background:var(--grey)}
-.multi-pads button[data-state='0']{color:#ddd}.multi-pads button[data-state='1']{background:var(--cyan)}.multi-pads button[data-state='2']{background:var(--yellow)}.multi-pads button[data-state='3']{background:var(--orange)}
 .multi-track .preview-dot.multi-hit{outline:1px solid #fff;box-shadow:0 0 5px var(--cyan)}
 .multi-empty-message{color:var(--text-muted);text-align:center;font-size:12px;padding:20px 5px}
 @media(max-width:1100px){.multi-mode-tabs button{min-height:40px;font-size:12px}.multi-track{padding:12px}.multi-beats{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}}
@@ -63,3 +51,11 @@
 .multi-modal-actions button:last-child{border-color:var(--cyan);background:rgba(0,207,232,.10)}
 
 .multi-preset-row .numbox-button,.multi-preset-row .numbox-button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:10px}
+
+.multi-mode-tabs button{display:flex;align-items:center;justify-content:center;gap:7px}
+.multi-mode-tabs svg,.multi-collapse svg{width:17px;height:17px;flex-shrink:0;fill:none;stroke:var(--orange);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.multi-collapse{display:grid;place-items:center;flex:0 0 26px;width:26px;height:30px;padding:4px;border:1px solid var(--border);border-radius:6px;background:#20212a;cursor:pointer}
+.multi-collapse[aria-expanded=true] svg{transform:rotate(180deg)}
+.multi-track-body[hidden]{display:none!important}
+.multi-collapsed .multi-track-head{margin-bottom:0}
+.multi-track .measure-preview{margin-top:4px}

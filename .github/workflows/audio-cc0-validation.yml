@@ -9,6 +9,9 @@ on:
       - 'song-export.js'
       - 'assets/metronome/**'
       - 'tests/instrument-samples-test.cjs'
+      - 'tests/song-back-regression-test.cjs'
+      - 'tests/mp3-export-test.cjs'
+      - 'tests/audio-harness.cjs'
   workflow_dispatch:
 
 permissions:

@@ -9,6 +9,7 @@
   return event;
  }
  class Clock{constructor(time,bpm){this.time=time;this.quarter=0;this.bpm=bpm;}at(time){return this.quarter+(time-this.time)*this.bpm/60;}when(quarter){return this.time+(quarter-this.quarter)*60/this.bpm;}setTempo(bpm,now){if(bpm===this.bpm)return;const t=Math.max(now,this.time);this.quarter=this.at(t);this.time=t;this.bpm=bpm;}}
- const api={Clock,cursor,next,layout};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.RenaxMultiClock=api;
+ function seek(c,quarter){if(c.quarter>=quarter-1e-10)return;let length=c.layout.numerator*4/c.layout.denominator;if(quarter>=c.origin+length){c.origin+=length;c.layout=layout(c.model);length=c.layout.numerator*4/c.layout.denominator;c.origin+=Math.floor((quarter-c.origin)/length)*length;c.step=0;c.quarter=c.origin;}while(c.quarter<quarter-1e-10)next(c);}
+ const api={Clock,cursor,next,layout,seek};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.RenaxMultiClock=api;
 })(typeof window!=='undefined'?window:globalThis);
 

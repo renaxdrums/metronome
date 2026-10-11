@@ -16,7 +16,7 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
     const b={id:'b',name:'Essai B',sections:[section('Dense 16',2,7,16,120,3),section('Dense 32',2,20,32,97)]};
     const c={id:'c',name:'Accents',sections:[section('Niveaux',1,5,4,60,1)]};c.sections[0].measure.beatStates=[[1],[1],[2],[3],[0]];
     const d={id:'d',name:'Morceau complet',sections:[section('Intro',4,4,4,97),section('Couplet 1',8,4,4,97),section('Refrain 1',8,5,4,120)]};
-    const lib=RENAX_SONGS.library;lib.profiles.find(x=>x.id===lib.activeProfile).songs=[a,b,c,d];RENAX_SONGS.validateLibrary(lib);localStorage.setItem('renax-drums-songs-v1',JSON.stringify(lib));return [a,b,c,d];
+    const lib=RENAX_SONGS.library;lib.profiles.find(x=>x.id===lib.activeProfile).songs=[a,b,c,d];RENAX_SONGS.validateLibrary(lib);RENAX_STORAGE.write(lib);return [a,b,c,d];
   });
   await p.reload();await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
   await p.getByRole('tab',{name:'Morceaux',exact:true}).click();await p.getByRole('button',{name:'Playlist',exact:true}).click();
@@ -30,14 +30,14 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
   await p.exposeFunction('mp3TestWrite',({name,bytes})=>{const target=path.join(destination,name);fs.writeFileSync(target,Buffer.from(bytes));writes.push(target);});
   await p.exposeFunction('mp3TestPicker',options=>{pickerOptions.push(options);});
   await p.evaluate(()=>{window.showSaveFilePicker=async options=>{await mp3TestPicker(options);return {name:options.suggestedName,createWritable:async()=>({write:async blob=>mp3TestWrite({name:options.suggestedName,bytes:Array.from(new Uint8Array(await blob.arrayBuffer()))}),close:async()=>{},abort:async()=>{}})};};});
-  const before=await p.evaluate(()=>({storage:localStorage.getItem('renax-drums-songs-v1'),bank:currentBank,volume:masterVolume,measures:JSON.stringify(measures),ctx:audioCtx.state,playing:isPlaying,chrono:document.querySelector('#workTimer')?.textContent}));
+  const before=await p.evaluate(()=>({storage:localStorage.getItem('renax-index2-store-v1:'+RENAX_STORAGE.scope),bank:currentBank,volume:masterVolume,measures:JSON.stringify(measures),ctx:audioCtx.state,playing:isPlaying,chrono:document.querySelector('#workTimer')?.textContent}));
   for(const song of fixtures.slice(0,2)){
     await p.selectOption('#mp3ExportSong',song.id);await p.locator('#mp3ExportSave').click();await p.waitForFunction(()=>document.getElementById('mp3ExportStatus').textContent.startsWith('MP3 enregistré'),{timeout:120000});
     const file=path.join(destination,song.name+'.mp3');assert(fs.existsSync(file));
     const info=probe(file),expected=song.sections.reduce((n,s)=>n+s.count*s.measure.numerator*60/s.measure.tempo*4/s.measure.denominator,0);
     assert.strictEqual(info.streams[0].codec_name,'mp3');assert(Math.abs(Number(info.format.duration)-expected-.055)<.06,'Wrong song selected');
   }
-  const after=await p.evaluate(()=>({storage:localStorage.getItem('renax-drums-songs-v1'),bank:currentBank,volume:masterVolume,measures:JSON.stringify(measures),ctx:audioCtx.state,playing:isPlaying,chrono:document.querySelector('#workTimer')?.textContent}));assert.deepStrictEqual(after,before);
+  const after=await p.evaluate(()=>({storage:localStorage.getItem('renax-index2-store-v1:'+RENAX_STORAGE.scope),bank:currentBank,volume:masterVolume,measures:JSON.stringify(measures),ctx:audioCtx.state,playing:isPlaying,chrono:document.querySelector('#workTimer')?.textContent}));assert.deepStrictEqual(after,before);
   assert.strictEqual(writes.length,2);assert.deepStrictEqual(pickerOptions.map(x=>x.suggestedName),['Essai A.mp3','Essai B.mp3']);
   for(const options of pickerOptions){assert.strictEqual(options.startIn,'music');assert.deepStrictEqual(options.types[0].accept,{'audio/mpeg':['.mp3']});}
   await p.evaluate(()=>{window.showSaveFilePicker=async()=>{throw new DOMException('Cancel','AbortError');};});await p.locator('#mp3ExportSave').click();await p.waitForFunction(()=>document.getElementById('mp3ExportStatus').textContent==='Export annulé.');assert.strictEqual(writes.length,2);
@@ -64,7 +64,7 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
   }
   const limiter=await p.evaluate(async()=>{const client=RENAX_MP3_EXPORT.workerClient();try{const pcm=new Float32Array(48000).fill(.2);pcm[24000]=2;const r=await client.call({op:'limiterTest',pcm,rate:48000,ceiling:.89},[pcm.buffer]);let peak=0;for(const v of r.pcm)peak=Math.max(peak,Math.abs(v));return {peak,minGain:r.minGain};}finally{client.close();}});assert(limiter.peak<=.890001&&limiter.minGain<1);
   const silent=await p.evaluate(async song=>{const r=await RENAX_MP3_EXPORT.exportSong(song,'clic',0);return r.report;},fixtures[2]);assert.strictEqual(silent.decodedTruePeak,0);
-  assert.strictEqual(await p.evaluate(()=>JSON.stringify(RENAX_SONGS.library)),JSON.stringify(JSON.parse(before.storage)));
+  assert.strictEqual(await p.evaluate(()=>JSON.stringify(RENAX_SONGS.library)),JSON.stringify(JSON.parse(before.storage).library));
   const running=await p.evaluate(async song=>{
     window.exportLiveEvents=[];const original=playClick;playClick=(s,t,f,c)=>{exportLiveEvents.push({time:t,beat:c.beatNumber});return original(s,t,f,c);};
     const originalCtx=audioCtx,originalMeasures=measures;await startMetronome();

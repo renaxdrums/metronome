@@ -19,8 +19,13 @@
     current=capture();restoring=false;
   }
   const previous=history.state?.[key];
-  if(previous?.screen)restore(previous.screen);
-  history.replaceState({...history.state,[key]:{...previous,screen:current,depth:previous?.depth||0}},'');
+  if(previous?.screen){const screen=previous.version===2?previous.screen:{...previous.screen,songs:{...previous.screen.songs,view:'home',song:null}};restore(screen);}
+  history.replaceState({...history.state,[key]:{...previous,version:2,screen:current,depth:previous?.depth||0}},'');
+  window.addEventListener('renax-navigation-restored',()=>{
+    if(restoring)return;
+    clearTimeout(pending);current=capture();const entry=history.state?.[key];
+    history.replaceState({...history.state,[key]:{...entry,version:2,screen:current}},'');
+  });
   function record(){
     if(restoring)return;
     const next=capture();
@@ -33,7 +38,7 @@
     const entry=history.state?.[key];
     const depth=(entry?.depth||0)+(replace?0:1);
     const parent=replace?entry?.parent:current;
-    history[replace?'replaceState':'pushState']({...history.state,[key]:{screen:next,depth,parent}},'');current=next;
+    history[replace?'replaceState':'pushState']({...history.state,[key]:{version:2,screen:next,depth,parent}},'');current=next;
   }
   document.addEventListener('click',event=>{
     const back=event.target.closest('.song-back,#index2SettingsClose,#index2SettingsBackdrop');

@@ -10,7 +10,14 @@
     if(!SOUND_BANKS[bank]||!Number.isFinite(volume)||volume<0||volume>1)throw Error('Réglages audio incorrects.');
     if(song.amorce){amorcePlan=amorcePlan||await RENAX_AMORCE.prepare(song);song={...song,sections:amorcePlan.sections};await prepareAllVoiceAudio();}
     const voice=!!SOUND_BANKS[bank].isVoice;
-    if(voice)await prepareAllVoiceAudio();else if(allVoiceAudioPromise)await allVoiceAudioPromise;
+    if(voice)await prepareAllVoiceAudio();
+    else {
+      // Load the same CC0 one-shots as the live scheduler BEFORE swapping to
+      // OfflineAudioContext; keep the original synth fallback if offline.
+      try { await ensureInstrumentBankReady(bank); }
+      catch(error) { console.warn('Instrument sample export fallback:', error); }
+      if(allVoiceAudioPromise)await allVoiceAudioPromise;
+    }
     if(audioCtx)await audioCtx.close();
     let duration=0;const sections=[];
     for(const section of song.sections){

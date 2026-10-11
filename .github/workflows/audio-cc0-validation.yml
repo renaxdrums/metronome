@@ -1,0 +1,38 @@
+name: CC0 metronome audio validation
+
+on:
+  push:
+    branches: [main, audio/cc0-pro-20261011]
+    paths:
+      - '.github/workflows/audio-cc0-validation.yml'
+      - 'index.html'
+      - 'song-export.js'
+      - 'assets/metronome/**'
+      - 'tests/instrument-samples-test.cjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sampled-audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium test runtime
+        run: |
+          npm install --no-save playwright@1.56.0
+          npx playwright install chromium --with-deps
+      - name: Audio headroom and sample integration
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/instrument-samples-test.cjs
+      - name: Navigation and MP3 export regression
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/song-back-regression-test.cjs
+          node tests/mp3-export-test.cjs

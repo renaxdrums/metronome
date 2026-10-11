@@ -3874,8 +3874,8 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     });
     prepareAllVoiceAudio().catch(() => {});
   </script>
-  <script src="pro-sound-bank.js?v=20261011-bank-cards7"></script>
-<script src="sound-bank-menu.js?v=20261011-bank-cards9"></script>
+  <script src="pro-sound-bank.js?v=20261012-gospel-drums1"></script>
+<script src="sound-bank-menu.js?v=20261012-gospel-drums1"></script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
   <script src="amorce-song.js?v=20261011-independent-voice1"></script>
   <script src="songs-index2.js?v=20261011-back-icon2"></script>
@@ -3973,7 +3973,7 @@ fader.addEventListener('input',()=>setTempo(positionToTempo(fader.value)));
 fader.addEventListener('keydown',event=>{const delta={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1,PageDown:-10,PageUp:10}[event.key];if(delta!==undefined||event.key==='Home'||event.key==='End'){event.preventDefault();setTempo(event.key==='Home'?2:event.key==='End'?999:Number(bpmSlider.value)+delta);}});
 bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',sync);
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
-})();</script><link rel="stylesheet" href="pro-interface.css?v=20261011-montserrat2">
-<script src="interface-language.js?v=20261011-language-flags2"></script>
+})();</script><link rel="stylesheet" href="pro-interface.css?v=20261012-font-audit1">
+<script src="interface-language.js?v=20261012-gospel-drums1"></script>
 </body>
 </html>

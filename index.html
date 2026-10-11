@@ -1358,13 +1358,13 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       <div class="control-group">
         <label><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18V5l11-2v13 M9 8l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg>Banque de sons</label>
         <select id="soundBank">
-          <option value="clic">Clic</option>
-          <option value="cloche">Cloche</option>
+          <option value="clic">Clic bois</option>
+          <option value="cloche">Cowbell</option>
           <option value="claves">Claves</option>
-          <option value="clic808">Clic 808</option>
-          <option value="beep">Beep</option>
-          <option value="voiceMale">Voice men EN</option>
-          <option value="voiceFemale">Voice female EN</option>
+          <option value="clic808">Kit TR-808</option>
+          <option value="beep">Shaker acoustique</option>
+          <option value="voiceMale">Voix masculine EN</option>
+          <option value="voiceFemale">Voix féminine EN</option>
         </select>
       </div>
 
@@ -2067,7 +2067,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 
     // The limiter is a safety net. Bank gains keep the incoming mix below -0.5 dBFS.
     const audioMixers = new WeakMap();
-    const BANK_GAINS = { clic: 0.28, cloche: 0.28, claves: 0.28, clic808: 0.28, beep: 0.28, voiceMale: 1, voiceFemale: 1 };
+    const BANK_GAINS = { clic: 0.36, cloche: 0.36, claves: 0.28, clic808: 0.28, beep: 0.28, voiceMale: 1, voiceFemale: 1 };
     function getAudioMixDestination(context) {
       let mixer = audioMixers.get(context);
       if (!mixer) {
@@ -3842,7 +3842,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     });
     prepareAllVoiceAudio().catch(() => {});
   </script>
-  <script src="pro-sound-bank.js?v=20261011-cc0-bank1"></script>
+  <script src="pro-sound-bank.js?v=20261011-sample-names2"></script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
   <script src="amorce-song.js?v=20261011-guide-count-sync1"></script>
   <script src="songs-index2.js?v=20261011-back-icon2"></script>

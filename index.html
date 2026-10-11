@@ -1307,7 +1307,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 </style>
 <style>
 .tempo-slider-row{display:flex;align-items:center;gap:6px;width:100%}
-.tempo-slider-row #bpmSlider{flex:1;min-width:0;width:auto;margin:0}
+.tempo-slider-row #bpmSlider{display:none!important}.tempo-slider-row #tempoFader{flex:1;min-width:0;width:auto;margin:0}
 .tempo-step-button{display:flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:32px;padding:0;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.025);color:var(--orange);cursor:pointer}
 .tempo-step-button svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tempo-step-button:hover{border-color:var(--orange);background:rgba(255,111,0,.08)}
@@ -1348,7 +1348,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       <div class="control-group">
         <label><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 20h10L14 4h-4L7 20Z M12 16l6-9 M9 20v-3h6v3"/></svg>Tempo (noire)</label>
         <div class="tempo-display" id="bpmDisplay">120 <span>BPM</span></div>
-        <div class="tempo-slider-row"><button type="button" id="tempoDecrease" class="tempo-step-button" aria-label="Diminuer le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><input type="range" id="bpmSlider" min="2" max="999" value="120"><button type="button" id="tempoIncrease" class="tempo-step-button" aria-label="Augmenter le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
+        <div class="tempo-slider-row"><button type="button" id="tempoDecrease" class="tempo-step-button" aria-label="Diminuer le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><input type="range" id="bpmSlider" min="2" max="999" value="120" hidden><input type="range" id="tempoFader" min="0" max="10000" step="1" value="4400" aria-label="Tempo" aria-valuetext="120 BPM"><button type="button" id="tempoIncrease" class="tempo-step-button" aria-label="Augmenter le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
         <button class="tap-tempo-btn" id="tapBtn" type="button">
           <span><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 13V5a2 2 0 0 1 4 0v7l3-1 4 3-2 7H9l-5-7a2 2 0 0 1 3-2l2 1Z"/></svg>TAP TEMPO</span>
           <span class="key-hint">NUM 0</span>
@@ -3792,5 +3792,15 @@ function sync(){const value=Number(bpmSlider.value),locked=training.engaged||bpm
 function adjust(delta){if(training.engaged||bpmSlider.disabled)return;const next=Math.max(Number(bpmSlider.min),Math.min(Number(bpmSlider.max),Number(bpmSlider.value)+delta));if(next!==Number(bpmSlider.value)){bpmSlider.value=String(next);bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));}sync();}
 decrease.addEventListener('click',()=>adjust(-1));increase.addEventListener('click',()=>adjust(1));bpmSlider.addEventListener('input',sync);
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});new MutationObserver(sync).observe(trainBtn,{attributes:true,attributeFilter:['aria-pressed','class']});sync();
+})();</script><script>(()=>{
+const fader=document.getElementById('tempoFader');
+function positionToTempo(position){const p=Math.max(0,Math.min(10000,Number(position)));return Math.round(p<=2000?2+p/2000*38:p<=8000?40+(p-2000)/6000*200:240+(p-8000)/2000*759);}
+function tempoToPosition(bpm){const t=Math.max(2,Math.min(999,Number(bpm)));return Math.round(t<=40?(t-2)/38*2000:t<=240?2000+(t-40)/200*6000:8000+(t-240)/759*2000);}
+function sync(){const bpm=Number(bpmSlider.value);fader.value=String(tempoToPosition(bpm));fader.disabled=training.engaged||bpmSlider.disabled;fader.setAttribute('aria-valuetext',bpm+' BPM');fader.title=bpm+' BPM';}
+function setTempo(bpm){if(training.engaged||bpmSlider.disabled){sync();return;}const next=Math.max(2,Math.min(999,Math.round(bpm)));if(next!==Number(bpmSlider.value)){bpmSlider.value=String(next);bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));}sync();}
+fader.addEventListener('input',()=>setTempo(positionToTempo(fader.value)));
+fader.addEventListener('keydown',event=>{const delta={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1,PageDown:-10,PageUp:10}[event.key];if(delta!==undefined||event.key==='Home'||event.key==='End'){event.preventDefault();setTempo(event.key==='Home'?2:event.key==='End'?999:Number(bpmSlider.value)+delta);}});
+bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',sync);
+new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script></body>
 </html>

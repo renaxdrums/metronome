@@ -1708,7 +1708,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     // See tests/voice-anchors.json; consonant pre-roll and internal pauses are retained.
     // Natural pitch is preserved and the Web Audio beat grid never moves.
     const VOICE_ATTACK_SECONDS = {
-      male: [0, 0.116, 0.000, 0.262, 0.143, 0.195, 0.256, 0.216, 0.097, 0.12, 0.176, 0.211, 0.15, 0.128, 0.125, 0.105, 0.189, 0.187, 0.091, 0.129, 0.14],
+      male: [0, 0.116, 0.175, 0.262, 0.143, 0.195, 0.256, 0.216, 0.097, 0.12, 0.176, 0.211, 0.15, 0.128, 0.125, 0.105, 0.189, 0.187, 0.091, 0.129, 0.14],
       female: [0,0.107,0.095,0.076,0.118,0.105,0.175,0.17,0.093,0.078,0.071,0.163,0.098,0.022,0.116,0.112,0.131,0.138,0.019,0.06,0.074],
     };
     const VOICE_MAX_ATTACK_SECONDS = Math.max(...Object.values(VOICE_ATTACK_SECONDS).flat());
@@ -1815,6 +1815,13 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     }
 
     function playVoiceMetronome(gender, dest, time, state, isFirst, context = {}) {
+      return renderVoiceCount(gender, dest, time, state, isFirst, context, {
+        anchors: VOICE_ATTACK_SECONDS[gender], volumes: [0,.72,.82,.92], firstGain:1.08, playbackRate:1
+      });
+    }
+
+    // The renderer shares recordings only. Each caller owns its timing and mix parameters.
+    function renderVoiceCount(gender, dest, time, state, isFirst, context, settings) {
       const beatNumber = Number(context.beatNumber) || 0;
       const subIndex = Number(context.subIndex) || 0;
       const beatDurationSec = Math.max(0.08, Number(context.beatDurationSec) || 0.5);
@@ -1829,17 +1836,17 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 
         // La voix reste à sa hauteur naturelle : aucune accélération/pitch liée au tempo.
         // Le timing du métronome reste piloté par Web Audio, indépendamment de la durée du sample.
-        const attack = Number.isFinite(context.voiceAnchorSeconds) ? context.voiceAnchorSeconds : (VOICE_ATTACK_SECONDS[gender][beatNumber] || 0);
-        const sourceTime = time - attack;
+        const attack = settings.anchors[beatNumber] || 0;
+        const sourceTime = time - attack / settings.playbackRate;
         // If a callback was delayed, skip only the elapsed pre-roll rather than
         // shifting this beat or every following beat. Normal scheduling is ahead.
         const startTime = Math.max(audioCtx.currentTime, sourceTime);
-        const offset = Math.max(0, startTime - sourceTime);
+        const offset = Math.max(0, startTime - sourceTime) * settings.playbackRate;
         if (offset >= buffer.duration) return; // A fully missed word cannot be replayed on time.
-        src.playbackRate.setValueAtTime(1, startTime);
+        src.playbackRate.setValueAtTime(settings.playbackRate, startTime);
 
-        let vol = state === 3 ? 0.92 : state === 2 ? 0.82 : 0.72;
-        if (isFirst) vol *= 1.08;
+        let vol = settings.volumes[state] || settings.volumes[1];
+        if (isFirst) vol *= settings.firstGain;
         gain.gain.setValueAtTime(vol, startTime);
 
         src.connect(gain);
@@ -3088,7 +3095,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 
     function scheduler() {
       if (appMode === 'polyrhythm') { schedulerPolyrhythm(); return; }
-      const voiceLead = SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active ? VOICE_MAX_ATTACK_SECONDS : 0;
+      const voiceLead = SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active ? Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds || 0) : 0;
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime + voiceLead) {
         if (playingMeasureIndex >= measures.length) { playingMeasureIndex = 0; currentStepInMeasure = 0; }
         const mIdx = playingMeasureIndex;
@@ -3844,7 +3851,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   </script>
   <script src="pro-sound-bank.js?v=20261011-archive-clicks5"></script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
-  <script src="amorce-song.js?v=20261011-guide-count-sync1"></script>
+  <script src="amorce-song.js?v=20261011-independent-voice1"></script>
   <script src="songs-index2.js?v=20261011-back-icon2"></script>
   <script type="module" src="cloud-backup.js?v=20261009-account-colors"></script>
   <script>

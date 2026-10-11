@@ -5,7 +5,7 @@ const table=Function('return ('+html.match(/const VOICE_ATTACK_SECONDS = (\{[\s\
 for(const anchor of anchors)assert.equal(table[anchor.gender][anchor.number],anchor.anchor_ms/1000);
 const from=html.indexOf('function playVoiceMetronome('),to=html.indexOf('    const SOUND_BANKS',from),renderer=html.slice(from,to),calls=[];
 const execute=Function('VOICE_ATTACK_SECONDS','calls',`
-const VOICE_METRONOME_BUFFERS={male:Object.fromEntries(Array.from({length:21},(_,n)=>[n,{duration:1}]))};
+const VOICE_METRONOME_BUFFERS={male:Object.fromEntries(Array.from({length:21},(_,n)=>[n,{duration:1,sampleRate:24000,length:24000,numberOfChannels:1,getChannelData(){return new Float32Array(24000).fill(.045)}}]))};
 const scheduledVoiceSources=new Set(),playVoiceSubdivisionTick=()=>{};
 const audioCtx={currentTime:0,createBufferSource(){return{playbackRate:{setValueAtTime(){}},connect(){},start(t,o){calls.push({t,o})}}},createGain(){return{gain:{setValueAtTime(){}},connect(){}}}};
 ${renderer}

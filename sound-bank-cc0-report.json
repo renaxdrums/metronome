@@ -57,49 +57,35 @@
   ],
   "additionalBanks": {
     "license": "CC0-1.0",
-    "source": "https://versilian-studios.com/vsco-community/",
-    "commonAttackRms": 0.06480741569500363,
-    "denseAbsolutePeakBound": 0.7,
+    "source": "Original mathematical synthesis for RENAX; no Ableton audio copied.",
     "samples": [
       {
-        "key": "proTambourine",
-        "name": "Tambourin",
-        "path": "Percussion/Tamb1-Hit_v2_rr1_Sum.wav",
-        "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Tamb1-Hit_v2_rr1_Sum.wav",
-        "sha256": "7bfc01a7d8b51bcc0a2e3dab986de8e06980d136f0ad645b798820d8ecd5eb37",
-        "attackRms": 0.06480741569500363,
-        "peak": 0.2380957537004397,
-        "seconds": 0.12
+        "key": "proDigital",
+        "name": "Clic studio",
+        "peak": 0.5150834026992475,
+        "attackRms": 0.075,
+        "seconds": 0.045
       },
       {
-        "key": "proSnare",
-        "name": "Caisse claire sèche",
-        "path": "Percussion/Snare2-HitSN_v3_rr1_Sum.wav",
-        "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Snare2-HitSN_v3_rr1_Sum.wav",
-        "sha256": "3df96009d655dd4fe43c635bd3c20314a1e0cbdf9f571ee8a66207f9ef917d08",
-        "attackRms": 0.06480741569500363,
-        "peak": 0.17944757829085634,
-        "seconds": 0.12
+        "key": "proQuartz",
+        "name": "Clic quartz",
+        "peak": 0.627664485446299,
+        "attackRms": 0.075,
+        "seconds": 0.045
       },
       {
-        "key": "proMarimba",
-        "name": "Marimba percussif",
-        "path": "Percussion/Marimba/Marimba_hit_Outrigger_C6_loud_01.wav",
-        "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Marimba/Marimba_hit_Outrigger_C6_loud_01.wav",
-        "sha256": "2e42b1b6f6923f32e3daadc12b063e94d15af20fa410ddcb267eb906fd6e0e89",
-        "attackRms": 0.06480741569500363,
-        "peak": 0.16620432051909217,
-        "seconds": 0.12
+        "key": "proTick",
+        "name": "Clic précis",
+        "peak": 0.7052461223484073,
+        "attackRms": 0.075,
+        "seconds": 0.045
       },
       {
-        "key": "proRim",
-        "name": "Rimshot acoustique",
-        "path": "VSCO 1 Percussion/drums/other/ethnic/giant/EthnicLargeStick_rimshot_1.wav",
-        "url": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/VSCO%201%20Percussion/drums/other/ethnic/giant/EthnicLargeStick_rimshot_1.wav",
-        "sha256": "f9a07c67191675015ec385ca29a5b44c8ddd6466599968aa152cffc2c6e94f6e",
-        "attackRms": 0.06480741569500363,
-        "peak": 0.3329323406571102,
-        "seconds": 0.12
+        "key": "proSoft",
+        "name": "Clic doux",
+        "peak": 0.43700309417598093,
+        "attackRms": 0.075,
+        "seconds": 0.045
       }
     ]
   }

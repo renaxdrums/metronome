@@ -47,7 +47,7 @@
   const songsHome=document.createElement('div');songsHome.id='songsHome';
   const songsRoot=document.createElement('div');songsRoot.id='songsRoot';songsRoot.hidden=true;
   songsRoot.append(songsHome,profilePane,songPane);panel.append(tabs,sequencePane,songsRoot);
-  function tab(name) {songsRoot.hidden=name!=='songs';sequencePane.hidden=name!=='sequence';tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.pane===name)));if(name==='sequence')unload();else selectOpenBlock();syncSongTransport();panel.scrollTop=0;}
+  function tab(name) {if(name==='songs'&&songsRoot.hidden)stopMetronome();songsRoot.hidden=name!=='songs';sequencePane.hidden=name!=='sequence';tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.pane===name)));if(name==='sequence')unload();else selectOpenBlock();syncSongTransport();panel.scrollTop=0;}
   for(const [name,title] of [['sequence','Séquenceur'],['songs','Morceaux']]) {const b=document.createElement('button');b.textContent=title;b.dataset.pane=name;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(name==='sequence'));b.onclick=()=>tab(name);tabs.append(b);}
   function navigate(view){if(view==='home'||view==='playlists'||view==='playlist'){unload();selectedSong=null;}songView=view;render();panel.scrollTop=0;}
   function el(tag,text,parent,cls) {const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;if(parent)parent.append(e);return e;}
@@ -320,7 +320,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       if(!p.songs.length)el('p','Crée ton premier morceau pour construire sa structure.',songPane,'song-note');
       for(const item of p.songs){
         const row=el('div',undefined,songPane,'song-section measure-card song-playlist-card');enableSongDrag(row,item,p);
-        const openSong=()=>{selectedSong=item.id;openSectionId=null;songView='detail';render();panel.scrollTop=0;};
+        const openSong=()=>{stopMetronome();selectedSong=item.id;openSectionId=null;songView='detail';render();panel.scrollTop=0;};
         row.tabIndex=0;row.setAttribute('aria-label','Ouvrir '+item.name);
         row.addEventListener('click',e=>{if(!e.target.closest('.song-open,.song-more-wrap'))openSong();});
         row.addEventListener('keydown',e=>{if(e.target===row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();openSong();}});

@@ -61,3 +61,5 @@
 .multi-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 .multi-modal-actions button{padding:9px 15px;border:1px solid var(--border);border-radius:6px;background:#282b35;color:var(--text);font-size:12px;cursor:pointer}
 .multi-modal-actions button:last-child{border-color:var(--cyan);background:rgba(0,207,232,.10)}
+
+.multi-preset-row .numbox-button,.multi-preset-row .numbox-button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:10px}

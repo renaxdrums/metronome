@@ -1,0 +1,54 @@
+[
+  {
+    "key": "gospelTambourine",
+    "name": "Tambourin acoustique",
+    "source": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Tamb1-Hit_v2_rr1_Sum.wav",
+    "author": "Versilian Studios",
+    "license": "CC0-1.0",
+    "sourceSha256": "7bfc01a7d8b51bcc0a2e3dab986de8e06980d136f0ad645b798820d8ecd5eb37",
+    "duration": 0.18,
+    "attackRms": 0.075,
+    "peak": 0.31272765966744054,
+    "pitchRatio": 1.0,
+    "processing": "Mono 44.1kHz, leading silence removed, short natural tail with 25ms fade, attack level matched; snare tightened +1.96 semitones"
+  },
+  {
+    "key": "gospelKick",
+    "name": "Kick Tama Rockstar",
+    "source": "https://freesound.org/people/Matias.Reccius/sounds/50982/",
+    "author": "Matias Reccius",
+    "license": "CC0-1.0",
+    "sourceSha256": "b241e979b09515dda83fa6e0bc6143bbbbbe17d4f7ece7e85693d4f9a7af81ee",
+    "duration": 0.24,
+    "attackRms": 0.07500000000000001,
+    "peak": 0.23410556393812787,
+    "pitchRatio": 1.0,
+    "processing": "Mono 44.1kHz, leading silence removed, short natural tail with 25ms fade, attack level matched; snare tightened +1.96 semitones"
+  },
+  {
+    "key": "gospelSnare",
+    "name": "Snare Tama Artwood",
+    "source": "https://freesound.org/people/Matias.Reccius/sounds/50981/",
+    "author": "Matias Reccius",
+    "license": "CC0-1.0",
+    "sourceSha256": "08989f18e810d53c3bc333cea21c8965128275de66947d21922e2dddc5ececd4",
+    "duration": 0.2,
+    "attackRms": 0.07500000000000001,
+    "peak": 0.18661698396112272,
+    "pitchRatio": 1.12,
+    "processing": "Mono 44.1kHz, leading silence removed, short natural tail with 25ms fade, attack level matched; snare tightened +1.96 semitones"
+  },
+  {
+    "key": "gospelHiHat",
+    "name": "Hi-hat acoustique",
+    "source": "https://freesound.org/people/Matias.Reccius/sounds/45061/",
+    "author": "Matias Reccius",
+    "license": "CC0-1.0",
+    "sourceSha256": "4a7c341e474d89af55a87512256dd913bd534268f1f493e56e18ef30a859a6ef",
+    "duration": 0.16,
+    "attackRms": 0.075,
+    "peak": 0.28309263891404834,
+    "pitchRatio": 1.0,
+    "processing": "Mono 44.1kHz, leading silence removed, short natural tail with 25ms fade, attack level matched; snare tightened +1.96 semitones"
+  }
+]

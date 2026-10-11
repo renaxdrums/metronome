@@ -37,5 +37,5 @@ jobs:
       - name: Navigation and MP3 export regression
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
-          node tests/song-back-regression-test.cjs
           node tests/mp3-export-test.cjs
+          node tests/song-back-regression-test.cjs

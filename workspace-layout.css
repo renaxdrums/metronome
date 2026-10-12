@@ -42,3 +42,7 @@
  footer>.visu-bottom>.legend{display:none!important}
 }
 @media(min-width:1101px) and (max-width:1300px){.main-grid{grid-template-columns:225px minmax(0,1fr) 300px!important}body[data-workspace=metronome] .main-grid{grid-template-columns:225px minmax(0,1fr)!important}#workspaceNav button{padding-inline:13px}}
+
+body:not(.poly-mode) #sequencePane>.sequence-count-row{display:none!important}
+body.poly-mode #sequencePane>.sequence-add{display:none!important}
+#sequenceAddMeasure:disabled{opacity:.45;cursor:default}

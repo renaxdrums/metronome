@@ -283,3 +283,8 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 #index2SettingsPanel button,#directAccountDialog .btn{background:#343b45!important;border-color:#505b69!important;color:var(--text)!important;border-radius:6px;box-shadow:none!important}
 #index2SettingsPanel button[aria-pressed=true],#index2SettingsPanel button[aria-selected=true]{background:#28424b!important;border-color:#4b7884!important}
 #index2SettingsPanel button:disabled{background:#343b45!important}
+
+/* Compact numeric selectors reserve room for both digits and their chevron. */
+.visu-measure-info .numbox-button{position:relative;padding:4px 15px 4px 4px!important;gap:0!important}
+.visu-measure-info .numbox-button::after{position:absolute;right:5px;top:50%;margin:0;transform:translateY(-70%) rotate(45deg)}
+.visu-measure-info .numbox-button>span{overflow:visible;text-overflow:clip}

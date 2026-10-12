@@ -37,7 +37,7 @@ body.poly-mode #sequencePane>.sequence-add{display:none!important}
 .panel-training .training-row input[type=number],.panel-training .training-row select,.panel-training .training-row .numbox-button{min-height:38px;height:38px}
 .panel-training .training-mode-tabs button{min-height:62px}
 .panel-training .btn-train{min-height:44px;margin:8px 0 0!important}
-.panel-training .silent-section{margin-top:22px}
+.panel-training .silent-section{margin:0;padding:0 0 16px;border-top:0;border-bottom:1px solid var(--border)}
 @media(min-width:1101px){
  body{padding:12px 16px;height:100dvh;overflow:hidden}
  header{margin-bottom:0;padding-bottom:12px}
@@ -121,14 +121,14 @@ body.poly-mode #sequencePane>.sequence-add{display:none!important}
  .visu-measure-info .sig-group{gap:4px}
  .visu-toolbar #workspaceControls{padding:0;border:0;min-width:0;width:100%}
  .visu-toolbar .workspace-controls-grid{display:flex;align-items:center;gap:10px;min-width:0}
- .visu-toolbar .workspace-controls-grid .control-group:first-child{display:flex;flex-direction:row;align-items:center;flex:1 1 auto;min-width:170px;gap:5px!important}
+ .visu-toolbar .workspace-controls-grid .control-group:first-child{display:flex;flex-direction:row;align-items:center;flex:1 1 auto;min-width:234px;gap:5px!important}
  .visu-toolbar .workspace-controls-grid .control-group:first-child>label{display:none}
  .visu-toolbar .workspace-controls-grid .tempo-display{font-size:20px;flex:0 0 auto;white-space:nowrap}
  .visu-toolbar .workspace-controls-grid .tempo-display span{font-size:8px}
- .visu-toolbar .workspace-controls-grid .tempo-slider-row{flex:1 1 auto;min-width:54px;gap:3px}
+ .visu-toolbar .workspace-controls-grid .tempo-slider-row{flex:1 1 auto;min-width:54px;max-width:240px;gap:3px}
  .visu-toolbar .workspace-controls-grid .tempo-step-button{width:20px!important;min-width:20px!important;height:28px!important;min-height:28px!important;flex:0 0 20px;padding:2px!important}
  .visu-toolbar .workspace-controls-grid #tempoFader{min-width:0;flex:1;width:100%}
- .visu-toolbar .workspace-controls-grid .tap-tempo-btn{flex:0 0 54px;min-width:54px;height:30px;padding:3px!important;font-size:8px;gap:3px}
+ .visu-toolbar .workspace-controls-grid .tap-tempo-btn{flex:0 0 90px;min-width:90px;height:32px;padding:5px 7px!important;font-size:10px;gap:5px}
  .visu-toolbar .workspace-controls-grid .tap-tempo-btn svg{width:11px;height:11px;margin:0}
  .visu-toolbar .workspace-controls-grid .control-group:nth-child(2){flex:0 1 200px;min-width:104px;gap:3px!important}
  .visu-toolbar .workspace-controls-grid .control-group:nth-child(3){flex:0 1 140px;min-width:65px;gap:3px!important}
@@ -139,3 +139,5 @@ body.poly-mode #sequencePane>.sequence-add{display:none!important}
  .visu-toolbar .workspace-controls-grid .volume-value{font-size:9px}
  .visu-toolbar #trainTimer{font-size:24px;letter-spacing:0;min-width:58px;text-align:right}
 }
+
+@media(min-width:1101px) and (max-width:1250px){.visu-toolbar .workspace-controls-grid .control-group:first-child{min-width:218px}.visu-toolbar .workspace-controls-grid .tap-tempo-btn{flex-basis:74px;min-width:74px;font-size:9px}}

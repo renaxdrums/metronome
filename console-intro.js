@@ -1,148 +1,115 @@
-/* Presentation only: no audio, musical state or saved data is changed. */
+/* Presentation only: geometry is read from the visible instrument, never written back. */
 (() => {
-  const overlay = document.getElementById('renaxArrival');
-  if (!overlay) return;
-  const preference = 'renax.arrival.enabled.v1';
-  const reduce = matchMedia('(prefers-reduced-motion:reduce)');
-  let enabled = true, timer, frame, canvas, previous;
-  try { enabled = localStorage.getItem(preference) !== 'false'; } catch {}
-  const word = overlay.querySelector('.console-arrival-word');
-  function label() {
-    const en = window.RENAX_I18N?.language === 'en';
-    overlay.setAttribute('aria-label', en ? 'Metronome introduction' : 'Animation d’arrivée Métronome');
-    word.replaceChildren(...[...(en ? 'Metronome' : 'Métronome')].map((letter, i) => {
-      const span = document.createElement('span'); span.textContent = letter;
-      span.style.setProperty('--n', i); return span;
-    }));
+ const overlay=document.getElementById('renaxArrival');if(!overlay)return;
+ const preference='renax.arrival.enabled.v1',reduce=matchMedia('(prefers-reduced-motion:reduce)');
+ let enabled=true,timer,frame,canvas,cover,staging,previous;
+ try{enabled=localStorage.getItem(preference)!=='false';}catch{}
+ const word=overlay.querySelector('.console-arrival-word'),logo=overlay.querySelector('.console-arrival-logo');
+ const captions=[word,...overlay.querySelectorAll('.console-arrival-brand,.console-arrival-sweep,.console-arrival-lines')];
+ const clamp=n=>Math.max(0,Math.min(1,n)),ease=n=>{n=clamp(n);return n*n*(3-2*n);};
+ function label(){const en=window.RENAX_I18N?.language==='en';overlay.setAttribute('aria-label',en?'Metronome introduction':'Animation d’arrivée Métronome');word.replaceChildren(...[...(en?'Metronome':'Métronome')].map((letter,i)=>{const span=document.createElement('span');span.textContent=letter;span.style.setProperty('--n',i);return span;}));}
+ function finish(){
+  clearTimeout(timer);cancelAnimationFrame(frame);overlay.hidden=true;
+  canvas?.remove();cover?.remove();staging?.remove();canvas=cover=staging=null;
+  overlay.style.removeProperty('background');overlay.style.pointerEvents='';
+  logo.style.removeProperty('opacity');for(const e of captions){e.style.opacity='';e.style.filter='';}
+  if(overlay.contains(document.activeElement))previous?.focus();
+ }
+ function begin(){
+  if(overlay.hidden)return;
+  canvas=document.createElement('canvas');canvas.className='console-arrival-dust';canvas.setAttribute('aria-hidden','true');overlay.after(canvas);
+  const ctx=canvas.getContext('2d',{alpha:true});if(!ctx){finish();return;}
+  cover=document.createElement('div');cover.className='console-arrival-matte';cover.setAttribute('aria-hidden','true');overlay.prepend(cover);overlay.style.setProperty('background','transparent','important');
+  const ns='http://www.w3.org/2000/svg';staging=document.createElementNS(ns,'svg');staging.classList.add('console-arrival-sampler');staging.setAttribute('aria-hidden','true');document.body.append(staging);
+  const paths=['M146 331 105 208 118 31 286 183H486L654 31 667 208 626 331','M146 331 286 183','M626 331 486 183','M187 332 264 449 256 461 312 597 356 662H416L460 597 516 461 508 449 585 332','M128 405 107 437 276 548','M644 405 665 437 496 548'];
+  const curves=paths.map(d=>{const p=document.createElementNS(ns,'path');p.setAttribute('d',d);staging.append(p);const length=p.getTotalLength();return Array.from({length:81},(_,i)=>{const q=p.getPointAtLength(length*i/80);return {x:q.x,y:q.y};});});
+  const details=['m230 320 77 29 18 33 13 53-26-52-43-19Z','m542 320-77 29-18 33-13 53 26-52 43-19Z','M352 610Q386 594 420 610Q410 628 386 646Q362 628 352 610Z'].map(d=>new Path2D(d));
+  const rect=logo.getBoundingClientRect(),scale=Math.min(rect.width/772,rect.height/958);
+  const origin={x:rect.left+(rect.width-772*scale)/2,y:rect.top+(rect.height-958*scale)/2};
+  const mapped=p=>({x:origin.x+p.x*scale,y:origin.y+p.y*scale});
+  const cross=mapped({x:386,y:735});
+  let width,height,started;
+  function resize(){width=innerWidth;height=innerHeight;const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
+  resize();
+  function destination(){
+   const instrument=document.getElementById('sequencerContainer'),r=instrument?.getBoundingClientRect();
+   const visible=r&&r.width>1&&r.height>1;
+   const center={x:visible?r.x+r.width/2:width/2,y:visible?r.y+r.height/2:height*.6};
+   const raw=visible?[...instrument.querySelectorAll('.step,.poly-dot')]:[];
+   const points=raw.map(e=>{const b=e.getBoundingClientRect();return {x:b.x+b.width/2,y:b.y+b.height/2,outer:e.classList.contains('outer'),inner:e.classList.contains('inner'),visible:b.width>0};}).filter(p=>p.visible);
+   const radii=points.map(p=>Math.hypot(p.x-center.x,p.y-center.y)).filter(n=>n>2);
+   const radius=radii.length?Math.max(...radii):Math.min(width*.22,height*.2,170);
+   const inner=points.some(p=>p.inner)?Math.max(...points.filter(p=>p.inner).map(p=>Math.hypot(p.x-center.x,p.y-center.y))):radius*.65;
+   return {center,radius,inner,points,poly:document.body.dataset.workspace==='polyrhythm',multi:document.body.dataset.workspace==='multi',visible};
   }
-  function finish() {
-    clearTimeout(timer); cancelAnimationFrame(frame); canvas?.remove(); canvas = null;
-    overlay.hidden = true; overlay.style.clipPath = ''; overlay.style.opacity = ''; overlay.style.maskImage = ''; overlay.style.webkitMaskImage = ''; overlay.style.pointerEvents = ''; overlay.classList.remove('is-skipping');
-    if (overlay.contains(document.activeElement)) previous?.focus();
-  }
-  function dissolve() {
-    if (overlay.hidden) return;
-    canvas = document.createElement('canvas'); canvas.className = 'console-arrival-dust';
-    canvas.setAttribute('aria-hidden', 'true'); overlay.after(canvas);
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (!ctx) { finish(); return; }
-    let width, height, started, last, emitted = 0;
-    const sparks = [], duration = 1350, tail = 1000;
-    const varied = () => Math.pow(Math.random(), .45 + Math.random() * 2.3);
-    const logo = overlay.querySelector('.console-arrival-logo');
-    const bounds = word.getBoundingClientRect(), logoBounds = logo?.getBoundingClientRect();
-    // Sample the actual letter shapes and the approved transparent logo once.
-    const stencil = document.createElement('canvas');
-    stencil.width = innerWidth; stencil.height = innerHeight;
-    const ink = stencil.getContext('2d', { willReadFrequently: true }), origins = [];
-    if (ink) {
-      for (const letter of word.children) {
-        const rect = letter.getBoundingClientRect(), style = getComputedStyle(letter);
-        ink.font = style.font; ink.fillStyle = style.color; ink.textBaseline = 'middle';
-        ink.fillText(letter.textContent, rect.left, rect.top + rect.height * .48);
-      }
-      if (logo?.complete && logo.naturalWidth && logoBounds) {
-        try { ink.drawImage(logo, logoBounds.x, logoBounds.y, logoBounds.width, logoBounds.height); } catch {}
-      }
-      try {
-        const pixels = ink.getImageData(0, 0, stencil.width, stencil.height).data;
-        for (let y = 0; y < stencil.height; y += 3) for (let x = 0; x < stencil.width; x += 3) {
-          const i = (y * stencil.width + x) * 4;
-          if (pixels[i + 3] > 80) origins.push({ x, y, warm: pixels[i] > pixels[i + 2] + 35 });
-        }
-      } catch {}
+  function stroke(points,color,lineWidth,alpha){if(alpha<=0)return;ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.globalAlpha=1;}
+  function tick(now){
+   if(overlay.hidden){finish();return;}if(width!==innerWidth||height!==innerHeight)resize();
+   if(started===undefined)started=now;
+   const elapsed=now-started,progress=clamp((elapsed-1100)/1850),motion=ease(progress),target=destination();
+   ctx.clearRect(0,0,width,height);
+   // One grazing light follows the approved orange engraving before it transforms.
+   if(elapsed<1100){
+    const scan=elapsed/1100;
+    for(let k=0;k<curves.length;k++){const curve=curves[k],at=(scan*1.2-k*.07);if(at<0||at>1)continue;const j=Math.round(at*80);stroke(curve.slice(Math.max(0,j-4),Math.min(81,j+5)).map(mapped),'#ffd5a6',Math.max(.8,scale*12),Math.sin(Math.PI*at)*.65);}
+   }
+   // A single soft wave traverses the scene once; it is not the reveal boundary.
+   const wave=clamp((elapsed-300)/800);
+   if(wave>0&&wave<1){
+    const x=-100+(width+200)*wave,alpha=Math.sin(Math.PI*wave)*.12;
+    const ribbon=Array.from({length:61},(_,i)=>{const y=height*i/60;return {x:x+Math.sin(y/height*Math.PI*1.4)*24,y};});
+    ctx.save();ctx.shadowColor='#f0c8a0';ctx.shadowBlur=18;stroke(ribbon,'#f3dcc7',1.2,alpha);ctx.restore();
+   }
+   if(elapsed>=1100){
+    logo.style.setProperty('opacity','0','important');
+    const color=`rgb(${Math.round(255+(69-255)*motion)},${Math.round(121+(215-121)*motion)},${Math.round(0+231*motion)})`;
+    const handoff=1-ease((progress-.76)/.24);
+    for(let k=0;k<curves.length;k++){
+     const ring=target.poly?(k<3?target.radius:target.inner):target.radius;
+     const parts=target.poly?3:6,segment=k%parts,start=-Math.PI/2+segment*Math.PI*2/parts;
+     const points=curves[k].map((p,i)=>{
+      const from=mapped(p),angle=start+(i/80)*Math.PI*2/parts;
+      const to={x:target.center.x+Math.cos(angle)*ring,y:target.center.y+Math.sin(angle)*ring};
+      const bend=Math.sin(Math.PI*motion)*Math.sin(i/80*Math.PI)*(k%2?1:-1)*20;
+      return {x:from.x+(to.x-from.x)*motion+bend,y:from.y+(to.y-from.y)*motion};
+     });
+     const arcColor=target.poly&&k<3?'#ff7900':color;
+     stroke(points,arcColor,scale*26*(1-motion)+1.2*motion,handoff*.9);
     }
-    origins.sort((a, b) => b.y - a.y);
-    function resize() {
-      width = innerWidth; height = innerHeight;
-      const dpr = Math.min(devicePixelRatio || 1, 2);
-      canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.save();ctx.translate(origin.x,origin.y);ctx.scale(scale,scale);ctx.globalAlpha=1-ease(progress/.42);ctx.fillStyle='#ff7900';for(const p of details)ctx.fill(p);ctx.restore();
+    // Straight shafts rotate together around their crossing; they never bend.
+    const center={x:cross.x+(target.center.x-cross.x)*motion,y:cross.y+(target.center.y-cross.y)*motion};
+    const half=330*scale+(target.radius-330*scale)*motion;
+    for(let k=0;k<2;k++){
+     const initial=(k?146:34)*Math.PI/180,final=k?Math.PI/2:0,angle=initial+(final-initial)*motion;
+     const a={x:center.x-Math.cos(angle)*half,y:center.y-Math.sin(angle)*half},b={x:center.x+Math.cos(angle)*half,y:center.y+Math.sin(angle)*half};
+     stroke([a,b],color,scale*24*(1-motion)+motion,handoff*(target.poly?1-ease(progress/.8):.85));
+     if(progress<.55){ctx.globalAlpha=1-ease(progress/.55);ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(a.x,a.y,scale*12,scale*9,angle,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
     }
-    resize();
-    function tick(now) {
-      if (overlay.hidden) { finish(); return; }
-      if (width !== innerWidth || height !== innerHeight) resize();
-      if (started === undefined) { started = now; last = now; }
-      const elapsed = now - started, dt = Math.min(.035, (now - last) / 1000); last = now;
-      const progress = Math.min(1, elapsed / duration);
-      // A broad, continuous fade travels from bottom to top; no boundary, wave or translation.
-      const stops = Array.from({ length: 13 }, (_, i) => {
-        const y = i / 12, local = Math.max(0, Math.min(1, (progress - (1 - y) * .48) / .52));
-        const alpha = 1 - local * local * (3 - 2 * local);
-        return 'rgba(0,0,0,' + alpha.toFixed(4) + ') ' + (y * 100).toFixed(2) + '%';
-      });
-      const mask = 'linear-gradient(to bottom,' + stops.join(',') + ')';
-      overlay.style.maskImage = mask; overlay.style.webkitMaskImage = mask;
-      if (progress > .85) overlay.style.pointerEvents = 'none';
-      const target = Math.round(Math.min(1, progress / .72) * Math.min(650, width * .65));
-      while (emitted < target) {
-        const origin = origins.length ? origins[Math.min(origins.length - 1, Math.floor((.15 + Math.min(1, progress / .72) * .75) * Math.random() * origins.length))] : { x: bounds.left + Math.random() * bounds.width, y: bounds.top + Math.random() * bounds.height, warm: true };
-        const depth = .22 + varied() * .78;
-        const angle = Math.random() * Math.PI * 2, speed = .22 + varied() * 1.25;
-        // A radial burst fills the whole viewport instead of following the lettering baseline.
-        const ambient = Math.random() < .22;
-        const x = ambient ? Math.random() * width : origin.x;
-        const y = ambient ? Math.random() * height : origin.y;
-        sparks.push({ x, y, vx: Math.cos(angle) * width * .42 * speed * depth,
-          vy: Math.sin(angle) * height * .65 * speed * depth, radius: .35 + varied() * 2.3,
-          life: .55 + varied() * 1.4, age: 0, depth, phase: Math.random() * Math.PI * 2,
-          flutter: 2 + varied() * 8, bend: 18 + varied() * 100, drag: .25 + varied() * 1.3,
-          flare: Math.random() < .045, warm: origin.warm, power: .22 + varied() * .78 });
-        emitted++;
-      }
-      ctx.clearRect(0, 0, width, height); ctx.globalCompositeOperation = 'lighter';
-      for (let i = sparks.length - 1; i >= 0; i--) {
-        const p = sparks[i]; p.age += dt;
-        if (p.age >= p.life) { sparks.splice(i, 1); continue; }
-        // Independent swirls, drag and overlapping flicker frequencies keep each spark alive.
-        p.vx += Math.sin(p.age * p.flutter + p.phase) * p.bend * dt;
-        p.vy += Math.cos(p.age * (p.flutter * .71) - p.phase) * p.bend * .7 * dt;
-        const drag = Math.exp(-p.drag * dt); p.vx *= drag; p.vy *= drag;
-        p.x += p.vx * dt; p.y += p.vy * dt;
-        const life = p.age / p.life;
-        const flicker = .66 + .22 * Math.sin(p.age * p.flutter * 2.8 + p.phase) + .12 * Math.cos(p.age * p.flutter * 5.1 - p.phase);
-        const alpha = Math.sin(Math.PI * life) * p.power * (1 - progress * .35) * flicker;
-        const color = p.warm ? '255,155,75' : '255,234,205';
-        const halo = p.radius * (p.flare ? 13 : 4) * (.8 + flicker * .3);
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, halo);
-        glow.addColorStop(0, 'rgba(255,245,222,' + alpha.toFixed(3) + ')');
-        glow.addColorStop(.15, 'rgba(' + color + ',' + (alpha * .55).toFixed(3) + ')');
-        glow.addColorStop(.45, 'rgba(' + color + ',' + (alpha * .10).toFixed(3) + ')');
-        glow.addColorStop(1, 'rgba(' + color + ',0)');
-        ctx.fillStyle = glow; ctx.fillRect(p.x - halo, p.y - halo, halo * 2, halo * 2);
-        if (p.flare) {
-          const length = 12 + Math.sin(Math.PI * life) * 22;
-          const streak = ctx.createLinearGradient(p.x - length, 0, p.x + length, 0);
-          streak.addColorStop(0, 'rgba(' + color + ',0)'); streak.addColorStop(.5, 'rgba(255,235,205,' + (alpha * .7).toFixed(3) + ')'); streak.addColorStop(1, 'rgba(' + color + ',0)');
-          ctx.fillStyle = streak; ctx.fillRect(p.x - length, p.y - .5, length * 2, 1);
-        }
-      }
-      if (elapsed >= duration + tail) finish(); else frame = requestAnimationFrame(tick);
+    // The final destinations come from the actual metric, including both polyrhythm rings.
+    const pointAlpha=ease((progress-.36)/.35)*handoff*.75;
+    for(let i=0;i<target.points.length;i++){
+     const p=target.points[i],seed=mapped(curves[i%curves.length][Math.floor(i*13%81)]);
+     const x=seed.x+(p.x-seed.x)*motion,y=seed.y+(p.y-seed.y)*motion;
+     ctx.fillStyle=target.poly&&p.outer?'#ff7900':color;ctx.globalAlpha=pointAlpha;ctx.beginPath();ctx.arc(x,y,1.6+motion*1.2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
     }
-    frame = requestAnimationFrame(tick);
-    timer = setTimeout(finish, duration + tail + 500);
+    if(target.multi){for(let i=1;i<=2;i++){const alpha=Math.sin(Math.PI*progress)*.12;ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=.7;ctx.globalAlpha=alpha;ctx.arc(center.x,center.y,half+i*6*Math.sin(Math.PI*motion),-.5+motion*i,Math.PI*1.6+motion*i);ctx.stroke();ctx.globalAlpha=1;}}
+    // The matte fades from its bottom, over a very broad feather. It never translates.
+    const stops=Array.from({length:13},(_,i)=>{const y=i/12,t=clamp((progress-(1-y)*.35)/.65),alpha=1-ease(t);return `rgba(0,0,0,${alpha.toFixed(4)}) ${(y*100).toFixed(2)}%`;});
+    cover.style.maskImage='linear-gradient(to bottom,'+stops.join(',')+')';cover.style.webkitMaskImage=cover.style.maskImage;
+    const textFade=1-ease((progress-.42)/.58);word.style.opacity=String(textFade);word.style.filter=`blur(${((1-textFade)*2).toFixed(2)}px)`;
+    for(const e of captions.slice(1))e.style.opacity=String(1-ease(progress/.7));
+    if(progress>.25)overlay.style.pointerEvents='none';
+   }
+   if(elapsed>=3300)finish();else frame=requestAnimationFrame(tick);
   }
-
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !overlay.hidden) { event.preventDefault(); finish(); }
-  }, true);
-  window.addEventListener('pagehide', finish, { once: true });
-  reduce.addEventListener('change', () => { if (reduce.matches) finish(); });
-  const settings = document.querySelector('#index2SettingsPanel .index2-settings-section');
-  if (settings) {
-    const row = document.createElement('label'); row.className = 'console-arrival-setting';
-    const caption = document.createElement('span'), toggle = document.createElement('input');
-    toggle.type = 'checkbox'; toggle.checked = enabled; row.append(caption, toggle); settings.append(row);
-    function translate() { caption.textContent = window.RENAX_I18N?.language === 'en' ? 'Intro animation' : 'Animation d’arrivée'; }
-    translate(); window.addEventListener('renax-language-changed', translate);
-    toggle.onchange = () => { enabled = toggle.checked; try { localStorage.setItem(preference, String(enabled)); } catch {} };
-  }
-  window.addEventListener('renax-language-changed', () => { if (!overlay.hidden) label(); });
-  if (enabled && !reduce.matches) {
-    label(); previous = document.activeElement;
-    // Keep the approved logo and lettering arrival, then fade the whole surface with warm flare particles.
-    timer = setTimeout(dissolve, 1700);
-  } else finish();
+  frame=requestAnimationFrame(tick);timer=setTimeout(finish,3900);
+ }
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}},true);
+ window.addEventListener('pagehide',finish,{once:true});reduce.addEventListener('change',()=>{if(reduce.matches)finish();});
+ const settings=document.querySelector('#index2SettingsPanel .index2-settings-section');
+ if(settings){const row=document.createElement('label');row.className='console-arrival-setting';const caption=document.createElement('span'),toggle=document.createElement('input');toggle.type='checkbox';toggle.checked=enabled;row.append(caption,toggle);settings.append(row);function translate(){caption.textContent=window.RENAX_I18N?.language==='en'?'Intro animation':'Animation d’arrivée';}translate();window.addEventListener('renax-language-changed',translate);toggle.onchange=()=>{enabled=toggle.checked;try{localStorage.setItem(preference,String(enabled));}catch{}};}
+ window.addEventListener('renax-language-changed',()=>{if(!overlay.hidden)label();});
+ if(enabled&&!reduce.matches){label();previous=document.activeElement;timer=setTimeout(begin,900);}else finish();
 })();
 

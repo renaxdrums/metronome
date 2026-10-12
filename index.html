@@ -1329,12 +1329,21 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 </style>
 <link rel="stylesheet" href="multi-metronome.css?v=20261012-sequence-fold1">
   <link rel="stylesheet" href="workspace-layout.css?v=20261012-workspaces8">
+<link rel="stylesheet" href="pro-interface.css?v=20261012-font-audit2">
+<link rel="stylesheet" href="console-theme.css?v=20261012-console1">
 </head>
 <body>
+<div id="renaxArrival" role="dialog" aria-modal="true" aria-label="Animation d’arrivée Métronome" data-no-translate>
+<div class="console-arrival-lines" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="console-arrival-center"><img class="console-arrival-logo" src="assets/renax-logo-approved.svg?v=20261012-console1" alt="Renax Drums">
+<div class="console-arrival-word" aria-label="Métronome"><span style="--n:0">M</span><span style="--n:1">é</span><span style="--n:2">t</span><span style="--n:3">r</span><span style="--n:4">o</span><span style="--n:5">n</span><span style="--n:6">o</span><span style="--n:7">m</span><span style="--n:8">e</span></div>
+<small class="console-arrival-brand">RENAX DRUMS</small><div class="console-arrival-sweep" aria-hidden="true"></div></div>
+<button type="button" class="console-arrival-skip">Passer</button></div>
+<noscript><style>#renaxArrival{display:none!important}</style></noscript>
 
   <header>
     <div class="header-left">
-      <img class="brand-logo" src="assets/renax-logo-approved.svg?v=20261011-fresh-pro1" alt="Logo RENAX DRUMS">
+      <img class="brand-logo" src="assets/renax-logo-approved.svg?v=20261012-console1" alt="Logo RENAX DRUMS">
       <div class="brand">
         <h1>RENAX DRUMS</h1>
         <p><span style="color:#fff">Métro</span><span style="color:var(--orange)">nome</span></p>
@@ -4004,11 +4013,12 @@ fader.addEventListener('input',()=>setTempo(positionToTempo(fader.value)));
 fader.addEventListener('keydown',event=>{const delta={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1,PageDown:-10,PageUp:10}[event.key];if(delta!==undefined||event.key==='Home'||event.key==='End'){event.preventDefault();setTempo(event.key==='Home'?2:event.key==='End'?999:Number(bpmSlider.value)+delta);}});
 bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',sync);
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
-})();</script><link rel="stylesheet" href="pro-interface.css?v=20261012-font-audit2">
+})();</script>
 <script src="multi-clock.js?v=20261012-multi5"></script>
 <script src="multi-metronome.js?v=20261012-measure-menus1"></script>
 <script src="interface-language.js?v=20261012-workspaces8"></script>
 <script src="workspace-layout.js?v=20261012-workspaces8"></script>
+<script src="console-intro.js?v=20261012-console1"></script>
 </body>
 </html>
 

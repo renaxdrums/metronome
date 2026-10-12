@@ -1,0 +1,43 @@
+/* Desktop workspace hierarchy. Existing controls and audio logic stay intact. */
+#workspaceNav,#workspaceHome{display:none}
+@media(min-width:1101px){
+ body{padding:12px 16px;height:100dvh;overflow:hidden}
+ header{margin-bottom:0;padding-bottom:12px}
+ #workspaceNav{display:flex;gap:6px;padding:10px 0 12px;flex-shrink:0;align-items:center}
+ #workspaceNav button{display:flex;align-items:center;justify-content:center;gap:9px;min-height:40px;padding:8px 18px;color:var(--text);background:transparent;border:1px solid transparent;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+ #workspaceNav button[aria-selected=true]{border-color:#009cab;background:#00cee514}
+ #workspaceNav button:hover{background:#ffffff06;border-color:var(--border)}
+ #workspaceNav svg,#workspaceHome svg{width:18px;height:18px;fill:none;stroke:var(--orange);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+ #workspaceNav button:focus-visible,#workspaceHome:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+ .main-grid{grid-template-columns:248px minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important;grid-template-areas:none!important;gap:16px!important}
+ .main-grid>.panel-params{grid-area:auto!important;grid-column:1!important;grid-row:1!important}
+ .main-grid>.panel-visu{grid-area:auto!important;grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;padding:18px!important;gap:12px!important}
+ .main-grid>.panel-seq{grid-area:auto!important;grid-column:3!important;grid-row:1!important;padding:16px!important}
+ .main-grid>.panel-training{display:none!important}
+ body[data-workspace=metronome] .main-grid,body[data-workspace=polyrhythm] .main-grid{grid-template-columns:248px minmax(0,1fr)!important}
+ body[data-workspace=metronome] .panel-seq,body[data-workspace=polyrhythm] .panel-seq{display:none!important}
+ #modeSwitch,.panel-seq>.song-tabs,.panel-seq .multi-mode-tabs{display:none!important}
+ .panel-params{padding:16px!important;gap:18px!important}
+ .panel-params .control-group{gap:8px!important}
+ .panel-params .control-group>label{display:flex;align-items:center;gap:8px;min-height:18px;margin:0;padding:0;font-size:11px;letter-spacing:.2px}
+ .panel-params .control-group>label svg{width:15px;flex:0 0 15px}
+ .panel-params .control-group:nth-of-type(4)>label{padding-left:23px}
+ .panel-params .training-section{padding-top:18px!important;gap:8px!important}
+ .panel-params .training-row{font-size:11px!important}
+ .panel-params .tempo-display{font-size:32px}
+ .panel-params .numbox-button,.panel-params input[type=number]{min-height:34px}
+ .panel-visu>.panel-title{flex:0 0 auto}
+ .panel-visu .visu-toolbar{padding-bottom:12px;gap:12px}
+ .panel-visu .sequencer-wrapper{flex:1 1 auto;min-height:0;container-type:size;padding:0!important;display:flex;align-items:center;justify-content:center;width:100%}
+ .panel-visu .sequencer-container{width:min(100%,calc(100cqh - 12px))!important;height:auto!important;max-width:780px!important;max-height:none!important;aspect-ratio:1}
+ .panel-visu.score-view .sequencer-wrapper{overflow:auto}
+ footer{min-height:64px;margin-top:12px;gap:16px;padding-top:10px}
+ footer>.visu-bottom{flex:1;min-width:0;gap:0;padding:0!important}
+ footer .visu-bottom .footer-center{display:flex!important;justify-content:center!important;position:static;transform:none;width:100%}
+ footer .visu-bottom #playBtn{min-width:132px!important;height:44px!important}
+ footer .footer-left{position:absolute;left:0;z-index:3}
+ #workspaceHome{display:grid;place-items:center;width:38px;height:38px;padding:0;background:#ffffff04;border:1px solid var(--border);border-radius:7px;cursor:pointer}
+ footer .footer-right{position:absolute;right:0;pointer-events:none}
+ footer>.visu-bottom>.legend{display:none!important}
+}
+@media(min-width:1101px) and (max-width:1300px){.main-grid{grid-template-columns:225px minmax(0,1fr) 300px!important}body[data-workspace=metronome] .main-grid,body[data-workspace=polyrhythm] .main-grid{grid-template-columns:225px minmax(0,1fr)!important}#workspaceNav button{padding-inline:13px}}

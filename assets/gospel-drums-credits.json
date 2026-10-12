@@ -1,16 +1,16 @@
 [
   {
     "key": "gospelTambourine",
-    "name": "Tambourin acoustique",
-    "source": "https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Percussion/Tamb1-Hit_v2_rr1_Sum.wav",
-    "author": "Versilian Studios",
+    "name": "Tambourin naturel",
+    "source": "https://raw.githubusercontent.com/sgossner/VCSL/master/Idiophones/Struck%20Idiophones/Tambourine%202/Tamb2_Hit_v2_rr2_Mid.wav",
+    "author": "Versilian Studios · VCSL",
     "license": "CC0-1.0",
-    "sourceSha256": "7bfc01a7d8b51bcc0a2e3dab986de8e06980d136f0ad645b798820d8ecd5eb37",
-    "duration": 0.18,
+    "sourceSha256": "b9bb7020852c91add8bb12754c8e71e231e5e7d8dd6553face1fc60c689187ff",
+    "duration": 0.28,
     "attackRms": 0.075,
-    "peak": 0.31272765966744054,
+    "peak": 0.3013397521248123,
     "pitchRatio": 1.0,
-    "processing": "Mono 44.1kHz, leading silence removed, short natural tail with 25ms fade, attack level matched; snare tightened +1.96 semitones"
+    "processing": "Natural struck tambourine recording, mono 44.1kHz, leading silence trimmed, 280ms natural tail with 25ms fade, 40ms attack RMS matched; no synthesis or sample pitch processing"
   },
   {
     "key": "gospelKick",
@@ -40,15 +40,15 @@
   },
   {
     "key": "gospelHiHat",
-    "name": "Hi-hat acoustique",
-    "source": "https://freesound.org/people/Matias.Reccius/sounds/45061/",
-    "author": "Matias Reccius",
+    "name": "Hi-hat fermé naturel",
+    "source": "https://raw.githubusercontent.com/sfzinstruments/virtuosity_drums/master/Samples/mid/hh/mid_hh_closed_vl3_rr1.flac",
+    "author": "Austin McMahon · Versilian Studios / Karoryfer Samples",
     "license": "CC0-1.0",
-    "sourceSha256": "4a7c341e474d89af55a87512256dd913bd534268f1f493e56e18ef30a859a6ef",
-    "duration": 0.16,
+    "sourceSha256": "5a747638b0acb5dc42f2e68c61b29085a489af524bdd5da180cb1de542e1bad1",
+    "duration": 0.22,
     "attackRms": 0.075,
-    "peak": 0.28309263891404834,
+    "peak": 0.3039712083353342,
     "pitchRatio": 1.0,
-    "processing": "Mono 44.1kHz, leading silence removed, short natural tail with 25ms fade, attack level matched; snare tightened +1.96 semitones"
+    "processing": "Natural closed hi-hat recording, mono 44.1kHz, silence trimmed, 220ms natural tail with 25ms fade, 40ms attack RMS matched; no pitch processing of the sample"
   }
 ]

@@ -281,7 +281,7 @@
     songsHome.hidden=songView!=='home';profilePane.hidden=songView!=='profile';songPane.hidden=!['playlists','playlist','detail'].includes(songView);
     button('Sauvegarde',songsHome,()=>navigate('profile')).classList.add('song-entry');
     button('Playlist',songsHome,()=>navigate('playlists')).classList.add('song-entry');
-    const backProfile=button('Retour',profilePane,()=>navigate('home'));backProfile.classList.add('song-back');backProfile.setAttribute('aria-label','Retour aux morceaux');
+    const backProfile=button('Retour',profilePane,()=>navigate('home'));backProfile.classList.add('song-back');backProfile.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 5-7 7 7 7M5 12h15"/></svg>';backProfile.setAttribute('aria-label','Retour aux morceaux');
     const backSong=button('Retour',songPane,()=>navigate(songView==='detail'?'playlist':songView==='playlist'?'playlists':'home'));backSong.classList.add('song-back');backSong.textContent='';backSong.setAttribute('aria-label',songView==='detail'?'Retour à la playlist':songView==='playlist'?'Retour aux playlists':'Retour aux morceaux');
 const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
     const createPlaylist=()=>{const name=prompt('Nom de la playlist');if(!name?.trim())return;unload();const created={id:id(),name:name.trim(),songs:[]};library.profiles.push(created);library.activeProfile=created.id;selectedSong=null;songView='playlist';persist();render();};

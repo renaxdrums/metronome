@@ -279,3 +279,7 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
  }
 }
 @media(max-width:1100px){.workspace-controls-grid .volume-row{min-width:0}.workspace-controls-grid #volumeSlider{min-width:72px;flex:1;width:100%}}
+
+#index2SettingsPanel button,#directAccountDialog .btn{background:#343b45!important;border-color:#505b69!important;color:var(--text)!important;border-radius:6px;box-shadow:none!important}
+#index2SettingsPanel button[aria-pressed=true],#index2SettingsPanel button[aria-selected=true]{background:#28424b!important;border-color:#4b7884!important}
+#index2SettingsPanel button:disabled{background:#343b45!important}

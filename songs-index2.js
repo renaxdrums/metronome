@@ -13,7 +13,7 @@
   }
   function durationText(song){const seconds=Math.round(playbackSections(song).reduce((total,section)=>total+section.count*section.measure.numerator*(4/section.measure.denominator)*60/section.measure.tempo,0));return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');}
   const blankSection=()=>({id:id(),label:'Couplet 1',count:4,measure:createMeasure(4,4,120)});
-  const blankSong=()=>({id:id(),name:'Nouveau morceau',sections:[blankSection()]});
+  const blankSong=()=>({id:id(),name:'Nouveau track',sections:[blankSection()]});
   const defaultLibrary=()=>({version:1,activeProfile:null,profiles:[{id:id(),name:'Mon profil',songs:[]}]});
   let library,selectedSong=null,loaded=null,endTimer=null,songView='home',openSectionId=null,storageStatus='Enregistrement automatique';
   try { library=JSON.parse(RENAX_STORAGE.read())||defaultLibrary();validateLibrary(library); }
@@ -48,7 +48,7 @@
   const songsRoot=document.createElement('div');songsRoot.id='songsRoot';songsRoot.hidden=true;
   songsRoot.append(songsHome,profilePane,songPane);panel.append(tabs,sequencePane,songsRoot);
   function tab(name) {if(name==='songs'&&songsRoot.hidden)stopMetronome();songsRoot.hidden=name!=='songs';sequencePane.hidden=name!=='sequence';tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.pane===name)));if(name==='sequence')unload();else selectOpenBlock();syncSongTransport();panel.scrollTop=0;}
-  for(const [name,title] of [['sequence','Séquenceur'],['songs','Morceaux']]) {const b=document.createElement('button');b.textContent=title;b.dataset.pane=name;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(name==='sequence'));b.onclick=()=>tab(name);tabs.append(b);}
+  for(const [name,title] of [['sequence','Séquenceur'],['songs','Tracks']]) {const b=document.createElement('button');b.textContent=title;b.dataset.pane=name;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(name==='sequence'));b.onclick=()=>tab(name);tabs.append(b);}
   function navigate(view){if(view==='home'||view==='playlists'||view==='playlist'){unload();selectedSong=null;}songView=view;render();panel.scrollTop=0;}
   function el(tag,text,parent,cls) {const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;if(parent)parent.append(e);return e;}
   function splitTitle(parent,white,orange){parent.replaceChildren();el('span',white,parent).style.color='#fff';el('span',orange,parent).style.color='var(--orange)';}
@@ -243,11 +243,11 @@
     const p=profile();
     const targets=library.profiles.filter(candidate=>mode==='move'?candidate.id!==p.id:true);
     if(!targets.length){status('Aucune autre playlist disponible.');return;}
-    const labels=targets.map((candidate,index)=>(index+1)+' — '+(candidate.name==='Mon profil'?'Morceaux':candidate.name));
+    const labels=targets.map((candidate,index)=>(index+1)+' — '+(candidate.name==='Mon profil'?'Tracks':candidate.name));
     const raw=prompt((mode==='move'?'Déplacer':'Copier')+' « '+source.name+' » vers :\n'+labels.join('\n')+'\n\nNuméro de la playlist');
     if(raw===null)return;const target=targets[Number(raw)-1];if(!target){status('Playlist non reconnue.');return;}
-    if(mode==='copy'){duplicateSongTo(source,target,false);persist();status('Morceau copié dans '+(target.name==='Mon profil'?'Morceaux':target.name)+'.');}
-    else{unload();p.songs=p.songs.filter(song=>song!==source);target.songs.push(source);selectedSong=null;persist();render();status('Morceau déplacé dans '+(target.name==='Mon profil'?'Morceaux':target.name)+'.');}
+    if(mode==='copy'){duplicateSongTo(source,target,false);persist();status('Morceau copié dans '+(target.name==='Mon profil'?'Tracks':target.name)+'.');}
+    else{unload();p.songs=p.songs.filter(song=>song!==source);target.songs.push(source);selectedSong=null;persist();render();status('Morceau déplacé dans '+(target.name==='Mon profil'?'Tracks':target.name)+'.');}
   }
   function addSongMenu(row,item){
     const p=profile();
@@ -293,15 +293,15 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       const list=el('div',undefined,overview,'playlist-list');
       for(const item of library.profiles){
         const entry=el('div',undefined,list);entry.style.position='relative';
-        const choice=button('',entry,()=>openPlaylist(item));choice.style.paddingRight='58px';choice.classList.add('playlist-choice');choice.setAttribute('aria-label','Ouvrir la playlist '+(item.name==='Mon profil'?'Morceaux':item.name));
-        const name=el('strong',item.name==='Mon profil'?'Morceaux':item.name,choice,'playlist-choice-name');if(item.name==='Mon profil')splitTitle(name,'Morc','eaux');
+        const choice=button('',entry,()=>openPlaylist(item));choice.style.paddingRight='58px';choice.classList.add('playlist-choice');choice.setAttribute('aria-label','Ouvrir la playlist '+(item.name==='Mon profil'?'Tracks':item.name));
+        const name=el('strong',item.name==='Mon profil'?'Tracks':item.name,choice,'playlist-choice-name');if(item.name==='Mon profil')splitTitle(name,'Morc','eaux');
         el('span',item.songs.length+' morceau'+(item.songs.length===1?'':'x'),choice,'playlist-choice-count');
         const controls=el('div',undefined,entry,'song-more-wrap');controls.style.top='8px';controls.style.bottom='auto';
         const trigger=button('⋯',controls,()=>{const opening=menu.hidden;songPane.querySelectorAll('.song-more-menu').forEach(other=>other.hidden=true);songPane.querySelectorAll('.song-more').forEach(other=>other.setAttribute('aria-expanded','false'));menu.hidden=!opening;trigger.setAttribute('aria-expanded',String(opening));});
-        trigger.className='song-more';trigger.setAttribute('aria-label','Actions de la playlist '+(item.name==='Mon profil'?'Morceaux':item.name));trigger.setAttribute('aria-haspopup','menu');trigger.setAttribute('aria-expanded','false');
+        trigger.className='song-more';trigger.setAttribute('aria-label','Actions de la playlist '+(item.name==='Mon profil'?'Tracks':item.name));trigger.setAttribute('aria-haspopup','menu');trigger.setAttribute('aria-expanded','false');
         const menu=el('div',undefined,controls,'song-more-menu');menu.hidden=true;menu.setAttribute('role','menu');menu.style.top='36px';menu.style.bottom='auto';
-        const rename=button('Renommer',menu,()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=prompt('Nom de la playlist',item.name==='Mon profil'?'Morceaux':item.name);if(name?.trim()){item.name=name.trim();persist();render();}});rename.setAttribute('role','menuitem');
-        const remove=button('Supprimer',menu,()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(!confirm('Supprimer la playlist « '+(item.name==='Mon profil'?'Morceaux':item.name)+' » et ses '+item.songs.length+' morceau(x) ?'))return;
+        const rename=button('Renommer',menu,()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=prompt('Nom de la playlist',item.name==='Mon profil'?'Tracks':item.name);if(name?.trim()){item.name=name.trim();persist();render();}});rename.setAttribute('role','menuitem');
+        const remove=button('Supprimer',menu,()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(!confirm('Supprimer la playlist « '+(item.name==='Mon profil'?'Tracks':item.name)+' » et ses '+item.songs.length+' morceau(x) ?'))return;
           if(library.activeProfile===item.id)unload();library.profiles=library.profiles.filter(candidate=>candidate!==item);
           if(!library.profiles.length)library.profiles=defaultLibrary().profiles;
           if(!library.profiles.some(candidate=>candidate.id===library.activeProfile)){library.activeProfile=library.profiles[0].id;selectedSong=null;openSectionId=null;}
@@ -311,7 +311,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
     }
     const localProfiles=el('section',undefined,songPane,'playlist-manager');localProfiles.hidden=songView!=='playlist';
     const playlistHeading=el('div',undefined,localProfiles,'playlist-heading');
-    const playlistTitle=el('strong',p.name==='Mon profil'?'Morceaux':p.name,playlistHeading,'playlist-heading-name');if(p.name==='Mon profil')splitTitle(playlistTitle,'Morc','eaux');
+    const playlistTitle=el('strong',p.name==='Mon profil'?'Tracks':p.name,playlistHeading,'playlist-heading-name');if(p.name==='Mon profil')splitTitle(playlistTitle,'Morc','eaux');
     if(songView==='playlist')playlistHeading.prepend(backSong);
     const actions=songView==='playlists'?null:el('div',undefined,songPane,'song-actions');
     const s=song();

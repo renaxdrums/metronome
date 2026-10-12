@@ -26,8 +26,8 @@
 .workspace-controls-grid .tempo-slider-row{margin-top:0}
 .workspace-controls-grid #soundBank{max-width:100%}
 #sequenceAddMeasure:disabled{opacity:.45;cursor:default}
-body:not(.poly-mode) #sequencePane>.sequence-count-row{display:none!important}
-body.poly-mode #sequencePane>.sequence-add{display:none!important}
+#sequencePane>.sequence-count-row{display:none!important}
+
 #mobileTrainingHost{width:100%!important;max-width:none!important}
 .panel-training .training-section{margin:0!important;border:0!important;padding:0!important;gap:16px!important;width:100%!important}
 .panel-training .training-section>label{display:none}
@@ -156,4 +156,13 @@ body.poly-mode #sequencePane>.sequence-add{display:none!important}
  .visu-toolbar .volume-row{gap:5px}
  .visu-toolbar #trainTimer{font-size:22px}
  .workspace-timer-label{font-size:7px!important}
+}
+
+@media(min-width:1101px){
+ .panel-visu>.visu-bottom{flex:0 0 auto;align-self:stretch;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 0 0!important;gap:0;border-top:1px solid var(--border)}
+ .panel-visu>.visu-bottom .footer-center{position:static!important;left:auto!important;bottom:auto!important;transform:none!important;display:flex!important;align-items:center;justify-content:center;width:100%;gap:8px}
+ .panel-visu>.visu-bottom #playBtn{min-width:132px!important;height:44px!important}
+ .panel-visu>.visu-bottom>.legend{display:none!important}
+ footer{flex:0 0 auto;min-height:22px;height:22px;margin-top:6px;padding:4px 0 0;display:flex;align-items:center;justify-content:flex-end;border-top:0}
+ footer .footer-right{position:static;display:flex;justify-content:flex-end;margin-left:auto}
 }

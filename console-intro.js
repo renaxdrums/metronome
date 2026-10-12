@@ -53,12 +53,39 @@
     const scan=elapsed/1100;
     for(let k=0;k<curves.length;k++){const curve=curves[k],at=(scan*1.2-k*.07);if(at<0||at>1)continue;const j=Math.round(at*80);stroke(curve.slice(Math.max(0,j-4),Math.min(81,j+5)).map(mapped),'#ffd5a6',Math.max(.8,scale*12),Math.sin(Math.PI*at)*.65);}
    }
-   // A single soft wave traverses the scene once; it is not the reveal boundary.
-   const wave=clamp((elapsed-300)/800);
+   // One travelling spectral field: fine interlaced audio filaments, not a sweeping edge.
+   const wave=clamp((elapsed-180)/1450);
    if(wave>0&&wave<1){
-    const x=-100+(width+200)*wave,alpha=Math.sin(Math.PI*wave)*.12;
-    const ribbon=Array.from({length:61},(_,i)=>{const y=height*i/60;return {x:x+Math.sin(y/height*Math.PI*1.4)*24,y};});
-    ctx.save();ctx.shadowColor='#f0c8a0';ctx.shadowBlur=18;stroke(ribbon,'#f3dcc7',1.2,alpha);ctx.restore();
+    const opacity=Math.pow(Math.sin(Math.PI*wave),.75),time=elapsed/1000;
+    const base=height*.69,amplitude=Math.min(height*.14,115),packet=wave*1.5-.25;
+    const spectrum=ctx.createLinearGradient(0,0,width,0);
+    spectrum.addColorStop(0,'#ff7900');spectrum.addColorStop(.32,'#ffbb65');spectrum.addColorStop(.58,'#cce6c2');spectrum.addColorStop(1,'#45d7e7');
+    const energy=u=>Math.exp(-Math.pow((u-packet)/.34,2));
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    // The spectral ridges stay thin and translucent behind the flowing lines.
+    ctx.strokeStyle=spectrum;ctx.lineWidth=.45;
+    for(let i=0;i<190;i++){
+     const u=i/189,x=u*width,e=energy(u);
+     const peak=Math.pow(Math.abs(Math.sin(u*83-time*2.7)+.45*Math.sin(u*157+time*1.8))/1.45,3);
+     const h=amplitude*1.8*peak*(.12+e*.88);
+     ctx.globalAlpha=opacity*(.025+e*.10);ctx.beginPath();ctx.moveTo(x,base+7);ctx.lineTo(x,base-h);ctx.stroke();
+    }
+    for(let k=0;k<38;k++){
+     const depth=k/37,phase=k*.173,points=[];
+     for(let i=0;i<=230;i++){
+      const u=i/230,e=energy(u),ridge=.25+.75*Math.pow(.5+.5*Math.sin(u*17-time*1.4+phase*.24),2);
+      const carrier=Math.sin(u*25-time*2.1+phase)+.42*Math.sin(u*49+time*.9-phase*.6)+.18*Math.sin(u*93-time*1.3+phase);
+      const y=base+carrier*amplitude*(.18+e*.82)*ridge*(.38+depth*.62)+(depth-.5)*18;
+      points.push({x:u*width,y});
+     }
+     ctx.shadowColor=k<19?'#ffb268':'#7cdbe8';ctx.shadowBlur=k%12===0?5:0;
+     stroke(points,spectrum,.55+depth*.3,opacity*(.10+depth*.075));
+     if(k%4===0){
+      const reflected=points.map(p=>({x:p.x,y:base+(base-p.y)*.35+13}));
+      ctx.shadowBlur=0;stroke(reflected,spectrum,.6,opacity*.035);
+     }
+    }
+    ctx.restore();
    }
    if(elapsed>=1100){
     logo.style.setProperty('opacity','0','important');

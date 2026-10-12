@@ -233,3 +233,49 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
 #songsRoot .song-count-in-summary,#songsRoot .song-count-in-tempo{color:var(--text-muted);font:500 11px/1.5 var(--font);margin:8px 0 0}
 #songsRoot .song-actions>.btn:not(.track-create):not(.song-back){background:#343b45!important;border-color:#505b69!important;color:var(--text)!important;border-radius:6px;min-height:38px;font:500 11px/1.4 var(--font);box-shadow:none}
 #songsRoot .playlist-manager .playlist-heading{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+
+/* Shared surfaces: training choices, Track cards, popups and menus. */
+:root{--card-selected:#1d2b32;--card-selected-border:#3b707c}
+.training-section .training-mode-tabs button,.training-section .training-curve-options button,.training-section #dirToggle button{background:#343b45!important;border:1px solid #505b69!important;color:var(--text)!important;box-shadow:none!important}
+.training-section .training-mode-tabs button[aria-selected=true],.training-section .training-curve-options button[aria-pressed=true],.training-section #dirToggle button.active{background:#28424b!important;border-color:#4b7884!important}
+.training-section .training-mode-tabs button svg,.training-section .training-curve-options button svg{stroke:var(--orange)!important}
+.training-section .training-mode-tabs button[aria-selected=true] svg,.training-section .training-curve-options button[aria-pressed=true] svg{stroke:var(--cyan)!important}
+#songsRoot .song-section.measure-card,#songsRoot .song-count-in.measure-card{background:var(--card-selected)!important;border-color:var(--card-selected-border)!important}
+#songsRoot #profilePane>.song-back{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;margin:0 0 4px;padding:0!important;border:1px solid #505b69!important;border-radius:6px;color:var(--orange)!important}
+#songsRoot #profilePane>.song-back::before,#songsRoot #profilePane>.song-back::after{content:none!important}
+#profilePane>.song-back svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+dialog,#beatEditor,#index2SettingsPanel{background:#272d35!important;border-color:#505b69!important;color:var(--text)!important;font-family:var(--font)!important;border-radius:9px}
+#mp3ExportDialog{font:500 12px/1.5 var(--font)!important;max-height:calc(100dvh - 32px);overflow:auto}
+#mp3ExportDialog h2{font:600 15px/1.4 var(--font);color:var(--text)}
+#mp3ExportDialog label{font:500 12px/1.4 var(--font);color:var(--text-muted);margin:12px 0 7px}
+#mp3ExportDialog :is(select,.numbox-button){background:#363e49!important;border-color:#505b69!important;color:var(--text)!important;font-family:var(--font)}
+#mp3ExportDialog .mp3-actions .btn{background:#343b45!important;border:1px solid #505b69!important;color:var(--text)!important;font:600 11px/1.4 var(--font)!important;letter-spacing:0;text-transform:none;border-radius:6px;white-space:normal}
+#mp3ExportDialog .mp3-actions #mp3ExportSave{background:#28424b!important;border-color:#4b7884!important;color:var(--cyan)!important}
+#mp3ExportDialog .mp3-credit{color:var(--text-muted)}
+.numbox-menu,.numbox-dropdown,.training-curve-menu,.sequence-more-actions,.multi-actions{background:#303844!important;border-color:#596675!important}
+.numbox-option{color:var(--text)}
+.numbox-option:hover{background:#414a56!important}
+.numbox-button{display:flex!important;align-items:center;justify-content:space-between;gap:7px;box-sizing:border-box}
+.numbox-button>span{display:block;flex:1;min-width:0;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;line-height:1.25;text-align:left}
+.numbox-button::after{flex:none}
+.visu-measure-info .numbox-button>span,.song-inline-field .numbox-button>span{text-align:center}
+.btn,#workspaceNav button,.multi-add,.training-mode-tabs button{overflow-wrap:anywhere}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+@media(min-width:1101px){
+ .panel-visu{container-type:inline-size}
+ .panel-visu .visu-toolbar{grid-template-columns:106px minmax(270px,1.5fr) minmax(180px,1fr) 150px 110px}
+ .visu-toolbar .volume-row{gap:8px}
+ .visu-toolbar #volumeSlider{min-width:90px;width:100%;flex:1}
+ .visu-toolbar .volume-value{flex:0 0 30px}
+ @container(max-width:940px){
+  .panel-visu .visu-toolbar{grid-template-columns:106px minmax(200px,1fr) 170px;row-gap:12px!important}
+  .visu-toolbar .visu-measure-info{grid-column:1;grid-row:1}
+  .visu-toolbar .workspace-tempo-group{grid-column:2;grid-row:1}
+  .visu-toolbar #workspaceTimer{grid-column:3;grid-row:1}
+  .visu-toolbar .workspace-control-group:has(#soundBank){grid-column:1/3;grid-row:2;margin-left:0!important;padding-left:0;border-left:0}
+  .visu-toolbar .workspace-control-group:has(#volumeSlider){grid-column:3;grid-row:2}
+  .visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(54px,1fr) 100px}
+  .visu-toolbar #tapBtn{width:100px;min-width:100px;font-size:9px}
+ }
+}
+@media(max-width:1100px){.workspace-controls-grid .volume-row{min-width:0}.workspace-controls-grid #volumeSlider{min-width:72px;flex:1;width:100%}}

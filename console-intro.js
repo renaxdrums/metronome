@@ -29,7 +29,7 @@
    [[187,332],[264,449],[256,461],[312,597],[356,662],[416,662],[460,597],[516,461],[508,449],[585,332]],
    [[128,405],[107,437],[276,548]],[[644,405],[665,437],[496,548]]
   ];
-  const fragments=contours.flatMap(contour=>contour.slice(1).map((p,i)=>({a:{x:contour[i][0],y:contour[i][1]},b:{x:p[0],y:p[1]}})));
+  const fragments=contours.flatMap(contour=>contour.slice(1).flatMap((p,i)=>Array.from({length:3},(_,part)=>({edge:i,part,a:{x:contour[i][0]+(p[0]-contour[i][0])*part/3,y:contour[i][1]+(p[1]-contour[i][1])*part/3},b:{x:contour[i][0]+(p[0]-contour[i][0])*(part+1)/3,y:contour[i][1]+(p[1]-contour[i][1])*(part+1)/3}}))));
   fragments.sort((a,b)=>Math.atan2((a.a.y+a.b.y)/2-330,(a.a.x+a.b.x)/2-386)-Math.atan2((b.a.y+b.b.y)/2-330,(b.a.x+b.b.x)/2-386));
   const details=['m230 320 77 29 18 33 13 53-26-52-43-19Z','m542 320-77 29-18 33-13 53 26-52 43-19Z','M352 610Q386 594 420 610Q410 628 386 646Q362 628 352 610Z'].map(d=>new Path2D(d));
   const rect=logo.getBoundingClientRect(),scale=Math.min(rect.width/772,rect.height/958);
@@ -54,7 +54,7 @@
   function tick(now){
    if(overlay.hidden){finish();return;}if(width!==innerWidth||height!==innerHeight)resize();
    if(started===undefined)started=now;
-   const elapsed=now-started,progress=clamp((elapsed-1100)/2300),motion=ease(progress),target=destination();
+   const elapsed=now-started,progress=clamp((elapsed-1100)/3200),motion=ease(progress),target=destination();
    ctx.clearRect(0,0,width,height);
    // One grazing light follows the approved orange engraving before it transforms.
    if(elapsed<1100){
@@ -106,19 +106,25 @@
      const f=fragments[k],half=fragments.length/2,inner=target.poly&&k>=half;
      const ring=inner?target.inner:target.radius,parts=target.poly?half:fragments.length,segment=k%parts;
      const start=-Math.PI+segment*Math.PI*2/parts,end=start+Math.PI*2/parts;
-     const stagger=(k%5)*.018,unfold=ease((progress-.24-stagger)/.60);
+     const stagger=(k%7)*.009,unfold=ease((progress-.22-stagger)/.70);
      const travel=ease((progress-.16)/.84),head=mapped({x:386,y:330});
      const radius=48+(ring-48)*travel,cx=head.x+(target.center.x-head.x)*travel,cy=head.y+(target.center.y-head.y)*travel;
      const mx=(f.a.x+f.b.x)/2-386,my=(f.a.y+f.b.y)/2-330,len=Math.hypot(mx,my)||1;
-     const separation=24*ease(progress/.20)*(1-unfold),lift=Math.sin(Math.PI*unfold)*12;
+     const separation=(18+f.part*9)*ease(progress/.22)*(1-unfold),lift=Math.sin(Math.PI*unfold)*18;
      const points=Array.from({length:17},(_,i)=>{
       const u=i/16,from=mapped({x:f.a.x+(f.b.x-f.a.x)*u,y:f.a.y+(f.b.y-f.a.y)*u});
       const angle=start+(end-start)*u,to={x:cx+Math.cos(angle)*radius,y:cy+Math.sin(angle)*radius};
       const detached={x:from.x+mx/len*separation,y:from.y+my/len*separation};
-      return {x:detached.x+(to.x-detached.x)*unfold,y:detached.y+(to.y-detached.y)*unfold-lift};
+      const bend=Math.sin(Math.PI*unfold),tangent=24*bend*bend*Math.sin(k*.73);
+      // Continuous in-between geometry: split engraving, bowed filament, then exact circular arc.
+      return {x:detached.x+(to.x-detached.x)*unfold-Math.sin(angle)*tangent,y:detached.y+(to.y-detached.y)*unfold-lift+Math.cos(angle)*tangent};
      });
      const arcColor=target.poly&&!inner?'#ff7900':color;
      stroke(points,arcColor,scale*26*(1-unfold)+1.2*unfold,handoff*.9);
+     if(unfold>.06&&unfold<.94){
+      const filament=Math.sin(Math.PI*unfold),offset=2.8*filament;
+      for(const sign of [-1,1])stroke(points.map((p,i)=>({x:p.x+sign*offset*Math.sin(start+i/16*(end-start)),y:p.y-sign*offset*Math.cos(start+i/16*(end-start))})),arcColor,.5,handoff*filament*.17);
+     }
      if(progress>.05&&progress<.36){
       ctx.fillStyle='#f4d5b5';ctx.globalAlpha=Math.sin(Math.PI*(progress-.05)/.31)*.5;
       for(const p of [points[0],points.at(-1)]){ctx.beginPath();ctx.arc(p.x,p.y,.65,0,Math.PI*2);ctx.fill();}
@@ -160,9 +166,9 @@
     for(const e of captions.slice(1))e.style.opacity=String(1-ease(progress/.7));
     if(progress>.25)overlay.style.pointerEvents='none';
    }
-   if(elapsed>=3750)finish();else frame=requestAnimationFrame(tick);
+   if(elapsed>=4550)finish();else frame=requestAnimationFrame(tick);
   }
-  frame=requestAnimationFrame(tick);timer=setTimeout(finish,4350);
+  frame=requestAnimationFrame(tick);timer=setTimeout(finish,5200);
  }
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}},true);
  window.addEventListener('pagehide',finish,{once:true});reduce.addEventListener('change',()=>{if(reduce.matches)finish();});

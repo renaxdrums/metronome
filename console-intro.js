@@ -17,7 +17,7 @@
  }
  function begin(){
   if(overlay.hidden)return;
-  canvas=document.createElement('canvas');canvas.className='console-arrival-dust';canvas.setAttribute('aria-hidden','true');overlay.after(canvas);
+  canvas=document.createElement('canvas');canvas.className='console-arrival-dust';canvas.setAttribute('aria-hidden','true');overlay.append(canvas);
   const ctx=canvas.getContext('2d',{alpha:true});if(!ctx){finish();return;}
   cover=document.createElement('div');cover.className='console-arrival-matte';cover.setAttribute('aria-hidden','true');overlay.prepend(cover);overlay.style.setProperty('background','transparent','important');
   const ns='http://www.w3.org/2000/svg';staging=document.createElementNS(ns,'svg');staging.classList.add('console-arrival-sampler');staging.setAttribute('aria-hidden','true');document.body.append(staging);
@@ -62,16 +62,20 @@
    }
    if(elapsed>=1100){
     logo.style.setProperty('opacity','0','important');
-    const color=`rgb(${Math.round(255+(69-255)*motion)},${Math.round(121+(215-121)*motion)},${Math.round(0+231*motion)})`;
+    const phase=motion<.45?motion/.45:(motion-.45)/.55;
+    const fromColor=motion<.45?[255,121,0]:[238,232,221],toColor=motion<.45?[238,232,221]:[69,215,231];
+    const color='rgb('+fromColor.map((v,i)=>Math.round(v+(toColor[i]-v)*phase)).join(',')+')';
     const handoff=1-ease((progress-.76)/.24);
     for(let k=0;k<curves.length;k++){
      const ring=target.poly?(k<3?target.radius:target.inner):target.radius;
      const parts=target.poly?3:6,segment=k%parts,start=-Math.PI/2+segment*Math.PI*2/parts;
      const points=curves[k].map((p,i)=>{
       const from=mapped(p),angle=start+(i/80)*Math.PI*2/parts;
-      const to={x:target.center.x+Math.cos(angle)*ring,y:target.center.y+Math.sin(angle)*ring};
-      const bend=Math.sin(Math.PI*motion)*Math.sin(i/80*Math.PI)*(k%2?1:-1)*20;
-      return {x:from.x+(to.x-from.x)*motion+bend,y:from.y+(to.y-from.y)*motion};
+      const shape=ease(progress/.32),travel=ease((progress-.12)/.88);
+      const head=mapped({x:386,y:330}),radius=38+(ring-38)*travel;
+      const cx=head.x+(target.center.x-head.x)*travel,cy=head.y+(target.center.y-head.y)*travel;
+      const arc={x:cx+Math.cos(angle)*radius,y:cy+Math.sin(angle)*radius};
+      return {x:from.x+(arc.x-from.x)*shape,y:from.y+(arc.y-from.y)*shape};
      });
      const arcColor=target.poly&&k<3?'#ff7900':color;
      stroke(points,arcColor,scale*26*(1-motion)+1.2*motion,handoff*.9);

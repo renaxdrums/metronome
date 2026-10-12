@@ -294,7 +294,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       for(const item of library.profiles){
         const entry=el('div',undefined,list);entry.style.position='relative';
         const choice=button('',entry,()=>openPlaylist(item));choice.style.paddingRight='58px';choice.classList.add('playlist-choice');choice.setAttribute('aria-label','Ouvrir la playlist '+(item.name==='Mon profil'?'Tracks':item.name));
-        const name=el('strong',item.name==='Mon profil'?'Tracks':item.name,choice,'playlist-choice-name');if(item.name==='Mon profil')splitTitle(name,'Morc','eaux');
+        const name=el('strong',item.name==='Mon profil'?'Tracks':item.name,choice,'playlist-choice-name');if(item.name==='Mon profil')name.textContent='Tracks';
         el('span',item.songs.length+' morceau'+(item.songs.length===1?'':'x'),choice,'playlist-choice-count');
         const controls=el('div',undefined,entry,'song-more-wrap');controls.style.top='8px';controls.style.bottom='auto';
         const trigger=button('⋯',controls,()=>{const opening=menu.hidden;songPane.querySelectorAll('.song-more-menu').forEach(other=>other.hidden=true);songPane.querySelectorAll('.song-more').forEach(other=>other.setAttribute('aria-expanded','false'));menu.hidden=!opening;trigger.setAttribute('aria-expanded',String(opening));});
@@ -311,12 +311,12 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
     }
     const localProfiles=el('section',undefined,songPane,'playlist-manager');localProfiles.hidden=songView!=='playlist';
     const playlistHeading=el('div',undefined,localProfiles,'playlist-heading');
-    const playlistTitle=el('strong',p.name==='Mon profil'?'Tracks':p.name,playlistHeading,'playlist-heading-name');if(p.name==='Mon profil')splitTitle(playlistTitle,'Morc','eaux');
+    const playlistTitle=el('strong',p.name==='Mon profil'?'Tracks':p.name,playlistHeading,'playlist-heading-name');if(p.name==='Mon profil')playlistTitle.textContent='Tracks';
     if(songView==='playlist')playlistHeading.prepend(backSong);
     const actions=songView==='playlists'?null:el('div',undefined,songPane,'song-actions');
     const s=song();
     if(songView==='playlist'&&!s){
-      button('Nouveau morceau',actions,()=>{unload();const s=blankSong();p.songs.push(s);selectedSong=s.id;openSectionId=null;songView='detail';persist();render();panel.scrollTop=0;});
+      button('Nouveau morceau',actions,()=>{unload();const s=blankSong();p.songs.push(s);selectedSong=s.id;openSectionId=null;songView='detail';persist();render();panel.scrollTop=0;}).classList.add('track-create');
       if(!p.songs.length)el('p','Crée ton premier morceau pour construire sa structure.',songPane,'song-note');
       for(const item of p.songs){
         const row=el('div',undefined,songPane,'song-section measure-card song-playlist-card');enableSongDrag(row,item,p);
@@ -397,7 +397,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const remove=action('Supprimer',()=>{if(s.sections.length<=1)return;s.sections.splice(i,1);changed();});remove.disabled=s.sections.length<=1;
         head.after(controls);controls.classList.add('song-block-header-actions');controls.addEventListener('click',e=>e.stopPropagation());
         controls.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();menu.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.focus();}});
-      });button('+ Ajouter une section',songPane,()=>{const section=blankSection();section.amorceLanguage=s.amorceDefaultLanguage||'fr';s.sections.push(section);openSectionId=section.id;changed();});
+      });button('+ Ajouter une section',songPane,()=>{const section=blankSection();section.amorceLanguage=s.amorceDefaultLanguage||'fr';s.sections.push(section);openSectionId=section.id;changed();}).classList.add('track-add-section');
       el('p',s.sections.reduce((n,s)=>n+s.count,0)+' mesures · Durée totale : '+durationText(s)+' · arrêt à la fin du morceau',songPane,'song-note').id='songDuration';
     }
     const labels=el('datalist',undefined,songPane);labels.id='songLabels';for(const name of ['Intro','Couplet 1','Couplet 2','Refrain 1','Refrain 2','Bridge','Solo','Outro'])el('option',name,labels).value=name;

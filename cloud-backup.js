@@ -3,6 +3,7 @@ import {firebaseConfig,providers,appCheckSiteKey,emulator} from './firebase-conf
 const storage=window.RENAX_STORAGE,api=window.RENAX_SONGS;
 await storage.ready;
 let account=null,remote=null,sdk=null,auth=null,db=null,unsubscribe=null,generation=0,running=false,retry=0,timer=null,deferred=false,message='Sauvegardé dans ce navigateur',failure='',confirmed=false;
+let pendingLocalChoice=null;
 const rememberKey='renax-index2-remember-auth';
 let remember=false;try{remember=localStorage.getItem(rememberKey)==='1';}catch{}
 const deviceKey='renax-index2-device';
@@ -188,7 +189,7 @@ function renderPanel(){
     choose('Se connecter','login','login',()=>{backupView=backupView==='login'?'':'login';renderPanel();});
     choose('Créer un compte','account','account',()=>{backupView=backupView==='account'?'':'account';renderPanel();});
   }
-  const localControl=choose('Sauvegarde locale','local','local',()=>{backupView=backupView==='local'?'':'local';renderPanel();});localControl.style.borderColor='var(--cyan)';localControl.querySelector('svg').style.color='var(--orange)';
+  const localControl=choose('Sauvegarde locale','local','local',()=>{if(pendingLocalChoice){const action=pendingLocalChoice;pendingLocalChoice=null;if(accountDialog.open)accountDialog.close();queueMicrotask(action);return;}backupView=backupView==='local'?'':'local';renderPanel();});localControl.style.borderColor='var(--cyan)';localControl.querySelector('svg').style.color='var(--orange)';
   if(json){json.id='backup-local';json.style.display=backupView==='local'?'flex':'none';root.append(json);const title=json.querySelector('h3');if(title)title.textContent='Sauvegarde locale';json.querySelectorAll('button').forEach((control,index)=>{if(!control.querySelector('svg'))backupIcon(control,index===0?'export':'import');});}
 
   const state=element('p',storage.healthy?message:'Sauvegarde locale impossible : exportez une copie JSON.',root);state.className='backup-status';state.classList.toggle('is-confirmed',confirmed);state.setAttribute('role','status');state.setAttribute('aria-live','polite');
@@ -243,13 +244,13 @@ setInterval(()=>{if(deferred&&!playing()){storage.reconcile();deferred=false;}},
 window.addEventListener('renax-library-edited',queue);
 renderPanel();
 if(firebaseConfig&&(remember||sessionStorage.getItem('renax-index2-auth-enabled')==='1'))ensureFirebase().catch(error=>say('Sauvegardé dans ce navigateur',friendly(error)));
-window.RENAX_BACKUP={sync,resolve,importGuest,get status(){return {message,failure,account:account?.uid??null,confirmed};}};
+window.RENAX_BACKUP={sync,resolve,importGuest,get status(){return {message,failure,account:account?.uid??null,confirmed};},openChoices(onLocal){pendingLocalChoice=typeof onLocal==='function'?onLocal:null;backupView='';renderPanel();accountDialog.append(document.getElementById('backupAccount'));if(!accountDialog.open)accountDialog.showModal();positionAccount();}};
 
 const accountDialog=document.createElement('dialog');accountDialog.id='directAccountDialog';accountDialog.setAttribute('aria-label','Connexion et compte');accountDialog.style.cssText='width:min(390px,calc(100vw - 28px));max-height:85vh;overflow:auto;background:#111116;color:var(--text);border:1px solid #30303a;border-radius:10px;padding:18px;';
 const closeAccount=document.createElement('button');closeAccount.type='button';closeAccount.className='btn';closeAccount.setAttribute('aria-label','Fermer');closeAccount.title='Fermer';closeAccount.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';closeAccount.style.cssText='width:28px;height:28px;min-height:28px;padding:0;display:flex;align-items:center;justify-content:center;margin-left:auto;';closeAccount.onclick=()=>accountDialog.close();accountDialog.append(closeAccount);document.body.append(accountDialog);
-accountDialog.addEventListener('close',()=>{const root=document.getElementById('backupAccount');if(root){const back=backupPane.querySelector('.song-back');if(back)back.after(root);else backupPane.prepend(root);}renderPanel();});
+accountDialog.addEventListener('close',()=>{pendingLocalChoice=null;const root=document.getElementById('backupAccount');if(root){const back=backupPane.querySelector('.song-back');if(back)back.after(root);else backupPane.prepend(root);}renderPanel();});
 const accountButton=document.createElement('button');accountButton.type='button';accountButton.id='directAccountBtn';accountButton.className='index2-header-btn';accountButton.title='Connexion et compte';accountButton.setAttribute('aria-label','Connexion et compte');accountButton.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3h7v18h-7M3 12h13m-4-4 4 4-4 4"/></svg>';
-accountButton.onclick=()=>{backupView=account?'':'login';renderPanel();accountDialog.append(document.getElementById('backupAccount'));accountDialog.showModal();positionAccount();};
+accountButton.onclick=()=>{pendingLocalChoice=null;backupView=account?'':'login';renderPanel();accountDialog.append(document.getElementById('backupAccount'));accountDialog.showModal();positionAccount();};
 document.querySelector('.index2-header-actions').prepend(accountButton);
 
 function positionAccount(){

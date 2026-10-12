@@ -170,3 +170,5 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
  #workspaceNav{gap:5px}
  .workspace-controls-grid #tapBtn{width:100px;font-size:10px}
 }
+
+@media(min-width:1101px){.panel-visu .visu-toolbar{grid-template-columns:110px minmax(310px,1.7fr) minmax(100px,1fr) minmax(72px,.6fr) 110px}}

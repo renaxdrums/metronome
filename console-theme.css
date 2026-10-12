@@ -293,3 +293,8 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 #renaxArrival{animation:none!important;will-change:clip-path;}
 .console-arrival-dust{position:fixed;inset:0;width:100%;height:100%;z-index:5001;pointer-events:none;}
 @media(prefers-reduced-motion:reduce){.console-arrival-dust{display:none!important;}}
+
+/* Align timer heading and value to the same edge in every workspace. */
+#workspaceTimer{align-items:flex-start!important;text-align:left;}
+#workspaceTimer .workspace-timer-label{width:auto;justify-content:flex-start;}
+.panel-visu #workspaceTimer #trainTimer{margin:0!important;align-self:flex-start;justify-content:flex-start;text-align:left;}

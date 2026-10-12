@@ -1,16 +1,18 @@
 /* Read-only visual tap after the existing final limiter. No extra audible output or microphone. */
 (() => {
  const host=document.querySelector('.sequencer-wrapper');if(!host)return;
- const canvas=document.createElement('canvas');canvas.id='audioLandscape';canvas.hidden=true;canvas.setAttribute('aria-hidden','true');host.prepend(canvas);
+ const surface=host.closest('.panel-visu')||host;
+ const canvas=document.createElement('canvas');canvas.id='audioLandscape';canvas.hidden=true;canvas.setAttribute('aria-hidden','true');surface.prepend(canvas);
  const paint=canvas.getContext('2d',{alpha:true});if(!paint)return;
  const reduce=matchMedia('(prefers-reduced-motion:reduce)'),phi=(1+Math.sqrt(5))/2;
  const bands=64,history=[],profile=new Float32Array(bands);
  let context,node,source,freq,samples,frame,width=0,height=0,level=0,last=0,historyAt=0,flow=0;
  function resize(){
-  const rect=host.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.min(width/phi,rect.height*2/3);
+  const rect=host.getBoundingClientRect(),surfaceRect=surface.getBoundingClientRect();
+  width=Math.max(1,rect.width);height=Math.min(width/phi,Math.max(rect.height,surfaceRect.bottom-rect.top)*2/3);
   const ratio=Math.min(devicePixelRatio||1,2);canvas.style.width=width+'px';canvas.style.height=height+'px';canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);paint.setTransform(ratio,0,0,ratio,0,0);
  }
- const observer=new ResizeObserver(resize);observer.observe(host);resize();
+ const observer=new ResizeObserver(resize);observer.observe(host);if(surface!==host)observer.observe(surface);resize();
  function attach(){
   const next=typeof audioCtx==='undefined'?null:audioCtx;
   if(!next||next.state==='closed')return false;
@@ -85,7 +87,7 @@
      const raw=current*.78+echo*.22;
      const edge=.3+.7*Math.pow(Math.sin(Math.PI*u),.65);
      const irregular=.78+.22*Math.sin(u*(13+Math.abs(seed)*24)+k*.37+flow*.9)+.08*Math.sin(u*73+k*.83-flow);
-     const relief=Math.pow(raw,.64)*maxHeight*edge*(.48+depth*.52)*irregular;
+     const relief=Math.min(.98,Math.pow(raw,.48)*1.8*irregular)*maxHeight*edge*(.55+depth*.45);
      const x=u*width,y=base-relief-(1-depth)*height*.045*visibility;
      if(raw<.002){started=false;continue;}
      if(!started){paint.moveTo(x,y);started=true;}else paint.lineTo(x,y);

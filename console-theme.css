@@ -263,12 +263,12 @@ dialog,#beatEditor,#index2SettingsPanel{background:#272d35!important;border-colo
 button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 @media(min-width:1101px){
  .panel-visu{container-type:inline-size}
- .panel-visu .visu-toolbar{grid-template-columns:106px minmax(270px,1.5fr) minmax(180px,1fr) 150px 110px}
+ .panel-visu .visu-toolbar{grid-template-columns:106px minmax(270px,1.5fr) minmax(180px,1fr) 190px 110px}
  .visu-toolbar .volume-row{gap:8px}
- .visu-toolbar #volumeSlider{min-width:90px;width:100%;flex:1}
+ .visu-toolbar #volumeSlider{min-width:120px;width:100%;flex:1}
  .visu-toolbar .volume-value{flex:0 0 30px}
  @container(max-width:940px){
-  .panel-visu .visu-toolbar{grid-template-columns:106px minmax(200px,1fr) 170px;row-gap:12px!important}
+  .panel-visu .visu-toolbar{grid-template-columns:106px minmax(200px,1fr) 190px;row-gap:12px!important}
   .visu-toolbar .visu-measure-info{grid-column:1;grid-row:1}
   .visu-toolbar .workspace-tempo-group{grid-column:2;grid-row:1}
   .visu-toolbar #workspaceTimer{grid-column:3;grid-row:1}

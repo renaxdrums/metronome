@@ -99,9 +99,6 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#2
 .console-arrival-lines span:nth-child(2){width:960px;height:570px;animation-delay:100ms}.console-arrival-lines span:nth-child(3){width:1200px;height:770px;animation-delay:200ms}
 .console-arrival-sweep{width:160px;height:1px;position:relative;overflow:hidden;background:#28313a;margin:27px auto 0}
 .console-arrival-sweep:after{content:'';position:absolute;inset:0;background:var(--cyan);animation:console-sweep 1350ms 250ms cubic-bezier(.25,.75,.3,1) both}
-.console-arrival-skip{position:absolute;right:24px;bottom:24px;border:1px solid #3a414b;border-radius:6px;background:#1c222a;color:#c8cdd3;padding:10px 16px;min-height:44px;font:500 12px var(--font);cursor:pointer}
-.console-arrival-skip:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
-#renaxArrival.is-skipping{display:none}
 .console-arrival-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;color:var(--text);font:500 12px var(--font)}
 .console-arrival-setting input{accent-color:var(--cyan);width:18px;height:18px}
 @keyframes console-logo{from{opacity:0;transform:scale(.75) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -110,7 +107,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#2
 @keyframes console-lines{from{opacity:0;transform:translate(-50%,-50%) rotate(-34deg) scale(.8)}to{opacity:1;transform:translate(-50%,-50%) rotate(-24deg) scale(1)}}
 @keyframes console-sweep{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 @keyframes console-curtain{to{transform:translateY(-105%);visibility:hidden;pointer-events:none}}
-@media(max-width:600px){.console-arrival-logo{width:66px;height:84px}.console-arrival-word{letter-spacing:-1.5px}.console-arrival-lines span{width:500px;height:290px}.console-arrival-skip{bottom:max(18px,env(safe-area-inset-bottom));right:18px}}
+@media(max-width:600px){.console-arrival-logo{width:66px;height:84px}.console-arrival-word{letter-spacing:-1.5px}.console-arrival-lines span{width:500px;height:290px}}
 @media(prefers-reduced-motion:reduce){#renaxArrival{animation:console-arrival-fade 150ms both}.console-arrival-logo,.console-arrival-word span,.console-arrival-brand,.console-arrival-lines span,.console-arrival-sweep:after{animation:none!important}.console-arrival-lines{display:none}@keyframes console-arrival-fade{to{opacity:0;visibility:hidden;pointer-events:none}}}
 
 

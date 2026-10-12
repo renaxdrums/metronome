@@ -340,3 +340,10 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 
 /* Full-width monochrome spectra preserve dark depth and bright foreground filaments. */
 #audioLandscape{opacity:.9;mix-blend-mode:normal;}
+
+/* One continuous circular visualization surface down through its transport. */
+@media(min-width:1101px){
+ .main-grid>.panel-visu{background:radial-gradient(ellipse at 50% 60%,#303b43 0,#232a32 75%)!important;border-radius:10px;}
+ .panel-visu .sequencer-wrapper{background:transparent!important;border-radius:0;}
+ .panel-visu>.visu-bottom{background:transparent!important;border-top:0!important;}
+}

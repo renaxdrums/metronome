@@ -54,3 +54,26 @@
  controls.addEventListener('toggle',()=>requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();}));
  const start=page;if(!document.getElementById('songsRoot').hidden){sync();if(!desktop.matches)switchTab('seq');}else go(start);window.addEventListener('load',()=>{sync();place();});
 })();
+
+/* Text fitting is presentation only; option names and handlers are preserved. */
+(()=>{
+ const selectors='.numbox-button,#workspaceNav button,#tapBtn,.btn,.multi-add,.training-mode-tabs button';
+ const observed=new WeakSet(),original=new WeakMap();let frame=0;
+ function fit(button){
+  if(!button.isConnected||button.clientWidth===0)return;
+  const label=button.matches('.numbox-button')?button.querySelector(':scope>span'):button;
+  if(!label)return;
+  if(!original.has(label))original.set(label,{value:label.style.getPropertyValue('font-size'),priority:label.style.getPropertyPriority('font-size')});
+  const saved=original.get(label);label.style.removeProperty('font-size');if(saved.value)label.style.setProperty('font-size',saved.value,saved.priority);
+  const base=parseFloat(getComputedStyle(label).fontSize),available=label.clientWidth;
+  if(!available||!base)return;
+  const overflow=label.scrollWidth;
+  if(overflow>available+1){const size=Math.max(9,Math.min(base,base*available/overflow));label.style.setProperty('font-size',size+'px','important');}
+  if(button.matches('.numbox-button'))button.title=label.textContent.trim();
+ }
+ const resize=new ResizeObserver(entries=>{for(const entry of entries)fit(entry.target);});
+ function scan(){frame=0;for(const button of document.querySelectorAll(selectors)){if(!observed.has(button)){observed.add(button);resize.observe(button);}fit(button);}}
+ function queue(){if(!frame)frame=requestAnimationFrame(scan);}
+ new MutationObserver(queue).observe(document.body,{childList:true,subtree:true,characterData:true});
+ window.addEventListener('resize',queue);document.fonts?.ready.then(queue);queue();
+})();

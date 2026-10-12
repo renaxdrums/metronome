@@ -17,6 +17,9 @@
  const items=[['metronome','Métronome',nativeMode.querySelector('[data-mode="metronome"] svg').outerHTML],['polyrhythm','Polyrythmie',nativeMode.querySelector('[data-mode="polyrhythm"] svg').outerHTML],['training','Entraînement',trainIcon],['sequence','Séquenceur',multiTabs.querySelector('button:first-child svg').outerHTML],['multi','Multipiste',multiTabs.querySelector('button:last-child svg').outerHTML],['tracks','Track',document.querySelector('.song-tabs [data-pane="songs"] svg')?.outerHTML||'<svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/></svg>']];
  let page='metronome',changing=false;try{const stored=localStorage.getItem('renax.workspace.v1');if(items.some(i=>i[0]===stored))page=stored;}catch{}
  const buttons=new Map();
+ const controlOpenByWorkspace=new Map();let shownWorkspace=null,wasDesktop=desktop.matches;
+ function rememberControls(){if(!desktop.matches&&shownWorkspace!==null)controlOpenByWorkspace.set(shownWorkspace,controls.open);}
+ function restoreControls(workspace){shownWorkspace=workspace;controls.open=desktop.matches||(controlOpenByWorkspace.get(workspace)??(workspace==='metronome'));}
  for(const [id,label,icon] of items){const b=document.createElement('button');b.type='button';b.dataset.workspace=id;b.setAttribute('role','tab');b.setAttribute('aria-controls',id==='training'?'mobileTrainingHost':id==='tracks'?'songsRoot':id==='sequence'||id==='multi'?'sequencePane':'sequencerContainer');b.innerHTML=icon+'<span>'+label+'</span>';b.onclick=()=>go(id);nav.append(b);buttons.set(id,b);}
  document.querySelector('header').after(nav);
  nav.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const list=[...buttons.values()],i=list.indexOf(document.activeElement),next=event.key==='Home'?0:event.key==='End'?list.length-1:(i+(event.key==='ArrowRight'?1:-1)+list.length)%list.length;list[next].click();list[next].focus();});
@@ -40,19 +43,19 @@
  function sync(){if(changing)return;if(window.RENAX_MULTI?.active)page='multi';else if(!document.getElementById('songsRoot').hidden)page='tracks';else if(appMode==='polyrhythm')page='polyrhythm';else if(!['metronome','sequence','training'].includes(page))page='sequence';document.body.dataset.workspace=page;
   for(const [id,b] of buttons){const selected=id===page;b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1;}try{localStorage.setItem('renax.workspace.v1',page);}catch{}place();syncAdd();
  }
- function go(next){changing=true;try{
+ function go(next){rememberControls();changing=true;try{
   if(next==='tracks'){if(appMode!=='metronome')nativeMode.querySelector('[data-mode="metronome"]').click();songTabs.querySelector('[data-pane="songs"]').click();}
   else{if(window.RENAX_MULTI?.active&&next!=='multi')multiTabs.querySelector('button:first-child').click();
    if(!document.getElementById('songsRoot').hidden)songTabs.querySelector('[data-pane="sequence"]').click();
    if(next==='multi'){if(!window.RENAX_MULTI?.active)multiTabs.querySelector('button:last-child').click();}
    else if(appMode!==(next==='polyrhythm'?'polyrhythm':'metronome'))nativeMode.querySelector('[data-mode="'+(next==='polyrhythm'?'polyrhythm':'metronome')+'"]').click();
-  }page=next;if(next==='training'){silent.classList.remove('is-expanded');silentCollapse.setAttribute('aria-expanded','false');setSilentMode(false);}controls.open=desktop.matches||next==='metronome';
+  }page=next;if(next==='training'){silent.classList.remove('is-expanded');silentCollapse.setAttribute('aria-expanded','false');setSilentMode(false);}restoreControls(next);
   if(!desktop.matches)switchTab(next==='training'?'training':['sequence','multi','tracks'].includes(next)?'seq':'visu');
  }finally{changing=false;sync();requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});}}
  const observer=new MutationObserver(sync);observer.observe(songTabs,{subtree:true,attributes:true,attributeFilter:['aria-selected']});observer.observe(multiTabs,{subtree:true,attributes:true,attributeFilter:['aria-selected']});observer.observe(nativeMode,{subtree:true,attributes:true,attributeFilter:['class']});
- new MutationObserver(place).observe(visu,{childList:true});window.addEventListener('resize',place);desktop.addEventListener('change',()=>{controls.open=desktop.matches||page==='metronome';place();if(!desktop.matches)switchTab(page==='training'?'training':['sequence','multi','tracks'].includes(page)?'seq':'visu');requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});});
- controls.addEventListener('toggle',()=>requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();}));
- const start=page;if(!document.getElementById('songsRoot').hidden){sync();if(!desktop.matches)switchTab('seq');}else go(start);window.addEventListener('load',()=>{sync();place();});
+ new MutationObserver(place).observe(visu,{childList:true});window.addEventListener('resize',place);desktop.addEventListener('change',()=>{if(!wasDesktop&&shownWorkspace!==null)controlOpenByWorkspace.set(shownWorkspace,controls.open);wasDesktop=desktop.matches;restoreControls(page);place();if(!desktop.matches)switchTab(page==='training'?'training':['sequence','multi','tracks'].includes(page)?'seq':'visu');requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});});
+ controls.addEventListener('toggle',()=>{rememberControls();requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});});
+ const start=page;if(!document.getElementById('songsRoot').hidden){restoreControls(page);sync();if(!desktop.matches)switchTab('seq');}else go(start);window.addEventListener('load',()=>{sync();place();});
 })();
 
 /* Text fitting is presentation only; option names and handlers are preserved. */

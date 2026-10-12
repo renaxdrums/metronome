@@ -1326,6 +1326,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 #beatEditor .beat-editor-legend{text-align:center;align-items:center;}
 </style>
 <link rel="stylesheet" href="multi-metronome.css?v=20261012-sequence-fold1">
+  <link rel="stylesheet" href="workspace-layout.css?v=20261012-workspaces4">
 </head>
 <body>
 
@@ -1614,12 +1615,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     if(trainingSection) trainingSection.before(trainingPlaceholder);
 
     function placeTrainingSection(){
-      if(!trainingSection)return;
-      if(window.innerWidth<=1100){
-        if(mobileTrainingHost && trainingSection.parentNode!==mobileTrainingHost) mobileTrainingHost.append(trainingSection);
-      }else if(trainingSection.parentNode!==paramsPanel){
-        trainingPlaceholder.parentNode?.insertBefore(trainingSection,trainingPlaceholder.nextSibling);
-      }
+      if(trainingSection && mobileTrainingHost && trainingSection.parentNode!==mobileTrainingHost) mobileTrainingHost.append(trainingSection);
     }
     placeTrainingSection();
     window.addEventListener('resize',placeTrainingSection);
@@ -3883,7 +3879,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     });
     prepareAllVoiceAudio().catch(() => {});
   </script>
-  <script src="pro-sound-bank.js?v=20261012-drum-levels2"></script>
+  <script src="pro-sound-bank.js?v=20261012-natural-drums2"></script>
 <script src="sound-bank-menu.js?v=20261012-gospel-drums1"></script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
   <script src="amorce-song.js?v=20261011-independent-voice1"></script>
@@ -3984,8 +3980,9 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script><link rel="stylesheet" href="pro-interface.css?v=20261012-font-audit2">
 <script src="multi-clock.js?v=20261012-multi5"></script>
-<script src="multi-metronome.js?v=20261012-multi8"></script>
-<script src="interface-language.js?v=20261012-workspaces1"></script>
-<script src="workspace-layout.js?v=20261012-workspaces3"></script>
+<script src="multi-metronome.js?v=20261012-multi9"></script>
+<script src="interface-language.js?v=20261012-workspaces4"></script>
+<script src="workspace-layout.js?v=20261012-workspaces4"></script>
 </body>
 </html>
+

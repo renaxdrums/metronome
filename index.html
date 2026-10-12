@@ -1330,7 +1330,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 <link rel="stylesheet" href="multi-metronome.css?v=20261012-sequence-fold1">
   <link rel="stylesheet" href="workspace-layout.css?v=20261012-workspaces8">
 <link rel="stylesheet" href="pro-interface.css?v=20261012-font-audit2">
-<link rel="stylesheet" href="console-theme.css?v=20261012-console2">
+<link rel="stylesheet" href="console-theme.css?v=20261012-mobile-consistency1">
 </head>
 <body>
 <div id="renaxArrival" role="dialog" aria-modal="true" aria-label="Animation d’arrivée Métronome" data-no-translate>
@@ -1338,7 +1338,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 <div class="console-arrival-center"><img class="console-arrival-logo" src="assets/renax-logo-approved.svg?v=20261012-console1" alt="Renax Drums">
 <div class="console-arrival-word" aria-label="Métronome"><span style="--n:0">M</span><span style="--n:1">é</span><span style="--n:2">t</span><span style="--n:3">r</span><span style="--n:4">o</span><span style="--n:5">n</span><span style="--n:6">o</span><span style="--n:7">m</span><span style="--n:8">e</span></div>
 <small class="console-arrival-brand">RENAX DRUMS</small><div class="console-arrival-sweep" aria-hidden="true"></div></div>
-<button type="button" class="console-arrival-skip">Passer</button></div>
+</div>
 <noscript><style>#renaxArrival{display:none!important}</style></noscript>
 
   <header>
@@ -1657,7 +1657,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 
     let audioCtx = null;
     let masterVolume = 0.8;
-    let currentBank = 'clic';
+    let currentBank = 'userTicking';
 
     async function initAudio() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3915,7 +3915,10 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     prepareAllVoiceAudio().catch(() => {});
   </script>
   <script src="pro-sound-bank.js?v=20261012-natural-drums2"></script>
-<script src="sound-bank-menu.js?v=20261012-gospel-drums1"></script>
+<script>/* Restore the approved Ticking sample as the first-load default. */
+(()=>{const menu=document.getElementById("soundBank"),tick=menu.querySelector('option[value="userTicking"]');if(tick){menu.prepend(tick);menu.value="userTicking";currentBank="userTicking";numboxWidgets.get(menu)?.rebuild();}})();
+</script>
+<script src="sound-bank-menu.js?v=20261012-default-ticking1"></script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
   <script src="amorce-song.js?v=20261011-independent-voice1"></script>
   <script src="songs-index2.js?v=20261012-workspaces1"></script>
@@ -4017,8 +4020,8 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="multi-clock.js?v=20261012-multi5"></script>
 <script src="multi-metronome.js?v=20261012-measure-menus1"></script>
 <script src="interface-language.js?v=20261012-workspaces8"></script>
-<script src="workspace-layout.js?v=20261012-workspaces8"></script>
-<script src="console-intro.js?v=20261012-console1"></script>
+<script src="workspace-layout.js?v=20261012-folded-silence1"></script>
+<script src="console-intro.js?v=20261012-no-skip1"></script>
 </body>
 </html>
 

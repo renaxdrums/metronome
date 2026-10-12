@@ -319,3 +319,13 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 @media(max-width:420px){
  .visu-toolbar:has(#workspaceTempoShortcut:not([hidden])) .visu-measure-info{flex-direction:column;align-items:flex-start;gap:4px;}
 }
+
+/* Logo-to-instrument presentation: stationary matte, one travelling wave. */
+#renaxArrival{isolation:isolate;will-change:auto;}
+.console-arrival-matte{position:absolute;inset:0;z-index:0;background:#101317;pointer-events:none;will-change:mask-image;}
+.console-arrival-center{position:relative;z-index:2;}
+.console-arrival-lines{z-index:1;}
+.console-arrival-sampler{position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;}
+.console-arrival-word span{animation-delay:calc(820ms + var(--n)*30ms);}
+.console-arrival-brand{animation-delay:1450ms;}
+.console-arrival-sweep:after{animation-delay:1500ms;}

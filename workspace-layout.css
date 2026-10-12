@@ -21,7 +21,7 @@
  .panel-params{padding:16px!important;gap:14px!important}
  .panel-params .control-group{gap:8px!important;margin:0!important}
  .panel-params .control-group>label{display:flex;align-items:center;gap:8px;min-height:18px;margin:0;padding:0;font-size:11px;letter-spacing:.2px}
- .panel-params .control-group>label svg{width:15px;flex:0 0 15px}
+ .panel-params .control-group>label svg{width:15px;flex:0 0 15px;margin-right:0}
  .panel-params .control-group:nth-of-type(4)>label{padding-left:23px}
  .panel-params .training-section{padding-top:18px!important;gap:8px!important}
  .panel-params .training-row{font-size:11px!important}

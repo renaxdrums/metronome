@@ -53,6 +53,22 @@
   function el(tag,text,parent,cls) {const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;if(parent)parent.append(e);return e;}
   function splitTitle(parent,white,orange){parent.replaceChildren();el('span',white,parent).style.color='#fff';el('span',orange,parent).style.color='var(--orange)';}
   function button(text,parent,fn) {const b=el('button',text,parent,'btn');b.type='button';b.onclick=fn;return b;}
+
+  function askSongConfirmation(message,acceptLabel='Supprimer'){
+    return new Promise(resolve=>{
+      const modal=document.createElement('dialog');modal.className='song-confirmation';modal.setAttribute('aria-labelledby','songConfirmTitle');
+      const title=el('h3','Confirmation',modal);title.id='songConfirmTitle';
+      el('p',message,modal,'song-confirm-message');
+      const actions=el('div',undefined,modal,'song-confirm-actions');
+      const previous=document.activeElement,returnFocus=previous?.closest('.song-more-wrap')?.querySelector('.song-more')||previous;
+      let settled=false;
+      const finish=accepted=>{if(settled)return;settled=true;modal.close();modal.remove();if(returnFocus?.isConnected)returnFocus.focus();resolve(accepted);};
+      const cancel=button('Annuler',actions,()=>finish(false)),accept=button(acceptLabel,actions,()=>finish(true));accept.classList.add('song-confirm-accept');cancel.autofocus=true;
+      modal.addEventListener('cancel',event=>{event.preventDefault();finish(false);});
+      modal.addEventListener('keydown',event=>event.stopPropagation());
+      (document.fullscreenElement||document.body).append(modal);modal.showModal();cancel.focus();
+    });
+  }
   function field(text,parent,value,change,options) {const label=el('label',text,parent),input=el(options?'select':'input',undefined,label);if(options)for(const v of options){const o=el('option',String(v),input);o.value=v;}else input.type=typeof value==='number'?'number':'text';input.setAttribute('aria-label',text);input.value=value;input.onchange=()=>change(input.value,input);return input;}
   function songNumbox(label,parent,value,commit,values){
     const options=[...new Set([...values,value])].sort((a,b)=>a-b);
@@ -273,7 +289,7 @@
     action('Dupliquer',()=>{duplicateSongTo(item,p,true);persist();render();});
     action('Déplacer vers…',()=>choosePlaylist(item,'move'));
     action('Copier vers…',()=>choosePlaylist(item,'copy'));
-    action('Supprimer',()=>{if(!confirm('Supprimer « '+item.name+' » ?'))return;unload();p.songs=p.songs.filter(song=>song!==item);if(selectedSong===item.id)selectedSong=null;persist();render();});
+    action('Supprimer',async()=>{if(!await askSongConfirmation('Supprimer « '+item.name+' » ?'))return;const currentProfile=library.profiles.find(candidate=>candidate.id===p.id);if(!currentProfile?.songs.some(candidate=>candidate.id===item.id))return;unload();currentProfile.songs=currentProfile.songs.filter(candidate=>candidate.id!==item.id);if(selectedSong===item.id)selectedSong=null;persist();render();});
     wrap.addEventListener('click',e=>e.stopPropagation());
     wrap.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.focus();}});
   }
@@ -301,8 +317,8 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         trigger.className='song-more';trigger.setAttribute('aria-label','Actions de la playlist '+(item.name==='Mon profil'?'Tracks':item.name));trigger.setAttribute('aria-haspopup','menu');trigger.setAttribute('aria-expanded','false');
         const menu=el('div',undefined,controls,'song-more-menu');menu.hidden=true;menu.setAttribute('role','menu');menu.style.top='36px';menu.style.bottom='auto';
         const rename=button('Renommer',menu,()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=prompt('Nom de la playlist',item.name==='Mon profil'?'Tracks':item.name);if(name?.trim()){item.name=name.trim();persist();render();}});rename.setAttribute('role','menuitem');
-        const remove=button('Supprimer',menu,()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(!confirm('Supprimer la playlist « '+(item.name==='Mon profil'?'Tracks':item.name)+' » et ses '+item.songs.length+' morceau(x) ?'))return;
-          if(library.activeProfile===item.id)unload();library.profiles=library.profiles.filter(candidate=>candidate!==item);
+        const remove=button('Supprimer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(!await askSongConfirmation('Supprimer la playlist « '+(item.name==='Mon profil'?'Tracks':item.name)+' » et ses '+item.songs.length+' track(s) ?'))return;
+          if(library.activeProfile===item.id)unload();library.profiles=library.profiles.filter(candidate=>candidate.id!==item.id);
           if(!library.profiles.length)library.profiles=defaultLibrary().profiles;
           if(!library.profiles.some(candidate=>candidate.id===library.activeProfile)){library.activeProfile=library.profiles[0].id;selectedSong=null;openSectionId=null;}
           persist();render();});remove.setAttribute('role','menuitem');
@@ -402,7 +418,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
     }
     const labels=el('datalist',undefined,songPane);labels.id='songLabels';for(const name of ['Intro','Couplet 1','Couplet 2','Refrain 1','Refrain 2','Bridge','Solo','Outro'])el('option',name,labels).value=name;
     const transferPane=el('section',undefined,profilePane,'backup-json');el('h3','Copie JSON',transferPane);
-    const transfers=el('div',undefined,transferPane,'song-actions');button('Exporter',transfers,()=>{const blob=new Blob([JSON.stringify(library,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='renax-morceaux.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});const importer=el('input',undefined,transferPane);importer.type='file';importer.accept='.json,application/json';importer.hidden=true;button('Importer',transfers,()=>importer.click());importer.onchange=async()=>{try{if(importer.files[0].size>5000000)throw Error('Fichier JSON trop volumineux.');const data=JSON.parse(await importer.files[0].text());validateLibrary(data);if(!confirm('Importer '+data.profiles.length+' profils et '+data.profiles.reduce((n,p)=>n+p.songs.length,0)+' morceaux ? Ils seront ajoutés sans remplacer les morceaux existants.'))return;unload();for(const imported of data.profiles){const p=clone(imported);p.id=id();p.name+=' (importé)';p.songs.forEach(s=>s.id=id());library.profiles.push(p);}library.activeProfile=library.profiles.at(-1).id;selectedSong=null;persist();render();status('Bibliothèque importée sans remplacer les morceaux existants.');}catch(e){status('Import refusé : '+e.message);}};
+    const transfers=el('div',undefined,transferPane,'song-actions');button('Exporter',transfers,()=>{const blob=new Blob([JSON.stringify(library,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='renax-morceaux.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});const importer=el('input',undefined,transferPane);importer.type='file';importer.accept='.json,application/json';importer.hidden=true;button('Importer',transfers,()=>importer.click());importer.onchange=async()=>{try{if(importer.files[0].size>5000000)throw Error('Fichier JSON trop volumineux.');const data=JSON.parse(await importer.files[0].text());validateLibrary(data);if(!await askSongConfirmation('Importer '+data.profiles.length+' profils et '+data.profiles.reduce((n,p)=>n+p.songs.length,0)+' tracks ? Ils seront ajoutés sans remplacer les tracks existants.','Importer'))return;unload();for(const imported of data.profiles){const p=clone(imported);p.id=id();p.name+=' (importé)';p.songs.forEach(s=>s.id=id());library.profiles.push(p);}library.activeProfile=library.profiles.at(-1).id;selectedSong=null;persist();render();status('Bibliothèque importée sans remplacer les morceaux existants.');}catch(e){status('Import refusé : '+e.message);}};
     el('p','Gardez une copie indépendante. Effacer les données du navigateur peut supprimer la sauvegarde locale.',transferPane,'song-note');el('div',storageStatus,transferPane).id='songStatus';setSectionOpen(openSectionId);selectOpenBlock();updatePosition();syncSongTransport();
   }
   // Song playback uses a snapshot; editing the saved arrangement stops its playback.
@@ -417,6 +433,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
   actionStyle.textContent+='#songPane .song-direct-play[aria-pressed="true"]{border-color:#a45427;color:var(--orange);background:#211a16;}';
   actionStyle.textContent+='#songPane .song-detail-toolbar{display:flex;align-items:stretch;flex-wrap:nowrap;gap:6px;}#songPane .song-detail-toolbar > button{height:36px;min-height:36px;box-sizing:border-box;}#songPane .song-detail-toolbar .song-back{margin:0;flex:0 0 auto;}#songPane .song-detail-toolbar .song-count-in-button{min-width:0;padding:6px 8px;}';
   actionStyle.textContent+='#songPane .song-actions.song-detail-toolbar > .btn.song-back,#songPane > .btn.song-back{display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px!important;width:36px!important;min-width:36px!important;max-width:36px;height:36px;min-height:36px;padding:0!important;border:1px solid var(--border);background:rgba(255,255,255,.025)!important;color:var(--orange)!important;border-radius:6px;}#songPane .song-back svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}#songPane .song-back:hover{border-color:var(--orange);background:rgba(255,111,0,.08);}';
+  actionStyle.textContent+='.song-confirmation{padding:20px;width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;}.song-confirmation::backdrop{background:#0008;}.song-confirmation h3{margin:0 0 12px;font:600 15px/1.4 var(--font);}.song-confirm-message{margin:0 0 20px;font:500 12px/1.5 var(--font);overflow-wrap:anywhere;}.song-confirm-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;}.song-confirm-actions .btn{min-height:40px;padding:9px 16px;border:1px solid #505b69;border-radius:6px;background:#343b45;color:var(--text);font:600 11px/1.4 var(--font);text-transform:none;letter-spacing:0;}.song-confirm-actions .song-confirm-accept{border-color:var(--orange);color:var(--orange);}.song-confirm-actions .btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}';
   document.head.append(actionStyle);
   render();
   window.RENAX_SONGS={validateLibrary,loadSong,unload,locate,

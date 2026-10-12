@@ -329,3 +329,5 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 .console-arrival-word span{animation-delay:calc(820ms + var(--n)*30ms);}
 .console-arrival-brand{animation-delay:1450ms;}
 .console-arrival-sweep:after{animation-delay:1500ms;}
+
+#renaxArrival .console-arrival-dust{z-index:1;}

@@ -17,7 +17,7 @@
   }
   function finish() {
     clearTimeout(timer); cancelAnimationFrame(frame); canvas?.remove(); canvas = null;
-    overlay.hidden = true; overlay.style.clipPath = ''; overlay.classList.remove('is-skipping');
+    overlay.hidden = true; overlay.style.clipPath = ''; overlay.style.opacity = ''; overlay.style.maskImage = ''; overlay.style.webkitMaskImage = ''; overlay.style.pointerEvents = ''; overlay.classList.remove('is-skipping');
     if (overlay.contains(document.activeElement)) previous?.focus();
   }
   function dissolve() {
@@ -26,8 +26,32 @@
     canvas.setAttribute('aria-hidden', 'true'); overlay.after(canvas);
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) { finish(); return; }
-    let width, height, started, last, previousFront;
-    const dust = [], duration = 1400, tail = 850;
+    let width, height, started, last, emitted = 0;
+    const sparks = [], duration = 1350, tail = 850;
+    const logo = overlay.querySelector('.console-arrival-logo');
+    const bounds = word.getBoundingClientRect(), logoBounds = logo?.getBoundingClientRect();
+    // Sample the actual letter shapes and the approved transparent logo once.
+    const stencil = document.createElement('canvas');
+    stencil.width = innerWidth; stencil.height = innerHeight;
+    const ink = stencil.getContext('2d', { willReadFrequently: true }), origins = [];
+    if (ink) {
+      for (const letter of word.children) {
+        const rect = letter.getBoundingClientRect(), style = getComputedStyle(letter);
+        ink.font = style.font; ink.fillStyle = style.color; ink.textBaseline = 'middle';
+        ink.fillText(letter.textContent, rect.left, rect.top + rect.height * .48);
+      }
+      if (logo?.complete && logo.naturalWidth && logoBounds) {
+        try { ink.drawImage(logo, logoBounds.x, logoBounds.y, logoBounds.width, logoBounds.height); } catch {}
+      }
+      try {
+        const pixels = ink.getImageData(0, 0, stencil.width, stencil.height).data;
+        for (let y = 0; y < stencil.height; y += 3) for (let x = 0; x < stencil.width; x += 3) {
+          const i = (y * stencil.width + x) * 4;
+          if (pixels[i + 3] > 80) origins.push({ x, y, warm: pixels[i] > pixels[i + 2] + 35 });
+        }
+      } catch {}
+    }
+    origins.sort((a, b) => b.y - a.y);
     function resize() {
       width = innerWidth; height = innerHeight;
       const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -35,51 +59,60 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
-    function edge(x, progress, now) {
-      const front = height + 24 - progress * (height + 70);
-      const roughness = Math.sin(Math.PI * Math.min(1, progress)) * 18;
-      return front + roughness * (Math.sin(x * .022 + now * .0011) * .5 + Math.sin(x * .057 - now * .0018) * .3 + Math.sin(x * .109 + now * .0007) * .2);
-    }
     function tick(now) {
       if (overlay.hidden) { finish(); return; }
       if (width !== innerWidth || height !== innerHeight) resize();
-      if (started === undefined) { started = now; last = now; previousFront = height; }
+      if (started === undefined) { started = now; last = now; }
       const elapsed = now - started, dt = Math.min(.035, (now - last) / 1000); last = now;
       const progress = Math.min(1, elapsed / duration);
-      const front = height + 24 - progress * (height + 70);
-      const points = ['0px 0px', width + 'px 0px'];
-      for (let x = width; x >= 0; x -= width / 48) points.push(x.toFixed(1) + 'px ' + edge(x, progress, now).toFixed(1) + 'px');
-      points.push('0px ' + edge(0, progress, now).toFixed(1) + 'px');
-      overlay.style.clipPath = 'polygon(' + points.join(',') + ')';
-      // Emit only material removed since the preceding frame, keeping density independent of refresh rate.
-      const removed = Math.max(0, previousFront - front); previousFront = front;
-      const count = progress < 1 ? Math.min(110, Math.round(width * removed / 155)) : 0;
-      for (let i = 0; i < count && dust.length < 2400; i++) {
-        const x = Math.random() * width, y = edge(x, progress, now) + Math.random() * Math.max(2, removed);
-        if (y < 0 || y > height) continue;
-        const nearTitle = Math.abs(x - width / 2) < Math.min(280, width * .36) && Math.abs(y - height / 2) < 110;
-        const accent = nearTitle && Math.random() < .16;
-        dust.push({ x, y, vx: (Math.random() - .5) * 55 + 12, vy: 18 + Math.random() * 70,
-          size: .45 + Math.pow(Math.random(), 2) * 1.4, age: 0, life: .28 + Math.random() * .7,
-          phase: Math.random() * Math.PI * 2, opacity: .18 + Math.random() * .55,
-          color: accent ? (Math.random() < .6 ? '255,121,0' : '237,240,242') : '115,126,136' });
+      // A broad, continuous fade travels from bottom to top; no boundary, wave or translation.
+      const stops = Array.from({ length: 13 }, (_, i) => {
+        const y = i / 12, local = Math.max(0, Math.min(1, (progress - (1 - y) * .48) / .52));
+        const alpha = 1 - local * local * (3 - 2 * local);
+        return 'rgba(0,0,0,' + alpha.toFixed(4) + ') ' + (y * 100).toFixed(2) + '%';
+      });
+      const mask = 'linear-gradient(to bottom,' + stops.join(',') + ')';
+      overlay.style.maskImage = mask; overlay.style.webkitMaskImage = mask;
+      if (progress > .85) overlay.style.pointerEvents = 'none';
+      const target = Math.round(Math.min(1, progress / .72) * Math.min(430, width * .45));
+      while (emitted < target) {
+        const origin = origins.length ? origins[Math.min(origins.length - 1, Math.floor((.15 + Math.min(1, progress / .72) * .75) * Math.random() * origins.length))] : { x: bounds.left + Math.random() * bounds.width, y: bounds.top + Math.random() * bounds.height, warm: true };
+        const depth = .35 + Math.random() * .65;
+        sparks.push({ x: origin.x, y: origin.y, vx: (Math.random() - .35) * 60 * depth,
+          vy: -(15 + Math.random() * 50) * depth, radius: .55 + Math.random() * 1.25,
+          life: .5 + Math.random() * .9, age: 0, depth, phase: Math.random() * Math.PI * 2,
+          flare: emitted % 67 === 0, warm: origin.warm, power: .35 + Math.random() * .65 });
+        emitted++;
       }
-      ctx.clearRect(0, 0, width, height);
-      for (let i = dust.length - 1; i >= 0; i--) {
-        const p = dust[i]; p.age += dt;
-        if (p.age >= p.life) { dust.splice(i, 1); continue; }
-        const wind = Math.sin(now * .0015 + p.y * .012 + p.phase);
-        p.vx += wind * 28 * dt; p.vy += 26 * dt;
-        p.x += (p.vx + Math.sin(p.age * 8 + p.phase) * 9) * dt; p.y += p.vy * dt;
-        const alpha = p.opacity * Math.pow(1 - p.age / p.life, 1.6);
-        ctx.fillStyle = 'rgba(' + p.color + ',' + alpha.toFixed(3) + ')';
-        ctx.beginPath(); ctx.ellipse(p.x, p.y, p.size, p.size * .65, p.phase + p.age, 0, Math.PI * 2); ctx.fill();
+      ctx.clearRect(0, 0, width, height); ctx.globalCompositeOperation = 'lighter';
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const p = sparks[i]; p.age += dt;
+        if (p.age >= p.life) { sparks.splice(i, 1); continue; }
+        p.x += (p.vx + Math.sin(now * .002 + p.phase) * 10) * dt;
+        p.y += (p.vy + Math.cos(p.age * 4 + p.phase) * 6) * dt;
+        const life = p.age / p.life;
+        const alpha = Math.sin(Math.PI * life) * p.power * (1 - progress * .45);
+        const color = p.warm ? '255,155,75' : '255,234,205';
+        const halo = p.radius * (p.flare ? 13 : 4);
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, halo);
+        glow.addColorStop(0, 'rgba(255,245,222,' + alpha.toFixed(3) + ')');
+        glow.addColorStop(.15, 'rgba(' + color + ',' + (alpha * .55).toFixed(3) + ')');
+        glow.addColorStop(.45, 'rgba(' + color + ',' + (alpha * .10).toFixed(3) + ')');
+        glow.addColorStop(1, 'rgba(' + color + ',0)');
+        ctx.fillStyle = glow; ctx.fillRect(p.x - halo, p.y - halo, halo * 2, halo * 2);
+        if (p.flare) {
+          const length = 12 + Math.sin(Math.PI * life) * 22;
+          const streak = ctx.createLinearGradient(p.x - length, 0, p.x + length, 0);
+          streak.addColorStop(0, 'rgba(' + color + ',0)'); streak.addColorStop(.5, 'rgba(255,235,205,' + (alpha * .7).toFixed(3) + ')'); streak.addColorStop(1, 'rgba(' + color + ',0)');
+          ctx.fillStyle = streak; ctx.fillRect(p.x - length, p.y - .5, length * 2, 1);
+        }
       }
       if (elapsed >= duration + tail) finish(); else frame = requestAnimationFrame(tick);
     }
     frame = requestAnimationFrame(tick);
     timer = setTimeout(finish, duration + tail + 500);
   }
+
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !overlay.hidden) { event.preventDefault(); finish(); }
   }, true);
@@ -97,7 +130,7 @@
   window.addEventListener('renax-language-changed', () => { if (!overlay.hidden) label(); });
   if (enabled && !reduce.matches) {
     label(); previous = document.activeElement;
-    // Keep the approved logo and lettering arrival, then erode the stationary surface from its bottom.
+    // Keep the approved logo and lettering arrival, then fade the whole surface with warm flare particles.
     timer = setTimeout(dissolve, 1700);
   } else finish();
 })();

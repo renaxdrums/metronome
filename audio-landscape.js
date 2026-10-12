@@ -4,10 +4,10 @@
  const canvas=document.createElement('canvas');canvas.id='audioLandscape';canvas.hidden=true;canvas.setAttribute('aria-hidden','true');host.prepend(canvas);
  const paint=canvas.getContext('2d',{alpha:true});if(!paint)return;
  const reduce=matchMedia('(prefers-reduced-motion:reduce)'),phi=(1+Math.sqrt(5))/2;
- const bands=48,history=[],profile=new Float32Array(bands);
+ const bands=64,history=[],profile=new Float32Array(bands);
  let context,node,source,freq,samples,frame,width=0,height=0,level=0,last=0,historyAt=0;
  function resize(){
-  const rect=host.getBoundingClientRect();width=Math.max(1,rect.width*2/3);height=width/phi;
+  const rect=host.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.min(width/phi,rect.height*2/3);
   const ratio=Math.min(devicePixelRatio||1,2);canvas.style.width=width+'px';canvas.style.height=height+'px';canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);paint.setTransform(ratio,0,0,ratio,0,0);
  }
  const observer=new ResizeObserver(resize);observer.observe(host);resize();
@@ -55,21 +55,31 @@
   const dt=Math.min(.1,(now-(last||now))/1000);last=now;
   const visible=host.getBoundingClientRect().height>0;
   const energy=measure(dt);paint.clearRect(0,0,width,height);
-  if(now-historyAt>33){historyAt=now;history.unshift(Float32Array.from(profile));if(history.length>23)history.pop();}
+  if(now-historyAt>16){historyAt=now;history.unshift(Float32Array.from(profile));if(history.length>48)history.pop();}
   const retained=history.some(values=>values.some(v=>v>.002));
   canvas.hidden=!visible||reduce.matches||(!retained&&energy<.002);
   if(!canvas.hidden){
-   const base=height-8,maxHeight=Math.min(height*.82,host.getBoundingClientRect().height*2/3);
+   const base=height-3,maxHeight=height*.94;
    const retainedLevel=history.reduce((top,values)=>Math.max(top,...values),0);
-   // Each filament is an actual recent spectral frame; no synthetic rhythm or free-running wave.
-   for(let k=history.length-1;k>=0;k--){
-    const depth=1-k/Math.max(1,history.length),values=history[k];
-    const shade=Math.round(105+depth*138);paint.strokeStyle='rgb('+shade+','+shade+','+shade+')';
-    paint.globalAlpha=(.07+depth*.19)*Math.min(1,retainedLevel*2.5);paint.lineWidth=.45+depth*.35;paint.beginPath();
-    for(let j=0;j<=190;j++){
-     const u=j/190,taper=Math.pow(Math.sin(Math.PI*u),.5),v=sample(values,u);
-     const x=u*width,y=base-v*maxHeight*taper-k*.55;
-     if(j===0)paint.moveTo(x,y);else paint.lineTo(x,y);
+   const visibility=Math.min(1,retainedLevel*3);
+   // A dense depth field interpolates the real recent spectra. Every contour fades with the actual sound.
+   const count=96,points=Math.min(320,Math.max(160,Math.round(width/4)));
+   for(let k=0;k<count;k++){
+    const depth=k/(count-1),age=(1-depth)*(history.length-1);
+    const a=history[Math.floor(age)],b=history[Math.min(history.length-1,Math.ceil(age))],blend=age%1;
+    const shade=depth<.35?Math.round(55+depth*180):depth<.8?Math.round(148+(depth-.35)*180):Math.round(235+(depth-.8)*100);
+    paint.strokeStyle='rgb('+shade+','+shade+','+shade+')';
+    paint.globalAlpha=(.15+depth*.38)*visibility;paint.lineWidth=depth>.86?.85:.55;
+    paint.beginPath();let started=false;
+    for(let j=0;j<=points;j++){
+     const u=j/points,spread=(1-depth)*.055;
+     const coordinate=Math.max(0,Math.min(1,u+(u-.5)*spread));
+     const raw=sample(a,coordinate)*(1-blend)+sample(b,coordinate)*blend;
+     const edge=.3+.7*Math.pow(Math.sin(Math.PI*u),.65);
+     const relief=Math.pow(raw,.64)*maxHeight*edge*(.48+depth*.52);
+     const x=u*width,y=base-relief-(1-depth)*height*.045*visibility;
+     if(raw<.002){started=false;continue;}
+     if(!started){paint.moveTo(x,y);started=true;}else paint.lineTo(x,y);
     }
     paint.stroke();
    }

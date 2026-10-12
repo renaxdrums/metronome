@@ -347,3 +347,8 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
  .panel-visu .sequencer-wrapper{background:transparent!important;border-radius:0;}
  .panel-visu>.visu-bottom{background:transparent!important;border-top:0!important;}
 }
+
+/* The sound landscape rises from the panel floor, beneath its Start button. */
+.panel-visu{position:relative;isolation:isolate;}
+.panel-visu .visu-toolbar,.panel-visu #workspaceControls,.panel-visu .sequencer-wrapper,.panel-visu>.visu-bottom{position:relative;z-index:1;}
+.panel-visu .sequencer-wrapper{background:transparent!important;}

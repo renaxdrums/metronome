@@ -69,6 +69,25 @@
       (document.fullscreenElement||document.body).append(modal);modal.showModal();cancel.focus();
     });
   }
+  function askPlaylistName(initial='',creating=false){
+    return new Promise(resolve=>{
+      const modal=document.createElement('dialog');modal.className='song-confirmation song-name-dialog';modal.setAttribute('aria-labelledby','playlistNameTitle');
+      el('h3',creating?'Nouvelle playlist':'Renommer la playlist',modal).id='playlistNameTitle';
+      const form=el('form',undefined,modal),label=el('label','Nom de la playlist',form,'song-name-label');
+      const input=el('input',undefined,label,'song-name-input');input.type='text';input.value=initial;input.required=true;input.maxLength=120;input.autocomplete='off';
+      const actions=el('div',undefined,form,'song-confirm-actions');
+      const previous=document.activeElement,returnFocus=previous?.closest('.song-more-wrap')?.querySelector('.song-more')||previous;
+      let settled=false;
+      const finish=name=>{if(settled)return;settled=true;modal.close();modal.remove();if(returnFocus?.isConnected)returnFocus.focus();resolve(name);};
+      button('Annuler',actions,()=>finish(null));
+      const accept=button(creating?'Créer':'Renommer',actions,()=>{});accept.type='submit';accept.classList.add('song-confirm-accept');
+      const validate=()=>{accept.disabled=!input.value.trim();};input.addEventListener('input',validate);validate();
+      form.addEventListener('submit',event=>{event.preventDefault();const name=input.value.trim();if(name)finish(name);});
+      modal.addEventListener('cancel',event=>{event.preventDefault();finish(null);});
+      modal.addEventListener('keydown',event=>event.stopPropagation());
+      (document.fullscreenElement||document.body).append(modal);modal.showModal();input.focus();input.select();
+    });
+  }
   function field(text,parent,value,change,options) {const label=el('label',text,parent),input=el(options?'select':'input',undefined,label);if(options)for(const v of options){const o=el('option',String(v),input);o.value=v;}else input.type=typeof value==='number'?'number':'text';input.setAttribute('aria-label',text);input.value=value;input.onchange=()=>change(input.value,input);return input;}
   function songNumbox(label,parent,value,commit,values){
     const options=[...new Set([...values,value])].sort((a,b)=>a-b);
@@ -300,7 +319,7 @@
     const backProfile=button('Retour',profilePane,()=>navigate('home'));backProfile.classList.add('song-back');backProfile.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 5-7 7 7 7M5 12h15"/></svg>';backProfile.setAttribute('aria-label','Retour aux morceaux');
     const backSong=button('Retour',songPane,()=>navigate(songView==='detail'?'playlist':songView==='playlist'?'playlists':'home'));backSong.classList.add('song-back');backSong.textContent='';backSong.setAttribute('aria-label',songView==='detail'?'Retour à la playlist':songView==='playlist'?'Retour aux playlists':'Retour aux morceaux');
 const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
-    const createPlaylist=()=>{const name=prompt('Nom de la playlist');if(!name?.trim())return;unload();const created={id:id(),name:name.trim(),songs:[]};library.profiles.push(created);library.activeProfile=created.id;selectedSong=null;songView='playlist';persist();render();};
+    const createPlaylist=async()=>{const name=await askPlaylistName('',true);if(!name)return;unload();const created={id:id(),name:name.trim(),songs:[]};library.profiles.push(created);library.activeProfile=created.id;selectedSong=null;songView='playlist';persist();render();};
     const openPlaylist=item=>{unload();library.activeProfile=item.id;selectedSong=null;songView='playlist';persist();render();panel.scrollTop=0;};
     if(songView==='playlists'){
       const overview=el('section',undefined,songPane,'playlist-overview');
@@ -316,7 +335,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const trigger=button('⋯',controls,()=>{const opening=menu.hidden;songPane.querySelectorAll('.song-more-menu').forEach(other=>other.hidden=true);songPane.querySelectorAll('.song-more').forEach(other=>other.setAttribute('aria-expanded','false'));menu.hidden=!opening;trigger.setAttribute('aria-expanded',String(opening));});
         trigger.className='song-more';trigger.setAttribute('aria-label','Actions de la playlist '+(item.name==='Mon profil'?'Tracks':item.name));trigger.setAttribute('aria-haspopup','menu');trigger.setAttribute('aria-expanded','false');
         const menu=el('div',undefined,controls,'song-more-menu');menu.hidden=true;menu.setAttribute('role','menu');menu.style.top='36px';menu.style.bottom='auto';
-        const rename=button('Renommer',menu,()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=prompt('Nom de la playlist',item.name==='Mon profil'?'Tracks':item.name);if(name?.trim()){item.name=name.trim();persist();render();}});rename.setAttribute('role','menuitem');
+        const rename=button('Renommer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=await askPlaylistName(item.name==='Mon profil'?'Tracks':item.name);if(name){const current=library.profiles.find(candidate=>candidate.id===item.id);if(!current)return;current.name=name;persist();render();}});rename.setAttribute('role','menuitem');
         const remove=button('Supprimer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(!await askSongConfirmation('Supprimer la playlist « '+(item.name==='Mon profil'?'Tracks':item.name)+' » et ses '+item.songs.length+' track(s) ?'))return;
           if(library.activeProfile===item.id)unload();library.profiles=library.profiles.filter(candidate=>candidate.id!==item.id);
           if(!library.profiles.length)library.profiles=defaultLibrary().profiles;
@@ -434,6 +453,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
   actionStyle.textContent+='#songPane .song-detail-toolbar{display:flex;align-items:stretch;flex-wrap:nowrap;gap:6px;}#songPane .song-detail-toolbar > button{height:36px;min-height:36px;box-sizing:border-box;}#songPane .song-detail-toolbar .song-back{margin:0;flex:0 0 auto;}#songPane .song-detail-toolbar .song-count-in-button{min-width:0;padding:6px 8px;}';
   actionStyle.textContent+='#songPane .song-actions.song-detail-toolbar > .btn.song-back,#songPane > .btn.song-back{display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px!important;width:36px!important;min-width:36px!important;max-width:36px;height:36px;min-height:36px;padding:0!important;border:1px solid var(--border);background:rgba(255,255,255,.025)!important;color:var(--orange)!important;border-radius:6px;}#songPane .song-back svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}#songPane .song-back:hover{border-color:var(--orange);background:rgba(255,111,0,.08);}';
   actionStyle.textContent+='.song-confirmation{padding:20px;width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;}.song-confirmation::backdrop{background:#0008;}.song-confirmation h3{margin:0 0 12px;font:600 15px/1.4 var(--font);}.song-confirm-message{margin:0 0 20px;font:500 12px/1.5 var(--font);overflow-wrap:anywhere;}.song-confirm-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;}.song-confirm-actions .btn{min-height:40px;padding:9px 16px;border:1px solid #505b69;border-radius:6px;background:#343b45;color:var(--text);font:600 11px/1.4 var(--font);text-transform:none;letter-spacing:0;}.song-confirm-actions .song-confirm-accept{border-color:var(--orange);color:var(--orange);}.song-confirm-actions .btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}';
+  actionStyle.textContent+='.song-name-label{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;color:var(--text-muted);font:500 12px/1.4 var(--font);}.song-name-input{width:100%;min-width:0;box-sizing:border-box;min-height:44px;padding:10px 12px;border:1px solid #505b69;border-radius:6px;background:#343b45;color:var(--text);font:500 14px/1.4 var(--font);}.song-name-input:focus{outline:2px solid var(--cyan);outline-offset:2px;}.song-name-dialog .btn:disabled{opacity:.4;cursor:not-allowed;}';
   document.head.append(actionStyle);
   render();
   window.RENAX_SONGS={validateLibrary,loadSong,unload,locate,

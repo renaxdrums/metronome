@@ -331,3 +331,9 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 .console-arrival-sweep:after{animation-delay:1500ms;}
 
 #renaxArrival .console-arrival-dust{z-index:1;}
+
+/* Transparent audio landscape: circular instrument remains the foreground. */
+.panel-visu .sequencer-wrapper{position:relative;isolation:isolate;overflow:hidden;}
+#audioLandscape{position:absolute;bottom:0;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;opacity:.7;mix-blend-mode:screen;}
+#audioLandscape[hidden],.panel-visu.score-view #audioLandscape{display:none!important;}
+.panel-visu .sequencer-container{z-index:1;}

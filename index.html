@@ -4037,6 +4037,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
     if (document.fullscreenElement) return;
     try {
       Promise.resolve(root.requestFullscreen({ navigationUI: 'hide' }))
+        .then(() => window.dispatchEvent(new Event('renax-fullscreen-entered')))
         .catch(error => console.info('[RENAX fullscreen] Refus du navigateur :', error));
     } catch (error) {
       console.info('[RENAX fullscreen] Fonction indisponible :', error);

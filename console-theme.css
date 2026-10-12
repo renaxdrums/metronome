@@ -140,3 +140,33 @@ body[data-workspace=training] .silent-section.is-expanded .silent-collapse::afte
 body[data-workspace=training] .silent-section:not(.is-expanded) :is(.silent-toggle,.silent-settings){display:none!important}
 body[data-workspace=training] .silent-section:not(.is-expanded){padding-bottom:0!important}
 body[data-workspace=training] .silent-collapse:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* Graphite contrast and consistent workspace icons. */
+:root{--bg:#1c2026;--panel:#272d35;--border:#414a56;--text-muted:#bcc5ce;--grey:#343b45;--grey-hover:#414a56}
+header{border-bottom:1px solid #ffffff0c}
+.panel{background:var(--panel);border-color:var(--border)}
+#workspaceNav{gap:8px}
+#workspaceNav button{background:#272d35;border:1px solid #414a56;border-bottom:2px solid #414a56;border-radius:7px}
+#workspaceNav button:hover{background:#323a44;border-color:#627080}
+#workspaceNav button[aria-selected=true],#workspaceNav button[aria-selected=true]:hover{background:#28424b;border-color:#4b7884;border-bottom-color:var(--cyan)}
+#workspaceNav button svg{stroke:var(--orange)!important;color:var(--orange)}
+#workspaceNav button[aria-selected=true] svg{stroke:var(--cyan)!important;color:var(--cyan)}
+.panel-visu .visu-toolbar,#workspaceControls{background:#2b313a!important;border-color:#48525e!important}
+.panel-visu .sequencer-wrapper{background:radial-gradient(ellipse at center,#303b43 0,#232a32 72%);border-radius:9px}
+.panel-visu.score-view .sequencer-wrapper{background:transparent}
+input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#363e49;border-color:#505b69}
+.measure-card,.song-section,.song-card,.playlist-choice,.song-block{background:#2b323c;border-color:#48525e!important}
+.numbox-dropdown,.sequence-more-actions,.multi-actions{background:#303844;border-color:#596675}
+#tapBtn{display:flex;align-items:center;justify-content:center!important;text-align:center;background:#363e49!important;border-color:#505b69!important}
+#tapBtn>span:first-child{display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+#tapBtn svg{stroke:var(--orange)!important;color:var(--orange);flex-shrink:0;margin:0}
+.workspace-timer-label svg{width:12px;height:12px;flex:0 0 12px;margin:0}
+@media(min-width:1101px) and (max-width:1250px){
+ .visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(48px,1fr) 100px}
+ .visu-toolbar #tapBtn{width:100px;min-width:100px;font-size:9px;padding:5px 6px!important}
+ .visu-toolbar #workspaceTimer{margin-left:6px!important;padding-left:6px}
+}
+@media(max-width:1100px){
+ #workspaceNav{gap:5px}
+ .workspace-controls-grid #tapBtn{width:100px;font-size:10px}
+}

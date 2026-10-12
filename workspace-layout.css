@@ -7,6 +7,7 @@
  #workspaceNav button{display:flex;align-items:center;justify-content:center;gap:9px;min-height:40px;padding:8px 18px;color:var(--text);background:transparent;border:1px solid transparent;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
  #workspaceNav button[aria-selected=true]{border-color:#009cab;background:#00cee514}
  #workspaceNav button:hover{background:#ffffff06;border-color:var(--border)}
+ #workspaceNav button[aria-selected=true]:hover{border-color:#009cab;background:#00cee514}
  #workspaceNav svg,#workspaceHome svg{width:18px;height:18px;fill:none;stroke:var(--orange);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
  #workspaceNav button:focus-visible,#workspaceHome:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
  .main-grid{grid-template-columns:248px minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important;grid-template-areas:none!important;gap:16px!important}

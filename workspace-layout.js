@@ -28,7 +28,8 @@
  function place(){const group=document.querySelector('.visu-bottom');if(group&&group.parentNode!==footer)footer.insertBefore(group,footer.querySelector('.footer-right'));
   if(trainingSection&&trainingSection.parentNode!==trainHost)trainHost.append(trainingSection);
   const target=!desktop.matches&&page==='training'&&document.body.dataset.mobilePane==='training'?trainPanel:visu;
-  if(controls.parentNode!==target){if(target===visu)visu.querySelector('.visu-toolbar').after(controls);else trainPanel.querySelector('.panel-title').after(controls);}
+  if(desktop.matches){const toolbar=visu.querySelector('.visu-toolbar');if(controls.parentNode!==toolbar)toolbar.insertBefore(controls,document.getElementById('trainTimer'));}
+  else if(controls.parentNode!==target){if(target===visu)visu.querySelector('.visu-toolbar').after(controls);else trainPanel.querySelector('.panel-title').after(controls);}
   if(page==='training'){if(silent.parentNode!==trainPanel)trainPanel.append(silent);}else if(silent.parentNode!==silentHome.parentNode)silentHome.after(silent);
  }
  function sync(){if(changing)return;if(window.RENAX_MULTI?.active)page='multi';else if(!document.getElementById('songsRoot').hidden)page='tracks';else if(appMode==='polyrhythm')page='polyrhythm';else if(!['metronome','sequence','training'].includes(page))page='sequence';document.body.dataset.workspace=page;

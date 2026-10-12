@@ -74,14 +74,19 @@
       const mask = 'linear-gradient(to bottom,' + stops.join(',') + ')';
       overlay.style.maskImage = mask; overlay.style.webkitMaskImage = mask;
       if (progress > .85) overlay.style.pointerEvents = 'none';
-      const target = Math.round(Math.min(1, progress / .72) * Math.min(430, width * .45));
+      const target = Math.round(Math.min(1, progress / .72) * Math.min(650, width * .65));
       while (emitted < target) {
         const origin = origins.length ? origins[Math.min(origins.length - 1, Math.floor((.15 + Math.min(1, progress / .72) * .75) * Math.random() * origins.length))] : { x: bounds.left + Math.random() * bounds.width, y: bounds.top + Math.random() * bounds.height, warm: true };
-        const depth = .35 + Math.random() * .65;
-        sparks.push({ x: origin.x, y: origin.y, vx: (Math.random() - .35) * 60 * depth,
-          vy: -(15 + Math.random() * 50) * depth, radius: .55 + Math.random() * 1.25,
-          life: .5 + Math.random() * .9, age: 0, depth, phase: Math.random() * Math.PI * 2,
-          flare: emitted % 67 === 0, warm: origin.warm, power: .35 + Math.random() * .65 });
+        const depth = .3 + Math.random() * .7;
+        const angle = Math.random() * Math.PI * 2, speed = .35 + Math.random() * .85;
+        // A radial burst fills the whole viewport instead of following the lettering baseline.
+        const ambient = Math.random() < .22;
+        const x = ambient ? Math.random() * width : origin.x;
+        const y = ambient ? Math.random() * height : origin.y;
+        sparks.push({ x, y, vx: Math.cos(angle) * width * .42 * speed * depth,
+          vy: Math.sin(angle) * height * .65 * speed * depth, radius: .5 + Math.random() * 1.7,
+          life: .65 + Math.random() * 1.15, age: 0, depth, phase: Math.random() * Math.PI * 2,
+          flare: emitted % 37 === 0, warm: origin.warm, power: .3 + Math.random() * .7 });
         emitted++;
       }
       ctx.clearRect(0, 0, width, height); ctx.globalCompositeOperation = 'lighter';

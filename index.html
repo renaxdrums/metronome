@@ -1289,10 +1289,12 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 .sequence-preview-play[aria-pressed="true"]{color:var(--cyan);border-color:var(--cyan);}
 .sequence-card-tools button:disabled{opacity:.4;cursor:default;}
 .sequence-more{position:relative;}
+.measure-head .measure-num[data-no-translate]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .sequence-more summary{list-style:none;font-size:20px;line-height:1;}
 .sequence-more summary::-webkit-details-marker{display:none;}
 .sequence-more-actions{position:absolute;right:35px;bottom:0;padding:5px;border:1px solid #3b3b46;background:#191a21;border-radius:8px;z-index:20;box-shadow:0 8px 24px #0008;}
-.sequence-more-actions button{width:auto;padding:0 12px;font:600 12px var(--font);}
+.sequence-more-actions{display:flex;flex-direction:column;gap:3px;min-width:132px;}
+.sequence-more-actions button{width:100%;padding:0 12px;text-align:left;font:600 12px var(--font);}
 #measureList .drop-target{border-top:3px solid var(--cyan);}#measureList .measure-card{touch-action:none;}#measureList .dragging{border-color:var(--orange);cursor:grabbing;} .sequence-drag-placeholder{border:1px dashed var(--orange);border-radius:8px;background:#ff6b0010;}
 #playBtn{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:9px;width:auto!important;min-width:116px!important;height:42px!important;min-height:42px!important;padding:10px 18px!important;border-radius:7px!important;background:rgba(0,229,255,.08)!important;border:1px solid rgba(0,229,255,.65)!important;box-shadow:none!important;color:var(--text)!important;font-size:0!important;line-height:1.35;transition:background .15s,border-color .15s;}
 #playBtn::before{content:'';position:static;display:block;flex:none;width:0;height:0;border-left:10px solid var(--cyan);border-top:6px solid transparent;border-bottom:6px solid transparent;}
@@ -2721,6 +2723,23 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       renderSequencerList(); renderActiveMeasure();
       measureCountSel.dispatchEvent(new Event('change', {bubbles:true}));
     }
+    function duplicateSequenceMeasure(m) {
+      if(playbackStarting || measures.length>=8)return;
+      const index=measures.indexOf(m);if(index<0)return;
+      stopMetronome();
+      const copy=JSON.parse(JSON.stringify(m));
+      if(copy.name)copy.name=(copy.name+' · copie').slice(0,100);
+      measures.splice(index+1,0,copy);
+      finishSequenceEdit(copy);
+    }
+    async function renameSequenceMeasure(m) {
+      if(playbackStarting || !measures.includes(m))return;
+      const collection=measures;
+      const value=await window.RENAX_MULTI.requestName('Libellé',m.name||'');
+      if(!value?.trim() || measures!==collection || !measures.includes(m))return;
+      m.name=value.trim().slice(0,100);
+      finishSequenceEdit(measures[activeMeasureIndex]);
+    }
     function removeSequenceMeasure(m) {
       if (playbackStarting || measures.length <= 1) return;
       const index=measures.indexOf(m); if(index<0)return;
@@ -2806,6 +2825,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     function decorateSequenceCards() {
       measureListEl.querySelectorAll('.measure-card').forEach((card,i)=>{
         const m=measures[i]; if(!m)return;
+        if(m.name){const title=card.querySelector('.measure-num');title.dataset.noTranslate='';title.textContent=m.name;}
         const tools=document.createElement('div');tools.className='sequence-card-tools';
         enableSequenceDrag(card,m);
         const play=document.createElement('button');play.type='button';play.className='sequence-preview-play';
@@ -2817,7 +2837,11 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         menu.addEventListener('click',e=>e.stopPropagation());menu.addEventListener('keydown',e=>e.stopPropagation());
         const actions=document.createElement('div');actions.className='sequence-more-actions';
         const del=document.createElement('button');del.type='button';del.textContent='Supprimer';del.disabled=measures.length<=1||playbackStarting;del.onclick=e=>{e.stopPropagation();removeSequenceMeasure(m);};
-        actions.append(del);menu.append(summary,actions);tools.append(play,menu);card.append(tools);
+        const duplicate=document.createElement('button');duplicate.type='button';duplicate.textContent='Dupliquer';duplicate.disabled=measures.length>=8||playbackStarting;
+        duplicate.onclick=e=>{e.stopPropagation();menu.open=false;duplicateSequenceMeasure(m);};
+        const rename=document.createElement('button');rename.type='button';rename.textContent='Renommer';rename.disabled=playbackStarting;
+        rename.onclick=e=>{e.stopPropagation();menu.open=false;renameSequenceMeasure(m);};
+        actions.append(duplicate,rename,del);menu.append(summary,actions);tools.append(play,menu);card.append(tools);
       });
     }
 
@@ -2935,7 +2959,8 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     function renderActiveMeasure() {
       const m = measures[activeMeasureIndex];
       if (!m) return;
-      activeMeasureLabel.textContent = `MESURE ${activeMeasureIndex + 1} / ${measures.length}`;
+      activeMeasureLabel.toggleAttribute('data-no-translate',!!m.name);
+      activeMeasureLabel.textContent = m.name || `MESURE ${activeMeasureIndex + 1} / ${measures.length}`;
       updateVoiceGroupLabel(m);
       activeNumeratorSel.value = String(m.numerator);
       activeDenominatorSel.value = String(m.denominator);
@@ -3336,7 +3361,8 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     renderActiveMeasure = function() {
       if (appMode !== 'polyrhythm') return renderActiveMeasureMetronome();
       const m=measures[activeMeasureIndex]; if(!m) return;
-      activeMeasureLabel.textContent=`MESURE ${activeMeasureIndex+1} / ${measures.length}`;
+      activeMeasureLabel.toggleAttribute('data-no-translate',!!m.name);
+      activeMeasureLabel.textContent=m.name||`MESURE ${activeMeasureIndex+1} / ${measures.length}`;
       updateVoiceGroupLabel();
       refreshBeatEditor();
       polyNumeratorInput.value=String(m.numerator); polyDenominatorInput.value=String(m.denominator); syncNumbox(polyNumeratorInput); syncNumbox(polyDenominatorInput);
@@ -3980,7 +4006,7 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script><link rel="stylesheet" href="pro-interface.css?v=20261012-font-audit2">
 <script src="multi-clock.js?v=20261012-multi5"></script>
-<script src="multi-metronome.js?v=20261012-multi9"></script>
+<script src="multi-metronome.js?v=20261012-measure-menus1"></script>
 <script src="interface-language.js?v=20261012-workspaces8"></script>
 <script src="workspace-layout.js?v=20261012-workspaces8"></script>
 </body>

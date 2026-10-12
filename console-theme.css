@@ -298,3 +298,9 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 #workspaceTimer{align-items:flex-start!important;text-align:left;}
 #workspaceTimer .workspace-timer-label{width:auto;justify-content:flex-start;}
 .panel-visu #workspaceTimer #trainTimer{margin:0!important;align-self:flex-start;justify-content:flex-start;text-align:left;}
+
+/* Desktop navigation fills the workspace with six equal columns. */
+@media(min-width:1101px){
+ #workspaceNav{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(8px,.65vw,14px);}
+ #workspaceNav button{width:100%;min-width:0;justify-content:center;margin:0;}
+}

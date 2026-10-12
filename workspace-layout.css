@@ -14,8 +14,8 @@
  .main-grid>.panel-visu{grid-area:auto!important;grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;padding:18px!important;gap:12px!important}
  .main-grid>.panel-seq{grid-area:auto!important;grid-column:3!important;grid-row:1!important;padding:16px!important}
  .main-grid>.panel-training{display:none!important}
- body[data-workspace=metronome] .main-grid,body[data-workspace=polyrhythm] .main-grid{grid-template-columns:248px minmax(0,1fr)!important}
- body[data-workspace=metronome] .panel-seq,body[data-workspace=polyrhythm] .panel-seq{display:none!important}
+ body[data-workspace=metronome] .main-grid{grid-template-columns:248px minmax(0,1fr)!important}
+ body[data-workspace=metronome] .panel-seq{display:none!important}
  #modeSwitch,.panel-seq>.song-tabs,.panel-seq .multi-mode-tabs{display:none!important}
  .panel-params{padding:16px!important;gap:18px!important}
  .panel-params .control-group{gap:8px!important}
@@ -40,4 +40,4 @@
  footer .footer-right{position:absolute;right:0;pointer-events:none}
  footer>.visu-bottom>.legend{display:none!important}
 }
-@media(min-width:1101px) and (max-width:1300px){.main-grid{grid-template-columns:225px minmax(0,1fr) 300px!important}body[data-workspace=metronome] .main-grid,body[data-workspace=polyrhythm] .main-grid{grid-template-columns:225px minmax(0,1fr)!important}#workspaceNav button{padding-inline:13px}}
+@media(min-width:1101px) and (max-width:1300px){.main-grid{grid-template-columns:225px minmax(0,1fr) 300px!important}body[data-workspace=metronome] .main-grid{grid-template-columns:225px minmax(0,1fr)!important}#workspaceNav button{padding-inline:13px}}

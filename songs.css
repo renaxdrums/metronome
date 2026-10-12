@@ -75,3 +75,11 @@ body .song-playlist-summary {color:#c6c6d0;}
 .song-count-in .measure-head {padding-right:40px;}
 .song-count-in .song-more-wrap {top:8px;bottom:auto;}
 .song-count-in-tempo {font-size:12px;color:var(--text-muted);}
+
+/* A folded section keeps the same compact name / signature / transport row as MultiMetro. */
+#songPane .song-section[data-section-id]{position:relative;padding:12px;border-radius:7px;min-height:56px;box-sizing:border-box}
+#songPane .song-section[data-section-id] .song-block-header{padding-right:78px;min-height:30px}
+#songPane .song-section[data-section-id] .song-block-header .measure-num{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#songPane .song-section[data-section-id] .song-block-header-actions{position:absolute!important;right:12px!important;top:12px!important;margin:0!important;float:none!important;gap:6px!important}
+#songPane .song-section[data-section-id].collapsed .song-block-summary{display:none}
+#songPane .song-section[data-section-id] .song-block-summary{margin-top:8px}

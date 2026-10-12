@@ -62,3 +62,13 @@
 
 .multi-preset-status{color:var(--text-muted);font-size:10px;line-height:1.5;overflow-wrap:anywhere;margin-top:-3px}
 .multi-preset-status[hidden]{display:none}
+
+/* Shared compact cards: direct click folds the standard sequencer too. */
+#measureList .measure-card{padding:12px;box-sizing:border-box}
+#measureList .measure-head{min-height:30px;align-items:center;padding-right:78px}
+#measureList .measure-num{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#measureList .measure-sig{white-space:nowrap}
+#measureList .sequence-card-tools{right:12px;top:12px;flex-direction:row;gap:6px}
+#measureList .sequence-card-tools button,#measureList .sequence-more summary{height:30px}
+#measureList .measure-card.sequence-collapsed{min-height:56px}
+#measureList .sequence-collapsed .measure-tempo-row,#measureList .sequence-collapsed .measure-preview{display:none}

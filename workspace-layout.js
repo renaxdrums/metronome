@@ -6,6 +6,8 @@
  controls.innerHTML='<summary>Réglages musicaux</summary><div class="workspace-controls-grid"></div>';
  controls.querySelector('div').append(...params.querySelectorAll(':scope > .control-group'));
  visu.querySelector('.visu-toolbar').after(controls);
+ const musicGroups=[...controls.querySelector('.workspace-controls-grid').children];musicGroups.forEach((g,i)=>{g.classList.add('workspace-control-group');if(i===0)g.classList.add('workspace-tempo-group');});
+ const timerGroup=document.createElement('div');timerGroup.id='workspaceTimer';timerGroup.innerHTML='<span class="workspace-timer-label">Chronomètre</span>';const timer=document.getElementById('trainTimer');timer.before(timerGroup);timerGroup.append(timer);
  const silent=document.querySelector('.silent-section'),silentHome=document.createComment('silent-controls-home');silent.before(silentHome);
  const nav=document.createElement('nav');nav.id='workspaceNav';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Espaces de travail');
  const trainIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2M12 9v4l3 2"/></svg>';
@@ -28,8 +30,8 @@
  function place(){const group=document.querySelector('.visu-bottom');if(group&&group.parentNode!==footer)footer.insertBefore(group,footer.querySelector('.footer-right'));
   if(trainingSection&&trainingSection.parentNode!==trainHost)trainHost.append(trainingSection);
   const target=!desktop.matches&&page==='training'&&document.body.dataset.mobilePane==='training'?trainPanel:visu;
-  if(desktop.matches){const toolbar=visu.querySelector('.visu-toolbar');if(controls.parentNode!==toolbar)toolbar.insertBefore(controls,document.getElementById('trainTimer'));}
-  else if(controls.parentNode!==target){if(target===visu)visu.querySelector('.visu-toolbar').after(controls);else trainPanel.querySelector('.panel-title').after(controls);}
+  if(desktop.matches){const toolbar=visu.querySelector('.visu-toolbar');if(controls.parentNode!==toolbar)toolbar.insertBefore(controls,timerGroup);for(const g of musicGroups)if(g.parentNode!==toolbar)toolbar.insertBefore(g,timerGroup);}
+  else{const grid=controls.querySelector('.workspace-controls-grid');for(const g of musicGroups)if(g.parentNode!==grid)grid.append(g);if(controls.parentNode!==target){if(target===visu)visu.querySelector('.visu-toolbar').after(controls);else trainPanel.querySelector('.panel-title').after(controls);}}
   if(page==='training'){if(silent.parentNode!==trainPanel||trainPanel.querySelector('.panel-title').nextElementSibling!==silent)trainPanel.querySelector('.panel-title').after(silent);}else if(silent.parentNode!==silentHome.parentNode)silentHome.after(silent);
  }
  function sync(){if(changing)return;if(window.RENAX_MULTI?.active)page='multi';else if(!document.getElementById('songsRoot').hidden)page='tracks';else if(appMode==='polyrhythm')page='polyrhythm';else if(!['metronome','sequence','training'].includes(page))page='sequence';document.body.dataset.workspace=page;

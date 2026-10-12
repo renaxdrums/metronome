@@ -26,6 +26,25 @@
   const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const particles=[];
   const rect=logo.getBoundingClientRect();
+  // Keep the original engraving highlight before the dust phase.
+  const scale=Math.min(rect.width/772,rect.height/958);
+  const origin={x:rect.left+(rect.width-772*scale)/2,y:rect.top+(rect.height-958*scale)/2};
+  const mapped=p=>({x:origin.x+p.x*scale,y:origin.y+p.y*scale});
+  const ns='http://www.w3.org/2000/svg',sampler=document.createElementNS(ns,'svg');
+  sampler.style.cssText='position:fixed;left:-2px;top:-2px;width:1px;height:1px;opacity:0;pointer-events:none';
+  document.body.append(sampler);
+  let curves=[];
+  try{
+   const paths=['M146 331 105 208 118 31 286 183H486L654 31 667 208 626 331',
+    'M146 331 286 183','M626 331 486 183',
+    'M187 332 264 449 256 461 312 597 356 662H416L460 597 516 461 508 449 585 332',
+    'M128 405 107 437 276 548','M644 405 665 437 496 548'];
+   curves=paths.map(d=>{
+    const p=document.createElementNS(ns,'path');p.setAttribute('d',d);sampler.append(p);
+    const length=p.getTotalLength();
+    return Array.from({length:81},(_,i)=>{const q=p.getPointAtLength(length*i/80);return {x:q.x,y:q.y};});
+   });
+  }finally{sampler.remove();}
   try{
    const sample=document.createElement('canvas');
    sample.width=Math.max(2,Math.round(rect.width*2));sample.height=Math.max(2,Math.round(rect.height*2));
@@ -98,7 +117,6 @@
    }
    // Hold the complete fox after the wave, then let fine dust peel away slowly.
    // Gusts, turbulence and drag are independent for each grain; none aims at the sequencer.
-   const release=clamp((elapsed-2320)/4300);
    if(elapsed>=2320){
     const logoFade=ease((elapsed-2650)/2250);
     logo.style.setProperty('opacity',String(1-logoFade),'important');

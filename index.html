@@ -1325,7 +1325,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 #beatEditor .beat-editor-division-label select,#beatEditor .beat-editor-division-label .numbox-button{width:100%;min-height:36px;font-family:var(--font);}
 #beatEditor .beat-editor-legend{text-align:center;align-items:center;}
 </style>
-<link rel="stylesheet" href="multi-metronome.css?v=20261012-multi7">
+<link rel="stylesheet" href="multi-metronome.css?v=20261012-sequence-fold1">
 </head>
 <body>
 
@@ -2175,6 +2175,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     let playbackStarting = false;
     let tempo = 120;
     let measures = [];
+    const collapsedSequenceMeasures = new WeakSet();
     let metronomeMeasures = [];
     let polyrhythmMeasures = [];
     let appMode = 'metronome';
@@ -2831,6 +2832,8 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         card.className = 'measure-card';
         card.setAttribute('role', 'button');
         card.tabIndex = 0;
+        card.classList.toggle('sequence-collapsed', collapsedSequenceMeasures.has(m));
+        card.setAttribute('aria-expanded', String(!collapsedSequenceMeasures.has(m)));
         if (i === activeMeasureIndex) card.classList.add('active');
         if (isPlaying && i === playingMeasureIndex) card.classList.add('playing');
 
@@ -2895,12 +2898,13 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         card.appendChild(tempoRow);
         card.appendChild(preview);
         const selectMeasure = () => {
+          if(collapsedSequenceMeasures.has(m))collapsedSequenceMeasures.delete(m);else collapsedSequenceMeasures.add(m);
           activeMeasureIndex = i;
           syncTempoUI(m);
           renderSequencerList();
           renderActiveMeasure();
         };
-        card.addEventListener('click', selectMeasure);
+        card.addEventListener('click', e => {if(!e.target.closest('button,input,select,details,label'))selectMeasure();});
         card.addEventListener('keydown', e => {
           if (e.target !== card) return;
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMeasure(); }

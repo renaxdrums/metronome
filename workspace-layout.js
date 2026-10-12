@@ -2,7 +2,7 @@
 (()=>{
  const nativeMode=document.getElementById('modeSwitch'),songTabs=document.querySelector('.song-tabs'),multiTabs=document.querySelector('.multi-mode-tabs'),visu=document.querySelector('.panel-visu'),footer=document.querySelector('footer'),params=document.querySelector('.panel-params'),trainPanel=document.querySelector('.panel-training'),trainHost=document.getElementById('mobileTrainingHost'),seqPanel=document.querySelector('.panel-seq');
  const desktop=matchMedia('(min-width:1101px)');
- const controls=document.createElement('details');controls.id='workspaceControls';controls.open=true;
+ const controls=document.createElement('details');controls.id='workspaceControls';controls.open=desktop.matches;
  controls.innerHTML='<summary>Réglages musicaux</summary><div class="workspace-controls-grid"></div>';
  controls.querySelector('div').append(...params.querySelectorAll(':scope > .control-group'));
  visu.querySelector('.visu-toolbar').after(controls);
@@ -32,7 +32,7 @@
  const buttons=new Map();
  const controlOpenByWorkspace=new Map();let shownWorkspace=null,wasDesktop=desktop.matches;
  function rememberControls(){if(!desktop.matches&&shownWorkspace!==null)controlOpenByWorkspace.set(shownWorkspace,controls.open);}
- function restoreControls(workspace){shownWorkspace=workspace;controls.open=desktop.matches||(controlOpenByWorkspace.get(workspace)??(workspace==='metronome'));}
+ function restoreControls(workspace){shownWorkspace=workspace;controls.open=desktop.matches||(controlOpenByWorkspace.get(workspace)??false);}
  for(const [id,label,icon] of items){const b=document.createElement('button');b.type='button';b.dataset.workspace=id;b.setAttribute('role','tab');b.setAttribute('aria-controls',id==='training'?'mobileTrainingHost':id==='tracks'?'songsRoot':id==='sequence'||id==='multi'?'sequencePane':'sequencerContainer');b.innerHTML=icon+'<span>'+label+'</span>';b.onclick=()=>go(id);nav.append(b);buttons.set(id,b);}
  document.querySelector('header').after(nav);
  nav.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const list=[...buttons.values()],i=list.indexOf(document.activeElement),next=event.key==='Home'?0:event.key==='End'?list.length-1:(i+(event.key==='ArrowRight'?1:-1)+list.length)%list.length;list[next].click();list[next].focus();});

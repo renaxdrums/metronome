@@ -9,6 +9,19 @@
  const musicGroups=[...controls.querySelector('.workspace-controls-grid').children];musicGroups.forEach((g,i)=>{g.classList.add('workspace-control-group');if(i===0)g.classList.add('workspace-tempo-group');});
  const volumeLabel=document.getElementById('volumeSlider').closest('.control-group').querySelector('label');volumeLabel.insertAdjacentHTML('afterbegin','<svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m11 5-6 4H2v6h3l6 4V5Z M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></svg>');
  const timerGroup=document.createElement('div');timerGroup.id='workspaceTimer';timerGroup.innerHTML='<span class="workspace-timer-label"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2M12 9v4l3 2"/></svg>Chronomètre</span>';const timer=document.getElementById('trainTimer');timer.before(timerGroup);timerGroup.append(timer);
+ const tempoShortcut=document.createElement('button');tempoShortcut.id='workspaceTempoShortcut';tempoShortcut.type='button';tempoShortcut.hidden=true;
+ tempoShortcut.setAttribute('aria-controls','workspaceControls');tempoShortcut.innerHTML='<strong></strong><span>BPM</span>';
+ timerGroup.before(tempoShortcut);
+ function syncTempoShortcut(){
+  const value=bpmDisplay.textContent.match(/\d+/)?.[0]||String(bpmSlider.value);
+  const number=tempoShortcut.querySelector('strong');if(number.textContent!==value)number.textContent=value;
+  tempoShortcut.setAttribute('aria-label','Ouvrir les réglages musicaux, tempo '+value+' BPM');
+  tempoShortcut.hidden=desktop.matches||controls.open;
+ }
+ tempoShortcut.addEventListener('click',()=>{controls.open=true;syncTempoShortcut();document.getElementById('tempoFader')?.focus({preventScroll:true});controls.scrollIntoView({block:'nearest',behavior:'smooth'});});
+ new MutationObserver(syncTempoShortcut).observe(bpmDisplay,{childList:true,subtree:true,characterData:true});
+ bpmSlider.addEventListener('input',syncTempoShortcut);
+
  const silent=document.querySelector('.silent-section'),silentHome=document.createComment('silent-controls-home');silent.before(silentHome);
  const silentCollapse=document.createElement('button');silentCollapse.type='button';silentCollapse.className='silent-collapse';silentCollapse.textContent='Mesures vides';silentCollapse.setAttribute('aria-expanded','false');silentCollapse.setAttribute('aria-controls','silentSettings');silent.querySelector('.silent-head').prepend(silentCollapse);
  silentCollapse.onclick=()=>{const expanded=silent.classList.toggle('is-expanded');silentCollapse.setAttribute('aria-expanded',String(expanded));};
@@ -33,7 +46,7 @@
  function syncAdd(){add.disabled=playbackStarting||measures.length>=8;}
  add.onclick=()=>{if(playbackStarting||!['metronome','polyrhythm'].includes(appMode)||window.RENAX_MULTI?.active||measures.length>=8)return;stopMetronome();measureCountSel.value=String(measures.length+1);measureCountSel.dispatchEvent(new Event('change',{bubbles:true}));activeMeasureIndex=measures.length-1;renderSequencerList();renderActiveMeasure();syncAdd();};
  measureCountSel.addEventListener('change',syncAdd);new MutationObserver(syncAdd).observe(playBtn,{attributes:true,attributeFilter:['disabled','class']});syncAdd();
- function place(){const group=document.querySelector('.visu-bottom');if(group){if(desktop.matches){if(group.parentNode!==visu)visu.append(group);}else if(group.parentNode!==footer)footer.insertBefore(group,footer.querySelector('.footer-right'));}
+ function place(){syncTempoShortcut();const group=document.querySelector('.visu-bottom');if(group){if(desktop.matches){if(group.parentNode!==visu)visu.append(group);}else if(group.parentNode!==footer)footer.insertBefore(group,footer.querySelector('.footer-right'));}
   if(trainingSection&&trainingSection.parentNode!==trainHost)trainHost.append(trainingSection);
   const target=!desktop.matches&&page==='training'&&document.body.dataset.mobilePane==='training'?trainPanel:visu;
   if(desktop.matches){const toolbar=visu.querySelector('.visu-toolbar');if(controls.parentNode!==toolbar)toolbar.insertBefore(controls,timerGroup);for(const g of musicGroups)if(g.parentNode!==toolbar)toolbar.insertBefore(g,timerGroup);}
@@ -54,7 +67,7 @@
  }finally{changing=false;sync();requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});}}
  const observer=new MutationObserver(sync);observer.observe(songTabs,{subtree:true,attributes:true,attributeFilter:['aria-selected']});observer.observe(multiTabs,{subtree:true,attributes:true,attributeFilter:['aria-selected']});observer.observe(nativeMode,{subtree:true,attributes:true,attributeFilter:['class']});
  new MutationObserver(place).observe(visu,{childList:true});window.addEventListener('resize',place);desktop.addEventListener('change',()=>{if(!wasDesktop&&shownWorkspace!==null)controlOpenByWorkspace.set(shownWorkspace,controls.open);wasDesktop=desktop.matches;restoreControls(page);place();if(!desktop.matches)switchTab(page==='training'?'training':['sequence','multi','tracks'].includes(page)?'seq':'visu');requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});});
- controls.addEventListener('toggle',()=>{rememberControls();requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});});
+ controls.addEventListener('toggle',()=>{rememberControls();syncTempoShortcut();requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});});
  const start=page;if(!document.getElementById('songsRoot').hidden){restoreControls(page);sync();if(!desktop.matches)switchTab('seq');}else go(start);window.addEventListener('load',()=>{sync();place();});
 })();
 

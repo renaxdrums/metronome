@@ -1,32 +1,61 @@
-/* Desktop workspace hierarchy. Existing controls and audio logic stay intact. */
-#workspaceNav,#workspaceHome{display:none}
+/* Original controls, reorganized across desktop and mobile workspaces. */
+#workspaceNav{display:flex;gap:6px;padding:10px 0 12px;flex-shrink:0;align-items:center}
+#workspaceNav button{display:flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:8px 18px;color:var(--text);background:transparent;border:1px solid transparent;border-radius:7px;font:600 12px var(--font);cursor:pointer}
+#workspaceNav button[aria-selected=true]{border-color:#009cab;background:#00cee514}
+#workspaceNav button:hover{background:#ffffff06;border-color:var(--border)}
+#workspaceNav button[aria-selected=true]:hover{border-color:#009cab;background:#00cee514}
+#workspaceNav svg{width:18px;height:18px;fill:none;stroke:var(--orange);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#workspaceNav button:focus-visible,#workspaceMobileViews button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+#workspaceMobileViews,#modeSwitch,.panel-seq>.song-tabs,.panel-seq .multi-mode-tabs,.mobile-tabs,.main-grid>.panel-params{display:none!important}
+#workspaceControls{flex:0 0 auto;border-bottom:1px solid var(--border);padding:0 0 12px;min-width:0}
+#workspaceControls>summary{color:var(--text);font-size:11px;font-weight:600;cursor:pointer;padding:8px 0}
+.poly-dot.outer{--poly-radius:var(--ring-radius)!important}
+.poly-dot.inner{--poly-radius:calc(var(--ring-radius) * .64)!important}
+.poly-ring.outer{width:calc(var(--ring-radius) * 2)!important;height:calc(var(--ring-radius) * 2)!important}
+.poly-ring.inner{width:calc(var(--ring-radius) * 1.28)!important;height:calc(var(--ring-radius) * 1.28)!important}
+.workspace-controls-grid{display:grid;grid-template-columns:minmax(210px,1.2fr) minmax(160px,1fr) minmax(130px,.8fr);gap:24px;align-items:start}
+.workspace-controls-grid .control-group{margin:0!important;gap:8px!important;min-width:0}
+.workspace-controls-grid .control-group>label{display:flex;align-items:center;gap:8px;font-size:10px;min-height:18px;line-height:18px;margin:0;letter-spacing:.3px}
+.workspace-controls-grid .control-group>label svg{width:15px;height:15px;margin:0;flex:0 0 15px}
+.workspace-controls-grid .tempo-display{font-size:28px;line-height:1.15;text-align:left;white-space:nowrap}
+.workspace-controls-grid .tempo-display span{font-size:10px}
+.workspace-controls-grid .tap-tempo-btn{min-height:32px;margin:0;font-size:10px}
+.workspace-controls-grid .numbox-custom,.workspace-controls-grid .numbox-button{width:100%;min-width:0}
+.workspace-controls-grid .numbox-button{height:36px}
+.workspace-controls-grid .volume-row{min-height:36px}
+.workspace-controls-grid .tempo-slider-row{margin-top:0}
+.workspace-controls-grid #soundBank{max-width:100%}
+#sequenceAddMeasure:disabled{opacity:.45;cursor:default}
+body:not(.poly-mode) #sequencePane>.sequence-count-row{display:none!important}
+body.poly-mode #sequencePane>.sequence-add{display:none!important}
+#mobileTrainingHost{width:100%!important;max-width:none!important}
+.panel-training .training-section{margin:0!important;border:0!important;padding:0!important;gap:16px!important;width:100%!important}
+.panel-training .training-section>label{display:none}
+.panel-training .training-fields{display:flex;flex-direction:column;gap:14px}
+.panel-training .training-row{font-size:11px;gap:10px}
+.panel-training .training-row .row-label{flex-basis:72px;font-size:10px}
+.panel-training .training-row input[type=number],.panel-training .training-row select,.panel-training .training-row .numbox-button{min-height:38px;height:38px}
+.panel-training .training-mode-tabs button{min-height:62px}
+.panel-training .btn-train{min-height:44px;margin:8px 0 0!important}
+.panel-training .silent-section{margin-top:22px}
 @media(min-width:1101px){
  body{padding:12px 16px;height:100dvh;overflow:hidden}
  header{margin-bottom:0;padding-bottom:12px}
- #workspaceNav{display:flex;gap:6px;padding:10px 0 12px;flex-shrink:0;align-items:center}
- #workspaceNav button{display:flex;align-items:center;justify-content:center;gap:9px;min-height:40px;padding:8px 18px;color:var(--text);background:transparent;border:1px solid transparent;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
- #workspaceNav button[aria-selected=true]{border-color:#009cab;background:#00cee514}
- #workspaceNav button:hover{background:#ffffff06;border-color:var(--border)}
- #workspaceNav button[aria-selected=true]:hover{border-color:#009cab;background:#00cee514}
- #workspaceNav svg,#workspaceHome svg{width:18px;height:18px;fill:none;stroke:var(--orange);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
- #workspaceNav button:focus-visible,#workspaceHome:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
- .main-grid{grid-template-columns:248px minmax(0,1fr) 330px!important;grid-template-rows:minmax(0,1fr)!important;grid-template-areas:none!important;gap:16px!important}
- .main-grid>.panel-params{grid-area:auto!important;grid-column:1!important;grid-row:1!important}
- .main-grid>.panel-visu{grid-area:auto!important;grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;padding:18px!important;gap:12px!important}
- .main-grid>.panel-seq{grid-area:auto!important;grid-column:3!important;grid-row:1!important;padding:16px!important}
+ .main-grid{display:grid!important;grid-template-columns:minmax(0,1fr) 360px!important;grid-template-rows:minmax(0,1fr)!important;grid-template-areas:none!important;gap:16px!important}
+ .main-grid>.panel-visu{grid-area:auto!important;grid-column:1!important;grid-row:1!important;display:flex!important;flex-direction:column!important;padding:18px!important;gap:12px!important}
+ .main-grid>.panel-seq,.main-grid>.panel-training{grid-area:auto!important;grid-column:2!important;grid-row:1!important;padding:18px!important}
+ .main-grid>.panel-seq{display:flex!important}
  .main-grid>.panel-training{display:none!important}
- body[data-workspace=metronome] .main-grid{grid-template-columns:248px minmax(0,1fr)!important}
- body[data-workspace=metronome] .panel-seq{display:none!important}
- #modeSwitch,.panel-seq>.song-tabs,.panel-seq .multi-mode-tabs{display:none!important}
- .panel-params{padding:16px!important;gap:14px!important}
- .panel-params .control-group{gap:8px!important;margin:0!important}
- .panel-params .control-group>label{display:flex;align-items:center;gap:8px;min-height:18px;margin:0;padding:0;font-size:11px;letter-spacing:.2px}
- .panel-params .control-group>label svg{width:15px;flex:0 0 15px;margin-right:0}
- .panel-params .control-group:nth-of-type(4)>label{padding-left:23px}
- .panel-params .training-section{padding-top:18px!important;gap:8px!important}
- .panel-params .training-row{font-size:11px!important}
- .panel-params .tempo-display{font-size:32px}
- .panel-params .numbox-button,.panel-params input[type=number]{min-height:34px}
+ body[data-workspace=metronome] .main-grid{grid-template-columns:minmax(0,1fr)!important}
+ body[data-workspace=metronome] .panel-seq,body[data-workspace=training] .panel-seq{display:none!important}
+ body[data-workspace=training] .main-grid>.panel-training{display:flex!important}
+ #workspaceControls>summary{display:none}
+ .workspace-controls-grid .control-group:first-child{display:grid;grid-template-columns:100px minmax(0,1fr);gap:6px 10px!important;align-items:center}
+ .workspace-controls-grid .control-group:first-child>label{grid-column:1/-1}
+ .workspace-controls-grid .tempo-display{grid-column:1;grid-row:2}
+ .workspace-controls-grid .tap-tempo-btn{grid-column:2;grid-row:2;min-width:0;padding:6px 8px}
+ .workspace-controls-grid .tempo-slider-row{grid-column:1/-1;grid-row:3}
+ .workspace-controls-grid .tap-tempo-btn .key-hint{display:none}
  .panel-visu>.panel-title{flex:0 0 auto}
  .panel-visu .visu-toolbar{padding-bottom:12px;gap:12px}
  .panel-visu .sequencer-wrapper{flex:1 1 auto;min-height:0;container-type:size;padding:0!important;display:flex;align-items:center;justify-content:center;width:100%}
@@ -36,13 +65,50 @@
  footer>.visu-bottom{flex:1;min-width:0;gap:0;padding:0!important}
  footer .visu-bottom .footer-center{display:flex!important;justify-content:center!important;position:static;transform:none;width:100%}
  footer .visu-bottom #playBtn{min-width:132px!important;height:44px!important}
- footer .footer-left{position:absolute;left:0;z-index:3}
- #workspaceHome{display:grid;place-items:center;width:38px;height:38px;padding:0;background:#ffffff04;border:1px solid var(--border);border-radius:7px;cursor:pointer}
  footer .footer-right{position:absolute;right:0;pointer-events:none}
  footer>.visu-bottom>.legend{display:none!important}
 }
-@media(min-width:1101px) and (max-width:1300px){.main-grid{grid-template-columns:225px minmax(0,1fr) 300px!important}body[data-workspace=metronome] .main-grid{grid-template-columns:225px minmax(0,1fr)!important}#workspaceNav button{padding-inline:13px}}
-
-body:not(.poly-mode) #sequencePane>.sequence-count-row{display:none!important}
-body.poly-mode #sequencePane>.sequence-add{display:none!important}
-#sequenceAddMeasure:disabled{opacity:.45;cursor:default}
+@media(max-width:1100px){
+ body{height:100dvh;min-height:0;padding:8px;overflow:hidden}
+ header{margin:0;min-height:42px;padding:0 0 8px}
+ #workspaceNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:8px 0}
+ #workspaceNav button{min-width:0;min-height:44px;padding:6px 2px;font-size:10px;gap:5px;background:#ffffff03;border-color:var(--border)}
+ #workspaceNav svg{width:15px;height:15px;flex:0 0 15px}
+ #workspaceMobileViews{gap:6px;padding:0 0 8px}
+ body[data-workspace=sequence] #workspaceMobileViews,body[data-workspace=multi] #workspaceMobileViews,body[data-workspace=tracks] #workspaceMobileViews,body[data-workspace=polyrhythm] #workspaceMobileViews{display:flex!important}
+ #workspaceMobileViews button{flex:1;min-height:36px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font:600 10px var(--font);border-radius:5px}
+ #workspaceMobileViews button[aria-pressed=true]{color:var(--text);background:#00cee510;border-color:#009cab}
+ .main-grid{display:block!important;flex:1;min-height:0;overflow:hidden}
+ .main-grid>.panel{height:100%;max-height:100%;display:none!important;padding:12px!important}
+ body[data-mobile-pane=visu] .main-grid>.panel-visu,body[data-mobile-pane=seq] .main-grid>.panel-seq,body[data-mobile-pane=training] .main-grid>.panel-training{display:flex!important}
+ body[data-mobile-pane=settings] .main-grid{display:none!important}
+ .panel-visu{gap:10px!important}
+ .panel-visu .sequencer-wrapper{flex:1;min-height:190px;container-type:size;overflow:hidden;width:100%;display:flex;align-items:center;justify-content:center}
+ .panel-visu .sequencer-container{width:min(100%,calc(100cqh - 8px))!important;height:auto!important;aspect-ratio:1;max-height:none}
+ .panel-visu.score-view .sequencer-wrapper{overflow:auto;min-height:190px}
+ .panel-visu .visu-toolbar{flex-shrink:0;min-height:42px}
+ .panel-visu .panel-title{display:none}
+ .workspace-controls-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+ .workspace-controls-grid .control-group:first-child{grid-column:1/-1;position:relative;padding-right:112px}
+ .workspace-controls-grid .tap-tempo-btn{position:absolute;right:0;top:22px;width:100px;height:42px}
+ .workspace-controls-grid .key-hint{display:none}
+ .workspace-controls-grid .tempo-display{font-size:28px}
+ #workspaceControls>summary{padding:0 0 8px;min-height:28px}
+ #workspaceControls:not([open]){padding-bottom:0}
+ .panel-training #workspaceControls{margin-bottom:16px}
+ .panel-training .training-mode-tabs{margin:0}
+ .main-grid>.panel-training>.panel-title{font-size:11px}
+ .panel-training .training-curve-menu{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .panel-seq{gap:14px}
+ .panel-seq #sequenceAddMeasure,.multi-add{min-height:44px}
+ .measure-card button,.song-block-header-actions button,.multi-track-head button{min-width:36px;min-height:36px}
+ footer{flex-shrink:0;position:relative;min-height:62px;margin-top:8px;padding:8px 0 0;display:flex;justify-content:center}
+ footer>.visu-bottom{width:100%;margin:0;padding:0!important;gap:0}
+ footer .footer-center{position:static!important;transform:none!important;display:flex!important;justify-content:center;gap:8px}
+ footer .footer-center #playBtn{min-width:132px!important;width:auto!important;height:44px!important;font-size:0!important}
+ footer .footer-left,footer .footer-right,footer>.visu-bottom>.legend{display:none!important}
+ body[data-workspace=training][data-mobile-pane=training] footer{display:none!important}
+ .mobile-training-bpm{display:none!important}
+ .index2-settings-panel.mobile-active{height:100%;overflow:auto}
+}
+@media(max-width:360px){#workspaceNav button{font-size:9px;gap:3px}#workspaceNav svg{width:13px;flex-basis:13px}.workspace-controls-grid{gap:8px}}

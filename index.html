@@ -4023,24 +4023,23 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="workspace-layout.js?v=20261012-graphite-icons1"></script>
 <script src="console-intro.js?v=20261012-no-replay1"></script>
 <script>
-/* Test opt-in uniquement : ?fullscreen=try — aucun changement pour les visiteurs ordinaires. */
+/* Smartphone : premier vrai toucher -> plein écran, une seule tentative par chargement. */
 (() => {
-  if (new URLSearchParams(location.search).get('fullscreen') !== 'try') return;
   if (!matchMedia('(max-width: 1100px) and (pointer: coarse)').matches) return;
-  const tabs = document.getElementById('mobileTabs');
   const root = document.documentElement;
-  if (!tabs || !document.fullscreenEnabled || typeof root.requestFullscreen !== 'function') return;
+  if (!document.fullscreenEnabled || typeof root.requestFullscreen !== 'function') return;
   let attempted = false;
-  // Uniquement un onglet : ne pas consommer le geste nécessaire au démarrage audio (Play).
-  tabs.addEventListener('click', event => {
-    if (attempted || !event.isTrusted || document.fullscreenElement ||
-        !event.target.closest('button[data-tab]')) return;
+  // Sur écran tactile, pointerup fournit l'activation utilisateur exigée par Chrome.
+  // La capture permet aussi le déclenchement pendant l'animation ou sur un contrôle.
+  document.addEventListener('pointerup', event => {
+    if (attempted || !event.isTrusted || !event.isPrimary || event.pointerType !== 'touch') return;
     attempted = true;
+    if (document.fullscreenElement) return;
     try {
       Promise.resolve(root.requestFullscreen({ navigationUI: 'hide' }))
-        .catch(error => console.info('[RENAX fullscreen test] Refus du navigateur :', error));
+        .catch(error => console.info('[RENAX fullscreen] Refus du navigateur :', error));
     } catch (error) {
-      console.info('[RENAX fullscreen test] Fonction indisponible :', error);
+      console.info('[RENAX fullscreen] Fonction indisponible :', error);
     }
   }, { capture: true });
 })();

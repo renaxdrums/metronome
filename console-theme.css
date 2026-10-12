@@ -55,9 +55,12 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#2
  .main-grid{gap:20px!important}
  .main-grid>.panel-visu{padding:0!important;gap:14px!important}
  .main-grid>.panel-seq,.main-grid>.panel-training{padding:16px!important}
- .panel-visu .visu-toolbar{background:#1a1b1f;border:1px solid #34363b;border-radius:10px;padding:13px!important}
+ .panel-visu .visu-toolbar{background:#1a1b1f;border:1px solid #34363b;border-radius:10px;padding:13px!important;grid-template-columns:110px minmax(310px,1.7fr) minmax(100px,1fr) minmax(72px,.6fr) 90px}
  .visu-toolbar .measure-label,.visu-toolbar .control-group>label,.workspace-timer-label{color:#b1b4bb;text-transform:none;letter-spacing:.1px;font-size:10px!important;font-weight:500!important}
- .visu-toolbar .workspace-control-group,.visu-toolbar #workspaceTimer{border-left-color:#34363b}
+ .visu-toolbar .workspace-control-group,.visu-toolbar #workspaceTimer{border-left-color:#34363b;padding-left:8px;margin-left:8px!important}
+ .visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(90px,1fr) 88px}
+ .visu-toolbar .tap-tempo-btn{width:88px;min-width:88px}
+ .visu-toolbar .visu-measure-info .numbox-custom,.visu-toolbar .visu-measure-info .numbox-button{width:40px!important;min-width:40px!important;flex-basis:40px!important}
  .visu-toolbar .tempo-display{font-weight:600;font-size:26px}
  .visu-toolbar .tap-tempo-btn{font-size:10px;font-weight:500}
  .visu-toolbar #trainTimer{font-size:26px;letter-spacing:-.8px}
@@ -66,7 +69,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#2
  .panel-visu>.visu-bottom{padding:13px 0 3px!important;border-top-color:#292c32}
  footer{color:var(--text-muted)}
 }
-@media(min-width:1101px) and (max-width:1250px){.visu-toolbar .tempo-display{font-size:21px}.visu-toolbar .measure-label,.visu-toolbar .control-group>label,.workspace-timer-label{font-size:9px!important}.visu-toolbar #trainTimer{font-size:23px}}
+@media(min-width:1101px) and (max-width:1250px){.panel-visu .visu-toolbar{grid-template-columns:96px minmax(250px,1.6fr) minmax(80px,1fr) minmax(65px,.6fr) 75px}.visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(80px,1fr) 68px;column-gap:5px!important}.visu-toolbar .tap-tempo-btn{width:68px;min-width:68px;font-size:8px}.visu-toolbar .tempo-display{font-size:21px}.visu-toolbar .measure-label,.visu-toolbar .control-group>label,.workspace-timer-label{font-size:9px!important}.visu-toolbar #trainTimer{font-size:23px}.visu-toolbar .visu-measure-info .numbox-custom,.visu-toolbar .visu-measure-info .numbox-button{width:36px!important;min-width:36px!important;flex-basis:36px!important}}
 @media(max-width:1100px){
  #workspaceNav{gap:4px;padding:6px 0 10px}
  #workspaceNav button{background:transparent;border:0;border-bottom:2px solid transparent;border-radius:5px 5px 0 0;min-height:44px;padding:7px 3px;font-weight:500}

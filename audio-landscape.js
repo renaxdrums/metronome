@@ -62,6 +62,9 @@
    const base=height-3,maxHeight=height*.94;
    const retainedLevel=history.reduce((top,values)=>Math.max(top,...values),0);
    const visibility=Math.min(1,retainedLevel*3);
+   let first=bands-1,lastBand=0;
+   for(const values of history)for(let i=0;i<bands;i++)if(values[i]>Math.max(.002,retainedLevel*.035)){first=Math.min(first,i);lastBand=Math.max(lastBand,i);}
+   const low=first/(bands-1),range=Math.max(1,lastBand-first)/(bands-1);
    // A dense depth field interpolates the real recent spectra. Every contour fades with the actual sound.
    const count=96,points=Math.min(320,Math.max(160,Math.round(width/4)));
    for(let k=0;k<count;k++){
@@ -73,7 +76,7 @@
     paint.beginPath();let started=false;
     for(let j=0;j<=points;j++){
      const u=j/points,spread=(1-depth)*.055;
-     const coordinate=Math.max(0,Math.min(1,u+(u-.5)*spread));
+     const coordinate=low+Math.max(0,Math.min(1,u+(u-.5)*spread))*range;
      const raw=sample(a,coordinate)*(1-blend)+sample(b,coordinate)*blend;
      const edge=.3+.7*Math.pow(Math.sin(Math.PI*u),.65);
      const relief=Math.pow(raw,.64)*maxHeight*edge*(.48+depth*.52);

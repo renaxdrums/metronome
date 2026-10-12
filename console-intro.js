@@ -27,7 +27,8 @@
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) { finish(); return; }
     let width, height, started, last, emitted = 0;
-    const sparks = [], duration = 1350, tail = 850;
+    const sparks = [], duration = 1350, tail = 1000;
+    const varied = () => Math.pow(Math.random(), .45 + Math.random() * 2.3);
     const logo = overlay.querySelector('.console-arrival-logo');
     const bounds = word.getBoundingClientRect(), logoBounds = logo?.getBoundingClientRect();
     // Sample the actual letter shapes and the approved transparent logo once.
@@ -77,28 +78,33 @@
       const target = Math.round(Math.min(1, progress / .72) * Math.min(650, width * .65));
       while (emitted < target) {
         const origin = origins.length ? origins[Math.min(origins.length - 1, Math.floor((.15 + Math.min(1, progress / .72) * .75) * Math.random() * origins.length))] : { x: bounds.left + Math.random() * bounds.width, y: bounds.top + Math.random() * bounds.height, warm: true };
-        const depth = .3 + Math.random() * .7;
-        const angle = Math.random() * Math.PI * 2, speed = .35 + Math.random() * .85;
+        const depth = .22 + varied() * .78;
+        const angle = Math.random() * Math.PI * 2, speed = .22 + varied() * 1.25;
         // A radial burst fills the whole viewport instead of following the lettering baseline.
         const ambient = Math.random() < .22;
         const x = ambient ? Math.random() * width : origin.x;
         const y = ambient ? Math.random() * height : origin.y;
         sparks.push({ x, y, vx: Math.cos(angle) * width * .42 * speed * depth,
-          vy: Math.sin(angle) * height * .65 * speed * depth, radius: .5 + Math.random() * 1.7,
-          life: .65 + Math.random() * 1.15, age: 0, depth, phase: Math.random() * Math.PI * 2,
-          flare: emitted % 37 === 0, warm: origin.warm, power: .3 + Math.random() * .7 });
+          vy: Math.sin(angle) * height * .65 * speed * depth, radius: .35 + varied() * 2.3,
+          life: .55 + varied() * 1.4, age: 0, depth, phase: Math.random() * Math.PI * 2,
+          flutter: 2 + varied() * 8, bend: 18 + varied() * 100, drag: .25 + varied() * 1.3,
+          flare: Math.random() < .045, warm: origin.warm, power: .22 + varied() * .78 });
         emitted++;
       }
       ctx.clearRect(0, 0, width, height); ctx.globalCompositeOperation = 'lighter';
       for (let i = sparks.length - 1; i >= 0; i--) {
         const p = sparks[i]; p.age += dt;
         if (p.age >= p.life) { sparks.splice(i, 1); continue; }
-        p.x += (p.vx + Math.sin(now * .002 + p.phase) * 10) * dt;
-        p.y += (p.vy + Math.cos(p.age * 4 + p.phase) * 6) * dt;
+        // Independent swirls, drag and overlapping flicker frequencies keep each spark alive.
+        p.vx += Math.sin(p.age * p.flutter + p.phase) * p.bend * dt;
+        p.vy += Math.cos(p.age * (p.flutter * .71) - p.phase) * p.bend * .7 * dt;
+        const drag = Math.exp(-p.drag * dt); p.vx *= drag; p.vy *= drag;
+        p.x += p.vx * dt; p.y += p.vy * dt;
         const life = p.age / p.life;
-        const alpha = Math.sin(Math.PI * life) * p.power * (1 - progress * .45);
+        const flicker = .66 + .22 * Math.sin(p.age * p.flutter * 2.8 + p.phase) + .12 * Math.cos(p.age * p.flutter * 5.1 - p.phase);
+        const alpha = Math.sin(Math.PI * life) * p.power * (1 - progress * .35) * flicker;
         const color = p.warm ? '255,155,75' : '255,234,205';
-        const halo = p.radius * (p.flare ? 13 : 4);
+        const halo = p.radius * (p.flare ? 13 : 4) * (.8 + flicker * .3);
         const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, halo);
         glow.addColorStop(0, 'rgba(255,245,222,' + alpha.toFixed(3) + ')');
         glow.addColorStop(.15, 'rgba(' + color + ',' + (alpha * .55).toFixed(3) + ')');

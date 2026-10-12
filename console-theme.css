@@ -337,3 +337,6 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 #audioLandscape{position:absolute;bottom:0;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;opacity:.7;mix-blend-mode:screen;}
 #audioLandscape[hidden],.panel-visu.score-view #audioLandscape{display:none!important;}
 .panel-visu .sequencer-container{z-index:1;}
+
+/* Full-width monochrome spectra preserve dark depth and bright foreground filaments. */
+#audioLandscape{opacity:.9;mix-blend-mode:normal;}

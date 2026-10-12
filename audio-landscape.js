@@ -30,7 +30,7 @@
   }
   const actual=Math.min(1,Math.pow(Math.max(0,peak*.9+rms*2.2),.65));
   canvas.dataset.audioLevel=actual.toFixed(5);
-  level=actual>level?actual:Math.max(actual,level*Math.exp(-dt/.16));
+  level=actual>level?actual:Math.max(actual,level*Math.exp(-dt/.25));
   for(let i=0;i<bands;i++){
    let energy=0,count=0;
    if(node&&context.state==='running'&&actual>.0002){
@@ -39,8 +39,9 @@
     for(let j=start;j<=end;j++){const magnitude=Number.isFinite(freq[j])?Math.pow(10,freq[j]/20):0;energy+=magnitude*magnitude;count++;}
    }
    const spectral=count?Math.sqrt(energy/count):0;
-   const value=Math.min(1,Math.sqrt(spectral*12))*level;
-   profile[i]=value>profile[i]?value:Math.max(value,profile[i]*Math.exp(-dt/.12));
+   const strength=spectral>0?Math.max(0,Math.min(1,(20*Math.log10(spectral)+85)/60)):0;
+   const value=strength*Math.pow(level,.55);
+   profile[i]=value>profile[i]?value:Math.max(value,profile[i]*Math.exp(-dt/.25));
   }
   return level;
  }
@@ -58,12 +59,13 @@
   const retained=history.some(values=>values.some(v=>v>.002));
   canvas.hidden=!visible||reduce.matches||(!retained&&energy<.002);
   if(!canvas.hidden){
-   const base=height-8,maxHeight=height*.82;
+   const base=height-8,maxHeight=Math.min(height*.82,host.getBoundingClientRect().height*2/3);
+   const retainedLevel=history.reduce((top,values)=>Math.max(top,...values),0);
    // Each filament is an actual recent spectral frame; no synthetic rhythm or free-running wave.
    for(let k=history.length-1;k>=0;k--){
     const depth=1-k/Math.max(1,history.length),values=history[k];
     const shade=Math.round(105+depth*138);paint.strokeStyle='rgb('+shade+','+shade+','+shade+')';
-    paint.globalAlpha=(.025+depth*.11)*Math.min(1,energy*2+.1);paint.lineWidth=.45+depth*.35;paint.beginPath();
+    paint.globalAlpha=(.07+depth*.19)*Math.min(1,retainedLevel*2.5);paint.lineWidth=.45+depth*.35;paint.beginPath();
     for(let j=0;j<=190;j++){
      const u=j/190,taper=Math.pow(Math.sin(Math.PI*u),.5),v=sample(values,u);
      const x=u*width,y=base-v*maxHeight*taper-k*.55;

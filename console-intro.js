@@ -23,6 +23,14 @@
   const ns='http://www.w3.org/2000/svg';staging=document.createElementNS(ns,'svg');staging.classList.add('console-arrival-sampler');staging.setAttribute('aria-hidden','true');document.body.append(staging);
   const paths=['M146 331 105 208 118 31 286 183H486L654 31 667 208 626 331','M146 331 286 183','M626 331 486 183','M187 332 264 449 256 461 312 597 356 662H416L460 597 516 461 508 449 585 332','M128 405 107 437 276 548','M644 405 665 437 496 548'];
   const curves=paths.map(d=>{const p=document.createElementNS(ns,'path');p.setAttribute('d',d);staging.append(p);const length=p.getTotalLength();return Array.from({length:81},(_,i)=>{const q=p.getPointAtLength(length*i/80);return {x:q.x,y:q.y};});});
+  const contours=[
+   [[146,331],[105,208],[118,31],[286,183],[486,183],[654,31],[667,208],[626,331]],
+   [[146,331],[286,183]],[[626,331],[486,183]],
+   [[187,332],[264,449],[256,461],[312,597],[356,662],[416,662],[460,597],[516,461],[508,449],[585,332]],
+   [[128,405],[107,437],[276,548]],[[644,405],[665,437],[496,548]]
+  ];
+  const fragments=contours.flatMap(contour=>contour.slice(1).map((p,i)=>({a:{x:contour[i][0],y:contour[i][1]},b:{x:p[0],y:p[1]}})));
+  fragments.sort((a,b)=>Math.atan2((a.a.y+a.b.y)/2-330,(a.a.x+a.b.x)/2-386)-Math.atan2((b.a.y+b.b.y)/2-330,(b.a.x+b.b.x)/2-386));
   const details=['m230 320 77 29 18 33 13 53-26-52-43-19Z','m542 320-77 29-18 33-13 53 26-52 43-19Z','M352 610Q386 594 420 610Q410 628 386 646Q362 628 352 610Z'].map(d=>new Path2D(d));
   const rect=logo.getBoundingClientRect(),scale=Math.min(rect.width/772,rect.height/958);
   const origin={x:rect.left+(rect.width-772*scale)/2,y:rect.top+(rect.height-958*scale)/2};
@@ -46,7 +54,7 @@
   function tick(now){
    if(overlay.hidden){finish();return;}if(width!==innerWidth||height!==innerHeight)resize();
    if(started===undefined)started=now;
-   const elapsed=now-started,progress=clamp((elapsed-1100)/1850),motion=ease(progress),target=destination();
+   const elapsed=now-started,progress=clamp((elapsed-1100)/2300),motion=ease(progress),target=destination();
    ctx.clearRect(0,0,width,height);
    // One grazing light follows the approved orange engraving before it transforms.
    if(elapsed<1100){
@@ -92,22 +100,42 @@
     const phase=motion<.45?motion/.45:(motion-.45)/.55;
     const fromColor=motion<.45?[255,121,0]:[238,232,221],toColor=motion<.45?[238,232,221]:[69,215,231];
     const color='rgb('+fromColor.map((v,i)=>Math.round(v+(toColor[i]-v)*phase)).join(',')+')';
-    const handoff=1-ease((progress-.76)/.24);
-    for(let k=0;k<curves.length;k++){
-     const ring=target.poly?(k<3?target.radius:target.inner):target.radius;
-     const parts=target.poly?3:6,segment=k%parts,start=-Math.PI/2+segment*Math.PI*2/parts;
-     const points=curves[k].map((p,i)=>{
-      const from=mapped(p),angle=start+(i/80)*Math.PI*2/parts;
-      const shape=ease(progress/.32),travel=ease((progress-.12)/.88);
-      const head=mapped({x:386,y:330}),radius=38+(ring-38)*travel;
-      const cx=head.x+(target.center.x-head.x)*travel,cy=head.y+(target.center.y-head.y)*travel;
-      const arc={x:cx+Math.cos(angle)*radius,y:cy+Math.sin(angle)*radius};
-      return {x:from.x+(arc.x-from.x)*shape,y:from.y+(arc.y-from.y)*shape};
+    const handoff=1-ease((progress-.88)/.12);
+    // Separate every angular edge before it unfurls into an arc. The breakup is deliberately readable.
+    for(let k=0;k<fragments.length;k++){
+     const f=fragments[k],half=fragments.length/2,inner=target.poly&&k>=half;
+     const ring=inner?target.inner:target.radius,parts=target.poly?half:fragments.length,segment=k%parts;
+     const start=-Math.PI+segment*Math.PI*2/parts,end=start+Math.PI*2/parts;
+     const stagger=(k%5)*.018,unfold=ease((progress-.24-stagger)/.60);
+     const travel=ease((progress-.16)/.84),head=mapped({x:386,y:330});
+     const radius=48+(ring-48)*travel,cx=head.x+(target.center.x-head.x)*travel,cy=head.y+(target.center.y-head.y)*travel;
+     const mx=(f.a.x+f.b.x)/2-386,my=(f.a.y+f.b.y)/2-330,len=Math.hypot(mx,my)||1;
+     const separation=24*ease(progress/.20)*(1-unfold),lift=Math.sin(Math.PI*unfold)*12;
+     const points=Array.from({length:17},(_,i)=>{
+      const u=i/16,from=mapped({x:f.a.x+(f.b.x-f.a.x)*u,y:f.a.y+(f.b.y-f.a.y)*u});
+      const angle=start+(end-start)*u,to={x:cx+Math.cos(angle)*radius,y:cy+Math.sin(angle)*radius};
+      const detached={x:from.x+mx/len*separation,y:from.y+my/len*separation};
+      return {x:detached.x+(to.x-detached.x)*unfold,y:detached.y+(to.y-detached.y)*unfold-lift};
      });
-     const arcColor=target.poly&&k<3?'#ff7900':color;
-     stroke(points,arcColor,scale*26*(1-motion)+1.2*motion,handoff*.9);
+     const arcColor=target.poly&&!inner?'#ff7900':color;
+     stroke(points,arcColor,scale*26*(1-unfold)+1.2*unfold,handoff*.9);
+     if(progress>.05&&progress<.36){
+      ctx.fillStyle='#f4d5b5';ctx.globalAlpha=Math.sin(Math.PI*(progress-.05)/.31)*.5;
+      for(const p of [points[0],points.at(-1)]){ctx.beginPath();ctx.arc(p.x,p.y,.65,0,Math.PI*2);ctx.fill();}
+      ctx.globalAlpha=1;
+     }
     }
-    ctx.save();ctx.translate(origin.x,origin.y);ctx.scale(scale,scale);ctx.globalAlpha=1-ease(progress/.42);ctx.fillStyle='#ff7900';for(const p of details)ctx.fill(p);ctx.restore();
+    // Eyes and muzzle remain distinct pieces; each takes its own path towards a real beat.
+    const detailCenters=[{x:292,y:368},{x:480,y:368},{x:386,y:625}];
+    for(let i=0;i<details.length;i++){
+     const c=detailCenters[i],from=mapped(c),travel=ease((progress-.20-i*.04)/.72);
+     const destination=target.points.length?target.points.reduce((best,p)=>i===0?(p.x<best.x?p:best):i===1?(p.x>best.x?p:best):(p.y>best.y?p:best),target.points[0]):target.center;
+     const spread=(i-1)*Math.sin(Math.PI*travel)*14;
+     const pos={x:from.x+(destination.x-from.x)*travel+spread,y:from.y+(destination.y-from.y)*travel};
+     ctx.save();ctx.translate(pos.x,pos.y);ctx.rotate((i-1)*Math.sin(Math.PI*travel)*.35);
+     const size=scale*(1-travel*.7);ctx.scale(size,size);ctx.translate(-c.x,-c.y);
+     ctx.globalAlpha=1-ease((progress-.48)/.5);ctx.fillStyle=color;ctx.fill(details[i]);ctx.restore();
+    }
     // Straight shafts rotate together around their crossing; they never bend.
     const center={x:cross.x+(target.center.x-cross.x)*motion,y:cross.y+(target.center.y-cross.y)*motion};
     const half=330*scale+(target.radius-330*scale)*motion;
@@ -132,9 +160,9 @@
     for(const e of captions.slice(1))e.style.opacity=String(1-ease(progress/.7));
     if(progress>.25)overlay.style.pointerEvents='none';
    }
-   if(elapsed>=3300)finish();else frame=requestAnimationFrame(tick);
+   if(elapsed>=3750)finish();else frame=requestAnimationFrame(tick);
   }
-  frame=requestAnimationFrame(tick);timer=setTimeout(finish,3900);
+  frame=requestAnimationFrame(tick);timer=setTimeout(finish,4350);
  }
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}},true);
  window.addEventListener('pagehide',finish,{once:true});reduce.addEventListener('change',()=>{if(reduce.matches)finish();});

@@ -5,7 +5,7 @@
  const paint=canvas.getContext('2d',{alpha:true});if(!paint)return;
  const reduce=matchMedia('(prefers-reduced-motion:reduce)'),phi=(1+Math.sqrt(5))/2;
  const bands=64,history=[],profile=new Float32Array(bands);
- let context,node,source,freq,samples,frame,width=0,height=0,level=0,last=0,historyAt=0;
+ let context,node,source,freq,samples,frame,width=0,height=0,level=0,last=0,historyAt=0,flow=0;
  function resize(){
   const rect=host.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.min(width/phi,rect.height*2/3);
   const ratio=Math.min(devicePixelRatio||1,2);canvas.style.width=width+'px';canvas.style.height=height+'px';canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);paint.setTransform(ratio,0,0,ratio,0,0);
@@ -30,6 +30,7 @@
   }
   const actual=Math.min(1,Math.pow(Math.max(0,peak*.9+rms*2.2),.65));
   canvas.dataset.audioLevel=actual.toFixed(5);
+  flow+=actual*dt*3.5;
   level=actual>level?actual:Math.max(actual,level*Math.exp(-dt/.25));
   for(let i=0;i<bands;i++){
    let energy=0,count=0;
@@ -76,10 +77,15 @@
     paint.beginPath();let started=false;
     for(let j=0;j<=points;j++){
      const u=j/points,spread=(1-depth)*.055;
-     const coordinate=low+Math.max(0,Math.min(1,u+(u-.5)*spread))*range;
-     const raw=sample(a,coordinate)*(1-blend)+sample(b,coordinate)*blend;
+     const seed=(Math.sin((k+1)*127.1)*43758.5453)%1;
+     const drift=(Math.sin(u*(9+Math.abs(seed)*16)+k*.71+flow)+.35*Math.sin(u*39-k*1.17-flow*.7))*.045*Math.sin(Math.PI*u);
+     const coordinate=low+Math.max(0,Math.min(1,u+(u-.5)*spread+drift))*range;
+     const current=sample(a,coordinate)*(1-blend)+sample(b,coordinate)*blend;
+     const echo=sample(history[Math.min(history.length-1,Math.floor(age+7))],low+Math.max(0,Math.min(1,u+drift*2))*range);
+     const raw=current*.78+echo*.22;
      const edge=.3+.7*Math.pow(Math.sin(Math.PI*u),.65);
-     const relief=Math.pow(raw,.64)*maxHeight*edge*(.48+depth*.52);
+     const irregular=.78+.22*Math.sin(u*(13+Math.abs(seed)*24)+k*.37+flow*.9)+.08*Math.sin(u*73+k*.83-flow);
+     const relief=Math.pow(raw,.64)*maxHeight*edge*(.48+depth*.52)*irregular;
      const x=u*width,y=base-relief-(1-depth)*height*.045*visibility;
      if(raw<.002){started=false;continue;}
      if(!started){paint.moveTo(x,y);started=true;}else paint.lineTo(x,y);

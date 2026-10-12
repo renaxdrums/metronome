@@ -225,3 +225,6 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
  #songsRoot .playlist-create,#songsRoot .track-create,#songsRoot .track-add-section,#sequenceAddMeasure,#multiControls>.multi-add{min-height:44px}
  #songsRoot #profilePane .btn{min-height:44px}
 }
+
+#songsRoot .playlist-choice{position:relative}
+#songsRoot .playlist-choice::after{position:absolute;top:50%;right:52px;transform:translateY(-50%);margin:0;line-height:1;width:8px}

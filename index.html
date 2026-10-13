@@ -1340,7 +1340,16 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   <link rel="stylesheet" href="workspace-layout.css?v=20261012-workspaces8">
 <link rel="stylesheet" href="pro-interface.css?v=20261012-font-audit2">
 <link rel="stylesheet" href="console-theme.css?v=20261013-poly-controls24">
-</head>
+<style>
+#multiPresetLibrary > h3{color:var(--text);margin:0 0 16px}
+#multiPresetLibrary > .btn{margin-bottom:16px}
+#multiPresetLibrary .multi-preset-card{margin-bottom:10px;cursor:pointer}
+#multiPresetLibrary .multi-track-head{display:flex;align-items:center;gap:8px}
+#multiPresetLibrary .multi-track-name{flex:1;min-width:0;overflow-wrap:anywhere}
+#multiPresetLibrary .measure-sig{white-space:nowrap;font-size:12px}
+#multiPresetLibrary button[hidden],#multiPresetLibrary[hidden],#multiControls[hidden],#multiTracks[hidden]{display:none!important}
+#multiControls > .song-back{margin-bottom:12px}
+</style></head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
 <div class="console-arrival-lines" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -2864,6 +2873,12 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       });
     }
 
+    function blockNumberMenu(values,value,label){
+      const select=document.createElement('select');select.setAttribute('aria-label',label);
+      for(const v of values){const option=document.createElement('option');option.value=String(v);option.textContent=String(v);select.append(option);}
+      select.value=String(value);return select;
+    }
+
     function renderSequencerList() {
       measureListEl.innerHTML = '';
       measures.forEach((m, i) => {
@@ -2880,17 +2895,23 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         head.className = 'measure-head';
         head.innerHTML = `<span class="measure-num">MESURE ${i + 1} / ${measures.length}</span><span class="measure-sig">${m.numerator}/${m.denominator}</span>`;
 
+        const ratio=document.createElement('div');ratio.className='poly-ratio-row sequence-signature-row';
+        const numerator=blockNumberMenu(Array.from({length:20},(_,v)=>v+1),m.numerator,`Numérateur mesure ${i+1}`);
+        const denominator=blockNumberMenu([2,4,8,16,32],m.denominator,`Dénominateur mesure ${i+1}`);
+        const slash=document.createElement('span');slash.className='poly-slash';slash.textContent='/';
+        for(const field of [numerator,denominator]){field.addEventListener('click',e=>e.stopPropagation());field.addEventListener('keydown',e=>e.stopPropagation());}
+        const changeSignature=(target,value)=>{activeMeasureIndex=i;target.value=String(value);target.dispatchEvent(new Event('change',{bubbles:true}));renderSequencerList();};
+        numerator.addEventListener('change',e=>{e.stopPropagation();changeSignature(activeNumeratorSel,numerator.value);});
+        denominator.addEventListener('change',e=>{e.stopPropagation();changeSignature(activeDenominatorSel,denominator.value);});
+        ratio.append(numerator,slash,denominator);
+
         const tempoRow = document.createElement('div');
         tempoRow.className = 'measure-tempo-row';
         const tempoLabel = document.createElement('span');
         tempoLabel.className = 'measure-tempo-label';
         tempoLabel.textContent = 'TEMPO';
-        const tempoInput = document.createElement('input');
-        tempoInput.type = 'number';
+        const tempoInput = blockNumberMenu(Array.from({length:998},(_,v)=>v+2),m.tempo,`Tempo mesure ${i+1}`);
         tempoInput.className = 'measure-tempo-input';
-        tempoInput.min = '2'; tempoInput.max = '999'; tempoInput.step = '1';
-        tempoInput.value = String(m.tempo);
-        tempoInput.inputMode = 'numeric';
         tempoInput.setAttribute('aria-label', `Tempo mesure ${i + 1}`);
         const tempoUnit = document.createElement('span');
         tempoUnit.className = 'measure-tempo-unit';
@@ -2934,6 +2955,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         }
 
         card.appendChild(head);
+        card.appendChild(ratio);
         card.appendChild(tempoRow);
         card.appendChild(preview);
         const selectMeasure = () => {
@@ -4029,7 +4051,7 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
 <script src="multi-clock.js?v=20261012-multi5"></script>
-<script src="multi-metronome.js?v=20261012-guest-save1"></script>
+<script src="multi-metronome.js?v=20261013-preset-library25"></script>
 <script src="interface-language.js?v=20261012-workspaces8"></script>
 <script src="workspace-layout.js?v=20261013-replica-guard15"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->

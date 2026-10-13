@@ -388,3 +388,7 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 
 /* Desktop camera margins stay equally black behind both scenes until landing. */
 @media(min-width:1101px){.console-arrival-stage{background:#050607!important;}}
+
+/* Ambient header wave stays beneath readable controls, including in the arrival mirror. */
+header{isolation:isolate;}
+#renaxHeaderWave{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.55;mask-image:linear-gradient(to bottom,transparent,black 18%,black 82%,transparent);}

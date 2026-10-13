@@ -1368,6 +1368,20 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
     stroke-linecap:round;stroke-linejoin:round;
   }
 }
+/* Même icône retour dans les presets multipistes sur téléphone et tablette. */
+@media (max-width:1100px){
+  #multiControls > .song-back{
+    display:inline-flex;align-items:center;justify-content:center;
+    align-self:flex-start;flex:0 0 44px;box-sizing:border-box;
+    width:44px;min-width:44px;max-width:44px;
+    height:44px;min-height:44px;padding:0;color:var(--orange);
+  }
+  #multiControls > .song-back svg{
+    display:block;flex:none;width:19px;height:19px;
+    fill:none;stroke:currentColor;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+}
 </style></head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>

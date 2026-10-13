@@ -385,3 +385,6 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 @media(prefers-reduced-motion:reduce){
  .console-arrival-replica,.console-arrival-stage{display:none!important;}
 }
+
+/* Desktop camera margins stay equally black behind both scenes until landing. */
+@media(min-width:1101px){.console-arrival-stage{background:#050607!important;}}

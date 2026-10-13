@@ -17,7 +17,7 @@
  presetRow.append(presetSelect,savePreset,removePreset);controls.append(add,presetRow,presetStatus);const list=document.createElement('div');list.id='multiTracks';pane.append(controls,list);
  const library=document.createElement('div');library.id='multiPresetLibrary';pane.append(library);
  const back=button('Retour aux presets',()=>{commit();libraryView=true;render();});
- back.className='btn song-back';back.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h12"/></svg>';controls.prepend(back);
+ back.className='btn song-back';back.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>';controls.prepend(back);
  function selectPreset(p){if(selectedPreset!==p.id)loadPreset(p.id);render();}
  function openPreset(p){selectPreset(p);libraryView=false;render();}
  async function playPreset(p){if(isPlaying&&selectedPreset===p.id&&!solo){stopMetronome();return;}stopMetronome();selectPreset(p);solo=null;await startMetronome();}

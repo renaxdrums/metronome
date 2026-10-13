@@ -95,7 +95,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#2
 .console-arrival-word span:nth-child(n+6){color:#ff7900}
 .console-arrival-brand{display:block;letter-spacing:3px;font:500 10px/1.5 var(--font);color:#9da6b1;margin-top:18px;animation:console-caption 800ms 650ms both}
 .console-arrival-lines{position:absolute;inset:0;opacity:.4;pointer-events:none}
-.console-arrival-lines span{position:absolute;border:1px solid #39414a;border-radius:45%;width:760px;height:420px;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-24deg);animation:console-lines 1900ms ease-out both}
+.console-arrival-lines span{position:absolute;border:1px solid #39414a;border-radius:45%;width:760px;height:420px;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-24deg);animation:none}
 .console-arrival-lines span:nth-child(2){width:960px;height:570px;animation-delay:100ms}.console-arrival-lines span:nth-child(3){width:1200px;height:770px;animation-delay:200ms}
 .console-arrival-sweep{width:160px;height:1px;position:relative;overflow:hidden;background:#28313a;margin:27px auto 0}
 .console-arrival-sweep:after{content:'';position:absolute;inset:0;background:var(--cyan);animation:console-sweep 1350ms 250ms cubic-bezier(.25,.75,.3,1) both}

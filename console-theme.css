@@ -352,3 +352,9 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline
 .panel-visu{position:relative;isolation:isolate;}
 .panel-visu .visu-toolbar,.panel-visu #workspaceControls,.panel-visu .sequencer-wrapper,.panel-visu>.visu-bottom{position:relative;z-index:1;}
 .panel-visu .sequencer-wrapper{background:transparent!important;}
+
+/* Camera transition: fullscreen intro scrolls away over the real responsive application. */
+#renaxArrival{will-change:transform;backface-visibility:hidden;transform-style:flat;}
+.console-arrival-curtain{position:fixed;inset:0;background:#101317;z-index:4999;pointer-events:none;will-change:transform;}
+#renaxArrival .console-arrival-wave{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;}
+@media(prefers-reduced-motion:reduce){.console-arrival-curtain,.console-arrival-wave{display:none!important;}}

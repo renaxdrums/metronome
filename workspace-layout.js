@@ -37,7 +37,7 @@
  document.querySelector('header').after(nav);
  nav.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const list=[...buttons.values()],i=list.indexOf(document.activeElement),next=event.key==='Home'?0:event.key==='End'?list.length-1:(i+(event.key==='ArrowRight'?1:-1)+list.length)%list.length;list[next].click();list[next].focus();});
  const mobileViews=document.createElement('div');mobileViews.id='workspaceMobileViews';mobileViews.setAttribute('role','group');mobileViews.setAttribute('aria-label','Vue de travail');
- mobileViews.innerHTML='<button type="button" data-pane="visu">Visualisation</button><button type="button" data-pane="seq">Blocs</button>';nav.after(mobileViews);
+ mobileViews.innerHTML='<button type="button" data-pane="visu">Visualisation</button><button type="button" data-pane="seq">Mesures</button>';nav.after(mobileViews);
  const nativeSwitchTab=switchTab;
  switchTab=function(name){nativeSwitchTab(name);document.body.dataset.mobilePane=name==='params'?'visu':name;if(name==='params'){controls.open=true;visu.classList.add('mobile-active');}for(const b of mobileViews.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.pane===document.body.dataset.mobilePane));place();};
  for(const b of mobileViews.querySelectorAll('button'))b.onclick=()=>switchTab(b.dataset.pane);

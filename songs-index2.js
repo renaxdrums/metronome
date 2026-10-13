@@ -159,7 +159,25 @@
   };
   const originalStop=stopMetronome;stopMetronome=function(...args){songStartEpoch++;preparingAmorce=false;window.RENAX_AMORCE?.stop();clearTimeout(endTimer);const result=originalStop(...args);syncSongTransport();return result;};
   const originalMode=setAppMode;setAppMode=function(mode){unload();return originalMode(mode);};
-  panicBtn.addEventListener('click',unload,true);
+  function resetSelectedSongBlock(){
+    const current=song();
+    if(!loaded||songView!=='detail'||!current||appMode!=='metronome'||training.engaged)return false;
+    const position=locate(activeMeasureIndex);
+    const section=current.sections.find(block=>block.id===openSectionId)||current.sections.find(block=>block.id===position?.section.id);
+    if(!section)return false;
+    // Save the last edit before unloading its snapshot; then reset the saved block.
+    unload();
+    section.measure.beatSubdivisions=Array(section.measure.numerator).fill(1);
+    section.measure.beatStates=Array.from({length:section.measure.numerator},()=>[1]);
+    openSectionId=section.id;
+    persist();render();resetCustomizationTimer();
+    particles.length=0;pulses.length=0;clearProgressTrail();
+    return true;
+  }
+  panicBtn.addEventListener('click',event=>{
+    if(resetSelectedSongBlock()){event.preventDefault();event.stopImmediatePropagation();}
+    else unload();
+  },true);
   function updatePosition(){
     const cards=songPane.querySelectorAll('.song-section,.song-count-in');
     if(songView==='playlist'){
@@ -209,6 +227,7 @@
     if(section&&JSON.stringify(section.measure)!==JSON.stringify(position.section.measure)){section.measure=clone(position.section.measure);persist();return true;}
     return false;
   }
+  const originalTempoFields=refreshTempoFields;refreshTempoFields=function(){originalTempoFields();if(saveLoadedPattern())refreshSongCards();};
   const originalPreviews=refreshMeasurePreviews;refreshMeasurePreviews=function(){originalPreviews();saveLoadedPattern();refreshSongCards();};
   const originalActive=renderActiveMeasure;renderActiveMeasure=function(){originalActive();if(saveLoadedPattern())refreshSongCards();updatePosition();};
   let suppressSongClickUntil=0;
@@ -442,7 +461,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const label=field('Libellé',body,section.label,value=>{section.label=value.trim()||'Section '+(i+1);changed();if(s.amorce)RENAX_AMORCE.prepare(s).catch(error=>status(error.message));});label.setAttribute('list','songLabels');
         if(s.amorce){const langs=el('div',undefined,body,'amorce-languages');for(const language of ['fr','en']){const b=button(language.toUpperCase(),langs,()=>{if(i===0){const previous=s.amorceDefaultLanguage||'fr';s.amorceDefaultLanguage=language;s.amorceLanguageChosen=true;for(const block of s.sections){if(block===section||(!block.amorceLanguageOverride&&(!block.amorceLanguage||block.amorceLanguage===previous)))block.amorceLanguage=language;}}else{section.amorceLanguage=language;section.amorceLanguageOverride=true;}changed();RENAX_AMORCE.prepare(s).catch(error=>status(error.message));});b.setAttribute('aria-pressed',String((section.amorceLanguage||'fr')===language));if((section.amorceLanguage||'fr')===language){b.style.color='var(--orange)';b.style.borderColor='var(--orange)';}b.setAttribute('aria-label',language.toUpperCase()+' pour '+section.label);}}label.addEventListener('input',()=>{section.label=label.value.trim()||'Bloc '+(i+1);title.textContent=section.label;persist();});
         const fields=el('div',undefined,body,'song-block-controls');const count=songNumbox('Mesures',fields,section.count,(value,input)=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1){input.value=section.count;return;}const total=s.sections.reduce((n,x)=>n+(x===section?0:x.count),0)+n;if(!Number.isSafeInteger(total)){input.value=section.count;return;}section.count=n;changed();},Array.from({length:64},(_,i)=>i+1));
-        const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999){input.value=section.measure.tempo;return;}if(section.measure.tempo===n){input.value=String(n);return;}section.measure.tempo=n;unload();resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';
+        const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999){input.value=section.measure.tempo;return;}if(section.measure.tempo===n){input.value=String(n);return;}unload();section.measure.tempo=n;resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';
         const preview=el('div',undefined,body,'measure-preview');
         for(let b=0;b<section.measure.numerator;b++){const group=el('div',undefined,preview,'preview-beat');for(const state of section.measure.beatStates[b])el('span',undefined,group,'preview-dot').dataset.state=state;}
         preview.dataset.pattern=JSON.stringify(section.measure.beatStates);

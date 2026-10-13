@@ -3,7 +3,7 @@
  const header=document.querySelector('body>header');if(!header)return;
  const canvas=document.createElement('canvas');canvas.id='renaxHeaderWave';canvas.setAttribute('aria-hidden','true');header.prepend(canvas);
  const ctx=canvas.getContext('2d',{alpha:true});if(!ctx)return;
- const reduce=matchMedia('(prefers-reduced-motion:reduce)'),period=64000;
+ const reduce=matchMedia('(prefers-reduced-motion:reduce)'),period=52000;
  let width=1,height=1,frame=0,last=0,elapsed=0,paintedAt=0,stopped=false;
  function contour(u,depth,theta){
   const phase=depth*5.9,packet=.5+.12*Math.sin(theta);

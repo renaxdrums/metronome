@@ -395,3 +395,7 @@ header{isolation:isolate;}
 
 /* Direction choices share the open graphite control surface. */
 .training-section #dirToggle{background:transparent!important;border:0!important;padding:0;gap:6px;border-radius:0;}
+
+/* Open control menus must paint above the circular visual, on every screen size. */
+.panel-visu .visu-toolbar:has(.numbox-custom.open),
+.panel-visu #workspaceControls:has(.numbox-custom.open){z-index:30;}

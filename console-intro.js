@@ -123,8 +123,14 @@
    }catch{/* Canvas is a visual detail; the UI must remain usable even if it fails. */}
   });
  }
- function startCamera(){
+ async function startCamera(){
   if(typeof overlay.animate!=='function'){finish();return;}
+  // Freeze the actual laid-out UI only after its fonts and first render have settled.
+  try{await document.fonts?.ready;}catch{}
+  if(finished||overlay.hidden)return;
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  if(finished||overlay.hidden)return;
+  try{createReplica();}catch(error){console.warn('[RENAX intro] Visual copy unavailable:',error);replica?.remove();backdrop?.remove();replica=null;backdrop=null;finish();return;}
   // Visible camera pull-back WHILE the fox/brand is still visible.
   // The matte is darker than the intro, exposing the receding frame edges.
   // Then the entire frame travels upward like a real vertical page scroll.
@@ -155,8 +161,7 @@
  }
  function begin(){
   if(overlay.hidden||finished)return;
-  // Build the visual copy before motion begins: no full-app clone per frame.
-  try{createReplica();}catch(error){console.warn('[RENAX intro] Visual copy unavailable:',error);replica?.remove();backdrop?.remove();replica=null;backdrop=null;}
+  // The replica is built just before the camera move, after layout readiness.
   // A black backing plane prevents premature exposure around the de-zoomed card.
   curtain=document.createElement('div');curtain.className='console-arrival-curtain';
   curtain.setAttribute('aria-hidden','true');overlay.before(curtain);
@@ -184,12 +189,11 @@
     if(started===undefined)started=now;
     const elapsed=now-started;
     ctx.clearRect(0,0,width,height);
-    if(elapsed>=1200)return; // Keep the final visible wave frame with the black panel.
-   // One travelling spectral field: fine interlaced audio filaments, not a sweeping edge.
-   const wave=clamp((Math.min(elapsed,1200)-180)/1450);
-   if(wave>0&&wave<1){
-    const opacity=Math.pow(Math.sin(Math.PI*wave),.75),time=elapsed/1000;
-    const base=height*.69,amplitude=Math.min(height*.14,115),packet=wave*1.5-.25;
+   // The spectral field stays in place and keeps breathing until the entire scene exits.
+   const wave=clamp(elapsed/450);
+   if(wave>0){
+    const opacity=wave*wave*(3-2*wave),time=elapsed/1000;
+    const base=height*.69,amplitude=Math.min(height*.14,115),packet=.5+.12*Math.sin(time*.45);
     const spectrum=ctx.createLinearGradient(0,0,width,0);
     spectrum.addColorStop(0,'#ff7900');spectrum.addColorStop(.32,'#ffbb65');spectrum.addColorStop(.58,'#cce6c2');spectrum.addColorStop(1,'#45d7e7');
     const energy=u=>Math.exp(-Math.pow((u-packet)/.34,2));
@@ -225,7 +229,7 @@
   }
   // Preserve the entire composition as the black panel moves upward.
   later(startCamera,2270);
-  later(finish,5600); // Safety fallback for background tabs and old browsers.
+  later(finish,7500); // Safety fallback for background tabs and old browsers.
  }
  document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}

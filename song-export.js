@@ -5,6 +5,10 @@
   const clone=value=>JSON.parse(JSON.stringify(value));
   const filename=name=>(name.trim().replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').replace(/[. ]+$/,'')||'Morceau')+'.mp3';
   const pause=()=>new Promise(resolve=>setTimeout(resolve,0));
+  // Android browsers cannot reliably use the File System Access save picker.
+  // A real, user-tappable Blob download link also works when the picker is absent.
+  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const canPickFile=typeof window.showSaveFilePicker==='function'&&!isMobile;
   async function renderPCM(song,bank,volume,amorcePlan=null) {
     RENAX_SONGS.validateLibrary({version:1,profiles:[{id:'export',name:'Export',songs:[song]}]});
     if(!SOUND_BANKS[bank]||!Number.isFinite(volume)||volume<0||volume>1)throw Error('Réglages audio incorrects.');
@@ -107,42 +111,94 @@
     const format=document.createElement('select');format.id='songExportFormat';
     for(const [value,text] of [['mp3','MP3 — audio'],['midi','MIDI — notes et tempo']]){const option=document.createElement('option');option.value=value;option.textContent=text;format.append(option);}
     const midiNote=document.createElement('p');midiNote.textContent='MIDI : clics sur le canal 10, note 37, trois vélocités pour les accents. Le son est choisi dans ton logiciel musical.';midiNote.hidden=true;
-    format.onchange=()=>{midiNote.hidden=format.value!=='midi';credit.hidden=format.value==='midi';};
+    format.onchange=()=>{midiNote.hidden=format.value!=='midi';credit.hidden=format.value==='midi';clearDownload();status.textContent='';};
     const label=document.createElement('label');label.htmlFor='mp3ExportSong';label.textContent='Morceau de la playlist';
     const select=document.createElement('select');select.id='mp3ExportSong';
     for(const song of playlistSongs()){const option=document.createElement('option');option.value=song.id;option.textContent=song.name;select.append(option);}
     if(songId)select.value=songId;
+    select.onchange=()=>{clearDownload();status.textContent='';};
     const actions=document.createElement('div');actions.className='mp3-actions';
-    const save=document.createElement('button');save.id='mp3ExportSave';save.className='btn';save.textContent='Choisir l’emplacement et exporter';save.type='button';
+    const save=document.createElement('button');save.id='mp3ExportSave';save.className='btn';save.textContent=canPickFile?'Choisir l’emplacement et exporter':'Préparer le téléchargement';save.type='button';
     const close=document.createElement('button');close.className='btn';close.textContent='Fermer';close.type='button';close.onclick=()=>dialog.close();
     const status=document.createElement('p');status.id='mp3ExportStatus';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+    const downloadLink=document.createElement('a');downloadLink.id='mp3ExportDownload';
+    downloadLink.hidden=true;downloadLink.textContent='Télécharger le fichier';
+    let downloadUrl=null;
+    function clearDownload(){
+      downloadLink.hidden=true;downloadLink.removeAttribute('href');
+      if(downloadUrl){URL.revokeObjectURL(downloadUrl);downloadUrl=null;}
+    }
+    function offerDownload(blob,name){
+      clearDownload();
+      downloadUrl=URL.createObjectURL(blob);
+      downloadLink.href=downloadUrl;
+      downloadLink.download=name;
+      downloadLink.textContent='Télécharger '+name;
+      downloadLink.hidden=false;
+    }
     const credit=document.createElement('div');credit.className='mp3-credit';credit.append('MP3 : ');
     for(const [text,href] of [['LAME','https://lame.sourceforge.net/'],['lamejs','https://github.com/zhuker/lamejs']]){const a=document.createElement('a');a.textContent=text;a.href=href;a.target='_blank';a.rel='noopener';credit.append(a,' ');}
     const songs=playlistSongs();save.disabled=!songs.length;
     if(!songs.length)status.textContent='La playlist ne contient aucun morceau.';
-    else if(!window.showSaveFilePicker){save.disabled=true;status.textContent='Pour choisir le dossier de destination, ouvre cet export dans Chrome ou Edge sur ordinateur.';}
+    else if(!canPickFile)status.textContent='Le fichier sera proposé au téléchargement après sa préparation.';
     let busy=false,closeTimer=null;
     save.onclick=async()=>{
       if(closeTimer){clearTimeout(closeTimer);closeTimer=null;}
       const song=playlistSongs().find(s=>s.id===select.value);if(!song||busy)return;
+      clearDownload();
       const snapshot=clone(song),bank=currentBank,volume=masterVolume;
       const midi=format.value==='midi';
+      const suggestedName=midi?filename(song.name).replace(/\.mp3$/,'.mid'):filename(song.name);
       busy=true;select.disabled=true;format.disabled=true;save.disabled=true;close.disabled=true;
       try{
-        // Picker first: it must retain the activation from this button click.
-        const handle=await window.showSaveFilePicker({id:midi?'renax-midi':'renax-mp3',startIn:'music',suggestedName:midi?filename(song.name).replace(/\.mp3$/,'.mid'):filename(song.name),types:[midi?{description:'Fichier MIDI',accept:{'audio/midi':['.mid']}}:{description:'Audio MP3',accept:{'audio/mpeg':['.mp3']}}],excludeAcceptAllOption:true});
+        let handle=null,pickerError=null;
+        // Ask for the destination immediately on PC while the click is still a user gesture.
+        // On mobile, skip this unsupported API and generate a downloadable Blob instead.
+        if(canPickFile){
+          try{
+            handle=await window.showSaveFilePicker({
+              id:midi?'renax-midi':'renax-mp3',startIn:'music',
+              suggestedName,
+              types:[midi?{description:'Fichier MIDI',accept:{'audio/midi':['.mid']}}:{description:'Audio MP3',accept:{'audio/mpeg':['.mp3']}}],
+              excludeAcceptAllOption:true
+            });
+          }catch(error){
+            if(error.name==='AbortError')throw error; // Explicit cancellation: do not generate.
+            pickerError=error;console.warn('[RENAX export] Sélecteur de fichiers indisponible :',error);
+          }
+        }
         status.textContent=midi?'Création du MIDI…':'Rendu du morceau…';
         const result=midi?RENAX_MIDI_EXPORT.exportSong(snapshot):await exportSong(snapshot,bank,volume,message=>status.textContent=message);
-        const writable=await handle.createWritable();
-        try{await writable.write(result.blob);await writable.close();}catch(e){await writable.abort().catch(()=>{});throw e;}
-        status.textContent=(midi?'MIDI':'MP3')+' enregistré : '+handle.name;
-        if(!midi)closeTimer=setTimeout(()=>{if(dialog?.open&&!busy)dialog.close();},5000);
-      }catch(e){status.textContent=e.name==='AbortError'?'Export annulé.':e.message;}
-      finally{busy=false;select.disabled=false;format.disabled=false;save.disabled=false;close.disabled=false;}
+        if(handle){
+          try{
+            const writable=await handle.createWritable();
+            try{await writable.write(result.blob);await writable.close();}
+            catch(error){await writable.abort().catch(()=>{});throw error;}
+          }catch(error){
+            pickerError=error;handle=null;
+            console.warn('[RENAX export] Enregistrement par sélecteur impossible :',error);
+          }
+        }
+        if(handle){
+          status.textContent=(midi?'MIDI':'MP3')+' enregistré : '+handle.name;
+          if(!midi)closeTimer=setTimeout(()=>{if(dialog?.open&&!busy)dialog.close();},5000);
+        }else{
+          // A visible, native anchor preserves a NEW user gesture after a lengthy
+          // MP3 render; programmatic clicks after awaits can be blocked on Android.
+          offerDownload(result.blob,suggestedName);
+          status.textContent=pickerError
+            ?'Enregistrement direct indisponible. Appuie sur le lien Télécharger ci-dessous.'
+            :'Fichier prêt. Appuie sur Télécharger ci-dessous pour l’enregistrer.';
+        }
+      }catch(error){
+        status.textContent=error.name==='AbortError'?'Export annulé.':(error.message||'Échec de l’export.');
+      }finally{
+        busy=false;select.disabled=false;format.disabled=false;save.disabled=false;close.disabled=false;
+      }
     };
     dialog.addEventListener('cancel',e=>{if(busy)e.preventDefault();});
-    dialog.addEventListener('close',()=>{if(closeTimer)clearTimeout(closeTimer);dialog.remove();dialog=null;});
-    actions.append(save,close);dialog.append(title,label,select,formatLabel,format,midiNote,actions,status,credit);document.body.append(dialog);dialog.showModal();
+    dialog.addEventListener('close',()=>{if(closeTimer)clearTimeout(closeTimer);clearDownload();dialog.remove();dialog=null;});
+    actions.append(save,close);dialog.append(title,label,select,formatLabel,format,midiNote,actions,status,downloadLink,credit);document.body.append(dialog);dialog.showModal();
   }
   function install(){
     const pane=document.getElementById('songPane');if(!pane||pane.hidden||document.getElementById('mp3ExportOpen'))return;

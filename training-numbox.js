@@ -139,9 +139,15 @@
         const number = Number(input.value);
         const delta = event.key === 'ArrowDown' ? 1 : -1;
         const next = Math.min(bounds.max, Math.max(bounds.min, number + delta * bounds.step));
+        if (Number.isFinite(next) && next !== number) {
+          input.value = String(next);
+          input.dispatchEvent(new Event('input', {bubbles: true}));
+          input.dispatchEvent(new Event('change', {bubbles: true}));
+        }
         menu.scrollTop = Math.max(0, (next - bounds.min) / bounds.step * ITEM_HEIGHT -
           (menu.clientHeight - ITEM_HEIGHT) / 2);
         paint(true);
+        requestAnimationFrame(refreshAll);
       }
     });
     menu.addEventListener('scroll', () => paint(), {passive: true});

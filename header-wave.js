@@ -19,7 +19,7 @@
   draw();
  }
  function draw(){
-  const theta=2*Math.PI*(elapsed%period)/period,base=height*.58,amplitude=height*.32;
+  const theta=2*Math.PI*(elapsed%period)/period,base=height*.88,amplitude=height*.075;
   ctx.clearRect(0,0,width,height);
   const gradient=ctx.createLinearGradient(0,0,width,0);
   gradient.addColorStop(0,'#ff7900');gradient.addColorStop(.32,'#ffbb65');gradient.addColorStop(.58,'#cce6c2');gradient.addColorStop(1,'#45d7e7');
@@ -28,7 +28,7 @@
   for(let k=0;k<30;k++){
    const depth=k/29;ctx.globalAlpha=.12+depth*.16;ctx.beginPath();
    for(let j=0;j<=points;j++){
-    const u=j/points,x=u*width,y=base+contour(u,depth,theta)*amplitude+(depth-.5)*height*.10;
+    const u=j/points,x=u*width,y=base+contour(u,depth,theta)*amplitude+(depth-.5)*height*.025;
     if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
    }
    ctx.stroke();

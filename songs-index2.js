@@ -91,6 +91,7 @@
   function field(text,parent,value,change,options) {const label=el('label',text,parent),input=el(options?'select':'input',undefined,label);if(options)for(const v of options){const o=el('option',String(v),input);o.value=v;}else input.type=typeof value==='number'?'number':'text';input.setAttribute('aria-label',text);input.value=value;input.onchange=()=>change(input.value,input);return input;}
   function songNumbox(label,parent,value,commit,values){
     const options=[...new Set([...values,value])].sort((a,b)=>a-b);
+    const deferred=options.length>100;
     const select=field(label,parent,value,(raw,control)=>{
       if(raw==='custom'){
         const entry=prompt(label+' : saisir une valeur',String(value));
@@ -99,11 +100,25 @@
       }
       commit(raw,control);
       syncNumbox(control);
-    },options);
+    },deferred?[value]:options);
     const custom=el('option','Autre…',select);custom.value='custom';
     const row=select.parentElement;row.className='song-inline-field';
     enhanceNumboxSelect(select);
     row.querySelector('.numbox-button').setAttribute('aria-label',label+' : '+value);
+    if(deferred){
+      let prepared=false;
+      const prepare=()=>{
+        if(prepared)return;prepared=true;
+        const current=select.value;
+        const all=[...new Set([...options,Number(current)])].filter(Number.isFinite).sort((a,b)=>a-b);
+        const fragment=document.createDocumentFragment();
+        for(const v of all){const option=document.createElement('option');option.value=String(v);option.textContent=String(v);fragment.append(option);}
+        const custom=document.createElement('option');custom.value='custom';custom.textContent='Autre…';fragment.append(custom);
+        select.replaceChildren(fragment);select.value=current;numboxWidgets.get(select)?.rebuild();
+      };
+      select.closest('.numbox-custom').addEventListener('click',event=>{if(event.target.closest('.numbox-button'))prepare();},true);
+      select.addEventListener('focus',prepare,{once:true});
+    }
     return select;
   }
   function profile(){return library.profiles.find(p=>p.id===library.activeProfile);}

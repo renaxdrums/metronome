@@ -58,7 +58,8 @@
      u:(x+.5+(random()-.5)*1.1)/sample.width,v:(y+.5+(random()-.5)*1.1)/sample.height,
      delay:random()*340+(x/sample.width)*160, mobility:.16+Math.pow(random(),1.55)*1.2,
      lift:(random()-.65)*1.35,whirl:.2+random()*.8,phase:random()*Math.PI*2,
-     radius:.19+random()*.36,alpha:.68+random()*.3
+     radius:.19+random()*.36,alpha:.68+random()*.3,
+     gustA:.35+random()*.65,gustB:.30+random()*.70,gustC:.28+random()*.72
     });
    }
   }catch(error){console.info('[RENAX intro] Échantillonnage du logo indisponible :',error);}
@@ -127,16 +128,23 @@
      const age=clamp((elapsed-570-p.delay)/2350);
      const gust=age*age*(.87+.10*Math.sin(age*11+p.phase))
       +.025*age*(1-Math.cos(age*14+p.phase));
-     const breeze=(9*age+132*gust)*p.mobility;
+     const breeze=(6*age+44*gust)*p.mobility;
+     // Three staggered, softly accelerating air currents from different sides.
+     // Each grain reacts according to its position and its own mobility.
+     const airA=ease((elapsed-1530)/800)*p.gustA*(.28+.72*(1-p.u)); // up-right
+     const airB=ease((elapsed-2150)/780)*p.gustB*(.28+.72*p.u);     // up-left
+     const airC=ease((elapsed-2670)/670)*p.gustC*(.34+.66*p.v);    // down-right
      const swirl=age*p.whirl;
      const baseX=current.left+p.u*current.width,baseY=current.top+p.v*current.height;
-     const x=baseX+breeze+Math.sin(age*7.7+p.phase)*7*swirl
+     const x=baseX+breeze+(36*airA-43*airB+54*airC)*p.mobility
+      +Math.sin(age*7.7+p.phase)*7*swirl
       +Math.sin(age*15.1+p.phase*.7)*2.4*swirl;
      const y=baseY+p.lift*(12*age+47*gust)*p.mobility
+      +(-18*airA-23*airB+20*airC)*p.mobility
       +Math.cos(age*8.6+p.phase)*7*swirl+Math.sin(age*13+p.phase)*2.2*swirl;
      const distance=Math.hypot(x-baseX,y-baseY);
      const radius=p.radius/(1+distance/67);
-     const worn=1-ease((age-.69)/.31);
+     const worn=1-ease((age-.79)/.21);
      const alpha=p.alpha*appearance*worn;
      if(alpha<.015)continue;
      ctx.globalAlpha=alpha;

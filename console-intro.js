@@ -37,13 +37,25 @@
   replica=document.createElement('div');replica.className='console-arrival-replica';
   replica.setAttribute('aria-hidden','true');replica.inert=true;
   const style=getComputedStyle(document.body);
-  replica.style.padding=style.padding;replica.style.gap=style.gap;
   replica.style.font=style.font;replica.style.color=style.color;
   replica.style.backgroundColor=style.backgroundColor;
-  // One non-interactive live-layout COPY: no event listeners or stale hand-drawn UI.
-  // Copy the currently rendered interface, so future design changes are reflected.
+  // Snapshot the EXACT rendered geometry, rather than asking the clone to
+  // independently recompute a different flex layout. Responsive and future
+  // UI changes automatically appear in the mirror on each new page load.
   for(const source of sceneNodes()){
+   const rect=source.getBoundingClientRect();
    const copy=source.cloneNode(true);
+   const computed=getComputedStyle(source);
+   copy.style.setProperty('position','absolute','important');
+   copy.style.setProperty('display',computed.display,'important');
+   copy.style.boxSizing='border-box';
+   copy.style.left=rect.left+'px';
+   copy.style.top=rect.top+'px';
+   copy.style.width=rect.width+'px';
+   copy.style.height=rect.height+'px';
+   copy.style.margin='0';
+   copy.style.flex='none';
+   copy.classList.add('console-arrival-mirror-piece');
    const fromFields=source.querySelectorAll('input,select,textarea,progress,meter');
    const toFields=copy.querySelectorAll('input,select,textarea,progress,meter');
    fromFields.forEach((field,i)=>{

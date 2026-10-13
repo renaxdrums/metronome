@@ -1354,6 +1354,20 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
 #multiPresetLibrary .measure-sig{white-space:nowrap;font-size:12px}
 #multiPresetLibrary button[hidden],#multiPresetLibrary[hidden],#multiControls[hidden],#multiTracks[hidden]{display:none!important}
 #multiControls > .song-back{margin-bottom:12px}
+@media (min-width:1101px){
+  /* Retour vers les presets : dimensions locales, sans modifier les autres boutons. */
+  #multiControls > .song-back{
+    display:inline-flex;align-items:center;justify-content:center;
+    align-self:flex-start;flex:0 0 36px;box-sizing:border-box;
+    width:36px;min-width:36px;max-width:36px;
+    height:36px;min-height:36px;padding:0;color:var(--orange);
+  }
+  #multiControls > .song-back svg{
+    display:block;flex:none;width:19px;height:19px;
+    fill:none;stroke:currentColor;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+}
 </style></head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>

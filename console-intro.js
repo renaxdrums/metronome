@@ -63,6 +63,9 @@
     if('value' in field)dest.value=field.value;
     if('checked' in field)dest.checked=field.checked;
     if('selectedIndex' in field)dest.selectedIndex=field.selectedIndex;
+    // Cloned duplicate IDs must not make the native fields underneath custom controls visible.
+    const fieldStyle=getComputedStyle(field);
+    for(const property of ['display','visibility','opacity','position','clip','clip-path','width','height','min-width','max-width','min-height','max-height','top','right','bottom','left'])dest.style.setProperty(property,fieldStyle.getPropertyValue(property),'important');
    });
    // No actions, focus, form submission or accessibility duplication.
    for(const node of copy.querySelectorAll('*')){

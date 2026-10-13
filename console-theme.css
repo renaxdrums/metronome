@@ -399,3 +399,12 @@ header{isolation:isolate;}
 /* Open control menus must paint above the circular visual, on every screen size. */
 .panel-visu .visu-toolbar:has(.numbox-custom.open),
 .panel-visu #workspaceControls:has(.numbox-custom.open){z-index:30;}
+
+/* Playlist playback and explicit selected-track editing. */
+#songsRoot .playlist-choice{padding-right:110px!important;}
+#songsRoot .playlist-choice::after{right:90px;}
+#songPane .song-selected-open[hidden]{display:none!important;}
+#songPane .song-playlist-card.active{background:#20333b!important;border-color:var(--cyan)!important;box-shadow:inset 3px 0 0 var(--cyan)!important;}
+#songPane .song-playlist-card .measure-preview{padding-right:112px;}
+#songPane .playlist-direct-play[aria-pressed="true"],#songPane .song-selected-open{color:var(--cyan)!important;border-color:#4b7884!important;background:#28424b!important;}
+#songPane .playlist-direct-play:disabled{opacity:.4;cursor:not-allowed;}

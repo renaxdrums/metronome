@@ -420,3 +420,9 @@ header{isolation:isolate;}
  .panel-visu #workspaceTimer #trainTimer{align-self:center!important;justify-content:center!important;text-align:center!important;}
  .panel-visu .workspace-control-group:has(#volumeSlider)>label{justify-content:center!important;text-align:center;}
 }
+
+/* Gentle playback cue, confined to the current song block. */
+#songsRoot #songPane .song-section.playing,#songsRoot #songPane .song-count-in.playing{position:relative}
+#songsRoot #songPane .song-section.playing::after,#songsRoot #songPane .song-count-in.playing::after{content:'';position:absolute;inset:0;border-radius:inherit;background:#fff;pointer-events:none;opacity:0;animation:song-playing-white var(--song-playing-pulse,1.2s) ease-in-out infinite}
+@keyframes song-playing-white{0%,100%{opacity:0}40%{opacity:.09}}
+@media(prefers-reduced-motion:reduce){#songsRoot #songPane .song-section.playing::after,#songsRoot #songPane .song-count-in.playing::after{animation:none;opacity:.045}}

@@ -193,14 +193,32 @@
     if(resetSelectedSongBlock()){event.preventDefault();event.stopImmediatePropagation();}
     else unload();
   },true);
+  let followedSongBlock=null;
+  function followPlayingBlock(card,section){
+    if(!isPlaying||songView!=='detail'||songsRoot.hidden){followedSongBlock=null;return;}
+    const key=loaded.song.id+':'+section.id;
+    if(followedSongBlock===key)return;
+    followedSongBlock=key;
+    card.style.setProperty('--song-playing-pulse',Math.max(.85,Math.min(2.4,120/getEffectiveTempo(section.measure)))+'s');
+    const bounds=panel.getBoundingClientRect(),rect=card.getBoundingClientRect(),padding=16;
+    if(!bounds.height||panel.scrollHeight<=panel.clientHeight)return;
+    const top=bounds.top+padding,bottom=bounds.bottom-padding;
+    let delta=0;
+    if(rect.top<top||rect.height>bottom-top)delta=rect.top-top;
+    else if(rect.bottom>bottom)delta=rect.bottom-bottom;
+    if(Math.abs(delta)>1)panel.scrollTo({top:Math.max(0,panel.scrollTop+delta),behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  }
   function updatePosition(){
     const cards=songPane.querySelectorAll('.song-section,.song-count-in');
+    if(!isPlaying||songView!=='detail'||songsRoot.hidden)followedSongBlock=null;
     if(songView==='playlist'){
       cards.forEach(card=>{const selected=card.dataset.songId===selectedSong;card.classList.toggle('active',selected);card.classList.toggle('playing',!!(isPlaying&&loaded?.song.id===card.dataset.songId));card.querySelector('.song-open')?.setAttribute('aria-pressed',String(selected));const edit=card.querySelector('.song-selected-open');if(edit)edit.hidden=!selected;});return;
     }
     if(!loaded){cards.forEach(card=>card.classList.remove('active','playing'));return;}
     const position=locate(activeMeasureIndex);if(!position)return;
-    cards.forEach((card,index)=>{card.classList.toggle('playing',isPlaying&&(card.dataset.sectionId||card.dataset.countInId)===position.section.id);card.classList.toggle('active',(card.dataset.sectionId||card.dataset.countInId)===position.section.id);});
+    let playingCard=null;
+    cards.forEach((card,index)=>{const current=(card.dataset.sectionId||card.dataset.countInId)===position.section.id;card.classList.toggle('playing',isPlaying&&current);card.classList.toggle('active',current);if(current)playingCard=card;});
+    if(playingCard)followPlayingBlock(playingCard,position.section);
   }
 
   const originalRender=renderSequencerList;renderSequencerList=function(){if(!loaded)return originalRender();measureListEl.replaceChildren();el('p','Morceau chargé : '+loaded.song.name,measureListEl,'song-note');};

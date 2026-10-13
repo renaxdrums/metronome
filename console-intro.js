@@ -72,7 +72,35 @@
    replica.append(copy);
   }
   document.body.append(backdrop,replica); // After the originals: original IDs remain the lookup targets.
+  // Container-query sizing (100cqh) is different in a cloned flex tree.
+  // Match the live sequencer geometry before the replica starts moving.
+  synchronizeMirrorGeometry();
   syncReplicaCanvases();
+ }
+ function synchronizeMirrorGeometry(){
+  if(!replica)return;
+  const original=document.querySelector('body > .main-grid > .panel-visu');
+  const mirrored=replica.querySelector('.main-grid > .panel-visu');
+  if(!original||!mirrored)return;
+  // Fix the wrapper first: it establishes the height used by the circle's
+  // container-query units. Then fix the circle to the exact source pixels.
+  for(const selector of ['.sequencer-wrapper','#sequencerContainer']){
+   const source=original.querySelector(selector),copy=mirrored.querySelector(selector);
+   if(!source||!copy)continue;
+   const rect=source.getBoundingClientRect();
+   if(!(rect.width>0&&rect.height>0))continue;
+   for(const [property,size] of [['width',rect.width],['height',rect.height],
+     ['min-width',rect.width],['max-width',rect.width],['min-height',rect.height],['max-height',rect.height]]){
+    copy.style.setProperty(property,size+'px','important');
+   }
+   // Relocate any residual offset caused by flex/grid recomputation, without
+   // changing the structure or listeners of the functional original.
+   const cloneRect=copy.getBoundingClientRect();
+   const dx=rect.left-cloneRect.left,dy=rect.top-cloneRect.top;
+   if(Math.abs(dx)>.5||Math.abs(dy)>.5){
+    copy.style.translate=dx.toFixed(2)+'px '+dy.toFixed(2)+'px';
+   }
+  }
  }
  function syncReplicaCanvases(){
   if(!replica)return;

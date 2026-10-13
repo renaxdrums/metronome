@@ -20,3 +20,7 @@
 #mp3ExportDialog .mp3-actions .btn {min-height:44px;padding:10px 12px;white-space:normal;line-height:1.4;}
 #mp3ExportDialog .mp3-actions #mp3ExportSave {flex:1 1 180px;}
 #mp3ExportDialog .mp3-actions .btn:last-child {flex:0 0 76px;}
+/* Native download fallback for Brave/Chrome Android and other browsers without a save picker. */
+#mp3ExportDownload:not([hidden]){display:block;margin-top:12px;padding:13px 12px;min-height:44px;
+ border-radius:6px;background:#ff7900;color:#111;text-align:center;font-weight:700;text-decoration:none;overflow-wrap:anywhere;}
+#mp3ExportDownload:focus-visible{outline:2px solid #fff;outline-offset:3px;}

@@ -2,8 +2,8 @@
 (() => {
  const overlay=document.getElementById('renaxArrival');if(!overlay)return;
  const preference='renax.arrival.enabled.v1',reduce=matchMedia('(prefers-reduced-motion:reduce)');
- let enabled=true,finished=false,frame,canvas,curtain,previous;
- const timeouts=[],animations=[],origins=[];
+ let enabled=true,finished=false,frame,canvas,curtain,previous,replica,backdrop;
+ const timeouts=[],animations=[];
  try{enabled=localStorage.getItem(preference)!=='false';}catch{}
  const word=overlay.querySelector('.console-arrival-word');
  const center=overlay.querySelector('.console-arrival-center');
@@ -22,31 +22,59 @@
   if(finished)return;
   finished=true;timeouts.forEach(clearTimeout);cancelAnimationFrame(frame);
   animations.forEach(a=>{try{a.cancel();}catch{}});
-  origins.forEach(([node,original])=>{node.style.transformOrigin=original;});
-  overlay.hidden=true;canvas?.remove();curtain?.remove();
+  overlay.hidden=true;canvas?.remove();curtain?.remove();replica?.remove();backdrop?.remove();
   overlay.style.removeProperty('transform');overlay.style.removeProperty('opacity');
   if(overlay.contains(document.activeElement))previous?.focus();
  }
  function sceneNodes(){
-  // Animate only top-level layout pieces; no DOM cloning or moving existing controls.
+  // Use the actual responsive application as the source of truth on EVERY load.
   return Array.from(document.body.children).filter(el=>
-   el!==overlay&&(el.matches('header,footer,.main-grid,#workspaceNav,#workspaceMobileViews,nav.mobile-tabs')));
+   el!==overlay&&el.matches('header,footer,.main-grid,#workspaceNav,#workspaceMobileViews,nav.mobile-tabs'));
  }
- function sceneZoom(){
-  for(const el of sceneNodes()){
-   if(el.hidden||getComputedStyle(el).display==='none')continue;
-   const rect=el.getBoundingClientRect();
-   if(!rect.width||!rect.height)continue;
-   const saved=el.style.transformOrigin;
-   origins.push([el,saved]);
-   // The same viewport-centered transform origin makes distinct layout panels
-   // read visually as one rigid camera plane. No geometry or data is changed.
-   el.style.transformOrigin=(innerWidth/2-rect.left)+'px '+(innerHeight/2-rect.top)+'px';
-   animations.push(el.animate([
-    {transform:'translate3d(0,48px,0) scale(.93)'},
-    {transform:'translate3d(0,0,0) scale(1)'}
-   ],{duration:1280,fill:'both',easing:'cubic-bezier(.24,.7,.22,1)'}));
+ function createReplica(){
+  if(replica)return;
+  backdrop=document.createElement('div');backdrop.className='console-arrival-stage';backdrop.setAttribute('aria-hidden','true');
+  replica=document.createElement('div');replica.className='console-arrival-replica';
+  replica.setAttribute('aria-hidden','true');replica.inert=true;
+  const style=getComputedStyle(document.body);
+  replica.style.padding=style.padding;replica.style.gap=style.gap;
+  replica.style.font=style.font;replica.style.color=style.color;
+  replica.style.backgroundColor=style.backgroundColor;
+  // One non-interactive live-layout COPY: no event listeners or stale hand-drawn UI.
+  // Copy the currently rendered interface, so future design changes are reflected.
+  for(const source of sceneNodes()){
+   const copy=source.cloneNode(true);
+   const fromFields=source.querySelectorAll('input,select,textarea,progress,meter');
+   const toFields=copy.querySelectorAll('input,select,textarea,progress,meter');
+   fromFields.forEach((field,i)=>{
+    const dest=toFields[i];if(!dest)return;
+    if('value' in field)dest.value=field.value;
+    if('checked' in field)dest.checked=field.checked;
+    if('selectedIndex' in field)dest.selectedIndex=field.selectedIndex;
+   });
+   // No actions, focus, form submission or accessibility duplication.
+   for(const node of copy.querySelectorAll('*')){
+    for(const attribute of [...node.attributes])if(/^on/i.test(attribute.name))node.removeAttribute(attribute.name);
+    if(node.matches('a,button,input,select,textarea,[tabindex]'))node.tabIndex=-1;
+   }
+   replica.append(copy);
   }
+  document.body.append(backdrop,replica); // After the originals: original IDs remain the lookup targets.
+  syncReplicaCanvases();
+ }
+ function syncReplicaCanvases(){
+  if(!replica)return;
+  const originals=sceneNodes().flatMap(el=>Array.from(el.querySelectorAll('canvas')));
+  const copies=replica.querySelectorAll('canvas');
+  originals.forEach((source,i)=>{
+   const target=copies[i];if(!target)return;
+   try{
+    if(!source.width||!source.height)return;
+    target.width=source.width;target.height=source.height;
+    const ctx=target.getContext('2d',{alpha:true});
+    if(ctx)ctx.drawImage(source,0,0);
+   }catch{/* Canvas is a visual detail; the UI must remain usable even if it fails. */}
+  });
  }
  function startCamera(){
   if(typeof overlay.animate!=='function'){finish();return;}
@@ -54,19 +82,33 @@
   // The matte is darker than the intro, exposing the receding frame edges.
   // Then the entire frame travels upward like a real vertical page scroll.
   const duration=2630, ease=x=>{x=clamp(x);return x*x*(3-2*x);};
-  const frames=Array.from({length:81},(_,i)=>{
-   const t=i/80,scale=1-.062*ease(t/.64),y=-116*ease((t-.23)/.77);
-   return {offset:t,transform:'translate3d(0,'+y.toFixed(4)+'%,0) scale('+scale.toFixed(5)+')'};
-  });
+  const frames=[],replicaFrames=[];
+  for(let i=0;i<=80;i++){
+   const t=i/80,zoom=ease(t/.64),travel=ease((t-.23)/.77);
+   const topScale=1-.062*zoom;
+   const topY=-116*travel;
+   frames.push({offset:t,transform:'translate3d(0,'+topY.toFixed(4)+'%,0) scale('+topScale.toFixed(5)+')'});
+   // The lower scene starts exactly at the bottom edge of the upper page.
+   // As it scrolls in, it gently grows to its real 100% size and position.
+   const bottomScale=.925+.075*ease(travel);
+   const edge=Math.max(0,(1+topScale)/2-1.16*travel);
+   const bottomY=100*(edge-(1-bottomScale)/2);
+   replicaFrames.push({offset:t,transform:'translate3d(0,'+bottomY.toFixed(4)+'%,0) scale('+bottomScale.toFixed(5)+')'});
+  }
   const timing={duration,easing:'linear',fill:'forwards'};
   const slide=overlay.animate(frames,timing);
   animations.push(slide);
   if(curtain)animations.push(curtain.animate(frames.map(frame=>({offset:frame.offset,transform:frame.transform.replace(/ scale\([^)]*\)/,'')})),timing));
-  later(sceneZoom,1090);
+  if(replica){
+   syncReplicaCanvases();
+   animations.push(replica.animate(replicaFrames,timing));
+  }
   slide.finished.then(finish,finish);
  }
  function begin(){
   if(overlay.hidden||finished)return;
+  // Build the visual copy before motion begins: no full-app clone per frame.
+  try{createReplica();}catch(error){console.warn('[RENAX intro] Visual copy unavailable:',error);replica?.remove();backdrop?.remove();replica=null;backdrop=null;}
   // A black backing plane prevents premature exposure around the de-zoomed card.
   curtain=document.createElement('div');curtain.className='console-arrival-curtain';
   curtain.setAttribute('aria-hidden','true');overlay.before(curtain);

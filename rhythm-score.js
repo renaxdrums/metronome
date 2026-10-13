@@ -31,7 +31,24 @@
   if(groupable){const toggle=button('Regroupement libre',()=>attempt(()=>save(core.regroup(m,!model.custom,model.custom?core.defaultGroups(m):core.defaultGroups(m).every(n=>n===2||n===3)?core.defaultGroups(m):core.groupCombinations(m.numerator)[0]))),groupPanel);toggle.id='scoreGroupingToggle';toggle.setAttribute('aria-pressed',String(model.custom));const groups=document.createElement('div');groups.className='score-group-tools';groupPanel.append(groups);let start=0;model.groups.forEach((n,i)=>{const label=document.createElement('label');label.textContent='Groupe '+(i+1)+' · '+(start+1)+' ';const select=document.createElement('select');select.setAttribute('aria-label','Taille du groupe '+(i+1));for(const value of [2,3]){const option=new Option(String(value),String(value));const left=m.numerator-model.groups.slice(0,i).reduce((a,b)=>a+b,0)-value;option.disabled=left<0||!core.groupCombinations(left).length;select.append(option);}select.value=n;select.disabled=!model.custom;select.onchange=()=>attempt(()=>{const prefix=model.groups.slice(0,i),value=Number(select.value),left=m.numerator-prefix.reduce((a,b)=>a+b,0)-value;save(core.regroup(m,true,[...prefix,value,...core.groupCombinations(left)[0]]));});label.append(select);groups.append(label);start+=n;});}
   message.dataset.error='false';message.textContent=isPlaying?'Lecture en cours : application au prochain passage de la mesure.':'Allonger absorbe les éléments suivants du groupe. Raccourcir crée un silence.';editor.append(message);
  }
- function fitScore(){if(!enabled)return;const svg=host.querySelector('svg');if(!svg)return;const ws=getComputedStyle(wrapper),hs=getComputedStyle(host),controls=parseFloat(ws.getPropertyValue('--score-controls-height'))||75,w=Number(svg.getAttribute('width')),h=Number(svg.getAttribute('height')),available=wrapper.clientHeight-parseFloat(ws.paddingTop)-parseFloat(ws.paddingBottom)-controls-parseFloat(hs.paddingTop)-parseFloat(hs.paddingBottom)-10-(appMode==='metronome'?28:0)-(scoreLegend?26:0),scale=Math.min((host.clientWidth-8)/w,Math.max(12,available)/h);svg.style.width=w*scale+'px';svg.style.height=h*scale+'px';svg.style.marginInline='auto';positionPulse();}
+ // Keep notation sized to the actual white score panel, independently of its height.
+ // Opening musical settings may reduce height, but must never shrink the four beats
+ // into a tiny strip. The score host scrolls vertically when there is not enough room.
+ function fitScore(){
+  if(!enabled)return;
+  const svg=host.querySelector('svg');if(!svg)return;
+  const w=Number(svg.getAttribute('width')),h=Number(svg.getAttribute('height'));
+  if(!(w>0&&h>0))return;
+  const style=getComputedStyle(host);
+  const inset=(parseFloat(style.paddingLeft)||0)+(parseFloat(style.paddingRight)||0);
+  const availableWidth=Math.max(1,host.clientWidth-inset-4);
+  const scale=availableWidth/w;
+  if(!Number.isFinite(scale)||scale<=0)return;
+  svg.style.width=(w*scale)+'px';
+  svg.style.height=(h*scale)+'px';
+  svg.style.marginInline='auto';
+  positionPulse();
+ }
  function layout(){const style=getComputedStyle(wrapper),controls=toolsPanel.offsetHeight+10;wrapper.style.setProperty('--score-controls-height',controls+'px');wrapper.style.setProperty('--score-circle-space',`${Math.max(40,wrapper.clientHeight-(enabled?controls:16)-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom))}px`);resizeCanvas();updateRingRadius();fitScore();refresh();}
  pencil.onclick=async()=>{await load();editing=!editing;pencil.classList.toggle('active',editing);pencil.setAttribute('aria-pressed',String(editing));editor.hidden=!editing;host.setAttribute('role',editing?'group':'img');selected=null;lastKey='';renderEditor();draw();layout();};
  let burstFrame=0,burstParticles=[],pulseMotion=null;

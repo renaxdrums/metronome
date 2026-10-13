@@ -43,10 +43,9 @@
    // read visually as one rigid camera plane. No geometry or data is changed.
    el.style.transformOrigin=(innerWidth/2-rect.left)+'px '+(innerHeight/2-rect.top)+'px';
    animations.push(el.animate([
-    {offset:0,transform:'translate3d(0,85px,0) scale(.85) rotate(-.32deg)'},
-    {offset:.48,transform:'translate3d(0,22px,0) scale(.95) rotate(.08deg)'},
-    {offset:1,transform:'translate3d(0,0,0) scale(1) rotate(0deg)'}
-   ],{duration:1040,fill:'both',easing:'cubic-bezier(.15,.72,.2,1)'}));
+    {transform:'translate3d(0,48px,0) scale(.93)'},
+    {transform:'translate3d(0,0,0) scale(1)'}
+   ],{duration:1280,fill:'both',easing:'cubic-bezier(.24,.7,.22,1)'}));
   }
  }
  function startCamera(){
@@ -54,24 +53,16 @@
   // Visible camera pull-back WHILE the fox/brand is still visible.
   // The matte is darker than the intro, exposing the receding frame edges.
   // Then the entire frame travels upward like a real vertical page scroll.
-  const timing={duration:1770,easing:'cubic-bezier(.40,.07,.17,1)',fill:'forwards'};
-  const slide=overlay.animate([
-   {offset:0,transform:'translate3d(0,0,0) scale(1) rotate(0deg)',borderRadius:'0px'},
-   {offset:.08,transform:'translate3d(-2px,1px,0) scale(.991) rotate(-.13deg)',borderRadius:'4px'},
-   {offset:.22,transform:'translate3d(3px,-2px,0) scale(.949) rotate(.3deg)',borderRadius:'12px'},
-   {offset:.38,transform:'translate3d(-1px,-4px,0) scale(.89) rotate(-.36deg)',borderRadius:'16px'},
-   {offset:.49,transform:'translate3d(0,-11px,0) scale(.89) rotate(0deg)',borderRadius:'16px'},
-   {offset:.68,transform:'translate3d(0,-41%,0) scale(.92) rotate(0deg)',borderRadius:'8px'},
-   {offset:1,transform:'translate3d(0,-112%,0) scale(.96) rotate(0deg)',borderRadius:'0px'}
-  ],timing);
+  const duration=2630, ease=x=>{x=clamp(x);return x*x*(3-2*x);};
+  const frames=Array.from({length:81},(_,i)=>{
+   const t=i/80,scale=1-.062*ease(t/.64),y=-116*ease((t-.23)/.77);
+   return {offset:t,transform:'translate3d(0,'+y.toFixed(4)+'%,0) scale('+scale.toFixed(5)+')'};
+  });
+  const timing={duration,easing:'linear',fill:'forwards'};
+  const slide=overlay.animate(frames,timing);
   animations.push(slide);
-  if(curtain)animations.push(curtain.animate([
-   {offset:0,transform:'translate3d(0,0,0)'},
-   {offset:.47,transform:'translate3d(0,0,0)'},
-   {offset:.68,transform:'translate3d(0,-41%,0)'},
-   {offset:1,transform:'translate3d(0,-112%,0)'}
-  ],timing));
-  later(sceneZoom,670);
+  if(curtain)animations.push(curtain.animate(frames.map(frame=>({offset:frame.offset,transform:frame.transform.replace(/ scale\([^)]*\)/,'')})),timing));
+  later(sceneZoom,1090);
   slide.finished.then(finish,finish);
  }
  function begin(){
@@ -103,9 +94,9 @@
     if(started===undefined)started=now;
     const elapsed=now-started;
     ctx.clearRect(0,0,width,height);
-    if(elapsed>=1710){canvas.remove();canvas=null;return;}
+    if(elapsed>=1200)return; // Keep the final visible wave frame with the black panel.
    // One travelling spectral field: fine interlaced audio filaments, not a sweeping edge.
-   const wave=clamp((elapsed-180)/1450);
+   const wave=clamp((Math.min(elapsed,1200)-180)/1450);
    if(wave>0&&wave<1){
     const opacity=Math.pow(Math.sin(Math.PI*wave),.75),time=elapsed/1000;
     const base=height*.69,amplitude=Math.min(height*.14,115),packet=wave*1.5-.25;
@@ -142,14 +133,9 @@
    }
    frame=requestAnimationFrame(tick);
   }
-  // Fade the whole brand after the camera begins receding; not before it.
+  // Preserve the entire composition as the black panel moves upward.
   later(startCamera,2270);
-  later(()=>{
-   const fade={duration:610,fill:'forwards',easing:'cubic-bezier(.35,0,.65,1)'};
-   if(center)animations.push(center.animate([{opacity:1},{opacity:0}],fade));
-   if(rings)animations.push(rings.animate([{opacity:.4},{opacity:0}],fade));
-  },2660);
-  later(finish,5000); // Safety fallback for background tabs and old browsers.
+  later(finish,5600); // Safety fallback for background tabs and old browsers.
  }
  document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}

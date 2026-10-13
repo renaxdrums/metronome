@@ -51,14 +51,14 @@
    const sampleCtx=sample.getContext('2d',{willReadFrequently:true});
    sampleCtx.drawImage(logo,0,0,sample.width,sample.height);
    const pixels=sampleCtx.getImageData(0,0,sample.width,sample.height).data;
-   for(let y=0;y<sample.height;y+=2)for(let x=0;x<sample.width;x+=2){
+   for(let y=0;y<sample.height;y++)for(let x=0;x<sample.width;x+=2){
     const offset=(y*sample.width+x)*4;
     if(pixels[offset+3]<75||random()<.16)continue;
     particles.push({
      u:(x+.5+(random()-.5)*1.1)/sample.width,v:(y+.5+(random()-.5)*1.1)/sample.height,
-     delay:random()*580+(x/sample.width)*330, mobility:.16+Math.pow(random(),1.55)*1.2,
+     delay:random()*340+(x/sample.width)*160, mobility:.16+Math.pow(random(),1.55)*1.2,
      lift:(random()-.65)*1.35,whirl:.2+random()*.8,phase:random()*Math.PI*2,
-     radius:.38+random()*.7,alpha:.55+random()*.4
+     radius:.19+random()*.36,alpha:.68+random()*.3
     });
    }
   }catch(error){console.info('[RENAX intro] Échantillonnage du logo indisponible :',error);}
@@ -115,16 +115,16 @@
     }
     ctx.restore();
    }
-   // Hold the complete fox after the wave, then let fine dust peel away slowly.
+   // Dust starts while the fox is appearing: no long static hold or ring transformation.
    // Gusts, turbulence and drag are independent for each grain; none aims at the sequencer.
-   if(elapsed>=2320){
-    const logoFade=ease((elapsed-2650)/2250);
+   if(elapsed>=570){
+    const logoFade=ease((elapsed-780)/2090);
     logo.style.setProperty('opacity',String(1-logoFade),'important');
     const current=logo.getBoundingClientRect();
-    const appearance=ease((elapsed-2240)/480)*(1-ease((elapsed-5650)/1100));
+    const appearance=ease((elapsed-570)/420)*(1-ease((elapsed-3540)/700));
     ctx.save();ctx.fillStyle='#ff7900';
     for(const p of particles){
-     const age=clamp((elapsed-2320-p.delay)/3550);
+     const age=clamp((elapsed-570-p.delay)/2350);
      const gust=age*age*(.87+.10*Math.sin(age*11+p.phase))
       +.025*age*(1-Math.cos(age*14+p.phase));
      const breeze=(9*age+132*gust)*p.mobility;
@@ -140,28 +140,28 @@
      const alpha=p.alpha*appearance*worn;
      if(alpha<.015)continue;
      ctx.globalAlpha=alpha;
-     ctx.beginPath();ctx.arc(x,y,Math.max(.12,radius),0,Math.PI*2);ctx.fill();
+     ctx.beginPath();ctx.arc(x,y,Math.max(.07,radius),0,Math.PI*2);ctx.fill();
     }
     ctx.restore();
    }
    // Reveal the page beneath the dust without moving the instrument or its panels.
-   if(elapsed>=3350){
-    const progress=clamp((elapsed-3350)/3150);
+   if(elapsed>=1950){
+    const progress=clamp((elapsed-1950)/2080);
     const stops=Array.from({length:13},(_,i)=>{
      const y=i/12,t=clamp((progress-(1-y)*.35)/.65);
      return 'rgba(0,0,0,'+(1-ease(t)).toFixed(4)+') '+(y*100).toFixed(2)+'%';
     });
     cover.style.maskImage='linear-gradient(to bottom,'+stops.join(',')+')';
     cover.style.webkitMaskImage=cover.style.maskImage;
-    const textFade=1-ease((elapsed-4120)/1450);
+    const textFade=1-ease((elapsed-2430)/1390);
     word.style.opacity=String(textFade);
     word.style.filter='blur('+((1-textFade)*2).toFixed(2)+'px)';
-    for(const e of captions.slice(1))e.style.opacity=String(1-ease((elapsed-3700)/2200));
-    if(elapsed>4050)overlay.style.pointerEvents='none';
+    for(const e of captions.slice(1))e.style.opacity=String(1-ease((elapsed-2500)/1350));
+    if(elapsed>2800)overlay.style.pointerEvents='none';
    }
-   if(elapsed>=6800)finish();else frame=requestAnimationFrame(tick);
+   if(elapsed>=4400)finish();else frame=requestAnimationFrame(tick);
   }
-  frame=requestAnimationFrame(tick);timer=setTimeout(finish,7500);
+  frame=requestAnimationFrame(tick);timer=setTimeout(finish,5000);
  }
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}},true);
  window.addEventListener('pagehide',finish,{once:true});reduce.addEventListener('change',()=>{if(reduce.matches)finish();});

@@ -146,7 +146,8 @@
   later(startCamera,2270);
   later(()=>{
    const fade={duration:610,fill:'forwards',easing:'cubic-bezier(.35,0,.65,1)'};
-   for(const target of [center,rings])if(target)animations.push(target.animate([{opacity:1},{opacity:0}],fade));
+   if(center)animations.push(center.animate([{opacity:1},{opacity:0}],fade));
+   if(rings)animations.push(rings.animate([{opacity:.4},{opacity:0}],fade));
   },2660);
   later(finish,5000); // Safety fallback for background tabs and old browsers.
  }

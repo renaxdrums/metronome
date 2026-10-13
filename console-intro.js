@@ -43,31 +43,35 @@
    // read visually as one rigid camera plane. No geometry or data is changed.
    el.style.transformOrigin=(innerWidth/2-rect.left)+'px '+(innerHeight/2-rect.top)+'px';
    animations.push(el.animate([
-    {offset:0,transform:'translate3d(0,25px,0) scale(.925) rotate(-.2deg)'},
-    {offset:.55,transform:'translate3d(0,8px,0) scale(.978) rotate(.07deg)'},
-    {offset:1,transform:'none'}
-   ],{duration:1180,fill:'both',easing:'cubic-bezier(.2,.72,.15,1)'}));
+    {offset:0,transform:'translate3d(0,85px,0) scale(.85) rotate(-.32deg)'},
+    {offset:.48,transform:'translate3d(0,22px,0) scale(.95) rotate(.08deg)'},
+    {offset:1,transform:'translate3d(0,0,0) scale(1) rotate(0deg)'}
+   ],{duration:1040,fill:'both',easing:'cubic-bezier(.15,.72,.2,1)'}));
   }
  }
  function startCamera(){
   if(typeof overlay.animate!=='function'){finish();return;}
-  // Subtle handheld camera drift and pull-back, then a vertical scroll
-  // revealing the actual interface underneath — not a screenshot or clone.
-  const timing={duration:1670,easing:'cubic-bezier(.42,.04,.14,1)',fill:'forwards'};
+  // Visible camera pull-back WHILE the fox/brand is still visible.
+  // The matte is darker than the intro, exposing the receding frame edges.
+  // Then the entire frame travels upward like a real vertical page scroll.
+  const timing={duration:1770,easing:'cubic-bezier(.40,.07,.17,1)',fill:'forwards'};
   const slide=overlay.animate([
-   {offset:0,transform:'translate3d(0,0,0) scale(1.025) rotate(0deg)'},
-   {offset:.12,transform:'translate3d(-1px,-1px,0) scale(.979) rotate(-.18deg)'},
-   {offset:.25,transform:'translate3d(2px,-3px,0) scale(.96) rotate(.13deg)'},
-   {offset:.39,transform:'translate3d(0,-6px,0) scale(.955) rotate(0deg)'},
-   {offset:1,transform:'translate3d(0,-108%,0) scale(.99) rotate(0deg)'}
+   {offset:0,transform:'translate3d(0,0,0) scale(1) rotate(0deg)',borderRadius:'0px'},
+   {offset:.08,transform:'translate3d(-2px,1px,0) scale(.991) rotate(-.13deg)',borderRadius:'4px'},
+   {offset:.22,transform:'translate3d(3px,-2px,0) scale(.949) rotate(.3deg)',borderRadius:'12px'},
+   {offset:.38,transform:'translate3d(-1px,-4px,0) scale(.89) rotate(-.36deg)',borderRadius:'16px'},
+   {offset:.49,transform:'translate3d(0,-11px,0) scale(.89) rotate(0deg)',borderRadius:'16px'},
+   {offset:.68,transform:'translate3d(0,-41%,0) scale(.92) rotate(0deg)',borderRadius:'8px'},
+   {offset:1,transform:'translate3d(0,-112%,0) scale(.96) rotate(0deg)',borderRadius:'0px'}
   ],timing);
   animations.push(slide);
   if(curtain)animations.push(curtain.animate([
    {offset:0,transform:'translate3d(0,0,0)'},
-   {offset:.39,transform:'translate3d(0,0,0)'},
-   {offset:1,transform:'translate3d(0,-108%,0)'}
+   {offset:.47,transform:'translate3d(0,0,0)'},
+   {offset:.68,transform:'translate3d(0,-41%,0)'},
+   {offset:1,transform:'translate3d(0,-112%,0)'}
   ],timing));
-  later(sceneZoom,445);
+  later(sceneZoom,670);
   slide.finished.then(finish,finish);
  }
  function begin(){
@@ -138,13 +142,13 @@
    }
    frame=requestAnimationFrame(tick);
   }
-  // All brand elements (fox, wordmark, caption and circles) leave together.
+  // Fade the whole brand after the camera begins receding; not before it.
+  later(startCamera,2270);
   later(()=>{
-   const fade={duration:460,fill:'forwards',easing:'cubic-bezier(.35,0,.65,1)'};
+   const fade={duration:610,fill:'forwards',easing:'cubic-bezier(.35,0,.65,1)'};
    for(const target of [center,rings])if(target)animations.push(target.animate([{opacity:1},{opacity:0}],fade));
-  },1850);
-  later(startCamera,2310);
-  later(finish,4650); // Safety fallback for background tabs and old browsers.
+  },2660);
+  later(finish,5000); // Safety fallback for background tabs and old browsers.
  }
  document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}

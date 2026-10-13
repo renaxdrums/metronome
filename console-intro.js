@@ -91,11 +91,15 @@
   if(!original||!mirrored)return;
   // Fix the wrapper first: it establishes the height used by the circle's
   // container-query units. Then fix the circle to the exact source pixels.
-  for(const selector of ['.sequencer-wrapper','#sequencerContainer']){
+  for(const selector of ['.visu-toolbar','.sequencer-wrapper','#sequencerContainer']){
    const source=original.querySelector(selector),copy=mirrored.querySelector(selector);
    if(!source||!copy)continue;
    const rect=source.getBoundingClientRect();
    if(!(rect.width>0&&rect.height>0))continue;
+   if(selector==='.visu-toolbar'){
+    const computed=getComputedStyle(source);
+    for(const property of ['display','box-sizing','grid-template-columns','grid-template-rows','column-gap','row-gap','padding-top','padding-right','padding-bottom','padding-left','align-items'])copy.style.setProperty(property,computed.getPropertyValue(property),'important');
+   }
    for(const [property,size] of [['width',rect.width],['height',rect.height],
      ['min-width',rect.width],['max-width',rect.width],['min-height',rect.height],['max-height',rect.height]]){
     copy.style.setProperty(property,size+'px','important');

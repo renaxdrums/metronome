@@ -244,6 +244,7 @@
     songPane.querySelectorAll('[data-section-id]').forEach(card=>{
       const section=current.sections.find(s=>s.id===card.dataset.sectionId);if(!section)return;
       card.querySelector('.measure-sig').textContent=section.measure.numerator+'/'+section.measure.denominator;
+      const countLabel=card.querySelector('.song-block-count');if(countLabel){countLabel.textContent=section.count+' M';countLabel.setAttribute('aria-label',section.count+' mesures');}
       card.querySelector('.song-block-summary').firstChild.textContent=section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+section.measure.tempo+' BPM';
       const preview=card.querySelector('.measure-preview'),previewKey=JSON.stringify(section.measure.beatStates);
       if(preview.dataset.pattern!==previewKey){preview.dataset.pattern=previewKey;preview.replaceChildren();
@@ -484,6 +485,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       s.sections.forEach((section,i)=>{const card=el('div',undefined,songPane,'song-section measure-card');card.dataset.sectionId=section.id;enableSongDrag(card,section,s,true);card.style.touchAction='none';card.tabIndex=0;card.setAttribute('role','group');
         const head=el('button',undefined,card,'measure-head song-block-header');head.type='button';
         const title=el('span',section.label||'Bloc '+(i+1),head,'measure-num');
+        const countLabel=el('span',section.count+' M',head,'song-block-count');countLabel.style.cssText='margin-left:auto;white-space:nowrap;font-size:11px;color:var(--muted)';countLabel.setAttribute('aria-label',section.count+' mesures');
         el('span',section.measure.numerator+'/'+section.measure.denominator,head,'measure-sig');
         const summary=el('div',section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+section.measure.tempo+' BPM',card,'song-block-summary');
         const body=el('div',undefined,card,'song-block-body');body.id='song-block-'+section.id;head.setAttribute('aria-controls',body.id);

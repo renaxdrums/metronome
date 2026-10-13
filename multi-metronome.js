@@ -1,7 +1,7 @@
 /* Parallel measures, isolated editing and a named local preset library. */
 (()=>{
  const KEY='renax.multimetro.v1',clone=x=>JSON.parse(JSON.stringify(x)),uid=()=>crypto.randomUUID(),pane=document.getElementById('sequencePane'),normalTitle=pane.querySelector('.panel-title');
- let libraryView=true,active=false,tracks=[],presets=[],selectedPreset='',draftTempo=tempo,saved=null,solo=null,clock=null,cursors=[],runId=0,startRequest=0,starting=0,dirtyTimer=0,undoQueue=0,baseline='',history=[],collapsedTracks=new Set(),liveOutputs=new Set();
+ let libraryModels=[],librarySignature='',libraryView=true,active=false,tracks=[],presets=[],selectedPreset='',draftTempo=tempo,saved=null,solo=null,clock=null,cursors=[],runId=0,startRequest=0,starting=0,dirtyTimer=0,undoQueue=0,baseline='',history=[],collapsedTracks=new Set(),liveOutputs=new Set();
  const defaultTrack=(name='Piste 1')=>({...createMeasure(4,4,tempo),id:uid(),name,bank:currentBank,mute:false,beatSubdivisions:[1,1,1,1],beatStates:[[1],[1],[1],[1]]});
  function validate(t){if(!t||!Array.isArray(t)||t.length>64)throw Error('Preset incompatible.');return t.map((m,i)=>{if(!m||!Number.isInteger(m.numerator)||m.numerator<1||m.numerator>20||![2,4,8,16,32].includes(m.denominator)||m.beatSubdivisions?.length!==m.numerator||m.beatStates?.length!==m.numerator)throw Error('Preset incompatible.');for(let b=0;b<m.numerator;b++)if(!Number.isInteger(m.beatSubdivisions[b])||m.beatSubdivisions[b]<1||m.beatSubdivisions[b]>8||m.beatStates[b]?.length!==m.beatSubdivisions[b]||m.beatStates[b].some(s=>![0,1,2,3].includes(s)))throw Error('Preset incompatible.');return {...clone(m),id:m.id||uid(),name:String(m.name||'Piste '+(i+1)).slice(0,100),bank:SOUND_BANKS[m.bank]?m.bank:'clic',mute:!!m.mute};});}
  try{const data=JSON.parse(localStorage.getItem(KEY)||'null');if(data){tracks=validate(data.tracks);draftTempo=Math.max(2,Math.min(999,Number(data.bpm||data.tracks?.[0]?.tempo)||tempo));collapsedTracks=new Set(data.collapsedTracks||[]);presets=(data.presets||[]).map(p=>({...p,tracks:validate(p.tracks)}));selectedPreset=presets.some(p=>p.id===data.selectedPreset)?data.selectedPreset:'';if(!selectedPreset&&!Object.hasOwn(data,'selectedPreset')){const matches=presets.filter(p=>p.tracks.some(t=>tracks.some(current=>current.id===t.id)));if(matches.length===1)selectedPreset=matches[0].id;}}}catch(error){console.warn('MultiMétro: sauvegarde conservée mais non chargée',error);}
@@ -22,17 +22,26 @@
  function openPreset(p){selectPreset(p);libraryView=false;render();}
  async function playPreset(p){if(isPlaying&&selectedPreset===p.id&&!solo){stopMetronome();return;}stopMetronome();selectPreset(p);solo=null;await startMetronome();}
  function renderLibrary(){
-  library.hidden=!active||!libraryView;if(!active||!libraryView)return;library.replaceChildren();
+  library.hidden=!active||!libraryView;if(!active||!libraryView)return;const signature=JSON.stringify(presets.map(p=>[p.id,p.name,p.tracks.length]));
+  if(signature===librarySignature&&presets.length===libraryModels.length&&presets.every((p,i)=>p===libraryModels[i])&&library.children.length){
+   for(const card of library.querySelectorAll('.multi-preset-card')){
+    const selected=card.dataset.presetId===selectedPreset;
+    card.classList.toggle('active',selected);card.setAttribute('aria-selected',String(selected));
+    card.querySelector('.multi-preset-open').hidden=!selected;
+    const play=card.querySelector('.multi-preset-play');play.innerHTML=sequenceTransportIcon(isPlaying&&selected&&!solo);play.disabled=!!starting;
+   }return;
+  }
+  librarySignature=signature;libraryModels=presets.slice();library.replaceChildren();
   const title=document.createElement('h3');title.textContent='Presets multipistes';library.append(title);
   const create=button('Nouveau preset',()=>{stopMetronome();commit();selectedPreset='';tracks=[defaultTrack()];measures=tracks;activeMeasureIndex=0;history=[];baseline=snapshot();libraryView=false;persist();choose(tracks[0]);renderPresets();});
   create.className='btn btn-cyan';create.style.width='100%';library.append(create);
   for(const p of presets){
-   const card=document.createElement('div');card.className='measure-card multi-preset-card';card.classList.toggle('active',selectedPreset===p.id);card.tabIndex=0;card.setAttribute('aria-label',p.name);card.setAttribute('aria-selected',String(selectedPreset===p.id));
+   const card=document.createElement('div');card.className='measure-card multi-preset-card';card.dataset.presetId=p.id;card.classList.toggle('active',selectedPreset===p.id);card.tabIndex=0;card.setAttribute('aria-label',p.name);card.setAttribute('aria-selected',String(selectedPreset===p.id));
    const head=document.createElement('div');head.className='multi-track-head';
    const name=document.createElement('strong');name.className='multi-track-name';name.dataset.noTranslate='';name.textContent=p.name;
    const count=document.createElement('span');count.textContent=p.tracks.length+' piste'+(p.tracks.length===1?'':'s');count.className='measure-sig';
-   const open=button('Ouvrir '+p.name,()=>openPreset(p));open.className='sequence-preview-play';open.hidden=selectedPreset!==p.id;open.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
-   const play=button('Lire '+p.name,()=>playPreset(p));play.className='sequence-preview-play';play.innerHTML=sequenceTransportIcon(isPlaying&&selectedPreset===p.id&&!solo);play.disabled=!!starting;
+   const open=button('Ouvrir '+p.name,()=>openPreset(p));open.className='sequence-preview-play multi-preset-open';open.hidden=selectedPreset!==p.id;open.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+   const play=button('Lire '+p.name,()=>playPreset(p));play.className='sequence-preview-play multi-preset-play';play.innerHTML=sequenceTransportIcon(isPlaying&&selectedPreset===p.id&&!solo);play.disabled=!!starting;
    const more=document.createElement('details');more.className='multi-more';
    const summary=document.createElement('summary');summary.textContent='⋯';summary.setAttribute('aria-label','Options de '+p.name);
    const menu=document.createElement('div');menu.className='multi-actions';

@@ -126,17 +126,18 @@
   // The matte is darker than the intro, exposing the receding frame edges.
   // Then the entire frame travels upward like a real vertical page scroll.
   const duration=2630, ease=x=>{x=clamp(x);return x*x*(3-2*x);};
-  const frames=[],replicaFrames=[];
+  const frames=[],replicaFrames=[],desktop=innerWidth>1100;
   for(let i=0;i<=80;i++){
    const t=i/80,zoom=ease(t/.64),travel=ease((t-.23)/.77);
-   const topScale=1-.062*zoom;
-   const topY=-116*travel;
+   const commonScale=1-.062*zoom*(1-ease((t-.78)/.22));
+   const topScale=desktop?commonScale:1-.062*zoom;
+   const topY=desktop?-100*travel*commonScale:-116*travel;
    frames.push({offset:t,transform:'translate3d(0,'+topY.toFixed(4)+'%,0) scale('+topScale.toFixed(5)+')'});
    // The lower scene starts exactly at the bottom edge of the upper page.
    // As it scrolls in, it gently grows to its real 100% size and position.
-   const bottomScale=.925+.075*ease(travel);
+   const bottomScale=desktop?commonScale:.925+.075*ease(travel);
    const edge=Math.max(0,(1+topScale)/2-1.16*travel);
-   const bottomY=100*(edge-(1-bottomScale)/2);
+   const bottomY=desktop?topY+100*commonScale:100*(edge-(1-bottomScale)/2);
    replicaFrames.push({offset:t,transform:'translate3d(0,'+bottomY.toFixed(4)+'%,0) scale('+bottomScale.toFixed(5)+')'});
   }
   const timing={duration,easing:'linear',fill:'forwards'};

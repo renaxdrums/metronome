@@ -815,6 +815,7 @@
     .numbox-option:hover, .numbox-option.active { background: rgba(0,229,255,.12); color: var(--cyan); }
 
     /* ===== Préparation audio : fine ligne cyan + READY temporaire ===== */
+    .audio-ready-wrap[hidden] { display: none !important; }
     .audio-ready-wrap {
       position: absolute;
       right: 12px;
@@ -1609,7 +1610,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
       <button class="btn" id="panicBtn">Reset</button>
     </div>
     
-    <div class="audio-ready-wrap" id="audioReadyWrap" aria-live="polite">
+    <div class="audio-ready-wrap" id="audioReadyWrap" aria-live="polite" hidden>
       <div class="audio-ready-label" id="audioReadyLabel">PRÉPARATION AUDIO...</div>
       <div class="audio-ready-track"><div class="audio-ready-bar" id="audioReadyBar"></div></div>
     </div>
@@ -1796,6 +1797,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
         playBtn.disabled = true;
         playBtn.classList.add('audio-loading');
         if (audioReadyLabel) audioReadyLabel.textContent = 'AUDIO ERROR';
+        if (audioReadyWrap) audioReadyWrap.hidden = false;
         console.warn('Audio preparation failed:', err);
         throw err;
       });

@@ -408,3 +408,15 @@ header{isolation:isolate;}
 #songPane .song-playlist-card .measure-preview{padding-right:112px;}
 #songPane .playlist-direct-play[aria-pressed="true"],#songPane .song-selected-open{color:var(--cyan)!important;border-color:#4b7884!important;background:#28424b!important;}
 #songPane .playlist-direct-play:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Shared numeric menus for polyrhythm cards. */
+.poly-ratio-row .numbox-custom{flex:0 0 58px!important;width:58px!important;min-width:58px!important;}
+.poly-ratio-row .numbox-button{width:58px!important;min-width:58px!important;height:32px!important;padding:5px 9px;}
+.measure-tempo-row:has(select.measure-tempo-input) .numbox-custom{flex:0 0 88px!important;width:88px!important;min-width:88px!important;}
+.measure-tempo-row:has(select.measure-tempo-input) .numbox-button{width:88px!important;min-width:88px!important;height:32px!important;color:var(--orange);}
+@media(min-width:1101px){
+ .panel-visu #workspaceTimer{align-items:center!important;}
+ .panel-visu #workspaceTimer .workspace-timer-label{justify-content:center!important;text-align:center;}
+ .panel-visu #workspaceTimer #trainTimer{align-self:center!important;justify-content:center!important;text-align:center!important;}
+ .panel-visu .workspace-control-group:has(#volumeSlider)>label{justify-content:center!important;text-align:center;}
+}

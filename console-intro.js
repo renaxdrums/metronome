@@ -72,10 +72,14 @@
    replica.append(copy);
   }
   document.body.append(backdrop,replica); // After the originals: original IDs remain the lookup targets.
-  // Container-query sizing (100cqh) is different in a cloned flex tree.
-  // Match the live sequencer geometry before the replica starts moving.
-  synchronizeMirrorGeometry();
-  syncReplicaCanvases();
+  // The replica starts translated below the screen. Measure it at its
+  // neutral final position, then restore the offscreen starting transform.
+  // Otherwise getBoundingClientRect includes a full viewport of offset.
+  replica.style.transform='none';
+  try{
+   synchronizeMirrorGeometry();
+   syncReplicaCanvases();
+  }finally{replica.style.removeProperty('transform');}
  }
  function synchronizeMirrorGeometry(){
   if(!replica)return;

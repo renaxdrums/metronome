@@ -8,7 +8,7 @@
   .numbox-menu.compact-floating{position:fixed;z-index:5000;box-sizing:border-box;box-shadow:0 8px 24px #0007;}
   `;document.head.append(style);
   function enhance(select){
-    if(numboxWidgets.has(select))return;
+    if(select.closest('.console-arrival-replica')||numboxWidgets.has(select))return;
     const rect=select.getBoundingClientRect(),computed=getComputedStyle(select);
     const numeric=/^\d+$/.test(select.options[0]?.textContent.trim()||'');
     enhanceNumboxSelect(select);
@@ -24,6 +24,7 @@
   const observer=new MutationObserver(records=>{
     const rebuilds=new Set();
     for(const record of records){
+      if(record.target.closest?.('.console-arrival-replica'))continue;
       if(record.type==='attributes'){
         if(record.target.tagName!=='SELECT')continue;
         const widget=record.target.parentElement?.querySelector('.numbox-button');
@@ -32,7 +33,7 @@
       }
       if(record.target.tagName==='SELECT'&&record.target.isConnected)rebuilds.add(record.target);
       for(const node of record.addedNodes){
-        if(node.nodeType!==1||!node.isConnected)continue;
+        if(node.nodeType!==1||!node.isConnected||node.closest('.console-arrival-replica'))continue;
         if(node.matches('select'))enhance(node);
         node.querySelectorAll('select').forEach(enhance);
       }

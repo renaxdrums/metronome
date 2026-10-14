@@ -5,7 +5,7 @@
 .score-view-switch button svg{width:17px;height:17px;flex-shrink:0;fill:none;stroke:var(--orange);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 .score-view-switch button.active{color:var(--text);border-color:rgba(0,229,255,.55);background:rgba(0,229,255,.08);box-shadow:0 0 0 1px rgba(0,229,255,.08) inset;}
 .score-view-switch button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
-.rhythm-score{display:none;width:100%;min-width:0;max-height:calc(100% - 75px);overflow:auto;background:linear-gradient(to bottom,#fff 0 8px,var(--orange) 8px 10px,#fff 10px);background-attachment:local;color:#111;border:1px solid rgba(255,255,255,.12);border-radius:3px;box-shadow:0 6px 12px -4px rgba(0,0,0,.3);box-sizing:border-box;padding:4px;align-self:center;overscroll-behavior:contain;}
+.rhythm-score{display:none;width:100%;min-width:0;max-height:calc(100% - 75px);overflow:auto;background:linear-gradient(145deg,#f8f5ef 0%,#f0ebe3 100%);color:#111;border:1px solid #ded8cf;border-radius:14px;box-shadow:0 12px 24px -10px rgba(0,0,0,.43),0 1px 0 rgba(255,255,255,.62) inset;box-sizing:border-box;padding:10px;align-self:center;overscroll-behavior:contain;}
 .rhythm-score-status{padding:24px 12px;text-align:center;font-size:13px;}
 .panel-visu.score-view .sequencer-wrapper{width:100%;min-width:0;overflow:hidden;padding:0 6px 14px;}
 .panel-visu.score-view #sequencerContainer{display:none;}

@@ -127,3 +127,11 @@ html,body,body *{scrollbar-width:thin!important;scrollbar-color:rgba(0,229,255,.
 .rhythm-score{padding-bottom:2px}
 .rhythm-score > .legend{margin:8px 0 0;padding:3px 6px 0}
 .visu-bottom > .legend{transform:translateY(4px);margin-bottom:-4px!important}
+
+.reset-undo-tools #scoreFreeMeasureBtn{display:flex;align-items:center;justify-content:center;width:32px;min-width:32px;height:32px;min-height:32px;padding:6px;margin:0;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.025);color:var(--orange);cursor:pointer}
+.reset-undo-tools #scoreFreeMeasureBtn[aria-pressed=true]{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.08)}
+.reset-undo-tools #scoreFreeMeasureBtn[hidden]{display:none!important}
+@media(min-width:1101px){
+ .score-tools-panel,.score-tools-panel .rhythm-editor{max-height:none!important}
+ .score-tools-panel .rhythm-editor{overflow:visible;padding:7px}
+}

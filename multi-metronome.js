@@ -10,7 +10,7 @@
  const sequence=document.createElement('button'),multi=document.createElement('button');for(const [button,label] of [[sequence,'Séquenceur'],[multi,'MultiMétro']]){button.type='button';button.innerHTML=(button===multi?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16M8 3v4M15 10v4M10 17v4"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h4v4H4zM10 5h4v4h-4zM16 5h4v4h-4zM4 15h16M4 19h16"/></svg>')+'<span>'+label+'</span>';button.setAttribute('role','tab');tabs.append(button);}sequence.onclick=()=>switchMode(false);multi.onclick=()=>switchMode(true);normalTitle.before(tabs);normalTitle.hidden=true;
  const controls=document.createElement('div');controls.id='multiControls';const add=button('Nouvelle mesure',()=>{stopMetronome();edit(()=>{tracks.push(defaultTrack('Piste '+(tracks.length+1)));activeMeasureIndex=tracks.length-1;});});add.className='multi-add';add.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Nouvelle mesure</span>';
  const presetTitle=document.createElement('input');presetTitle.type='text';presetTitle.maxLength=100;presetTitle.className='multi-preset-name';presetTitle.setAttribute('aria-label','Nom du preset');presetTitle.style.cssText='width:100%;box-sizing:border-box;min-height:38px;padding:8px 10px';
- presetTitle.oninput=()=>{const p=presets.find(p=>p.id===selectedPreset);if(p&&presetTitle.value.trim()){p.name=presetTitle.value.trim().slice(0,100);persist();}};
+ presetTitle.oninput=()=>{const p=presets.find(p=>p.id===selectedPreset);if(p&&presetTitle.value.trim()){p.name=presetTitle.value.trim().slice(0,100);persist();syncPresetContext();}};
  presetTitle.onchange=()=>renderPresets();
  const presetStatus=document.createElement('div');presetStatus.className='multi-preset-status';presetStatus.setAttribute('role','status');presetStatus.setAttribute('aria-live','polite');
  controls.append(presetTitle,add,presetStatus);const list=document.createElement('div');list.id='multiTracks';pane.append(controls,list);
@@ -83,7 +83,8 @@
  function saveCurrentPreset(){const p=presets.find(p=>p.id===selectedPreset);if(p){p.bpm=tempo;p.tracks=clone(tracks);}}
  function commit(){clearTimeout(undoQueue);undoQueue=0;if(!active)return;if(!libraryView)ensureCurrentPreset();const next=snapshot();if(baseline&&next!==baseline){history.push(baseline);if(history.length>100)history.shift();}if(next!==baseline)saveCurrentPreset();baseline=next;persist();syncUndo();}
  function edit(action){if(starting)return;commit();action();measures=tracks;activeMeasureIndex=Math.min(Math.max(0,activeMeasureIndex),tracks.length-1);for(const t of tracks)t.tempo=tempo;commit();render();if(tracks.length)renderActiveMeasure();else stopMetronome();}
- function renderPresets(){
+ function syncPresetContext(){const p=presets.find(p=>p.id===selectedPreset),t=tracks[activeMeasureIndex];if(active&&p&&t){activeMeasureLabel.dataset.presetContext=p.name;activeMeasureLabel.title=p.name+' · '+t.name;}else{delete activeMeasureLabel.dataset.presetContext;activeMeasureLabel.removeAttribute('title');}}
+ function renderPresets(){syncPresetContext();
   const p=presets.find(p=>p.id===selectedPreset);
   if(document.activeElement!==presetTitle)presetTitle.value=p?.name||'';
   presetTitle.disabled=!p;presetStatus.replaceChildren();presetStatus.hidden=!p;
@@ -125,7 +126,7 @@
  }}timerID=setTimeout(schedule,lookahead);}
  window.RENAX_MULTI={requestName,get active(){return active;},render,start,stop,schedule,get solo(){return solo;},get generation(){return runId;},changed(){if(active){clearTimeout(dirtyTimer);commit();render();}}};
  const oldRender=renderSequencerList;renderSequencerList=function(...args){if(active)return render();return oldRender.apply(this,args);};const oldPreview=refreshMeasurePreviews;refreshMeasurePreviews=function(...args){const result=oldPreview.apply(this,args);if(active){commit();render();}return result;};
- const oldTempo=getEffectiveTempo;getEffectiveTempo=function(m){return active?tempo:oldTempo(m);};const oldActive=renderActiveMeasure;renderActiveMeasure=function(...args){const r=oldActive.apply(this,args);if(active&&tracks[activeMeasureIndex]){activeMeasureLabel.dataset.noTranslate='';activeMeasureLabel.textContent=tracks[activeMeasureIndex].name;}return r;};
+ const oldTempo=getEffectiveTempo;getEffectiveTempo=function(m){return active?tempo:oldTempo(m);};const oldActive=renderActiveMeasure;renderActiveMeasure=function(...args){const r=oldActive.apply(this,args);if(active&&tracks[activeMeasureIndex]){activeMeasureLabel.dataset.noTranslate='';activeMeasureLabel.textContent=tracks[activeMeasureIndex].name;syncPresetContext();}return r;};
  const oldTrain=updateTrainButton;updateTrainButton=function(...args){const r=oldTrain.apply(this,args);if(active){trainBtn.disabled=true;trainBtn.title='Entraînement disponible dans Séquenceur';}return r;};
  const oldAppMode=setAppMode;setAppMode=function(...args){if(active)switchMode(false);return oldAppMode.apply(this,args);};
  document.querySelector('.song-tabs [data-pane="songs"]').addEventListener('click',()=>{if(active)switchMode(false);},true);

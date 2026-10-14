@@ -1587,6 +1587,26 @@ html#renaxApp[data-theme=light] body :is(.index2-settings-note,.song-note,.song-
  html#renaxApp[data-theme=light] body #multiControls>:is(.multi-add,.multi-preset-status){grid-column:1/-1}
 }
 
+
+/* Proposal: consistent creation actions and explicit musical context. */
+html#renaxApp[data-theme=light] body #multiPresetLibrary>.btn{
+ display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;
+ background:#e1eef0!important;border:1px solid #83aeba!important;color:#116373!important;
+ font:600 12px/1.4 var(--font)!important;text-transform:none!important;letter-spacing:.1px!important;box-shadow:none!important;
+}
+html#renaxApp[data-theme=light] body #multiPresetLibrary>.btn::before{content:'+';font:400 20px/1 var(--font);}
+html#renaxApp[data-theme=light] body #multiPresetLibrary>.btn:hover{background:#d0e7eb!important;border-color:var(--cyan)!important}
+html#renaxApp[data-theme=light] body.multi-mode #activeMeasureLabel[data-preset-context]{display:flex!important;align-items:center;gap:4px;max-width:100%;white-space:nowrap;}
+html#renaxApp[data-theme=light] body.multi-mode #activeMeasureLabel[data-preset-context]::before{content:attr(data-preset-context) ' ·';color:#52616d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 1 auto;}
+html#renaxApp[data-theme=light] #multiPresetLibrary>h3{font:650 16px/1.4 var(--font);margin-bottom:14px;color:var(--text);}
+@media(min-width:1101px){
+ html#renaxApp[data-theme=light] header{min-height:50px}
+ html#renaxApp[data-theme=light] #workspaceNav{padding:4px 0 10px}
+ html#renaxApp[data-theme=light] #workspaceNav button{min-height:42px}
+ html#renaxApp[data-theme=light] .main-grid>.panel-visu{gap:10px!important}
+ html#renaxApp[data-theme=light] .visu-toolbar{padding:12px!important}
+}
+
 </style>
 </head>
 <body>
@@ -4301,7 +4321,7 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
 <script src="multi-clock.js?v=20261012-multi5"></script>
-<script src="multi-metronome.js?v=20261014-track-solo6"></script>
+<script src="multi-metronome.js?v=20261014-preset-context16"></script>
 <script src="interface-language.js?v=20261014-block-ramp1"></script>
 <script src="workspace-layout.js?v=20261013-replica-guard15"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->

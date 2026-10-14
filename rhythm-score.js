@@ -42,7 +42,20 @@
   const style=getComputedStyle(host);
   const inset=(parseFloat(style.paddingLeft)||0)+(parseFloat(style.paddingRight)||0);
   const availableWidth=Math.max(1,host.clientWidth-inset-4);
-  const scale=availableWidth/w;
+  let scale=availableWidth/w;
+  // Réserver la hauteur de la légende et de l'indicateur de pulsation pour éviter
+  // de devoir faire défiler la partition afin de voir la légende.
+  const wrapperStyle=getComputedStyle(wrapper);
+  const wrapperPadding=(parseFloat(wrapperStyle.paddingTop)||0)+(parseFloat(wrapperStyle.paddingBottom)||0);
+  const hostPadding=(parseFloat(style.paddingTop)||0)+(parseFloat(style.paddingBottom)||0);
+  const svgStyle=getComputedStyle(svg);
+  const svgSpacing=(parseFloat(svgStyle.marginTop)||0)+(parseFloat(svgStyle.marginBottom)||0);
+  const otherHeight=[...host.children].filter(child=>child!==svg&&getComputedStyle(child).display!=='none').reduce((sum,child)=>{
+   const css=getComputedStyle(child);
+   return sum+child.offsetHeight+(parseFloat(css.marginTop)||0)+(parseFloat(css.marginBottom)||0);
+  },0);
+  const remaining=wrapper.clientHeight-(toolsPanel.offsetHeight+10)-wrapperPadding-hostPadding-svgSpacing-otherHeight-8;
+  if(remaining>64)scale=Math.min(scale,remaining/h);
   if(!Number.isFinite(scale)||scale<=0)return;
   svg.style.width=(w*scale)+'px';
   svg.style.height=(h*scale)+'px';

@@ -25,9 +25,9 @@
     if(audioCtx)await audioCtx.close();
     let duration=0;const sections=[];
     for(const section of song.sections){
-      const m=section.measure,barDuration=(60/m.tempo)*(4/m.denominator)*m.numerator;
+      const m=section.measure,sectionDuration=RENAX_SONG_TEMPO.duration(section),barDuration=sectionDuration/section.count;
       sections.push({label:section.label,count:section.count,start:duration,barDuration,tempo:m.tempo,numerator:m.numerator,denominator:m.denominator});
-      duration+=barDuration*section.count;
+      duration+=sectionDuration;
     }
     const lead=voice||amorcePlan?VOICE_MAX_ATTACK_SECONDS:0;
     // Oscillator tails are allowed to finish, just as in finite live playback.
@@ -38,15 +38,16 @@
     if(amorcePlan)RENAX_AMORCE.begin(audioCtx,lead,amorcePlan);
     let time=lead,events=0,steps=0;
     for(const section of song.sections){
-      const m=section.measure,beatDuration=getStepDurationMs(m.tempo,m.denominator,1)/1000;
+      const m=section.measure;
       const group=voice&&m.denominator>=16?m.denominator/4:1;
       for(let bar=0;bar<section.count;bar++) {
         for(let beat=0;beat<m.numerator;beat++){
+          const beatDuration=RENAX_SONG_TEMPO.stepDuration(section,bar,beat,0,1);
           const subdivisions=m.beatSubdivisions[beat];
           for(let sub=0;sub<subdivisions;sub++){
             const state=m.beatStates[beat][sub];
             if(!RENAX_AMORCE.step(time,state,beat===0&&sub===0,sub,beat)&&state){playClick(state,time,beat===0&&sub===0,{mode:'metronome',beatNumber:beat%group===0?Math.floor(beat/group)+1:0,subIndex:sub,beatDurationSec:beatDuration*group});events++;}
-            time+=getStepDurationMs(m.tempo,m.denominator,subdivisions)/1000;
+            time+=RENAX_SONG_TEMPO.stepDuration(section,bar,beat,sub,subdivisions);
             if(++steps%4096===0)await pause();
           }
         }

@@ -1579,6 +1579,14 @@ html#renaxApp[data-theme=light] body :is(.index2-settings-note,.song-note,.song-
 @media(prefers-reduced-motion:no-preference){html#renaxApp[data-theme=light] :is(button,.numbox-button,.measure-card){transition:background-color .15s,border-color .15s,box-shadow .15s}}
 
 
+
+@media(min-width:1101px){
+ html#renaxApp[data-theme=light] body #multiControls{display:grid;grid-template-columns:36px minmax(0,1fr);align-items:center;gap:10px!important;margin-bottom:8px!important}
+ html#renaxApp[data-theme=light] body #multiControls>button.song-back{grid-column:1;grid-row:1;align-self:center;margin:0!important}
+ html#renaxApp[data-theme=light] body #multiControls>.multi-preset-name{grid-column:2;grid-row:1;min-width:0}
+ html#renaxApp[data-theme=light] body #multiControls>:is(.multi-add,.multi-preset-status){grid-column:1/-1}
+}
+
 </style>
 </head>
 <body>

@@ -41,7 +41,7 @@
     const selected=value==='light'?'light':'dark';
     document.documentElement.dataset.theme=selected;
     for(const theme of ['light','dark']) buttons[theme].setAttribute('aria-pressed',String(theme===selected));
-    if(meta)meta.content=selected==='light'?'#e9eef2':'#1c2026';
+    if(meta)meta.content=selected==='light'?'#e9eef2':'#1c2127';
     try{localStorage.setItem(key,selected);}catch{}
     window.dispatchEvent(new CustomEvent('renax-theme-changed',{detail:{theme:selected}}));
   }

@@ -205,6 +205,14 @@ html[data-theme="light"] .song-block-summary,
 html[data-theme="light"] #songsRoot .song-playlist-summary { color:var(--text-muted)!important; }
 
 /* Keep the validated rhythmic sheet and its editor untouched in BOTH themes. */
+/* The notation editor is a deliberately dark validated island: retain readable icons and inputs. */
+html[data-theme="light"] .rhythm-editor {
+  --text:#edf0f2;--text-muted:#bcc5ce;--border:#414a56;
+}
+html[data-theme="light"] .rhythm-editor :is(select,input:not([type="range"]):not([type="checkbox"])) {
+  background:#1b1c23!important;border-color:#414a56!important;color:#edf0f2!important;
+}
+
 /* A small stable segmented selector, within the existing Interface settings card. */
 .interface-theme-switch { display:grid;grid-template-columns:1fr 1fr;gap:4px;min-width:0; }
 .interface-theme-switch button { min-width:0;padding:7px 5px;font:600 10px var(--font);cursor:pointer; }

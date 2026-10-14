@@ -439,3 +439,10 @@ header{isolation:isolate;}
 .multi-track .multi-solo{font:600 11px/1 var(--font)!important}
 .multi-track .multi-mute svg,.multi-track .sequence-preview-play svg{width:16px!important;height:16px!important}
 .multi-track .multi-solo[aria-pressed=true],.multi-track .sequence-preview-play[aria-pressed=true]{border-color:var(--cyan)!important}
+
+/* Raise the open action menu above controls on following rows. */
+#songsRoot #songPane .song-more-wrap:has(.song-more-menu:not([hidden])){z-index:50!important}
+#songsRoot #songPane .song-more-menu:not([hidden]){z-index:51!important}
+#songsRoot .playlist-list > div:has(.song-more-menu:not([hidden])),
+#songsRoot .song-section:has(.song-more-menu:not([hidden])),
+#songsRoot .song-count-in:has(.song-more-menu:not([hidden])){position:relative;z-index:40}

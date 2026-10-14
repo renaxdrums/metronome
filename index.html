@@ -1607,6 +1607,16 @@ html#renaxApp[data-theme=light] #multiPresetLibrary>h3{font:650 16px/1.4 var(--f
  html#renaxApp[data-theme=light] .visu-toolbar{padding:12px!important}
 }
 
+
+/* Tap Tempo: allow real breathing room around the icon and label. */
+html#renaxApp[data-theme=light] .visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(48px,1fr) 116px!important}
+html#renaxApp[data-theme=light] .visu-toolbar #tapBtn{width:116px!important;min-width:116px!important;padding:8px 12px!important;font-size:10px!important;overflow:hidden}
+html#renaxApp[data-theme=light] #tapBtn>span:first-child{justify-content:center;gap:7px!important}
+@media(max-width:1100px){
+ html#renaxApp[data-theme=light] .workspace-controls-grid #tapBtn{width:116px!important;min-width:116px!important;padding:8px 12px!important;font-size:10px!important}
+ html#renaxApp[data-theme=light] .workspace-controls-grid .control-group:first-child{padding-right:126px}
+}
+
 </style>
 </head>
 <body>

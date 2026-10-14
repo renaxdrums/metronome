@@ -1268,7 +1268,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 </style>
   <link rel="stylesheet" href="mobile-landscape.css?v=20261008-landscape">
   <link rel="stylesheet" href="training-modes.css?v=20261011-training-play1">
-  <link rel="stylesheet" href="rhythm-score.css?v=20261014-neutral-score-editor2">
+  <link rel="stylesheet" href="rhythm-score.css?v=20261014-score-gray-legend1">
 
 <style>
   /* Center the main transport independently of the compact reset control. */
@@ -3978,7 +3978,7 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
 </script>
-<script src="sound-bank-menu.js?v=20261013-mobile-open-up1"></script>
+<script src="sound-bank-menu.js?v=20261014-approved-order1"></script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
   <script src="amorce-song.js?v=20261011-independent-voice1"></script>
   <script src="songs-index2.js?v=20261013-block-count28"></script>
@@ -4056,7 +4056,7 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
   <script src="training-numbox.js?v=20261013-training-numbox1"></script>
   <script src="compact-controls.js?v=20261013-mobile-bank-up1"></script>
   <script src="navigation-history.js?v=20261011-reload-view1"></script>
-  <script src="rhythm-score.js?v=20261013-panel-width1"></script>
+  <script src="rhythm-score.js?v=20261014-legend-fit1"></script>
   <script src="edit-history.js?v=20261010-undo2"></script>
 <script>
 (()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();

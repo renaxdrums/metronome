@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script>
+/* Apply before first paint. A system light preference never overrides the default. */
+(()=>{let theme='dark';try{if(localStorage.getItem('renax-appearance')==='light')theme='light';}catch{}document.documentElement.dataset.theme=theme;})();
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <link rel="manifest" href="manifest.webmanifest?v=20261013-app-icon18">
@@ -1376,7 +1380,46 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
 @media(max-width:1100px){
   #multiControls > button.song-back{height:44px;min-height:44px;}
 }
-</style></head>
+</style><style id="appearance-theme">
+/* Appearance: the approved graphite interface remains the default. */
+html{color-scheme:dark}
+html[data-theme=light]{color-scheme:light;--bg:#eef1f4;--panel:#fff;--border:#c5cdd6;--text:#222d38;--text-muted:#526170;--orange:#b84b00;--cyan:#087c90;--yellow:#15783e;--grey:#dce2e8;--grey-hover:#cfd8e1}
+html[data-theme=light] body{background:var(--bg);color:var(--text)}
+html[data-theme=light] header{border-bottom-color:#cbd3dc}
+html[data-theme=light] :is(.panel,.measure-card,.song-section,.song-card,.song-block,.song-count-in,.multi-track,#multiPresetLibrary .multi-preset-card){background:#fff!important;border-color:var(--border)!important;color:var(--text)!important}
+html[data-theme=light] .main-grid>.panel-visu{background:radial-gradient(ellipse at 50% 60%,#fff,#e3e9ef 75%)!important}
+html[data-theme=light] :is(.panel-visu .visu-toolbar,#workspaceControls){background:#f8fafc!important;border-color:var(--border)!important}
+html[data-theme=light] :is(input:not([type=range]):not([type=checkbox]),select,textarea,.numbox-button){background:#e9eef3!important;border-color:#b8c5d1!important;color:var(--text)!important}
+html[data-theme=light] :is(.numbox-menu,.numbox-dropdown,.sequence-more-actions,.multi-actions,dialog,#beatEditor,#index2SettingsPanel,#songsRoot #songPane .song-more-menu){background:#fff!important;border-color:#aebdca!important;color:var(--text)!important;box-shadow:0 12px 28px #22334425}
+html[data-theme=light] :is(.numbox-option,.index2-setting-row,.index2-settings-title,.index2-settings-section h3,.workspace-timer-label,.measure-label,.control-group>label,.measure-sig,.legend){color:var(--text)!important}
+html[data-theme=light] :is(.numbox-option:hover,.numbox-option.active,.numbox-option[aria-selected=true]){background:#dceef2!important;color:var(--cyan)!important}
+html[data-theme=light] #workspaceNav button{background:#fff!important;border-color:var(--border)!important;color:var(--text-muted)!important}
+html[data-theme=light] #workspaceNav button[aria-selected=true]{background:#deedf1!important;border-color:var(--cyan)!important;color:var(--text)!important}
+html[data-theme=light] :is(.measure-card.active,.multi-track.active,.song-section.active,#songPane .song-playlist-card.active,#multiPresetLibrary .multi-preset-card.active){background:#e4f0f3!important;border-color:var(--cyan)!important}
+html[data-theme=light] :is(#songsHome>.song-entry,#songsRoot .playlist-choice){background:#fff!important;border-color:var(--border)!important;color:var(--text)!important}
+html[data-theme=light] :is(#songsHome>.song-entry:hover,#songsRoot .playlist-choice:hover){background:#e9eff4!important}
+html[data-theme=light] :is(#playBtn,#trainBtn,#sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,#songsRoot .track-create,#songsRoot .track-add-section,#songPane .song-selected-open,#songPane .playlist-direct-play[aria-pressed=true],#multiPresetLibrary .multi-preset-create){background:#deedf1!important;border-color:#74aab6!important;color:var(--cyan)!important}
+html[data-theme=light] :is(#playBtn:hover,#trainBtn:hover){background:#cce5eb!important}
+html[data-theme=light] :is(#tapBtn,.training-mode-tabs button,.dir-toggle button,.rhythm-editor button,.rhythm-editor summary){background:#e9eef3!important;border-color:#b8c5d1!important;color:var(--text)!important}
+html[data-theme=light] :is(.training-mode-tabs button.active,.dir-toggle button.active,.rhythm-editor button.active){background:#dceef2!important;border-color:var(--cyan)!important}
+html[data-theme=light] :is(.sequence-preview-play,.sequence-more summary,.multi-more summary,.multi-solo,.multi-mute,#songsRoot #songPane .song-more,#songsRoot .song-back,#multiPresetLibrary button,.index2-header-btn,.console-intro-replay,.view-toggle button,.reset-undo-tools button){background:transparent!important;border-color:#b8c5d1!important;color:var(--orange)!important}
+html[data-theme=light] #songsRoot #songPane .song-more-menu .btn{color:var(--text)!important}
+html[data-theme=light] #songsRoot #songPane .song-more-menu .btn:hover{background:#e9eff4!important;color:var(--orange)!important}
+html[data-theme=light] .beat-number{color:var(--text);text-shadow:0 2px 8px #ffffff90}
+html[data-theme=light] .beat-number.pulse{color:var(--cyan);text-shadow:0 0 12px #087c9020}
+html[data-theme=light] :is(.sequencer-cross,.sequencer-cross::before,.sequencer-cross::after){background:#526170}
+html[data-theme=light] .visu-toolbar :is(.workspace-control-group,#workspaceTimer){border-left-color:var(--border)!important}
+html[data-theme=light] .numbox-menu{scrollbar-color:var(--cyan) #e9eef3}
+html[data-theme=light] input[type=range]{background:#c5cdd6}
+html[data-theme=light] #workspaceTempoShortcut{background:#e9eef3;border-color:var(--border)}
+html[data-theme=light] #songsRoot #songPane :is(.song-section.playing,.song-count-in.playing)::after{background:#567080}
+html[data-theme=light] .rhythm-score{border:1px solid var(--border)}
+html[data-theme=light] :is(.index2-settings-note,.index2-status,footer){color:var(--text-muted)!important}
+.appearance-options{display:flex;gap:8px}
+.appearance-options button{flex:1;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--grey);color:var(--text);font:600 12px var(--font);cursor:pointer}
+.appearance-options button[aria-pressed=true]{border-color:var(--cyan);box-shadow:inset 0 -2px var(--cyan)}
+</style>
+</head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
 <div class="console-arrival-lines" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -1611,6 +1654,13 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
       <button class="index2-close" id="index2SettingsClose" type="button" aria-label="Fermer">×</button>
     </div>
 
+<section class="index2-settings-section">
+<h3>Apparence</h3>
+<div class="appearance-options" role="group" aria-label="Mode d’affichage">
+<button type="button" data-appearance="dark" aria-pressed="true">Sombre</button>
+<button type="button" data-appearance="light" aria-pressed="false">Clair</button>
+</div>
+</section>
     <section class="index2-settings-section">
       <h3>MIDI & déclenchement</h3>
       <div class="index2-setting-row">
@@ -4106,6 +4156,17 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
       console.info('[RENAX fullscreen] Fonction indisponible :', error);
     }
   }, { capture: true });
+})();
+</script>
+<script>
+(()=>{const root=document.documentElement,buttons=document.querySelectorAll('[data-appearance]');
+function apply(theme){root.dataset.theme=theme==='light'?'light':'dark';
+document.querySelector('meta[name="theme-color"]')?.setAttribute('content',root.dataset.theme==='light'?'#eef1f4':'#1c2127');
+buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.appearance===root.dataset.theme)));
+}
+buttons.forEach(b=>b.addEventListener('click',()=>{apply(b.dataset.appearance);try{localStorage.setItem('renax-appearance',root.dataset.theme);}catch{}}));
+window.addEventListener('storage',e=>{if(e.key==='renax-appearance')apply(e.newValue)});
+apply(root.dataset.theme);
 })();
 </script>
 </body>

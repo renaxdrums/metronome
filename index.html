@@ -1617,6 +1617,31 @@ html#renaxApp[data-theme=light] #tapBtn>span:first-child{justify-content:center;
  html#renaxApp[data-theme=light] .workspace-controls-grid .control-group:first-child{padding-right:126px}
 }
 
+
+/* Final light contrast and state hierarchy across training and rhythm cards. */
+html#renaxApp[data-theme=light] body .training-section :is(.row-label,.training-row>span,.training-curve-row),
+html#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label){
+ color:#52616d!important;opacity:1!important;font-size:11px!important;font-weight:600;letter-spacing:.1px!important;text-transform:none!important;
+}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button{
+ background:#fff!important;border:1px solid #bac8d1!important;color:#344957!important;box-shadow:none!important;font-size:11px!important;
+}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button[aria-selected=true]{
+ background:#d8edf1!important;border-color:#087c90!important;color:#075c6d!important;font-weight:700!important;box-shadow:inset 0 -3px #087c90!important;
+}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button[aria-selected=true] svg{stroke:#087c90!important}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button:not([aria-selected=true]) svg{stroke:#667b89!important}
+html#renaxApp[data-theme=light] body .silent-section{border-color:#cbd3da!important}
+html#renaxApp[data-theme=light] body .silent-settings.disabled{opacity:1!important}
+html#renaxApp[data-theme=light] body .silent-settings.disabled :is(select,.numbox-button){background:#eef1f3!important;color:#687684!important;border-color:#cbd3da!important;opacity:1!important;box-shadow:none!important}
+html#renaxApp[data-theme=light] body .silent-settings.disabled .numbox-button::after{border-color:#687684!important}
+html#renaxApp[data-theme=light] body .silent-settings.disabled label{color:#687684!important;opacity:1!important}
+html#renaxApp[data-theme=light] body .measure-preview .preview-dot{width:6px;height:6px}
+html#renaxApp[data-theme=light] body .multi-preset-status,
+html#renaxApp[data-theme=light] body #songsRoot :is(.song-block-summary,.song-note,.song-playlist-summary){font-size:11px!important;color:#52616d!important;line-height:1.5}
+html#renaxApp[data-theme=light] body .training-section :is(.training-curve-menu button[aria-pressed=true],#dirToggle button.active){background:#d8edf1!important;color:#075c6d!important;border-color:#087c90!important;box-shadow:inset 0 -2px #087c90!important}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button:focus-visible{outline:2px solid #087c90;outline-offset:3px}
+
 </style>
 </head>
 <body>

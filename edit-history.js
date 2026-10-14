@@ -11,7 +11,9 @@
  const settings=['trainStart','trainEnd','trainDuration','trainDurationUnit','trainStep','trainInterval','trainIntervalUnit'];
  function snapshot(){const songs=window.RENAX_SONGS;return {mode:appMode,metro:clone(songs?.loaded?songs.loaded.previous:metronomeMeasures),poly:clone(polyrhythmMeasures),active:activeMeasureIndex,tempo,bank:currentBank,volume:masterVolume,silent:silentModeEnabled,clickMeasures,silentMeasures,direction:training.direction,training:window.RENAX_TRAINING?.editState,fields:Object.fromEntries(settings.map(id=>[id,document.getElementById(id)?.value])),library:songs?clone(songs.library):null,navigation:songs?.navigation};}
  function signature(s){const {active,navigation,tempo,...edit}=s;return JSON.stringify(edit);}
- let restoring=false,pending=null,baseline=snapshot();const history=[];
+ let restoring=false,pending=null,baseline=snapshot(),history=[];
+ const workspaceHistories=new Map();let workspace='metronome';
+ window.RENAX_EDIT_HISTORY={leaveWorkspace(){commit();workspaceHistories.set(workspace,history);},enterWorkspace(next){clearTimeout(pending);pending=null;workspace=next;history=workspaceHistories.get(next)||[];baseline=snapshot();sync();}};
  function sync(){undo.disabled=!history.length;undo.setAttribute('aria-disabled',String(undo.disabled));}
  function commit(){clearTimeout(pending);pending=null;if(restoring)return;const next=snapshot();if(signature(next)!==signature(baseline)){history.push(baseline);baseline=next;}else baseline=next;sync();}
  function queue(){if(restoring)return;clearTimeout(pending);pending=setTimeout(commit,200);}

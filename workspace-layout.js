@@ -29,6 +29,20 @@
  const trainIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2M12 9v4l3 2"/></svg>';
  const items=[['metronome','Métronome',nativeMode.querySelector('[data-mode="metronome"] svg').outerHTML],['polyrhythm','Polyrythmie',nativeMode.querySelector('[data-mode="polyrhythm"] svg').outerHTML],['training','Entraînement',trainIcon],['sequence','Séquenceur',multiTabs.querySelector('button:first-child svg').outerHTML],['multi','Multipiste',multiTabs.querySelector('button:last-child svg').outerHTML],['tracks','Track',document.querySelector('.song-tabs [data-pane="songs"] svg')?.outerHTML||'<svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/></svg>']];
  let page='metronome',changing=false;
+ // Each native workspace owns its musical model. The audio scheduler is reused.
+ const musicalStates=new Map();
+ const nativeWorkspaces=new Set(['metronome','training','sequence']);
+ const initialBank=currentBank;
+ function captureMusic(){return {measures:metronomeMeasures,index:activeMeasureIndex,bank:currentBank,silent:silentModeEnabled,click:clickMeasures,quiet:silentMeasures};}
+ musicalStates.set('metronome',captureMusic());
+ function restoreMusic(workspace){
+  let state=musicalStates.get(workspace);
+  if(!state){const m=createMeasure(4,4,120);m.beatSubdivisions=[1,1,1,1];m.beatStates=[[1],[1],[1],[1]];state={measures:[m],index:0,bank:initialBank,silent:false,click:3,quiet:1};musicalStates.set(workspace,state);}
+  metronomeMeasures=state.measures;measures=metronomeMeasures;activeMeasureIndex=Math.max(0,Math.min(state.index,measures.length-1));playingMeasureIndex=activeMeasureIndex;currentStepInMeasure=0;
+  currentBank=state.bank;soundBankSel.value=currentBank;syncNumbox(soundBankSel);
+  clickMeasures=state.click;silentMeasures=state.quiet;clickMeasureCountSel.value=String(clickMeasures);silentMeasureCountSel.value=String(silentMeasures);syncNumbox(clickMeasureCountSel);syncNumbox(silentMeasureCountSel);setSilentMode(state.silent);
+  measureCountSel.value=String(measures.length);closeBeatEditor();renderSequencerList();renderActiveMeasure();refreshMeasurePreviews();resetCustomizationTimer();
+ }
  const buttons=new Map();
  const controlOpenByWorkspace=new Map();let shownWorkspace=null,wasDesktop=desktop.matches;
  function rememberControls(){if(!desktop.matches&&shownWorkspace!==null)controlOpenByWorkspace.set(shownWorkspace,controls.open);}
@@ -56,13 +70,13 @@
  function sync(){if(changing)return;if(window.RENAX_MULTI?.active)page='multi';else if(!document.getElementById('songsRoot').hidden)page='tracks';else if(appMode==='polyrhythm')page='polyrhythm';else if(!['metronome','sequence','training'].includes(page))page='sequence';document.body.dataset.workspace=page;
   for(const [id,b] of buttons){const selected=id===page;b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1;}try{localStorage.setItem('renax.workspace.v1',page);}catch{}place();syncAdd();
  }
- function go(next){rememberControls();changing=true;try{
+ function go(next){if(next===page&&shownWorkspace!==null)return;rememberControls();window.RENAX_EDIT_HISTORY?.leaveWorkspace();stopMetronome();endTraining();if(nativeWorkspaces.has(page)&&!window.RENAX_MULTI?.active&&document.getElementById('songsRoot').hidden)musicalStates.set(page,captureMusic());changing=true;try{
   if(next==='tracks'){if(appMode!=='metronome')nativeMode.querySelector('[data-mode="metronome"]').click();songTabs.querySelector('[data-pane="songs"]').click();}
   else{if(window.RENAX_MULTI?.active&&next!=='multi')multiTabs.querySelector('button:first-child').click();
    if(!document.getElementById('songsRoot').hidden)songTabs.querySelector('[data-pane="sequence"]').click();
    if(next==='multi'){if(!window.RENAX_MULTI?.active)multiTabs.querySelector('button:last-child').click();}
    else if(appMode!==(next==='polyrhythm'?'polyrhythm':'metronome'))nativeMode.querySelector('[data-mode="'+(next==='polyrhythm'?'polyrhythm':'metronome')+'"]').click();
-  }page=next;if(next==='training'){silent.classList.remove('is-expanded');silentCollapse.setAttribute('aria-expanded','false');setSilentMode(false);}restoreControls(next);
+  }page=next;if(nativeWorkspaces.has(next))restoreMusic(next);if(next==='training'){silent.classList.remove('is-expanded');silentCollapse.setAttribute('aria-expanded','false');}restoreControls(next);window.RENAX_EDIT_HISTORY?.enterWorkspace(next);
   if(!desktop.matches)switchTab(next==='training'?'training':['sequence','multi','tracks'].includes(next)?'seq':'visu');
  }finally{changing=false;sync();requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});}}
  const observer=new MutationObserver(sync);observer.observe(songTabs,{subtree:true,attributes:true,attributeFilter:['aria-selected']});observer.observe(multiTabs,{subtree:true,attributes:true,attributeFilter:['aria-selected']});observer.observe(nativeMode,{subtree:true,attributes:true,attributeFilter:['class']});

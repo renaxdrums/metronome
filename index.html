@@ -3235,8 +3235,9 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
         const { beat, subIndex } = getBeatAndSub(m, sIdx);
         const state = m.beatStates[beat] ? m.beatStates[beat][subIndex] : 0;
         const isFirst = (sIdx === 0);
-        const effectiveTempo = getEffectiveTempo(m);
-        const beatDurationSec = getStepDurationMs(effectiveTempo, m.denominator, 1) / 1000;
+        const rampStep = !training.engaged ? window.RENAX_SONG_TEMPO?.liveStep?.(mIdx,beat,subIndex,m.beatSubdivisions[beat]||1) : null;
+        const effectiveTempo = rampStep?.tempo ?? getEffectiveTempo(m);
+        const beatDurationSec = rampStep?.beatSeconds ?? getStepDurationMs(effectiveTempo, m.denominator, 1) / 1000;
         const voiceGroupSize = getVoiceGroupSize(m);
         if (!window.RENAX_AMORCE?.step(nextNoteTime,state,isFirst,subIndex,beat) && state > 0 && isSilentCycleAudible()) {
           if(model.countIn)playCountIn(nextNoteTime,isFirst);else playClick(state, nextNoteTime, isFirst, {
@@ -3248,10 +3249,11 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
             beatDurationSec: beatDurationSec * voiceGroupSize
           });
         }
-        scheduleVisualUpdate(mIdx, sIdx, nextNoteTime, { beat, subIndex, voiceGroupSize, subdivisions: m.beatSubdivisions[beat], durationMs: getStepDurationMs(effectiveTempo, m.denominator, m.beatSubdivisions[beat]) });
-
         const subdiv = m.beatSubdivisions[beat] || 1;
-        nextNoteTime += getStepDurationMs(effectiveTempo, m.denominator, subdiv) / 1000;
+        const stepSeconds = rampStep?.seconds ?? getStepDurationMs(effectiveTempo, m.denominator, subdiv) / 1000;
+        scheduleVisualUpdate(mIdx, sIdx, nextNoteTime, { beat, subIndex, voiceGroupSize, subdivisions: m.beatSubdivisions[beat], durationMs: stepSeconds * 1000 });
+
+        nextNoteTime += stepSeconds;
 
         currentStepInMeasure++;
         if (currentStepInMeasure >= measureTotalSteps(m)) {
@@ -3980,8 +3982,9 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
 </script>
 <script src="sound-bank-menu.js?v=20261014-approved-order1"></script>
   <script src="local-backup.js?v=20261011-reload-view1"></script>
-  <script src="amorce-song.js?v=20261011-independent-voice1"></script>
-  <script src="songs-index2.js?v=20261013-block-count28"></script>
+  <script src="amorce-song.js?v=20261014-block-ramp1"></script>
+  <script src="song-tempo-ramp.js?v=20261014-block-ramp1"></script>
+  <script src="songs-index2.js?v=20261014-block-ramp1"></script>
   <script type="module" src="cloud-backup.js?v=20261012-choice1"></script>
   <script>
     // Index 2 : ouvrir les morceaux de la playlist avec les sections repliées.
@@ -4001,8 +4004,8 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
       }, true);
     })();
   </script>
-  <script src="midi-export.js?v=20261007-midi"></script>
-  <script src="song-export.js?v=20261013-mobile-download1"></script>
+  <script src="midi-export.js?v=20261014-block-ramp1"></script>
+  <script src="song-export.js?v=20261014-block-ramp1"></script>
 
   <script>
   (() => {

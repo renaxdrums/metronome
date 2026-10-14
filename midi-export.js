@@ -19,9 +19,15 @@
       for(let bar=0;bar<section.count;bar++)for(let beat=0;beat<m.numerator;beat++){
         const count=m.beatSubdivisions[beat];
         for(let sub=0;sub<count;sub++){
+          const at=Math.round(sectionStart+(bar*m.numerator+beat+sub/count)*beatTicks);
+          if(RENAX_SONG_TEMPO.active(section)){
+            const stepSeconds=RENAX_SONG_TEMPO.stepDuration(section,bar,beat,sub,count);
+            const microTempo=Math.round(stepSeconds*1000000/(4/m.denominator/count));
+            if(microTempo>0xffffff||microTempo<1)throw Error('Tempo trop lent pour cet export MIDI.');
+            meta(at,0x51,[microTempo>>>16&255,microTempo>>>8&255,microTempo&255]);
+          }
           const state=m.beatStates[beat][sub];if(!state)continue;
           if(++notes>1000000)throw Error('Morceau trop long pour cet export MIDI.');
-          const at=Math.round(sectionStart+(bar*m.numerator+beat+sub/count)*beatTicks);
           const end=Math.min(Math.round(sectionStart+(bar*m.numerator+beat+(sub+1)/count)*beatTicks),at+Math.max(1,Math.min(60,Math.round(beatTicks/count/2))));
           const velocity=[0,64,96,127][state];
           events.push({at,order:2,data:[0x99,37,velocity]},{at:end,order:1,data:[0x89,37,0]});

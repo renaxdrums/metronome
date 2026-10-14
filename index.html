@@ -1643,7 +1643,7 @@ html#renaxApp[data-theme=light] body .training-section :is(.training-curve-menu 
 html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button:focus-visible{outline:2px solid #087c90;outline-offset:3px}
 
 </style>
-<style id="light-readability20">html#renaxApp[data-theme=light] .beat-divider{background:#8396a3!important}html#renaxApp[data-theme=light] .poly-ring.outer{border-color:#d88c55!important}html#renaxApp[data-theme=light] .poly-ring.inner{border-color:#61adba!important}html#renaxApp[data-theme=light] .subdivision-dot{min-width:5px;min-height:5px}html#renaxApp[data-theme=light] .legend{color:#52616d!important;font-size:12px!important}html#renaxApp[data-theme=light] button:focus-visible,html#renaxApp[data-theme=light] [role=button]:focus-visible{outline:2px solid #087c90;outline-offset:3px}@media(min-width:1101px){.panel-visu .visu-toolbar{min-height:86px;box-sizing:border-box}.panel-visu .sequencer-wrapper{overflow:clip}}</style></head>
+<style id="light-readability20">html#renaxApp[data-theme=light] .beat-divider{background:#667d8c!important}html#renaxApp[data-theme=light] .poly-ring.outer{border-color:#d88c55!important}html#renaxApp[data-theme=light] .poly-ring.inner{border-color:#61adba!important}html#renaxApp[data-theme=light] .subdivision-dot{min-width:5px;min-height:5px}html#renaxApp[data-theme=light] .legend{color:#52616d!important;font-size:12px!important}html#renaxApp[data-theme=light] button:focus-visible,html#renaxApp[data-theme=light] [role=button]:focus-visible{outline:2px solid #087c90;outline-offset:3px}@media(min-width:1101px){.panel-visu .visu-toolbar{min-height:86px;box-sizing:border-box}.panel-visu .sequencer-wrapper{overflow:clip}}</style></head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
 <div class="console-arrival-lines" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -1899,7 +1899,7 @@ html#renaxApp[data-theme=light] body .training-section .training-mode-tabs butto
         <label>Canal MIDI</label>
         <select disabled><option>À définir</option></select>
       </div>
-      <div class="index2-settings-note">Emplacement réservé à la future commande MIDI. Aucun comportement MIDI n'est ajouté dans index2 : le moteur actuel reste inchangé.</div>
+      <div class="index2-settings-note">Le déclenchement MIDI sera disponible dans une prochaine version.</div>
     </section>
 
     <section class="index2-settings-section">
@@ -1916,8 +1916,8 @@ html#renaxApp[data-theme=light] body .training-section .training-mode-tabs butto
     </section>
 
     <section class="index2-settings-section">
-      <h3>Principe de cette variante</h3>
-      <div class="index2-settings-note">Les commandes musicales restent dans l'espace de travail. Les options techniques et futures intégrations sont isolées ici pour réduire la charge visuelle.</div>
+      <h3>Utilisation</h3>
+      <div class="index2-settings-note">Sélectionne une mesure ou une piste pour modifier son rythme. Le crayon ouvre l’éditeur de partition ; la flèche annule la dernière modification.</div>
     </section>
   </aside>
 
@@ -4356,8 +4356,8 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
 <script src="multi-clock.js?v=20261012-multi5"></script>
-<script src="multi-metronome.js?v=20261014-text-audit18"></script>
-<script src="interface-language.js?v=20261014-block-ramp1"></script>
+<script src="multi-metronome.js?v=20261014-polish21"></script>
+<script src="interface-language.js?v=20261014-polish21"></script>
 <script src="workspace-layout.js?v=20261014-independent20"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=20261013-wave-lively19"></script>

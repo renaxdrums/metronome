@@ -16,9 +16,12 @@
  .sound-bank-cards .numbox-option:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
  `;document.head.append(style);
  function reorder(keys){const selected=select.value,options=[...select.options];options.sort((a,b)=>{const ai=keys.indexOf(a.value),bi=keys.indexOf(b.value);return(ai<0?999:ai)-(bi<0?999:bi)});for(const o of options)select.append(o);select.value=selected;numboxWidgets.get(select)?.rebuild();}
- // Ordre proposé à la première ouverture ; un ordre personnel enregistré reste prioritaire.
- reorder(['userMetroclic','userTicking','userDrumsticks','voiceMale','voiceFemale','userElectric','userViii','userWater']);
- try{const saved=JSON.parse(localStorage.getItem(storageKey)||'null');if(Array.isArray(saved))reorder(saved);}catch{}
+ // Conserver l'ordre validé des huit premiers sons, même si le navigateur a mémorisé un ancien tri.
+ // Les autres sons conservent leur ordre personnel éventuel, puis leur ordre existant.
+ const approvedOrder=['userMetroclic','userTicking','userDrumsticks','voiceMale','voiceFemale','userElectric','userViii','userWater'];
+ let savedOrder=null;
+ try{savedOrder=JSON.parse(localStorage.getItem(storageKey)||'null');}catch{}
+ reorder(Array.isArray(savedOrder)?[...approvedOrder,...savedOrder.filter(key=>!approvedOrder.includes(key))]:approvedOrder);
  function save(){const keys=[...list.querySelectorAll('.numbox-option')].map(x=>x.dataset.value);try{localStorage.setItem(storageKey,JSON.stringify(keys));}catch{}reorder(keys);}
  function icon(key){if(/tambourine/i.test(key))return '<circle cx="12" cy="12" r="8"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>';if(/hihat/i.test(key))return '<path d="M3 8q9-4 18 0M3 11q9-4 18 0M12 4v17M7 21h10"/>';if(/kick|snare/i.test(key))return '<ellipse cx="12" cy="7" rx="9" ry="4"/><path d="M3 7v10c0 5 18 5 18 0V7M7 11v7M17 11v7"/>';if(/voice/i.test(key))return '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>';if(/water/i.test(key))return '<path d="M12 2C9 7 5 10 5 14a7 7 0 0 0 14 0c0-4-4-7-7-12Z"/>';if(/stick|claves/i.test(key))return '<path d="m4 3 15 17M20 3 5 20M3 4l2-2M19 2l2 2"/>';if(/cowbell|cloche/i.test(key))return '<path d="M8 4h8l4 16H4L8 4ZM5 16h14"/>';if(/triangle/i.test(key))return '<path d="m11 3-9 17h20L13 4M18 13l-5 4"/>';return '<path d="M3 12h3l3-8 6 16 3-8h3"/>';}
  function decorate(){for(const item of list.querySelectorAll('.numbox-option')){if(item.dataset.bankCard)return;item.dataset.bankCard='1';const label=item.textContent;item.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+icon(item.dataset.value)+'</svg><span></span>';item.querySelector('span').textContent=label;item.title='Appuyer et glisser pour déplacer · Alt + flèche pour réordonner';item.setAttribute('aria-label',label);

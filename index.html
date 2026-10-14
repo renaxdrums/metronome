@@ -1439,6 +1439,52 @@ html[data-theme=light] #index2SettingsPanel :is(button,.numbox-button){backgroun
 html[data-theme=light] #index2SettingsPanel button[aria-pressed=true]{background:#bfdde4!important;border-color:var(--cyan)!important;color:#145c6d!important}
 html[data-theme=light] #index2SettingsPanel .index2-settings-note{background:#e8edf2!important;color:#465969!important}
 html[data-theme=light] #index2SettingsPanel button:disabled{opacity:.65}
+/* Shared light surfaces, including controls created by late-loaded modules. */
+html[data-theme=light]{--muted:var(--text-muted);--card:#edf1f5;--card-selected:#e4f0f3;--card-selected-border:#74aab6;--light-surface:#edf1f5;--light-control:#d5dee7;--light-hover:#c8d6e2;--light-active:#bfdde4;--light-outline:#a5b6c6}
+html[data-theme=light] body :is(.numbox-menu,.numbox-dropdown,.sequence-more-actions,.multi-actions,.multi-modal,.backup-dialog){background:var(--light-surface)!important;color:var(--text)!important;border-color:var(--light-outline)!important;box-shadow:0 12px 28px #22334425!important}
+html[data-theme=light] body .sound-bank-cards .numbox-option{background:var(--light-control)!important;color:var(--text)!important;border-color:var(--light-outline)!important}
+html[data-theme=light] body .sound-bank-cards .numbox-option:hover{background:var(--light-hover)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body .sound-bank-cards .numbox-option.active{background:var(--light-active)!important;color:var(--cyan)!important;border-color:var(--orange)!important}
+html[data-theme=light] body :is(.sequence-more-actions,.multi-actions) button{color:var(--text)!important;background:transparent!important}
+html[data-theme=light] body :is(.sequence-more-actions,.multi-actions) button:hover{background:var(--light-hover)!important;color:var(--orange)!important}
+html[data-theme=light] body .score-tools-panel .rhythm-editor{background:#dce4ec!important;border-color:var(--light-outline)!important;scrollbar-color:var(--cyan) var(--light-control)!important}
+html[data-theme=light] body .rhythm-editor :is(button,select){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body .rhythm-editor button:not(:disabled):hover{background:var(--light-hover)!important;border-color:var(--orange)!important}
+html[data-theme=light] body .rhythm-editor button[aria-pressed=true]{background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body .score-editor-message[data-error=true],html[data-theme=light] body .backup-error{color:#a13c12!important}
+html[data-theme=light] body :is(.score-editor-title,.score-editor-message,.score-editor-hint,.song-hint,.song-status,.training-curve-row){color:var(--text-muted)!important}
+html[data-theme=light] body .training-section :is(.training-mode-tabs button,.training-curve-options button){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body .training-section :is(.training-mode-tabs button[aria-selected=true],.training-curve-options button[aria-pressed=true]){background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body :is(.silent-toggle,.multi-mode-tabs button,.multi-collapse,.multi-modal-actions button,.song-confirm-actions .btn){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body :is(.silent-toggle.active,.multi-mode-tabs button[aria-selected=true],.multi-modal-actions button:last-child){background:var(--light-active)!important;border-color:var(--cyan)!important;color:var(--cyan)!important}
+html[data-theme=light] body .song-confirm-actions .song-confirm-accept{color:var(--orange)!important;border-color:var(--orange)!important}
+html[data-theme=light] body :is(.step,.poly-dot)[data-state="2"],html[data-theme=light] body :is(.step,.poly-dot)[data-state="3"]{color:#fff!important}
+html[data-theme=light] body .step[data-state="2"] span,html[data-theme=light] body .step[data-state="3"] span{color:#fff!important}
+html[data-theme=light] body #beatEditor button[data-state="0"]{color:var(--text)!important}
+html[data-theme=light] body #beatEditor button:not([data-state="0"])[data-state]{color:#fff!important}
+html[data-theme=light] body .preview-dot[data-state="0"]{background:#bcc9d6!important}
+html[data-theme=light] body .song-tabs button{background:var(--light-control)!important;color:var(--text)!important;border-color:var(--light-outline)!important}
+html[data-theme=light] body .song-tabs button[aria-selected=true]{background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body #songsRoot :is(.song-section.measure-card,.song-count-in.measure-card,.song-section.measure-card:hover){background:var(--light-surface)!important;border-color:var(--light-outline)!important}
+html[data-theme=light] body #songsRoot :is(.song-section.active,.song-section.playing,.song-count-in.playing){background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body #songsRoot :is(.song-actions>.btn:not(.track-create):not(.song-back),.song-count-in-button,.song-block-body .song-actions .btn,.playlist-tools>.btn,.playlist-rename){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #songsRoot .song-count-in-button[aria-pressed=true]{background:var(--light-active)!important;border-color:var(--cyan)!important;color:var(--cyan)!important}
+html[data-theme=light] body #songsRoot :is(input[type=text],.song-inline-field .numbox-button){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #songsRoot .song-playlist-summary{color:var(--text-muted)!important}
+html[data-theme=light] body #songsRoot :is(.backup-profile,.backup-json,#backupAccount){background:#dce4ec!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #songsRoot #profilePane .btn,html[data-theme=light] body #directAccountDialog .btn{background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #songsRoot #profilePane .btn:hover,html[data-theme=light] body #directAccountDialog .btn:hover{background:var(--light-hover)!important}
+html[data-theme=light] body #mp3ExportDialog :is(select,.numbox-button){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #mp3ExportDialog .mp3-actions .btn{background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #mp3ExportDialog .mp3-actions #mp3ExportSave,html[data-theme=light] body #mp3ExportDownload:not([hidden]){background:var(--light-active)!important;border-color:var(--cyan)!important;color:var(--cyan)!important}
+html[data-theme=light] body #workspaceMobileViews button{background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #workspaceMobileViews button[aria-pressed=true]{background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body #index2SettingsPanel{color-scheme:light}
+html[data-theme=light],html[data-theme=light] body,html[data-theme=light] body *{scrollbar-color:var(--cyan) var(--light-control)!important}
+html[data-theme=light] body *::-webkit-scrollbar-track,html[data-theme=light] body *::-webkit-scrollbar-corner{background:var(--light-control)!important}
+html[data-theme=light] body *::-webkit-scrollbar-thumb{background:var(--cyan)!important;border-color:var(--light-control)!important}
+html[data-theme=light] body button:disabled{cursor:not-allowed}
+
 </style>
 </head>
 <body>

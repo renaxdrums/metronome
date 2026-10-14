@@ -11,7 +11,8 @@
     m.countIn=true;m.beatSubdivisions=Array(c.numerator).fill(1);m.beatStates=Array.from({length:c.numerator},()=>[1]);
     return [{id:'count-in:'+song.id,label:'Décompte',count:c.count,measure:m},...song.sections];
   }
-  function durationText(song){const seconds=Math.round(playbackSections(song).reduce((total,section)=>total+section.count*section.measure.numerator*(4/section.measure.denominator)*60/section.measure.tempo,0));return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');}
+  function durationText(song){const seconds=Math.round(playbackSections(song).reduce((total,section)=>total+RENAX_SONG_TEMPO.duration(section),0));return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');}
+  const tempoDescription=section=>RENAX_SONG_TEMPO.active(section)?section.measure.tempo+' → '+section.tempoRamp.endTempo:String(section.measure.tempo);
   const blankSection=()=>({id:id(),label:'Couplet 1',count:4,measure:createMeasure(4,4,120)});
   const blankSong=()=>({id:id(),name:'Nouveau track',sections:[blankSection()]});
   const defaultLibrary=()=>({version:1,activeProfile:null,profiles:[{id:id(),name:'Mon profil',songs:[]}]});
@@ -31,6 +32,7 @@
         for(const section of song.sections) {
           const m=section.measure;
           if(typeof section.label!=='string'||!Number.isSafeInteger(section.count)||section.count<1||!m||!Number.isInteger(m.numerator)||m.numerator<1||m.numerator>20||![2,4,8,16,32].includes(m.denominator)||!Number.isFinite(m.tempo)||m.tempo<2||m.tempo>999)throw Error('Section incorrecte.');
+          if(section.tempoRamp?.enabled&&(!Number.isFinite(section.tempoRamp.endTempo)||section.tempoRamp.endTempo<=m.tempo||section.tempoRamp.endTempo>999))throw Error('Accélération du bloc incorrecte.');
           if(!Array.isArray(m.beatSubdivisions)||m.beatSubdivisions.length!==m.numerator||!Array.isArray(m.beatStates)||m.beatStates.length!==m.numerator)throw Error('Subdivisions incorrectes.');
           m.beatSubdivisions.forEach((n,b)=>{if(!allowedSubdivisions(m.denominator).includes(n)||!Array.isArray(m.beatStates[b])||m.beatStates[b].length!==n||m.beatStates[b].some(s=>![0,1,2,3].includes(s)))throw Error('Clic incorrect.');});
           total+=section.count;if(!Number.isSafeInteger(total))throw Error('Nombre de mesures trop grand.');
@@ -133,6 +135,15 @@
   function changed(){unload();resetCustomizationTimer();persist();render();}
   function unload(){if(!loaded)return;saveLoadedPattern();stopMetronome();clearTimeout(endTimer);const previous=loaded.previous;loaded=null;measures=previous;metronomeMeasures=previous;activeMeasureIndex=0;playingMeasureIndex=0;currentStepInMeasure=0;measureCountSel.value=String(measures.length);renderSequencerList();renderActiveMeasure();updatePosition();}
   function locate(index){let start=0;for(let i=0;i<loaded.song.sections.length;i++){const s=loaded.song.sections[i];if(index<start+s.count)return {section:s,index:i,start,bar:index-start+1};start+=s.count;}return null;}
+  RENAX_SONG_TEMPO.liveStep=(measureIndex,beat,subIndex,subdivisions)=>{
+    if(!loaded)return null;
+    const position=locate(measureIndex),section=position?.section;
+    if(!section||!RENAX_SONG_TEMPO.active(section))return null;
+    const bar=position.bar-1,pulse=bar*section.measure.numerator+beat;
+    return {tempo:RENAX_SONG_TEMPO.tempoAt(section,pulse+subIndex/subdivisions),
+      seconds:RENAX_SONG_TEMPO.stepDuration(section,bar,beat,subIndex,subdivisions),
+      beatSeconds:RENAX_SONG_TEMPO.stepDuration(section,bar,beat,0,1)};
+  };
   function loadSong(sectionId=null,amorcePlan=null){const s=song();if(!s||sectionId&&!s.sections.some(section=>section.id===sectionId))return;unload();stopMetronome();endTraining();if(appMode!=='metronome')setAppMode('metronome');setSilentMode(false);resetCustomizationTimer();const previous=metronomeMeasures;const snapshot=clone(s);snapshot.sections=sectionId?snapshot.sections.filter(section=>section.id===sectionId):(amorcePlan?amorcePlan.sections:playbackSections(snapshot));loaded={song:snapshot,previous,preview:!!sectionId,total:snapshot.sections.reduce((n,s)=>n+s.count,0)};
     // Repeat section templates lazily: no array of every bar and no eight-bar limit.
     measures=new Proxy([], {get(target,key){if(key==='length')return loaded.total;if(key==='indexOf')return m=>{if(locate(activeMeasureIndex)?.section.measure===m)return activeMeasureIndex;let n=0;for(const s of loaded.song.sections){if(s.measure===m)return n;n+=s.count;}return -1;};if(typeof key==='string'&&/^\d+$/.test(key))return locate(Number(key))?.section.measure;return Reflect.get(target,key);}});
@@ -245,7 +256,7 @@
       const section=current.sections.find(s=>s.id===card.dataset.sectionId);if(!section)return;
       card.querySelector('.measure-sig').textContent=section.measure.numerator+'/'+section.measure.denominator;
       const countLabel=card.querySelector('.song-block-count');if(countLabel){countLabel.textContent=section.count+' M';countLabel.setAttribute('aria-label',section.count+' mesures');}
-      card.querySelector('.song-block-summary').firstChild.textContent=section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+section.measure.tempo+' BPM';
+      card.querySelector('.song-block-summary').firstChild.textContent=section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+tempoDescription(section)+' BPM';
       const preview=card.querySelector('.measure-preview'),previewKey=JSON.stringify(section.measure.beatStates);
       if(preview.dataset.pattern!==previewKey){preview.dataset.pattern=previewKey;preview.replaceChildren();
         for(const states of section.measure.beatStates){const group=el('div',undefined,preview,'preview-beat');for(const state of states)el('span',undefined,group,'preview-dot').dataset.state=state;}
@@ -443,7 +454,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         el('span',item.name,open,'measure-num');
         const meters=[...new Set(item.sections.map(s=>s.measure.numerator+'/'+s.measure.denominator))];
         const signature=el('span',meters.length===1?meters[0]:'Mixte',open,'measure-sig');signature.title=meters.join(' · ');
-        const tempos=item.sections.map(s=>s.measure.tempo),min=Math.min(...tempos),max=Math.max(...tempos);
+        const tempos=item.sections.flatMap(s=>RENAX_SONG_TEMPO.active(s)?[s.measure.tempo,s.tempoRamp.endTempo]:[s.measure.tempo]),min=Math.min(...tempos),max=Math.max(...tempos);
         const tempoRow=el('div',undefined,row,'measure-tempo-row');el('span','TEMPO',tempoRow,'measure-tempo-label');el('span',min===max?String(min):min+'–'+max,tempoRow,'song-tempo-value');el('span','BPM',tempoRow,'measure-tempo-unit');
         el('p',item.sections.length+' sections · '+item.sections.reduce((n,s)=>n+s.count,0)+' mesures · '+durationText(item),row,'song-playlist-summary');
         const preview=el('div',undefined,row,'measure-preview');preview.title='Début du morceau';for(const states of item.sections[0].measure.beatStates){const group=el('div',undefined,preview,'preview-beat');for(const state of states)el('span',undefined,group,'preview-dot').dataset.state=state;}
@@ -487,7 +498,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const title=el('span',section.label||'Bloc '+(i+1),head,'measure-num');
         const countLabel=el('span',section.count+' M',head,'song-block-count');countLabel.style.cssText='margin-left:auto;white-space:nowrap;font-size:11px;color:var(--muted)';countLabel.setAttribute('aria-label',section.count+' mesures');
         el('span',section.measure.numerator+'/'+section.measure.denominator,head,'measure-sig');
-        const summary=el('div',section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+section.measure.tempo+' BPM',card,'song-block-summary');
+        const summary=el('div',section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+tempoDescription(section)+' BPM',card,'song-block-summary');
         const body=el('div',undefined,card,'song-block-body');body.id='song-block-'+section.id;head.setAttribute('aria-controls',body.id);
         const choose=(showVisualizer=true)=>{setSectionOpen(section.id);loadSong();activeMeasureIndex=countInBars(s)+s.sections.slice(0,i).reduce((n,s)=>n+s.count,0);renderActiveMeasure();if(showVisualizer&&window.innerWidth<=1100)switchTab('visu');};
         head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')e.stopPropagation();});
@@ -496,7 +507,24 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const label=field('Libellé',body,section.label,value=>{section.label=value.trim()||'Section '+(i+1);changed();if(s.amorce)RENAX_AMORCE.prepare(s).catch(error=>status(error.message));});label.setAttribute('list','songLabels');
         if(s.amorce){const langs=el('div',undefined,body,'amorce-languages');for(const language of ['fr','en']){const b=button(language.toUpperCase(),langs,()=>{if(i===0){const previous=s.amorceDefaultLanguage||'fr';s.amorceDefaultLanguage=language;s.amorceLanguageChosen=true;for(const block of s.sections){if(block===section||(!block.amorceLanguageOverride&&(!block.amorceLanguage||block.amorceLanguage===previous)))block.amorceLanguage=language;}}else{section.amorceLanguage=language;section.amorceLanguageOverride=true;}changed();RENAX_AMORCE.prepare(s).catch(error=>status(error.message));});b.setAttribute('aria-pressed',String((section.amorceLanguage||'fr')===language));if((section.amorceLanguage||'fr')===language){b.style.color='var(--orange)';b.style.borderColor='var(--orange)';}b.setAttribute('aria-label',language.toUpperCase()+' pour '+section.label);}}label.addEventListener('input',()=>{section.label=label.value.trim()||'Bloc '+(i+1);title.textContent=section.label;persist();});
         const fields=el('div',undefined,body,'song-block-controls');const count=songNumbox('Mesures',fields,section.count,(value,input)=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1){input.value=section.count;return;}const total=s.sections.reduce((n,x)=>n+(x===section?0:x.count),0)+n;if(!Number.isSafeInteger(total)){input.value=section.count;return;}section.count=n;changed();},Array.from({length:64},(_,i)=>i+1));
-        const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999){input.value=section.measure.tempo;return;}if(section.measure.tempo===n){input.value=String(n);return;}unload();section.measure.tempo=n;resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';
+        const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999||section.tempoRamp?.enabled&&n>=section.tempoRamp.endTempo){input.value=section.measure.tempo;if(section.tempoRamp?.enabled&&n>=section.tempoRamp.endTempo)status('Le tempo de départ doit rester inférieur au tempo d’arrivée.');return;}if(section.measure.tempo===n){input.value=String(n);return;}unload();section.measure.tempo=n;resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';
+        const rampControls=el('div',undefined,body,'song-ramp-controls');
+        const rampLabel=el('label',undefined,rampControls,'song-ramp-toggle');
+        const rampToggle=el('input',undefined,rampLabel);rampToggle.type='checkbox';rampToggle.checked=!!section.tempoRamp?.enabled;rampToggle.disabled=section.measure.tempo>=999;
+        el('span','Accélération progressive',rampLabel);
+        rampToggle.addEventListener('change',()=>{
+          if(rampToggle.checked){const previous=section.tempoRamp?.endTempo;section.tempoRamp={enabled:true,endTempo:previous>section.measure.tempo?previous:Math.min(999,section.measure.tempo+20)};}
+          else section.tempoRamp={...section.tempoRamp,enabled:false};
+          changed();
+        });
+        if(section.tempoRamp?.enabled){
+          const arrival=songNumbox('Arrivée (BPM)',rampControls,section.tempoRamp.endTempo,(v,input)=>{
+            const n=Number(v);
+            if(!Number.isFinite(n)||n<=section.measure.tempo||n>999){input.value=section.tempoRamp.endTempo;status('Le tempo d’arrivée doit être supérieur au tempo de départ.');return;}
+            section.tempoRamp.endTempo=n;changed();
+          },Array.from({length:998},(_,i)=>i+2));
+          arrival.closest('label').classList.add('song-ramp-target');
+        }
         const preview=el('div',undefined,body,'measure-preview');
         for(let b=0;b<section.measure.numerator;b++){const group=el('div',undefined,preview,'preview-beat');for(const state of section.measure.beatStates[b])el('span',undefined,group,'preview-dot').dataset.state=state;}
         preview.dataset.pattern=JSON.stringify(section.measure.beatStates);

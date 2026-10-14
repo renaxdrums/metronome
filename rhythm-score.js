@@ -4,7 +4,7 @@
  const viewSwitch=document.getElementById("scoreViewSwitch");wrapper.prepend(viewSwitch);
  for(const button of [metronomeButton,partitionButton]){for(const node of [...button.childNodes])if(node.nodeType===Node.TEXT_NODE)node.remove();button.title=button.getAttribute("aria-label");}
  const host=document.createElement('div');host.className='rhythm-score';host.id='rhythmScore';host.setAttribute('role','img');host.setAttribute('aria-label','Partition rythmique, police Bravura');wrapper.append(host);
- let enabled=false,loading,Flow,core,lastKey='',notes=new Map(),cues=[],active=[],frame=0,redraw=0,pulseAnchors=[],pulseBeat=0,pulseLineY=0;
+ let enabled=false,loading,Flow,core,lastKey='',notes=new Map(),cues=[],active=[],frame=0,redraw=0,pulseAnchors=[],pulseBeat=0,pulseLineY=0,fitWidth=0,scoreCropY=0;
  const status=text=>{host.replaceChildren();const p=document.createElement('div');p.className='rhythm-score-status';p.textContent=text;host.append(p);};
  async function load(){if(!loading)loading=Promise.all([import('./rhythm-editor-core.mjs?v=20261010-paired-groups1'),new Promise((resolve,reject)=>{if(window.Vex)return resolve();const script=document.createElement('script');script.src='vendor/vexflow-bravura-4.2.5.js';script.onload=resolve;script.onerror=()=>{script.remove();reject(new Error('Impossible de charger la partition. Réessaie avec Partition.'));};document.head.append(script);})]).then(([module])=>{core=module;Flow=window.Vex.Flow||window.Vex;Flow.setMusicFont('Bravura');}).catch(error=>{loading=null;throw error;});return loading;}
 
@@ -55,7 +55,15 @@
    return sum+child.offsetHeight+(parseFloat(css.marginTop)||0)+(parseFloat(css.marginBottom)||0);
   },0);
   const remaining=wrapper.clientHeight-(toolsPanel.offsetHeight+10)-wrapperPadding-hostPadding-svgSpacing-otherHeight-8;
-  if(remaining>64)scale=Math.min(scale,remaining/h);
+  if(remaining>64){
+   const heightScale=remaining/h;
+   const wanted=Math.ceil(availableWidth/heightScale);
+   // Spread the staff in VexFlow coordinates instead of squeezing the entire
+   // drawing into a narrow centered strip when the panel is shallow.
+   const nextWidth=Math.max(Math.floor(host.clientWidth-10),wanted);
+   if(Math.abs(nextWidth-fitWidth)>2){fitWidth=nextWidth;lastKey='';refresh();}
+   scale=Math.min(scale,heightScale);
+  }
   if(!Number.isFinite(scale)||scale<=0)return;
   svg.style.width=(w*scale)+'px';
   svg.style.height=(h*scale)+'px';
@@ -68,7 +76,7 @@
  const burstCanvas=document.createElement('canvas'),burstRatio=Math.min(2,window.devicePixelRatio||1);burstCanvas.width=90*burstRatio;burstCanvas.height=70*burstRatio;burstCanvas.setAttribute('aria-hidden','true');pulse.prepend(burstCanvas);const burstContext=burstCanvas.getContext('2d');burstContext.scale(burstRatio,burstRatio);
  function clearBurst(){pulseMotion?.cancel();pulseMotion=null;cancelAnimationFrame(burstFrame);burstFrame=0;burstParticles=[];burstContext.clearRect(0,0,90,70);}
  function drawBurst(now){burstFrame=0;burstContext.clearRect(0,0,90,70);for(const p of burstParticles){const t=Math.min(1,(now-p.start)/p.duration),travel=1-Math.pow(1-t,3);if(t<1){burstContext.globalAlpha=.55*Math.pow(1-t,2);burstContext.fillStyle='#000';burstContext.beginPath();burstContext.arc(45+Math.cos(p.angle)*p.distance*travel,35+Math.sin(p.angle)*p.distance*travel,p.size*(1-.35*t),0,Math.PI*2);burstContext.fill();}}burstParticles=burstParticles.filter(p=>now-p.start<p.duration);burstContext.globalAlpha=1;if(burstParticles.length)burstFrame=requestAnimationFrame(drawBurst);}
- function positionPulse(beat=pulseBeat){pulseBeat=beat;const svg=host.querySelector('svg');if(!svg||!pulseAnchors.length)return;const next=pulseAnchors.find(a=>a.beat>beat),previous=[...pulseAnchors].reverse().find(a=>a.beat<=beat)||pulseAnchors[0];const x=next?previous.x+(next.x-previous.x)*(beat-previous.beat)/(next.beat-previous.beat):previous.x;const bounds=svg.getBoundingClientRect(),container=host.getBoundingClientRect(),scale=bounds.width/Number(svg.getAttribute('width'));pulse.style.marginLeft=(bounds.left-container.left+host.scrollLeft-host.clientLeft-parseFloat(getComputedStyle(host).paddingLeft)+x*scale-35)+'px';pulse.style.transform='translateY('+(pulseLineY*scale+14-bounds.height-17)+'px)';pulse.dataset.beat=String(beat);}
+ function positionPulse(beat=pulseBeat){pulseBeat=beat;const svg=host.querySelector('svg');if(!svg||!pulseAnchors.length)return;const next=pulseAnchors.find(a=>a.beat>beat),previous=[...pulseAnchors].reverse().find(a=>a.beat<=beat)||pulseAnchors[0];const x=next?previous.x+(next.x-previous.x)*(beat-previous.beat)/(next.beat-previous.beat):previous.x;const bounds=svg.getBoundingClientRect(),container=host.getBoundingClientRect(),scale=bounds.width/Number(svg.getAttribute('width'));pulse.style.marginLeft=(bounds.left-container.left+host.scrollLeft-host.clientLeft-parseFloat(getComputedStyle(host).paddingLeft)+x*scale-35)+'px';pulse.style.transform='translateY('+((pulseLineY-scoreCropY)*scale+14-bounds.height-17)+'px)';pulse.dataset.beat=String(beat);}
  function pulseNow(beat){const m=measures[activeMeasureIndex],groups=m.denominator>=8&&m.numerator%3===0?Array(m.numerator/3).fill(3):m.denominator>=8&&m.numerator>=5&&m.numerator%2?[...Array((m.numerator-3)/2).fill(2),3]:Array(m.numerator).fill(1);let startBeat=0,units=1;for(const group of groups){if(startBeat===beat){units=group;break;}startBeat+=group;}const fadeMs=Math.min(650,getStepDurationMs(getEffectiveTempo(m),m.denominator,1)*units*.95);pulse.style.setProperty('--pulse-fade-duration',fadeMs+'ms');const previousBeat=pulseBeat,previousX=parseFloat(pulse.style.marginLeft);clearBurst();positionPulse(beat);const targetX=parseFloat(pulse.style.marginLeft);if(beat>previousBeat&&Number.isFinite(previousX)&&!matchMedia('(prefers-reduced-motion:reduce)').matches)pulseMotion=pulse.animate([{transform:pulse.style.transform+' translateX('+(previousX-targetX)+'px)'},{transform:pulse.style.transform}],{duration:Math.min(140,fadeMs*.4),easing:'cubic-bezier(.16,1,.3,1)'});pulse.classList.remove('pulsing');void pulse.offsetWidth;pulse.classList.add('pulsing');if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const start=performance.now();for(let i=0;i<12;i++)burstParticles.push({angle:Math.PI*2*(i+Math.random()*.5)/12,distance:7+Math.random()*11,size:.45+Math.random()*.4,start,duration:380+Math.random()*240});burstFrame=requestAnimationFrame(drawBurst);}
 
 
@@ -78,10 +86,10 @@
  function draw(){
   if(!enabled||!Flow)return;const measure=measures[activeMeasureIndex];if(!measure)return;
   const width=Math.floor(host.clientWidth-10);if(width<100)return;
-  const key=JSON.stringify([appMode,activeMeasureIndex,width,measure.numerator,measure.denominator,measure.beatSubdivisions,measure.beatStates,measure.outerStates,measure.innerStates,measure.rhythmEditor,editing,selected,isPlaying]);if(key===lastKey)return;lastKey=key;const continuing=active.map(item=>({key:item.key,end:item.end}));clearHeads();notes=new Map();pulseAnchors=[];pulse.classList.remove('pulsing');host.replaceChildren();
+  const key=JSON.stringify([appMode,activeMeasureIndex,width,fitWidth,measure.numerator,measure.denominator,measure.beatSubdivisions,measure.beatStates,measure.outerStates,measure.innerStates,measure.rhythmEditor,editing,selected,isPlaying]);if(key===lastKey)return;lastKey=key;const continuing=active.map(item=>({key:item.key,end:item.end}));clearHeads();notes=new Map();pulseAnchors=[];pulse.classList.remove('pulsing');host.replaceChildren();
   try{
    const poly=appMode==='polyrhythm',beats=poly?null:core.spell(measure,core.editorModel(measure)),rows=poly?[null]:[beats];
-   const renderWidth=poly?Math.max(width,Math.max(measure.numerator,measure.denominator)*30+100):Math.max(width,...rows.map(row=>row.reduce((sum,b)=>sum+Math.max(46,b.count*25+12),84)));
+   const renderWidth=poly?Math.max(width,fitWidth,Math.max(measure.numerator,measure.denominator)*30+100):Math.max(width,fitWidth,...rows.map(row=>row.reduce((sum,b)=>sum+Math.max(46,b.count*25+12),84)));
    const height=poly?270:rows.length*140+18,renderer=new Flow.Renderer(host,Flow.Renderer.Backends.SVG);renderer.resize(renderWidth,height);const svg=host.querySelector('svg');svg.style.width='100%';svg.style.height='auto';const context=renderer.getContext();context.setFillStyle('#111').setStrokeStyle('#111');
    rows.forEach((row,rowIndex)=>{
     const voices=[],tuplets=[],beams=[];const stave=new Flow.Stave(2,18+rowIndex*140,renderWidth-4);stave.addClef('percussion');if(rowIndex===0)stave.addTimeSignature(`${measure.numerator}/${poly?4:measure.denominator}`);if(!poly&&rowIndex<rows.length-1)stave.setEndBarType(Flow.Barline.type.NONE);stave.setContext(context).draw();if(!poly)pulseLineY=stave.getYForLine(4);
@@ -103,6 +111,10 @@
      const headBounds=element?.querySelector('.vf-notehead')?.getBBox();pulseAnchors.push({beat:piece.start,x:headBounds?headBounds.x+headBounds.width/2:note.getAbsoluteX()});const b=Math.floor(piece.start+1e-8),sub=Math.round((piece.start-b)*measure.beatSubdivisions[b]);remember(note,`${b}:${sub}`,piece.state);}
 
    });
+   // Crop renderer padding, keeping stems, tuplets and staff lines intact.
+   const ink=svg.getBBox();scoreCropY=Math.max(0,Math.floor(ink.y-12));
+   const inkHeight=Math.ceil(ink.y+ink.height+16-scoreCropY);
+   if(inkHeight>0){svg.setAttribute('viewBox','0 '+scoreCropY+' '+renderWidth+' '+inkHeight);svg.setAttribute('height',String(inkHeight));}
    if(appMode==='metronome'){pulseAnchors.push({beat:measure.numerator,x:renderWidth-12});host.append(pulse);}if(scoreLegend)host.append(scoreLegend);fitScore();host.dataset.font='Bravura';host.dataset.measure=String(activeMeasureIndex);host.dataset.noteCount=String(notes.size);
    for(const item of continuing){const note=notes.get(item.key);if(isPlaying&&note?.state&&item.end>audioCtx.currentTime){for(const head of note.heads)head.classList.add('score-active-head');active.push({...note,...item});}}
   }catch(error){lastKey='';status('La partition de ce rythme ne peut pas être affichée.');console.error('Rhythm score:',error);}

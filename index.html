@@ -8,6 +8,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png?v=20261013-app-icon18">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=20261013-app-icon18">
   <meta name="theme-color" content="#1c2127">
+  <script>/* Apply saved appearance before styles paint. */try{document.documentElement.dataset.theme=localStorage.getItem("renax.interfaceTheme.v1")==="light"?"light":"dark";}catch{document.documentElement.dataset.theme="dark";}</script>
   <meta name="apple-mobile-web-app-title" content="Renax Métronome">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1376,7 +1377,9 @@ body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!im
 @media(max-width:1100px){
   #multiControls > button.song-back{height:44px;min-height:44px;}
 }
-</style></head>
+</style>
+<link rel="stylesheet" href="interface-theme.css?v=20261014-light1">
+</head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
 <div class="console-arrival-lines" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -4081,6 +4084,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="multi-clock.js?v=20261012-multi5"></script>
 <script src="multi-metronome.js?v=20261014-track-solo6"></script>
 <script src="interface-language.js?v=20261012-workspaces8"></script>
+<script src="interface-theme.js?v=20261014-light1"></script>
 <script src="workspace-layout.js?v=20261013-replica-guard15"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=20261013-wave-lively19"></script>

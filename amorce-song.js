@@ -11,8 +11,8 @@
   out.connect(getVoiceMixDestination(audioCtx));
   renderVoiceCount('male',out,time,state,isFirst,context,guideVoice);
  }
- const key=s=>JSON.stringify([s.id,s.sections.map(b=>[b.label,b.amorceLanguage||'fr',b.count,b.measure]),s.countIn]);
- const load=()=>modules||(modules=Promise.all([import('./prototypes/amorce/neural-engine.mjs?v=20261010-label-fast1'),import('./prototypes/amorce/syllables.mjs'),import('./amorce-plan.mjs')]).catch(error=>{modules=null;throw error;}));
+ const key=s=>JSON.stringify([s.id,s.sections.map(b=>[b.label,b.amorceLanguage||'fr',b.count,b.measure,b.tempoRamp]),s.countIn]);
+ const load=()=>modules||(modules=Promise.all([import('./prototypes/amorce/neural-engine.mjs?v=20261010-label-fast1'),import('./prototypes/amorce/syllables.mjs'),import('./amorce-plan.mjs?v=20261014-block-ramp1')]).catch(error=>{modules=null;throw error;}));
  async function prepare(song){const k=key(song);if(plans.has(k))return plans.get(k);const snapshot=JSON.parse(JSON.stringify(song));
   const job=(async()=>{const [engine,syllables,planner]=await load();const speeches=await Promise.all(snapshot.sections.map(b=>engine.synthesize(b.label,b.amorceLanguage||'fr')));const candidates=speeches.map((s,i)=>syllables.lastSyllableCandidate(s.events,snapshot.sections[i].amorceLanguage||'fr'));return {...planner.planAmorce(snapshot,speeches,candidates),speeches,candidates};})();plans.set(k,job);job.catch(()=>plans.delete(k));if(plans.size>12)plans.delete(plans.keys().next().value);return job;
  }

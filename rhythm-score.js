@@ -16,7 +16,8 @@
  const pulse=document.createElement('div');pulse.className='score-pulse';pulse.hidden=true;pulse.setAttribute('aria-label','Pulsation');pulse.innerHTML='<span></span>';wrapper.append(pulse);
  const freeButton=document.createElement('button');freeButton.id='scoreFreeMeasureBtn';freeButton.type='button';freeButton.title='Mesure libre';freeButton.setAttribute('aria-label','Mesure libre');freeButton.setAttribute('aria-pressed','false');
  freeButton.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18M3 13h18M3 18h18M4 5v16M20 5v16M15 16V4"/><ellipse cx="12" cy="17" rx="3" ry="2" transform="rotate(-20 12 17)"/></svg>';
- document.getElementById('undoBtn').after(freeButton);
+ const mountFreeButton=()=>document.getElementById('undoBtn')?.after(freeButton);
+ if(document.getElementById('undoBtn'))mountFreeButton();else document.addEventListener('DOMContentLoaded',mountFreeButton,{once:true});
  function syncFreeButton(){const m=measures[activeMeasureIndex];freeButton.hidden=appMode!=='metronome';freeButton.setAttribute('aria-pressed',String(!!m?.rhythmEditor?.free));}
  freeButton.onclick=async()=>{try{await load();if(appMode!=='metronome')return;const m=measures[activeMeasureIndex];save(core.setFreeMeasure(m,!core.editorModel(m).free));syncFreeButton();}catch(error){console.error('Mesure libre:',error);}};
  syncFreeButton();

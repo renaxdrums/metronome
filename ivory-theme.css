@@ -65,8 +65,6 @@ html#renaxApp[data-theme=ivory] .step[data-state="0"] span{color:#c2d0cf!importa
 html#renaxApp[data-theme=ivory] .poly-ring.outer{border-color:#97d4a580!important}
 html#renaxApp[data-theme=ivory] .poly-ring.inner{border-color:#70d5df80!important}
 html#renaxApp[data-theme=ivory] .poly-dot{box-shadow:none!important}
-html#renaxApp[data-theme=ivory] .poly-dot.outer:not([data-state="0"]){background:#97d4a5!important}
-html#renaxApp[data-theme=ivory] .poly-dot.inner:not([data-state="0"]){background:#70d5df!important}
 html#renaxApp[data-theme=ivory] :is(.btn,.multi-add,.playlist-create,.track-create,.track-add-section,.appearance-options button){
  background:#295363!important;border-color:#557b85!important;color:var(--text)!important;box-shadow:none!important;
 }
@@ -213,3 +211,9 @@ html#renaxApp[data-theme=ivory] :is(.multi-preset-create,.sequence-add){text-tra
 }
 
 html#renaxApp[data-theme=ivory] footer :is(.footer-right, .footer-right span, .author-credit){color:#4e695f!important;font-size:10px!important}
+
+html#renaxApp[data-theme=ivory] .poly-dot[data-state="1"]{background:#70d5df!important;border-color:#70d5df!important}
+html#renaxApp[data-theme=ivory] .poly-dot[data-state="2"]{background:#97d4a5!important;border-color:#97d4a5!important}
+html#renaxApp[data-theme=ivory] .poly-dot[data-state="3"]{background:#e6d8b7!important;border-color:#e6d8b7!important}
+html#renaxApp[data-theme=ivory] .poly-ring.outer{border-color:#e6d8b780!important}
+html#renaxApp[data-theme=ivory] :is(.step.active,.poly-dot.active){outline:2px solid #f6f1e5;outline-offset:4px;box-shadow:0 0 0 6px #70d5df20!important}

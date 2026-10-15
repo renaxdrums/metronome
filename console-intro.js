@@ -2,7 +2,7 @@
 (() => {
  const overlay=document.getElementById('renaxArrival');if(!overlay)return;
  const preference='renax.arrival.enabled.v1',reduce=matchMedia('(prefers-reduced-motion:reduce)');
- let enabled=true,finished=false,frame,canvas,curtain,previous,replica,backdrop,replicaViewport=null;
+ let enabled=true,finished=false,frame,canvas,curtain,previous,replica,backdrop,replicaViewport=null,mirrorRefresh=0;
  const timeouts=[],animations=[];
  try{enabled=localStorage.getItem(preference)!=='false';}catch{}
  const word=overlay.querySelector('.console-arrival-word');
@@ -22,7 +22,7 @@
  const later=(callback,ms)=>{timeouts.push(setTimeout(()=>{if(!finished)callback();},ms));};
  function finish(){
   if(finished)return;
-  finished=true;timeouts.forEach(clearTimeout);cancelAnimationFrame(frame);
+  finished=true;timeouts.forEach(clearTimeout);cancelAnimationFrame(frame);cancelAnimationFrame(mirrorRefresh);
   animations.forEach(a=>{try{a.cancel();}catch{}});
   overlay.hidden=true;canvas?.remove();curtain?.remove();replica?.remove();backdrop?.remove();
   overlay.style.removeProperty('transform');overlay.style.removeProperty('opacity');
@@ -33,20 +33,24 @@
   return Array.from(document.body.children).filter(el=>
    el!==overlay&&el.matches('header,footer,.main-grid,#workspaceNav,#workspaceMobileViews,nav.mobile-tabs'));
  }
- function createReplica(){
-  if(replica)return;
-  // The mirror is a frozen frame: if the viewport changes, never keep showing
-  // geometry copied at the previous size over the newly responsive live page.
+ function createReplica(refresh=false){
+  // Keep the same animated replica element across fullscreen/orientation changes.
+  // Rebuild its visual children from the live responsive UI, without restarting
+  // the intro, its camera animation, or the fullscreen gesture.
+  if(replica&&!refresh)return;
   replicaViewport={width:innerWidth,height:innerHeight};
-  backdrop=document.createElement('div');backdrop.className='console-arrival-stage';backdrop.setAttribute('aria-hidden','true');
-  replica=document.createElement('div');replica.className='console-arrival-replica';
-  replica.setAttribute('aria-hidden','true');replica.setAttribute('data-no-translate','');replica.inert=true;
+  if(!replica){
+   backdrop=document.createElement('div');backdrop.className='console-arrival-stage';backdrop.setAttribute('aria-hidden','true');
+   replica=document.createElement('div');replica.className='console-arrival-replica';
+   replica.setAttribute('aria-hidden','true');replica.setAttribute('data-no-translate','');replica.inert=true;
+  }
   const style=getComputedStyle(document.body);
   replica.style.font=style.font;replica.style.color=style.color;
   replica.style.backgroundColor=style.backgroundColor;
   // Snapshot the EXACT rendered geometry, rather than asking the clone to
   // independently recompute a different flex layout. Responsive and future
   // UI changes automatically appear in the mirror on each new page load.
+  const newPieces=document.createDocumentFragment();
   for(const source of sceneNodes()){
    const rect=source.getBoundingClientRect();
    const copy=source.cloneNode(true);
@@ -77,17 +81,17 @@
     for(const attribute of [...node.attributes])if(/^on/i.test(attribute.name))node.removeAttribute(attribute.name);
     if(node.matches('a,button,input,select,textarea,[tabindex]'))node.tabIndex=-1;
    }
-   replica.append(copy);
+   newPieces.append(copy);
   }
-  document.body.append(backdrop,replica); // After the originals: original IDs remain the lookup targets.
-  // The replica starts translated below the screen. Measure it at its
-  // neutral final position, then restore the offscreen starting transform.
-  // Otherwise getBoundingClientRect includes a full viewport of offset.
-  replica.style.transform='none';
+  replica.replaceChildren(newPieces);
+  if(!replica.isConnected)document.body.append(backdrop,replica); // Keep native IDs as the document's first match.
+  // The FIRST measurement uses the neutral position; later refreshes keep
+  // the running Web Animations transform so the camera never jumps.
+  if(!refresh)replica.style.transform='none';
   try{
    synchronizeMirrorGeometry();
    syncReplicaCanvases();
-  }finally{replica.style.removeProperty('transform');}
+  }finally{if(!refresh)replica.style.removeProperty('transform');}
  }
  function synchronizeMirrorGeometry(){
   if(!replica)return;
@@ -112,7 +116,14 @@
    // Relocate any residual offset caused by flex/grid recomputation, without
    // changing the structure or listeners of the functional original.
    const cloneRect=copy.getBoundingClientRect();
-   const dx=rect.left-cloneRect.left,dy=rect.top-cloneRect.top;
+   const replicaRect=replica.getBoundingClientRect();
+   // Normalize the visual bounds back to the replica's untransformed
+   // coordinate space, including while its zoom/scroll WAAPI is running.
+   const sx=replicaRect.width/Math.max(1,replica.offsetWidth);
+   const sy=replicaRect.height/Math.max(1,replica.offsetHeight);
+   const cloneX=(cloneRect.left-replicaRect.left)/Math.max(.01,sx);
+   const cloneY=(cloneRect.top-replicaRect.top)/Math.max(.01,sy);
+   const dx=rect.left-cloneX,dy=rect.top-cloneY;
    if(Math.abs(dx)>.5||Math.abs(dy)>.5){
     copy.style.translate=dx.toFixed(2)+'px '+dy.toFixed(2)+'px';
    }
@@ -249,15 +260,24 @@
   if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}
  },true);
  window.addEventListener('pagehide',finish,{once:true});
- // A changed viewport invalidates the entrance replica. Hand control back to
- // the real live interface rather than showing an obsolete clone or black gap.
- // Ignore the small height variations of mobile browser address bars.
- window.addEventListener('resize',()=>{
-  if(finished||overlay.hidden||!replicaViewport)return;
-  const dx=Math.abs(innerWidth-replicaViewport.width);
-  const dy=Math.abs(innerHeight-replicaViewport.height);
-  if(dx>3||dy>(innerWidth<=1100?110:8))finish();
- });
+ // Fullscreen changes the viewport. Never call finish() here: doing so
+ // skips the approved camera pull-back and reveals the page immediately.
+ // Refresh only the mirror content on the next painted layout frame.
+ function refreshMirrorOnViewportChange(){
+  if(finished||overlay.hidden||!replica)return;
+  if(replicaViewport &&
+    Math.abs(innerWidth-replicaViewport.width)<2 &&
+    Math.abs(innerHeight-replicaViewport.height)<2)return;
+  cancelAnimationFrame(mirrorRefresh);
+  mirrorRefresh=requestAnimationFrame(()=>{
+   mirrorRefresh=0;
+   if(finished||overlay.hidden)return;
+   try{createReplica(true);}
+   catch(error){console.warn('[RENAX intro] Mirror resize refresh unavailable:',error);}
+  });
+ }
+ window.addEventListener('resize',refreshMirrorOnViewportChange);
+ document.addEventListener('fullscreenchange',()=>requestAnimationFrame(refreshMirrorOnViewportChange));
  reduce.addEventListener('change',()=>{if(reduce.matches)finish();});
  const settings=document.querySelector('#index2SettingsPanel .index2-settings-section');
  if(settings){

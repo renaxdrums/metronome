@@ -565,13 +565,13 @@ html#renaxApp#renaxApp[data-theme=ivory] body #tapBtn:hover{background:#285646!i
 html#renaxApp#renaxApp[data-theme=ivory] body #tapBtn :is(svg,.orange-ui-icon){
  color:var(--ivory-lime)!important;stroke:currentColor!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body :is(.song-back,button[aria-label^="Retour"],button[aria-label^="Back"],button[title^="Retour"],button[title^="Back"]){
+html#renaxApp#renaxApp[data-theme=ivory] body :is(#songsRoot #songPane .song-back,.song-back,button[aria-label^="Retour"],button[aria-label^="Back"],button[title^="Retour"],button[title^="Back"]){
  background:#173e37!important;color:var(--ivory-lime)!important;border-color:#345f51!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body :is(.song-back,button[aria-label^="Retour"],button[aria-label^="Back"],button[title^="Retour"],button[title^="Back"]):hover{
+html#renaxApp#renaxApp[data-theme=ivory] body :is(#songsRoot #songPane .song-back,.song-back,button[aria-label^="Retour"],button[aria-label^="Back"],button[title^="Retour"],button[title^="Back"]):hover{
  background:#285646!important;color:var(--ivory-lime)!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body :is(.song-back,button[aria-label^="Retour"],button[aria-label^="Back"],button[title^="Retour"],button[title^="Back"]) :is(svg,.orange-ui-icon){
+html#renaxApp#renaxApp[data-theme=ivory] body :is(#songsRoot #songPane .song-back,.song-back,button[aria-label^="Retour"],button[aria-label^="Back"],button[title^="Retour"],button[title^="Back"]) :is(svg,.orange-ui-icon){
  color:var(--ivory-lime)!important;stroke:currentColor!important;
 }
 html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields :is(.training-curve-select>summary,.training-curve-menu,.training-curve-menu button){

@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Apply before first paint. A system light preference never overrides the default. */
-(()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['light','ivory'].includes(saved))theme=saved;}catch{}document.documentElement.dataset.theme=theme;})();
+(()=>{let theme='ivory';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory'].includes(saved))theme=saved;}catch{}document.documentElement.dataset.theme=theme;})();
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png?v=20261013-app-icon18">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png?v=20261013-app-icon18">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png?v=20261013-app-icon18">
-  <meta name="theme-color" content="#1c2127">
+  <meta name="theme-color" content="#f3f0e4">
   <meta name="apple-mobile-web-app-title" content="Renax Métronome">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1681,6 +1681,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
 }
 </style>
 <link rel="stylesheet" href="ivory-theme.css?v=20261015-ivory33">
+<link rel="stylesheet" href="renax-pulse-ivory.css?v=20261015-ivorycitron1">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>

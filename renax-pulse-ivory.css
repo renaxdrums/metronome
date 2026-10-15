@@ -314,3 +314,9 @@ html#renaxApp[data-theme=ivory] body #songsRoot #songPane :is(button:disabled,bu
  background:#e4e7dd!important;color:#536153!important;border-color:#c8cec1!important;opacity:1!important;box-shadow:none!important;
 }
 html#renaxApp[data-theme=ivory] body #songsRoot #songPane button :is(svg,span,.orange-ui-icon){color:inherit!important;stroke:currentColor!important}
+
+html#renaxApp#renaxApp[data-theme=ivory] body .orange-ui-icon{color:#345f51!important;stroke:currentColor!important}
+html#renaxApp#renaxApp[data-theme=ivory] body .numbox-button::after{border-color:#345f51!important}
+html#renaxApp#renaxApp[data-theme=ivory] body :is(button,summary,.numbox-option) svg{color:inherit!important;stroke:currentColor!important}
+html#renaxApp#renaxApp[data-theme=ivory] body :is(#playBtn,#trainBtn,#trainingVisualBtn):not(:disabled){background:#d7ed56!important;color:#173e37!important;border-color:#9cac39!important}
+html#renaxApp#renaxApp[data-theme=ivory] body :is(#playBtn,#trainBtn,#trainingVisualBtn):not(:disabled):hover{background:#e1f371!important}

@@ -1682,7 +1682,40 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
 </style>
 <link rel="stylesheet" href="ivory-theme.css?v=20261015-ivory33">
 <link rel="stylesheet" href="renax-pulse-ivory.css?v=20261016-citrus44">
-</head>
+<style id="beat-hover45">
+/* Clickable beats: enlarge the box around its anchored centre, never its
+   orbital transform. Preserve measure-start/compound sizing and play pulses. */
+#sequencerContainer .step{
+ --beat-hover-factor:1;--beat-hover-color:var(--cyan);cursor:pointer;
+ transition:transform .12s ease,background .15s,box-shadow .15s,border-color .15s,width .14s ease,height .14s ease;
+}
+#sequencerContainer .step:is(.compound-strong,.measure-start){--beat-hover-factor:1.3}
+#sequencerContainer .step.compound-weak{--beat-hover-factor:.8}
+#sequencerContainer .step[data-state="0"]{--beat-hover-color:var(--text-muted)}
+#sequencerContainer .step[data-state="2"]{--beat-hover-color:var(--yellow)}
+#sequencerContainer .step[data-state="3"]{--beat-hover-color:var(--orange)}
+#sequencerContainer .step::after{
+ content:"";position:absolute;inset:-5px;border-radius:inherit;pointer-events:none;
+ border:1px solid color-mix(in srgb,var(--beat-hover-color) 60%,transparent);
+ box-shadow:0 0 7px color-mix(in srgb,var(--beat-hover-color) 28%,transparent);
+ opacity:0;transition:opacity .14s ease;
+}
+@media(hover:hover) and (pointer:fine){
+ #sequencerContainer .step:hover{
+  width:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
+  height:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
+ }
+ #sequencerContainer .step:hover::after{opacity:1}
+}
+#sequencerContainer .step:focus-visible{
+ width:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
+ height:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
+}
+#sequencerContainer .step:focus-visible::after{opacity:1}
+@media(prefers-reduced-motion:reduce){
+ #sequencerContainer .step,#sequencerContainer .step::after{transition:none!important}
+}
+</style></head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
 <div class="console-arrival-lines" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -3507,6 +3540,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
         step.setAttribute('role','button');
         step.tabIndex = 0;
         step.setAttribute('aria-label','Régler le temps ' + (b+1));
+        step.title='Subdiviser ce temps';
         const angle = b / m.numerator * 360;
         step.style.setProperty('--angle', angle + 'deg');
         const number = document.createElement('span');
@@ -4397,7 +4431,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 })();</script>
 <script src="multi-clock.js?v=20261012-multi5"></script>
 <script src="multi-metronome.js?v=20261014-polish21"></script>
-<script src="interface-language.js?v=20261015-ivory28"></script>
+<script src="interface-language.js?v=20261016-beat-hover45"></script>
 <script src="workspace-layout.js?v=20261015-ivory28"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=20261015-ivory33"></script>

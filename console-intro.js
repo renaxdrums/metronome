@@ -55,15 +55,16 @@
    const rect=source.getBoundingClientRect();
    const copy=source.cloneNode(true);
    const computed=getComputedStyle(source);
+   // Body-child layout rules no longer match once the scene is inside the
+   // camera wrapper. Preserve those computed styles, including the panels,
+   // instead of letting a different grid appear during the final reveal.
+   for(const [original,mirror] of [[source,copy],...[...source.children].map((node,i)=>[node,copy.children[i]])]){
+    const rendered=getComputedStyle(original);
+    for(const property of rendered)mirror.style.setProperty(property,rendered.getPropertyValue(property),'important');
+   }
    copy.style.setProperty('position','absolute','important');
    copy.style.setProperty('display',computed.display,'important');
-   copy.style.boxSizing='border-box';
-   copy.style.left=rect.left+'px';
-   copy.style.top=rect.top+'px';
-   copy.style.width=rect.width+'px';
-   copy.style.height=rect.height+'px';
-   copy.style.margin='0';
-   copy.style.flex='none';
+   for(const [property,value] of Object.entries({'box-sizing':'border-box',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',margin:'0',flex:'none',transform:'none'}))copy.style.setProperty(property,value,'important');
    copy.classList.add('console-arrival-mirror-piece');
    const fromFields=source.querySelectorAll('input,select,textarea,progress,meter');
    const toFields=copy.querySelectorAll('input,select,textarea,progress,meter');
@@ -146,11 +147,11 @@
  async function startCamera(){
   if(typeof overlay.animate!=='function'){finish();return;}
   // Freeze the actual laid-out UI only after its fonts and first render have settled.
-  try{await document.fonts?.ready;}catch{}
+  await readyWithin(document.fonts?.ready,800);
   if(finished||overlay.hidden)return;
   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   if(finished||overlay.hidden)return;
-  try{createReplica();}catch(error){console.warn('[RENAX intro] Visual copy unavailable:',error);replica?.remove();backdrop?.remove();replica=null;backdrop=null;finish();return;}
+  try{createReplica(true);}catch(error){console.warn('[RENAX intro] Visual copy unavailable:',error);replica?.remove();backdrop?.remove();replica=null;backdrop=null;finish();return;}
   // Visible camera pull-back WHILE the fox/brand is still visible.
   // The matte is darker than the intro, exposing the receding frame edges.
   // Then the entire frame travels upward like a real vertical page scroll.
@@ -289,10 +290,14 @@
   toggle.onchange=()=>{enabled=toggle.checked;try{localStorage.setItem(preference,String(enabled));}catch{}};
  }
  window.addEventListener('renax-language-changed',()=>{if(!overlay.hidden)label();});
+ function readyWithin(promise,ms){
+  // Readiness must never trap the user behind the opening screen.
+  return Promise.race([Promise.resolve(promise).catch(()=>{}),new Promise(resolve=>timeouts.push(setTimeout(resolve,ms)))]);
+ }
  async function launch(){
   // Complete the expensive UI snapshot before any visible entrance motion.
   // Fonts and the fox image cannot change the title geometry halfway through.
-  try{await Promise.all([document.fonts?.ready,logo?.decode?.().catch(()=>{})]);}catch{}
+  await readyWithin(Promise.all([document.fonts?.ready,logo?.decode?.().catch(()=>{})]),1200);
   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   if(finished)return;
   label();previous=document.activeElement;
@@ -300,5 +305,5 @@
   overlay.dataset.introReady='true';
   later(begin,900);
  }
- if(enabled&&!reduce.matches)launch();else finish();
+ if(enabled&&!reduce.matches){later(finish,10000);launch().catch(error=>{console.warn('[RENAX intro] Opening unavailable:',error);finish();});}else finish();
 })();

@@ -140,7 +140,7 @@ jobs:
       - name: Show review captures in job log
         if: always()
         run: |
-          for img in pulse-1440x900.png pulse-390x844.png; do
+          for img in pulse-1440x900.png pulse-390x844.png layout-1440-sequence.png layout-390-sequence.png layout-390-sequence-measures.png layout-1440-multi.png; do
             if [ -s "$img" ]; then
               echo "RENAX_IMG_${img}_START"
               base64 -w0 "$img"

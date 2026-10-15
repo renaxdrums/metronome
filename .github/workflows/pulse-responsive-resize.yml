@@ -1,0 +1,101 @@
+name: PULSE responsive resize validation
+on:
+  push:
+    branches: [fix/pulse-fluid-resize-20261015]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  responsive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Browser
+        run: |
+          npm install --no-save playwright@1.56.0
+          npx playwright install chromium --with-deps
+      - name: Check live resizing and arrival replica
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/renax-responsive.log 2>&1 &
+          sleep 2
+          node --input-type=module <<'JS'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          let checks=0,issues=0;
+          const check=(ok,label,more='')=>{checks++; console.log((ok?'PASS':'FAIL'),label,more);if(!ok)issues++};
+          const page=await browser.newPage({viewport:{width:1500,height:900}});
+          const errors=[];page.on('pageerror',e=>errors.push(e.message));
+          await page.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
+          await page.evaluate(()=>{localStorage.setItem('renax-appearance','ivory');localStorage.setItem('renax.arrival.enabled.v1','false')});
+          await page.reload({waitUntil:'domcontentloaded'});
+          await page.waitForSelector('body > #workspaceNav [data-workspace=metronome]');
+          await page.waitForTimeout(400);
+          const sizes=[[1500,900],[1380,800],[1280,720],[1101,700],[1100,700],[900,650],[430,860],[390,844],[360,640],[320,568],[430,860],[1280,720],[1500,900]];
+          for(const [width,height] of sizes){
+           await page.setViewportSize({width,height});
+           await page.waitForTimeout(420);
+           const a=await page.evaluate(()=>{
+            const R=s=>{const n=document.querySelector(s);if(!n)return null;const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};
+            const nav=[...document.querySelectorAll('body > #workspaceNav [data-workspace]')].map(n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom}});
+            const wrapper=R('body > .main-grid .panel-visu .sequencer-wrapper'),dial=R('#sequencerContainer'),switcher=R('#scoreViewSwitch');
+            return {scroll:document.documentElement.scrollWidth,viewport:innerWidth,theme:document.documentElement.dataset.theme,
+            nav,wrapper,dial,switcher,play:R('#playBtn'),eraser:R('.reset-undo-tools #panicBtn'),undo:R('.reset-undo-tools #undoBtn'),
+            bodyHeight:document.body.scrollHeight,viewHeight:innerHeight};
+           });
+           const id=width+'x'+height;
+           check(a.theme==='ivory','Theme preserved',id);
+           check(a.scroll<=width+2,'No horizontal overflow',id+' '+a.scroll);
+           check(a.nav.length===6,'Six responsive workspaces',id);
+           check(a.nav.every(n=>n.x>=-2&&n.right<=width+2),'Navigation stays within viewport',id);
+           check(!!a.eraser&&!!a.undo,'Eraser and undo preserved',id);
+           if(a.wrapper&&a.dial&&a.wrapper.w>0){
+            const cent=(a.dial.x+a.dial.w/2)-(a.wrapper.x+a.wrapper.w/2);
+            check(Math.abs(cent)<=2.5,'Dial remains horizontally centered',id+' dx='+cent.toFixed(2));
+            check(a.dial.w<=a.wrapper.w+2,'Dial fits wrapper width',id+' d='+a.dial.w+' w='+a.wrapper.w);
+            check(a.dial.w>=100,'Dial not unusably small',id+' d='+a.dial.w);
+            if(width<=1100&&a.switcher?.w>0)check(a.dial.y>=a.switcher.bottom+2,'Beat 1 clear of view selector',id+' gap='+(a.dial.y-a.switcher.bottom).toFixed(1));
+           }
+           if([1500,1280,1100,390,320].includes(width))await page.screenshot({path:'resize-'+id+'.png',fullPage:true});
+          }
+          for(const space of ['sequence','multi','training','tracks','polyrhythm','metronome']){
+           await page.locator('body > #workspaceNav [data-workspace="'+space+'"]').click();
+           check(await page.locator('body').getAttribute('data-workspace')===space,'Workspace switch remains functional',space);
+          }
+          await page.close();
+          const intro=await browser.newPage({viewport:{width:1360,height:840}});
+          const introErrors=[];intro.on('pageerror',e=>introErrors.push(e.message));
+          await intro.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
+          await intro.evaluate(()=>{localStorage.setItem('renax-appearance','ivory');localStorage.setItem('renax.arrival.enabled.v1','true')});
+          await intro.reload({waitUntil:'domcontentloaded'});
+          await intro.locator('.console-arrival-replica').waitFor({state:'attached',timeout:12000});
+          check(await intro.locator('.console-arrival-replica').count()===1,'Intro snapshot created');
+          await intro.setViewportSize({width:700,height:800});
+          await intro.waitForTimeout(550);
+          check(await intro.locator('#renaxArrival').isHidden(),'Intro releases on resize');
+          check(await intro.locator('.console-arrival-replica').count()===0,'Stale mirror removed on resize');
+          check(await intro.locator('.console-arrival-stage').count()===0,'Stale stage removed on resize');
+          check(await intro.locator('body > #workspaceNav [data-workspace]').count()===6,'Real navigation after transition');
+          check(introErrors.length===0,'No runtime errors in intro',introErrors.join('; '));
+          check(errors.length===0,'No runtime errors during resizing',errors.join('; '));
+          await browser.close();
+          console.log('RESPONSIVE_SUMMARY',checks,'checks;',issues,'failures');
+          if(issues)process.exit(1);
+          JS
+      - name: Screenshots
+        if: always()
+        run: |
+          for img in resize-1280x720.png resize-390x844.png resize-320x568.png; do
+            if [ -s "$img" ]; then
+              echo "RENAX_IMG_${img}_START"
+              base64 -w0 "$img"
+              echo
+              echo "RENAX_IMG_${img}_END"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: responsive-captures
+          path: resize-*.png

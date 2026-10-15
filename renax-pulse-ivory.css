@@ -64,7 +64,7 @@ html#renaxApp[data-theme=ivory] :is(#bpmDisplay,.tempo-display,#trainTimer,.volu
 html#renaxApp[data-theme=ivory] #workspaceTempoShortcut{background:#f2f2e5!important;border:1px solid #cdd6c5!important;color:#173e37!important}
 html#renaxApp[data-theme=ivory] #tapBtn{background:#edf1e2!important;border:1px solid #ccd6c4!important;color:#173e37!important}
 /* Musique : couleurs des clics validées, positions et états fonctionnels intacts. */
-html#renaxApp[data-theme=ivory] .sequencer-container:not(.poly-ring)::before{
+html#renaxApp[data-theme=ivory] body:not(.poly-mode) .panel-visu:not(.score-view) .sequencer-container::before{
  content:"";position:absolute;left:50%;top:50%;
  width:calc(var(--ring-radius, 138px) * 2);height:calc(var(--ring-radius, 138px) * 2);
  transform:translate(-50%,-50%);border:1px solid #c7cebb;border-radius:50%;

@@ -475,3 +475,15 @@ html#renaxApp[data-theme=ivory] .panel-visu :is(
   max-height:190px!important;margin:auto!important;
  }
 }
+
+/* Responsive control sizing and beat-marker clearance, ivory only. */
+@media(min-width:1101px) and (max-width:1380px){
+ html#renaxApp[data-theme=ivory] body .visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(0,1fr) 96px!important}
+ html#renaxApp[data-theme=ivory] body .visu-toolbar .workspace-tempo-group #tapBtn{
+  width:96px!important;min-width:96px!important;max-width:96px!important;
+  padding:5px 6px!important;font-size:9px!important;letter-spacing:0!important;box-sizing:border-box!important;overflow:hidden!important
+ }
+}
+@media(max-width:1100px){
+ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel{margin-bottom:10px!important}
+}

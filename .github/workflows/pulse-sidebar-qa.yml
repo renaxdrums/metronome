@@ -91,6 +91,52 @@ jobs:
           console.log('SUMMARY:', checks,'checks;',fails,'failures');
           if(fails)process.exit(1);
           JS
+      - name: Centering and workspace measurements
+        run: |
+          python3 -m http.server 8766 --bind 127.0.0.1 >/tmp/renax-http2.log 2>&1 &
+          sleep 2
+          node --input-type=module <<'JS'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          let issues=0;
+          const dims=[[1440,900],[1280,720],[1024,768],[390,844],[360,640]];
+          for(const [width,height] of dims) {
+            const p=await browser.newPage({viewport:{width,height}});
+            await p.goto('http://127.0.0.1:8766/index.html',{waitUntil:'domcontentloaded'});
+            await p.evaluate(()=>{localStorage.setItem('renax-appearance','ivory');localStorage.setItem('renax.arrival.enabled.v1','false')});
+            await p.reload({waitUntil:'domcontentloaded'});
+            await p.waitForSelector('body > #workspaceNav [data-workspace=metronome]');
+            await p.waitForTimeout(400);
+            for(const id of ['metronome','polyrhythm','sequence','multi','training','tracks']){
+              await p.locator('body > #workspaceNav [data-workspace="'+id+'"]').click();
+              await p.waitForTimeout(300);
+              const audit=await p.evaluate(()=>{
+                const R=s=>{const n=document.querySelector(s);if(!n)return null;const q=n.getBoundingClientRect();return {x:+q.x.toFixed(1),y:+q.y.toFixed(1),w:+q.width.toFixed(1),h:+q.height.toFixed(1),right:+q.right.toFixed(1),bottom:+q.bottom.toFixed(1)}};
+                return {workspace:document.body.dataset.workspace,pane:document.body.dataset.mobilePane,
+                  main:R('.main-grid'),visu:R('.main-grid>.panel-visu'),seq:R('.main-grid>.panel-seq'),
+                  wrapper:R('.panel-visu .sequencer-wrapper'),circle:R('#sequencerContainer'),
+                  scoreSwitch:R('#scoreViewSwitch'),transport:R('#playBtn'),
+                  seqList:R('#measureList'),nav:R('body > #workspaceNav')};
+              });
+              const zone=audit.wrapper||audit.visu;
+              const circle=audit.circle;
+              const visible=zone&&circle&&circle.w>10;
+              const offset=visible?+((circle.x+circle.w/2)-(zone.x+zone.w/2)).toFixed(2):null;
+              console.log('CENTER_DIAG',width,height,id,JSON.stringify({...audit,centerOffset:offset}));
+              if(visible&&Math.abs(offset)>3){issues++;console.error('CENTER_FAILURE',width,height,id,offset)}
+              if((width===1440||width===390)&&['metronome','sequence','multi','tracks'].includes(id))
+                await p.screenshot({path:'layout-'+width+'-'+id+'.png',fullPage:true});
+              if(width<1101&&id==='sequence'){
+                await p.locator('body > #workspaceMobileViews [data-pane="seq"]').click();
+                await p.screenshot({path:'layout-'+width+'-sequence-measures.png',fullPage:true});
+              }
+            }
+            await p.close();
+          }
+          await browser.close();
+          console.log('CENTER_SUMMARY',issues,'geometric deviations');
+          if(issues)process.exit(1);
+          JS
       - name: Show review captures in job log
         if: always()
         run: |

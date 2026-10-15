@@ -491,6 +491,27 @@ html#renaxApp[data-theme=ivory] .panel-visu :is(
 @media(min-width:1101px) and (max-width:1380px){
  html#renaxApp[data-theme=ivory] body .visu-toolbar .workspace-tempo-group #tapBtn{position:relative!important;right:26px!important}
 }
-@media(max-width:1100px){
- html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) #sequencerContainer{top:8px!important}
+
+
+/* The view selector consumes its own row. Fit the complete dial in the
+   remaining two-dimensional space, including beat-marker clearance. */
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .sequencer-wrapper{
+ display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:flex-start!important;
+ container-type:size;width:100%!important;min-width:0!important;min-height:0!important;
+ padding:0!important;gap:12px!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel{
+ position:relative!important;inset:auto!important;order:0!important;
+ width:100%!important;box-sizing:border-box!important;
+ min-height:44px!important;height:44px!important;max-height:44px!important;
+ flex:0 0 44px!important;margin:0!important;padding-right:48px!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) #sequencerContainer{
+ order:1!important;position:relative!important;inset:auto!important;
+ flex:0 0 auto!important;box-sizing:border-box!important;
+ width:max(0px,min(calc(100cqw - 24px),calc(100cqh - 72px),var(--seq-size)))!important;
+ height:auto!important;min-width:0!important;min-height:0!important;
+ max-width:100%!important;max-height:none!important;aspect-ratio:1!important;
+ margin:auto!important;align-self:center!important;
 }

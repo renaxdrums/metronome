@@ -124,6 +124,8 @@ jobs:
               const offset=visible?+((circle.x+circle.w/2)-(zone.x+zone.w/2)).toFixed(2):null;
               console.log('CENTER_DIAG',width,height,id,JSON.stringify({...audit,centerOffset:offset}));
               if(visible&&Math.abs(offset)>3){issues++;console.error('CENTER_FAILURE',width,height,id,offset)}
+              if(visible&&width===1280&&height===720&&id==='sequence'&&circle.w<260){issues++;console.error('COMPACT_DIAL_TOO_SMALL',circle.w)}
+              if(width===390&&id==='sequence'){const contrast=await p.evaluate(()=>{const el=document.querySelector('.panel-seq .silent-head-label');return el?{color:getComputedStyle(el).color,opacity:getComputedStyle(el).opacity,font:getComputedStyle(el).fontSize}:null});console.log('SEQUENCE_LABEL_AUDIT',JSON.stringify(contrast));if(!contrast||parseInt(contrast.font)<10){issues++;console.error('SEQUENCE_LABEL_TOO_SMALL',JSON.stringify(contrast))}}
               if((width===1440||width===390)&&['metronome','sequence','multi','tracks'].includes(id))
                 await p.screenshot({path:'layout-'+width+'-'+id+'.png',fullPage:true});
               if(width<1101&&id==='sequence'){

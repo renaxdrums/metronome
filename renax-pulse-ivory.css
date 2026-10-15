@@ -427,3 +427,81 @@ html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-thumb{background:#58BFC4!imp
 @media(prefers-reduced-motion:reduce){
  html#renaxApp[data-theme=ivory] #workspaceNav button{transition:none!important}
 }
+
+
+/* Critical visual review v2: resolve specificity inherited from the old ivory
+   `:is(...,#workspaceControls)` rule, keep the preview airy, not dark. */
+html#renaxApp[data-theme=ivory] .panel-visu :is(.visu-toolbar,#workspaceControls){
+ background:#FCFAF2!important;
+ background-image:none!important;
+ border:1px solid #D6D7C8!important;
+ color:#173E37!important;
+ box-shadow:none!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu .visu-toolbar :is(
+ .control-group>label,.measure-label,.workspace-timer-label,#trainTimer,
+ .tempo-display,.tempo-display span,#bpmDisplay,.volume-value
+){color:#315A4D!important;opacity:1!important}
+html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-tempo-group .tempo-display{
+ color:#173E37!important;font-weight:750!important;
+}
+html#renaxApp[data-theme=ivory] body[data-workspace=metronome] .sequencer-container::before{
+ background:conic-gradient(from 0deg,#30788A 0 25%,#B5CA39 25% 50%,#B4B5A0 50% 75%,#D7DFC0 75% 100%)!important;
+ -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px))!important;
+ mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px))!important;
+}
+html#renaxApp[data-theme=ivory] body[data-workspace=metronome] .sequencer-container::after{
+ width:calc(1.57 * var(--ring-radius,138px))!important;
+ background:radial-gradient(circle,#FDFBF3 0%,#F4F2E6 100%)!important;
+ border:1px solid #E5E5D8!important;
+}
+/* Preserve the original score editor's panel geometry.
+   Expand switch labels only when the circular visualizer is showing. */
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel{
+ min-height:45px!important;max-height:45px!important;height:45px!important;
+ flex:0 0 45px!important;align-self:stretch!important;
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:8px!important;margin:0 0 2px!important;padding:0 1px!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel::before{
+ content:'◷  VISUALISATION';
+ flex:0 0 auto;color:#60786C;font:800 10px/1.2 var(--font);
+ letter-spacing:.105em;white-space:nowrap;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel .score-view-switch{
+ position:static!important;display:flex!important;flex-direction:row!important;
+ align-items:center!important;align-self:center!important;
+ padding:3px!important;margin:0 0 0 auto!important;gap:3px!important;
+ border:1px solid #D2D8CA!important;border-radius:11px!important;
+ background:#F2F3E8!important;box-shadow:none!important;
+ max-width:100%!important;max-height:45px!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-view-switch button{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:auto!important;min-width:94px!important;height:36px!important;min-height:36px!important;
+ padding:6px 11px!important;gap:6px!important;
+ border:0!important;border-radius:8px!important;
+ color:#536B5F!important;background:transparent!important;
+ font:700 11px/1 var(--font)!important;text-transform:none!important;
+ letter-spacing:0!important;white-space:nowrap!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-view-switch button[aria-pressed=true]{
+ background:#173E37!important;color:#FDFBF3!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-view-switch button svg{
+ width:16px!important;height:16px!important;stroke:currentColor!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .reset-undo-tools{
+ top:55px!important;
+}
+@media(max-width:370px){
+ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel::before{
+  font-size:9px!important;letter-spacing:.045em!important;
+ }
+ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-view-switch button{
+  padding:5px!important;font-size:10px!important;min-width:76px!important;
+ }
+ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-view-switch button svg{
+  width:13px!important;height:13px!important;
+ }
+}

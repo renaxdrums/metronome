@@ -266,3 +266,46 @@ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) :is(#scoreMetronome
   font-size:9px!important;
  }
 }
+
+/* Unified Ivory control states. Scoped to appearance; no musical behavior. */
+html#renaxApp[data-theme=ivory] body :is(#songsRoot,#index2SettingsPanel,.panel,dialog) :is(button.btn,button.song-more,button.song-count-in-button,.sequence-preview-play,.multi-solo,.multi-mute,.song-back,summary,.appearance-options button){
+ background:#f1f3e8!important;color:#244c40!important;border-color:#bdcbb9!important;
+}
+html#renaxApp[data-theme=ivory] body :is(button,summary,.numbox-trigger,.numbox-option):focus-visible{
+ outline:2px solid #147789!important;outline-offset:3px!important;
+}
+html#renaxApp[data-theme=ivory] body :is(#songsRoot,#index2SettingsPanel,.panel,dialog) :is(button.btn,button.song-more,button.song-count-in-button,.sequence-preview-play,.multi-solo,.multi-mute,.song-back,summary):not(:disabled):hover{
+ background:#e0e8d5!important;color:#173e37!important;border-color:#718c70!important;
+}
+html#renaxApp[data-theme=ivory] body :is(#songsRoot,#index2SettingsPanel,.panel,dialog) :is(button[aria-pressed=true],button[aria-selected=true],summary[aria-expanded=true],button.song-more[aria-expanded=true]){
+ background:#244f43!important;color:#fcfaf2!important;border-color:#244f43!important;
+}
+html#renaxApp[data-theme=ivory] body :is(button:disabled,button[aria-disabled=true]){
+ background:#e4e7dd!important;color:#536153!important;border-color:#c8cec1!important;
+ opacity:1!important;box-shadow:none!important;cursor:default!important;
+}
+html#renaxApp[data-theme=ivory] body :is(button,summary,.numbox-trigger) :is(svg,.orange-ui-icon){
+ color:inherit!important;stroke:currentColor!important;
+}
+html#renaxApp[data-theme=ivory] body .orange-ui-icon{color:#345f51!important;stroke:currentColor!important}
+html#renaxApp[data-theme=ivory] body :is(.numbox-menu,.sound-bank-cards .numbox-menu,.song-more-menu){
+ background:#fcfaf2!important;border-color:#bdcbb9!important;color:#244c40!important;
+}
+html#renaxApp[data-theme=ivory] body :is(.numbox-option,.sound-bank-cards .numbox-option){
+ background:#fcfaf2!important;color:#244c40!important;border-color:#d5ddcd!important;
+}
+html#renaxApp[data-theme=ivory] body :is(.numbox-option,.sound-bank-cards .numbox-option):hover{
+ background:#e0e8d5!important;color:#173e37!important;
+}
+html#renaxApp[data-theme=ivory] body :is(.numbox-option,.sound-bank-cards .numbox-option):is(.active,[aria-selected=true]){
+ background:#244f43!important;color:#fcfaf2!important;border-color:#244f43!important;
+}
+html#renaxApp[data-theme=ivory] body :is(#playBtn,#trainBtn,#trainingVisualBtn):not(:disabled){
+ background:#d7ed56!important;color:#173e37!important;border-color:#9cac39!important;
+}
+html#renaxApp[data-theme=ivory] body :is(#playBtn,#trainBtn,#trainingVisualBtn):not(:disabled):hover{
+ background:#e1f371!important;color:#173e37!important;
+}
+html#renaxApp[data-theme=ivory] body :is(button[aria-pressed=true],button[aria-selected=true]) .orange-ui-icon{
+ color:inherit!important;
+}

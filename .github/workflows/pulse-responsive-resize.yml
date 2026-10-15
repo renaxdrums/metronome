@@ -85,6 +85,47 @@ jobs:
           console.log('RESPONSIVE_SUMMARY',checks,'checks;',issues,'failures');
           if(issues)process.exit(1);
           JS
+      - name: Normal entrance, landscape and theme regression
+        run: |
+          python3 -m http.server 8766 --bind 127.0.0.1 >/tmp/renax-landscape.log 2>&1 &
+          sleep 2
+          node --input-type=module <<'JS'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:1366,height:768}});
+          const errors=[];page.on('pageerror',e=>errors.push(e.message));
+          await page.goto('http://127.0.0.1:8766/index.html',{waitUntil:'domcontentloaded'});
+          await page.evaluate(()=>{localStorage.setItem('renax-appearance','ivory');localStorage.setItem('renax.arrival.enabled.v1','true')});
+          await page.reload({waitUntil:'domcontentloaded'});
+          await page.locator('.console-arrival-replica').waitFor({timeout:12000});
+          await page.locator('#renaxArrival').waitFor({state:'hidden',timeout:15000});
+          if(await page.locator('.console-arrival-replica').count())throw Error('Intro mirror retained after normal completion');
+          console.log('PASS Normal animation completes without retaining mirror');
+          await page.evaluate(()=>localStorage.setItem('renax.arrival.enabled.v1','false'));
+          for(const [w,h] of [[1101,580],[844,390],[720,400],[667,375],[390,844]]){
+            await page.setViewportSize({width:w,height:h});
+            await page.waitForTimeout(240);
+            const d=await page.evaluate(()=>{
+              const nav=[...document.querySelectorAll('body > #workspaceNav [data-workspace]')];
+              const rect=el=>{const x=el.getBoundingClientRect();return{x:x.x,right:x.right,y:x.y,bottom:x.bottom}};
+              return {scroll:document.documentElement.scrollWidth,viewport:innerWidth,buttons:nav.map(rect),
+                play:rect(document.querySelector('#playBtn')),theme:document.documentElement.dataset.theme};
+            });
+            if(d.scroll>w+2||d.buttons.length!==6||d.buttons.some(x=>x.x<0||x.right>w+2))throw Error('Responsive nav/scroll failure '+w+'x'+h+' '+JSON.stringify(d));
+            console.log('PASS Landscape/small PC '+w+'x'+h);
+            for(const id of ['sequence','multi','tracks','training','metronome']){
+              await page.locator('body > #workspaceNav [data-workspace="'+id+'"]').click();
+              if(await page.locator('body').getAttribute('data-workspace')!==id)throw Error('Navigation failed '+id+' at '+w+'x'+h);
+            }
+          }
+          for(const theme of ['dark','light','ivory']){
+            await page.evaluate(t=>{localStorage.setItem('renax-appearance',t);document.documentElement.dataset.theme=t},theme);
+            if(await page.locator('html').getAttribute('data-theme')!==theme)throw Error('Theme failed '+theme);
+          }
+          if(errors.length)throw Error('Page errors '+errors.join('; '));
+          await browser.close();
+          console.log('FULL_REGRESSION_PASS');
+          JS
       - name: Screenshots
         if: always()
         run: |

@@ -232,3 +232,27 @@ html#renaxApp[data-theme=ivory] .mp3-credit{color:#c2d0cf!important}
 html#renaxApp[data-theme=ivory] *{scrollbar-color:#70d5df #173b4b!important}
 html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-track,html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-corner{background:#173b4b!important}
 html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-thumb{background:#70d5df!important;border-color:#173b4b!important}
+
+/* Two greens: retain the mint/forest family, add a distinct citrus accent. */
+html#renaxApp[data-theme=ivory]{--ivory-lime:#d9ef62}
+html#renaxApp[data-theme=ivory] .brand-logo{
+ content:url("assets/renax-logo-ivory.svg?v=20261015-citron31");filter:none!important;
+ width:34px!important;height:46px!important;padding:6px;background:#173b4b;border-radius:9px;box-sizing:content-box;
+}
+html#renaxApp[data-theme=ivory] #bpmDisplay{color:var(--ivory-lime)!important}
+html#renaxApp[data-theme=ivory] .visu-toolbar .orange-ui-icon{stroke:var(--ivory-lime)!important}
+html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]{border-color:#b8d477!important;box-shadow:inset 0 -3px var(--ivory-lime)!important}
+html#renaxApp[data-theme=ivory] :is(.multi-track.active,.multi-preset.active,.measure-card.active,.playlist-choice.active,.song-section.selected){box-shadow:inset 3px 0 var(--ivory-lime)!important}
+html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active){background:var(--ivory-lime)!important;border-color:var(--ivory-lime)!important;color:#173b4b!important}
+html#renaxApp[data-theme=ivory] .score-view-switch button[aria-pressed=true] svg{stroke:var(--ivory-lime)!important}
+@media(min-width:1101px){
+ html#renaxApp[data-theme=ivory] #workspaceNav button{padding:12px 8px!important;gap:9px}
+ html#renaxApp[data-theme=ivory] #workspaceNav button svg{width:18px;height:18px;padding:4px;border-radius:6px;box-sizing:content-box;flex:0 0 18px}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{background:#173b4b;stroke:var(--ivory-lime)!important}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{background:var(--ivory-lime);border:1px solid #61796a;width:6px;height:6px;flex-basis:6px}
+}
+@media(max-width:1100px){
+ html#renaxApp[data-theme=ivory] .brand-logo{width:25px!important;height:33px!important;padding:4px;border-radius:7px}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{stroke:#596a16!important}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{background:#7b941f}
+}

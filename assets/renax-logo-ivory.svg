@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 772 958" role="img" aria-labelledby="title desc">
+ <title id="title">Renax Drums</title>
+ <desc id="desc">Renard géométrique vert citron et deux baguettes droites croisées, à olives allongées. Fond transparent.</desc>
+ <g fill="none" stroke="#d9ef62" stroke-width="26" stroke-linejoin="miter" stroke-linecap="square">
+  <path d="M146 331 105 208 118 31 286 183H486L654 31 667 208 626 331"/>
+  <path d="m146 331 140-148M626 331 486 183"/>
+  <path d="m187 332 77 117-8 12 56 136 44 65h60l44-65 56-136-8-12 77-117"/>
+  <path d="m128 405-21 32 169 111M644 405l21 32-169 111"/>
+ </g>
+ <g fill="#d9ef62">
+  <path d="m230 320 77 29 18 33 13 53-26-52-43-19Z"/>
+  <path d="m542 320-77 29-18 33-13 53 26-52 43-19Z"/>
+  <path d="M352 610Q386 594 420 610Q410 628 386 646Q362 628 352 610Z"/>
+  <defs><g id="stick">
+   <path d="M72 543C108 543 135 540 190 536L721 535Q739 535 739 548Q739 561 721 561L190 560C135 556 108 553 72 553Z"/>
+   <ellipse cx="62" cy="548" rx="12" ry="10"/>
+  </g></defs>
+  <use href="#stick" transform="rotate(34 62 548)"/>
+  <g transform="rotate(146 710 548)"><use href="#stick" transform="translate(648 0)"/></g>
+ </g>
+</svg>

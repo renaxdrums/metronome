@@ -73,12 +73,14 @@ jobs:
               const bounds=n=>{const r=n?.getBoundingClientRect();return r?{width:r.width,height:r.height}:null};
               return {hidden:document.querySelector('#renaxArrival').hidden,
                 replica:!!rep,stage:!!document.querySelector('.console-arrival-stage'),
-                viewport:[innerWidth,innerHeight],mirrorViewport:copy?bounds(copy):null,
-                liveViewport:source?bounds(source):null,fullscreen:!!document.fullscreenElement};
+                viewport:[innerWidth,innerHeight],mirrorViewport:copy?{width:copy.offsetWidth,height:copy.offsetHeight,renderedWidth:bounds(copy).width}:null,
+                liveViewport:source?bounds(source):null,fullscreen:!!document.fullscreenElement,
+                cameraRunning:document.querySelector('#renaxArrival').getAnimations().some(a=>a.playState==='running')};
             });
             console.log('INTRO_RESIZE_AUDIT',label,JSON.stringify(audit));
             verify(!audit.hidden&&audit.replica&&audit.stage,'No premature landing after resize',label);
-            verify(audit.mirrorViewport&&audit.liveViewport&&Math.abs(audit.mirrorViewport.width-audit.liveViewport.width)<2,'Mirrored panel follows responsive width',label);
+            verify(audit.mirrorViewport&&audit.liveViewport&&Math.abs(audit.mirrorViewport.width-audit.liveViewport.width)<2,'Mirror underlying layout matches real panel (ignores cinematic zoom)',label);
+            if(pass===2)verify(audit.cameraRunning,'Camera still playing after fullscreen and resize',label);
             await p.waitForTimeout(120);
             if(platform.name==='pc'||platform.name==='mobile')await p.screenshot({path:'intro-'+platform.name+'-'+pass+'-after-touch.png',fullPage:false});
             await p.locator('#renaxArrival').waitFor({state:'hidden',timeout:13000});

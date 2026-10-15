@@ -1,0 +1,113 @@
+name: Cinematic intro continuity QA
+on:
+  push:
+    branches: [fix/intro-fullscreen-continuity-20261015]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  animation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.56.0
+          npx playwright install chromium --with-deps
+      - name: Test intro twice on PC, tablet and smartphone
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/renax-intro.log 2>&1 &
+          sleep 2
+          node --input-type=module <<'JS'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+          let ok=0,fail=0;
+          const verify=(v,n,extra='')=>{if(v){ok++;console.log('PASS',n,extra)}else{fail++;console.error('FAIL',n,extra)}};
+          const profiles=[
+            {name:'pc',w:1440,h:900,touch:false,w2:1280,h2:800},
+            {name:'tablet',w:820,h:1180,touch:true,w2:768,h2:1024},
+            {name:'mobile',w:390,h:844,touch:true,w2:390,h2:792},
+            {name:'landscape',w:844,h:390,touch:true,w2:780,h2:390}
+          ];
+          for(const platform of profiles){
+           for(let pass=1;pass<=2;pass++){
+            const ctx=await browser.newContext({viewport:{width:platform.w,height:platform.h},hasTouch:platform.touch,isMobile:platform.touch,deviceScaleFactor:1,reducedMotion:'no-preference'});
+            await ctx.addInitScript(()=>{
+              window.__renaxFullscreenCalls=0;
+              const native=Element.prototype.requestFullscreen;
+              if(native)Element.prototype.requestFullscreen=function(...args){
+                window.__renaxFullscreenCalls++;
+                return native.apply(this,args);
+              };
+            });
+            const p=await ctx.newPage();
+            const errors=[];
+            p.on('pageerror',e=>errors.push(e.message));
+            await p.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded',timeout:60000});
+            await p.evaluate(()=>{localStorage.setItem('renax-appearance','ivory');localStorage.setItem('renax.arrival.enabled.v1','true')});
+            await p.reload({waitUntil:'domcontentloaded',timeout:60000});
+            await p.locator('.console-arrival-replica').waitFor({state:'attached',timeout:15000});
+            const label=platform.name+' pass '+pass;
+            verify(!(await p.locator('#renaxArrival').isHidden()),'Intro initially visible',label);
+            verify(await p.locator('.console-arrival-replica').count()===1,'Single live mirror',label);
+            if(pass===2){
+              await p.waitForFunction(()=>document.querySelector('#renaxArrival')?.getAnimations().some(a=>a.playState==='running'),{timeout:10000});
+              verify(!(await p.locator('#renaxArrival').isHidden()),'Cinematic camera in progress',label);
+            }
+            const gesture=platform.touch?()=>p.touchscreen.tap(platform.w/2,Math.min(platform.h/2,320)):()=>p.mouse.click(platform.w/2,Math.min(platform.h/2,320));
+            await gesture();
+            await p.waitForTimeout(200);
+            const fs=await p.evaluate(()=>({enabled:document.fullscreenEnabled,calls:window.__renaxFullscreenCalls,active:!!document.fullscreenElement}));
+            console.log('FULLSCREEN_AUDIT',label,JSON.stringify(fs));
+            if(fs.enabled)verify(fs.calls>=1,'Fullscreen requested on first touch',label);
+            else console.log('LIMITATION Fullscreen API unavailable in this browser',label);
+            verify(!(await p.locator('#renaxArrival').isHidden()),'First touch does not skip animation',label);
+            await p.setViewportSize({width:platform.w2,height:platform.h2});
+            await p.waitForTimeout(280);
+            const audit=await p.evaluate(()=>{
+              const rep=document.querySelector('.console-arrival-replica'),source=document.querySelector('body > .main-grid'),copy=rep?.querySelector('.main-grid');
+              const bounds=n=>{const r=n?.getBoundingClientRect();return r?{width:r.width,height:r.height}:null};
+              return {hidden:document.querySelector('#renaxArrival').hidden,
+                replica:!!rep,stage:!!document.querySelector('.console-arrival-stage'),
+                viewport:[innerWidth,innerHeight],mirrorViewport:copy?bounds(copy):null,
+                liveViewport:source?bounds(source):null,fullscreen:!!document.fullscreenElement};
+            });
+            console.log('INTRO_RESIZE_AUDIT',label,JSON.stringify(audit));
+            verify(!audit.hidden&&audit.replica&&audit.stage,'No premature landing after resize',label);
+            verify(audit.mirrorViewport&&audit.liveViewport&&Math.abs(audit.mirrorViewport.width-audit.liveViewport.width)<2,'Mirrored panel follows responsive width',label);
+            await p.waitForTimeout(120);
+            if(platform.name==='pc'||platform.name==='mobile')await p.screenshot({path:'intro-'+platform.name+'-'+pass+'-after-touch.png',fullPage:false});
+            await p.locator('#renaxArrival').waitFor({state:'hidden',timeout:13000});
+            verify(await p.locator('.console-arrival-replica').count()===0,'Mirror removed only after animation',label);
+            verify(await p.locator('.console-arrival-stage').count()===0,'Stage removed on landing',label);
+            verify(await p.locator('.console-arrival-curtain').count()===0,'Curtain removed on landing',label);
+            verify(await p.locator('body > #workspaceNav [data-workspace]').count()===6,'Real navigation restored',label);
+            verify(errors.length===0,'No uncaught page errors',label+' '+errors.slice(0,3).join(';'));
+            if(platform.name==='pc'||platform.name==='mobile')await p.screenshot({path:'intro-'+platform.name+'-'+pass+'-landed.png',fullPage:false});
+            await ctx.close();
+           }
+          }
+          await browser.close();
+          console.log('INTRO_QA_SUMMARY',ok,'passed',fail,'failed');
+          if(fail)process.exit(1);
+          JS
+      - name: Expose key screenshots
+        if: always()
+        run: |
+          for img in intro-pc-1-after-touch.png intro-pc-2-after-touch.png intro-mobile-1-after-touch.png intro-mobile-2-after-touch.png; do
+            if [ -s "$img" ]; then
+              echo "RENAX_IMG_${img}_START"
+              base64 -w0 "$img"
+              echo
+              echo "RENAX_IMG_${img}_END"
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: intro-validation-screenshots
+          path: intro-*.png

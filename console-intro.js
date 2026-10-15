@@ -13,7 +13,9 @@
  function label(){
   const en=window.RENAX_I18N?.language==='en';
   overlay.setAttribute('aria-label',en?'Metronome introduction':'Animation d’arrivée Métronome');
-  word.replaceChildren(...[...(en?'Metronome':'Métronome')].map((letter,i)=>{
+  const title=en?'Metronome':'Métronome';
+  if(word.textContent===title)return; // Never restart the letter animation for the same label.
+  word.replaceChildren(...[...title].map((letter,i)=>{
    const span=document.createElement('span');span.textContent=letter;span.style.setProperty('--n',i);return span;
   }));
  }
@@ -35,7 +37,7 @@
   if(replica)return;
   backdrop=document.createElement('div');backdrop.className='console-arrival-stage';backdrop.setAttribute('aria-hidden','true');
   replica=document.createElement('div');replica.className='console-arrival-replica';
-  replica.setAttribute('aria-hidden','true');replica.inert=true;
+  replica.setAttribute('aria-hidden','true');replica.setAttribute('data-no-translate','');replica.inert=true;
   const style=getComputedStyle(document.body);
   replica.style.font=style.font;replica.style.color=style.color;
   replica.style.backgroundColor=style.backgroundColor;
@@ -181,11 +183,14 @@
     ctx.setTransform(dpr,0,0,dpr,0,0);
    }
    resize();
-   function stroke(points,color,lineWidth,alpha){
+   const samples=Array.from({length:231},(_,i)=>({u:i/230}));
+   const yValues=new Float64Array(231);
+   const phases=Array.from({length:38},(_,k)=>{const p=k*.173;return {cos:Math.cos(p),sin:Math.sin(p),cos6:Math.cos(p*.6),sin6:Math.sin(p*.6),cos24:Math.cos(p*.24),sin24:Math.sin(p*.24)};});
+   function stroke(values,color,lineWidth,alpha,reflectionBase){
     if(alpha<=0)return;
     ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=lineWidth;
     ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();
-    points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.globalAlpha=1;
+    for(let i=0;i<values.length;i++){const x=i/(values.length-1)*width,y=reflectionBase===undefined?values[i]:reflectionBase+(reflectionBase-values[i])*.35+13;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);}ctx.stroke();ctx.globalAlpha=1;
    }
    function tick(now){
     if(finished||overlay.hidden)return;
@@ -210,20 +215,22 @@
      const h=amplitude*1.8*peak*(.12+e*.88);
      ctx.globalAlpha=opacity*(.025+e*.10);ctx.beginPath();ctx.moveTo(x,base+7);ctx.lineTo(x,base-h);ctx.stroke();
     }
+    // Cache point phases once per frame rather than repeating 35,000 trigonometric
+    // calls and allocating thousands of point objects while the title is moving.
+    for(const sample of samples){
+     const u=sample.u,a=u*25-time*2.1,b=u*49+time*.9,c=u*93-time*1.3,r=u*17-time*1.4;
+     sample.e=energy(u);sample.sa=Math.sin(a);sample.ca=Math.cos(a);sample.sb=Math.sin(b);sample.cb=Math.cos(b);sample.sc=Math.sin(c);sample.cc=Math.cos(c);sample.sr=Math.sin(r);sample.cr=Math.cos(r);
+    }
     for(let k=0;k<38;k++){
-     const depth=k/37,phase=k*.173,points=[];
-     for(let i=0;i<=230;i++){
-      const u=i/230,e=energy(u),ridge=.25+.75*Math.pow(.5+.5*Math.sin(u*17-time*1.4+phase*.24),2);
-      const carrier=Math.sin(u*25-time*2.1+phase)+.42*Math.sin(u*49+time*.9-phase*.6)+.18*Math.sin(u*93-time*1.3+phase);
-      const y=base+carrier*amplitude*(.18+e*.82)*ridge*(.38+depth*.62)+(depth-.5)*18;
-      points.push({x:u*width,y});
+     const depth=k/37,p=phases[k];
+     for(let i=0;i<samples.length;i++){
+      const q=samples[i],ridge=.25+.75*Math.pow(.5+.5*(q.sr*p.cos24+q.cr*p.sin24),2);
+      const carrier=q.sa*p.cos+q.ca*p.sin+.42*(q.sb*p.cos6-q.cb*p.sin6)+.18*(q.sc*p.cos+q.cc*p.sin);
+      yValues[i]=base+carrier*amplitude*(.18+q.e*.82)*ridge*(.38+depth*.62)+(depth-.5)*18;
      }
      ctx.shadowColor=k<19?'#ffb268':'#7cdbe8';ctx.shadowBlur=k%12===0?5:0;
-     stroke(points,spectrum,.55+depth*.3,opacity*(.10+depth*.075));
-     if(k%4===0){
-      const reflected=points.map(p=>({x:p.x,y:base+(base-p.y)*.35+13}));
-      ctx.shadowBlur=0;stroke(reflected,spectrum,.6,opacity*.035);
-     }
+     stroke(yValues,spectrum,.55+depth*.3,opacity*(.10+depth*.075));
+     if(k%4===0){ctx.shadowBlur=0;stroke(yValues,spectrum,.6,opacity*.035,base);}
     }
     ctx.restore();
    }
@@ -250,5 +257,16 @@
   toggle.onchange=()=>{enabled=toggle.checked;try{localStorage.setItem(preference,String(enabled));}catch{}};
  }
  window.addEventListener('renax-language-changed',()=>{if(!overlay.hidden)label();});
- if(enabled&&!reduce.matches){label();previous=document.activeElement;later(begin,900);}else finish();
+ async function launch(){
+  // Complete the expensive UI snapshot before any visible entrance motion.
+  // Fonts and the fox image cannot change the title geometry halfway through.
+  try{await Promise.all([document.fonts?.ready,logo?.decode?.().catch(()=>{})]);}catch{}
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  if(finished)return;
+  label();previous=document.activeElement;
+  try{createReplica();}catch(error){console.warn('[RENAX intro] Visual copy unavailable:',error);finish();return;}
+  overlay.dataset.introReady='true';
+  later(begin,900);
+ }
+ if(enabled&&!reduce.matches)launch();else finish();
 })();

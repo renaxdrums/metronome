@@ -42,7 +42,7 @@ jobs:
             const wrapper=R('body > .main-grid .panel-visu .sequencer-wrapper'),dial=R('#sequencerContainer'),switcher=R('#scoreViewSwitch');
             return {scroll:document.documentElement.scrollWidth,viewport:innerWidth,theme:document.documentElement.dataset.theme,
             nav,wrapper,dial,switcher,play:R('#playBtn'),eraser:R('.reset-undo-tools #panicBtn'),undo:R('.reset-undo-tools #undoBtn'),
-            bodyHeight:document.body.scrollHeight,viewHeight:innerHeight};
+            bodyHeight:document.body.scrollHeight,viewHeight:innerHeight,beatOne:R('#sequencerContainer .step'),tempo:R('.visu-toolbar .workspace-tempo-group'),tap:R('.visu-toolbar .tap-tempo-btn'),timer:R('.visu-toolbar #workspaceTimer'),panel:R('.main-grid>.panel-visu'),panelScroll:document.querySelector('.main-grid>.panel-visu')?.scrollHeight, panelClient:document.querySelector('.main-grid>.panel-visu')?.clientHeight};
            });
            const id=width+'x'+height;
            check(a.theme==='ivory','Theme preserved',id);
@@ -55,7 +55,9 @@ jobs:
             check(Math.abs(cent)<=2.5,'Dial remains horizontally centered',id+' dx='+cent.toFixed(2));
             check(a.dial.w<=a.wrapper.w+2,'Dial fits wrapper width',id+' d='+a.dial.w+' w='+a.wrapper.w);
             check(a.dial.w>=100,'Dial not unusably small',id+' d='+a.dial.w);
-            if(width<=1100&&a.switcher?.w>0)check(a.dial.y>=a.switcher.bottom+2,'Beat 1 clear of view selector',id+' gap='+(a.dial.y-a.switcher.bottom).toFixed(1));
+            if(width>1100&&width<=1380&&a.tap?.w&&a.timer?.w)check(a.tap.right<=a.timer.x+2,'Tap tempo does not collide with timer',id+' tap.right='+a.tap.right.toFixed(1)+' timer.x='+a.timer.x.toFixed(1));
+            if(width<=370&&height<=630)check(a.dial.w>=170&&a.panelScroll>a.panelClient,'Tiny phone uses scrollable non-miniature dial',id+' diameter='+a.dial.w+' '+a.panelScroll+'/'+a.panelClient);
+            if(width<=1100&&a.switcher?.w>0&&a.beatOne)check(a.beatOne.y>=a.switcher.bottom+2,'Beat 1 clear of view selector',id+' gap='+(a.beatOne.y-a.switcher.bottom).toFixed(1));
            }
            if([1500,1280,1100,390,320].includes(width))await page.screenshot({path:'resize-'+id+'.png',fullPage:true});
           }

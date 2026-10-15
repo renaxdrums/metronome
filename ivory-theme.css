@@ -211,3 +211,5 @@ html#renaxApp[data-theme=ivory] :is(.multi-preset-create,.sequence-add){text-tra
  html#renaxApp[data-theme=ivory] body[data-workspace=metronome] .visu-toolbar .workspace-control-group:has(#volumeSlider){grid-column:4;grid-row:1}
  html#renaxApp[data-theme=ivory] body[data-workspace=metronome] .visu-toolbar #workspaceTimer{grid-column:5;grid-row:1}
 }
+
+html#renaxApp[data-theme=ivory] footer :is(.footer-right, .footer-right span, .author-credit){color:#4e695f!important;font-size:10px!important}

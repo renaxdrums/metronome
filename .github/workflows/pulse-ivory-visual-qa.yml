@@ -34,7 +34,7 @@ jobs:
             const errors=[];
             page.on('pageerror',error=>errors.push(error.message));
             await page.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded',timeout:60000});
-            await page.evaluate(()=>localStorage.removeItem('renax-appearance'));
+            await page.evaluate(()=>{localStorage.removeItem('renax-appearance');localStorage.setItem('renax.arrival.enabled.v1','false')});
             await page.reload({waitUntil:'domcontentloaded',timeout:60000});
             await page.waitForSelector('#workspaceNav [data-workspace="metronome"]',{timeout:30000});
             await page.evaluate(()=>document.getElementById('renaxArrival')?.remove());

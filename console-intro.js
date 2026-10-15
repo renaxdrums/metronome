@@ -2,7 +2,7 @@
 (() => {
  const overlay=document.getElementById('renaxArrival');if(!overlay)return;
  const preference='renax.arrival.enabled.v1',reduce=matchMedia('(prefers-reduced-motion:reduce)');
- let enabled=true,finished=false,frame,canvas,curtain,previous,replica,backdrop;
+ let enabled=true,finished=false,frame,canvas,curtain,previous,replica,backdrop,replicaViewport=null;
  const timeouts=[],animations=[];
  try{enabled=localStorage.getItem(preference)!=='false';}catch{}
  const word=overlay.querySelector('.console-arrival-word');
@@ -35,6 +35,9 @@
  }
  function createReplica(){
   if(replica)return;
+  // The mirror is a frozen frame: if the viewport changes, never keep showing
+  // geometry copied at the previous size over the newly responsive live page.
+  replicaViewport={width:innerWidth,height:innerHeight};
   backdrop=document.createElement('div');backdrop.className='console-arrival-stage';backdrop.setAttribute('aria-hidden','true');
   replica=document.createElement('div');replica.className='console-arrival-replica';
   replica.setAttribute('aria-hidden','true');replica.setAttribute('data-no-translate','');replica.inert=true;
@@ -246,6 +249,15 @@
   if(e.key==='Escape'&&!overlay.hidden){e.preventDefault();finish();}
  },true);
  window.addEventListener('pagehide',finish,{once:true});
+ // A changed viewport invalidates the entrance replica. Hand control back to
+ // the real live interface rather than showing an obsolete clone or black gap.
+ // Ignore the small height variations of mobile browser address bars.
+ window.addEventListener('resize',()=>{
+  if(finished||overlay.hidden||!replicaViewport)return;
+  const dx=Math.abs(innerWidth-replicaViewport.width);
+  const dy=Math.abs(innerHeight-replicaViewport.height);
+  if(dx>3||dy>(innerWidth<=1100?110:8))finish();
+ });
  reduce.addEventListener('change',()=>{if(reduce.matches)finish();});
  const settings=document.querySelector('#index2SettingsPanel .index2-settings-section');
  if(settings){

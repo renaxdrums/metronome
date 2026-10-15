@@ -487,3 +487,10 @@ html#renaxApp[data-theme=ivory] .panel-visu :is(
 @media(max-width:1100px){
  html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel{margin-bottom:10px!important}
 }
+/* Reduced-width visual clearance, scoped to ivory only. */
+@media(min-width:1101px) and (max-width:1380px){
+ html#renaxApp[data-theme=ivory] body .visu-toolbar .workspace-tempo-group #tapBtn{position:relative!important;right:26px!important}
+}
+@media(max-width:1100px){
+ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) #sequencerContainer{top:8px!important}
+}

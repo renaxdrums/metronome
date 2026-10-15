@@ -268,13 +268,13 @@ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) :is(#scoreMetronome
 }
 
 /* Unified Ivory control states. Scoped to appearance; no musical behavior. */
-html#renaxApp[data-theme=ivory] body :is(#songsRoot #songPane,#index2SettingsPanel,.panel,dialog) :is(button.btn,button.song-more,button.song-count-in-button,.sequence-preview-play,.multi-solo,.multi-mute,.song-back,summary,.appearance-options button){
+html#renaxApp[data-theme=ivory] body :is(#songsRoot #songPane,#index2SettingsPanel,.panel,dialog) :is(button.btn:where(:not(#playBtn,#trainBtn,#trainingVisualBtn)),button.song-more,button.song-count-in-button,.sequence-preview-play,.multi-solo,.multi-mute,.song-back,summary,.appearance-options button){
  background:#f1f3e8!important;color:#244c40!important;border-color:#bdcbb9!important;
 }
 html#renaxApp[data-theme=ivory] body :is(button,summary,.numbox-trigger,.numbox-option):focus-visible{
  outline:2px solid #147789!important;outline-offset:3px!important;
 }
-html#renaxApp[data-theme=ivory] body :is(#songsRoot #songPane,#index2SettingsPanel,.panel,dialog) :is(button.btn,button.song-more,button.song-count-in-button,.sequence-preview-play,.multi-solo,.multi-mute,.song-back,summary):not(:disabled):hover{
+html#renaxApp[data-theme=ivory] body :is(#songsRoot #songPane,#index2SettingsPanel,.panel,dialog) :is(button.btn:where(:not(#playBtn,#trainBtn,#trainingVisualBtn)),button.song-more,button.song-count-in-button,.sequence-preview-play,.multi-solo,.multi-mute,.song-back,summary):not(:disabled):hover{
  background:#e0e8d5!important;color:#173e37!important;border-color:#718c70!important;
 }
 html#renaxApp[data-theme=ivory] body :is(#songsRoot #songPane,#index2SettingsPanel,.panel,dialog) :is(button[aria-pressed=true],button[aria-selected=true],summary[aria-expanded=true],button.song-more[aria-expanded=true]){

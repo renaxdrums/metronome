@@ -1,9 +1,9 @@
 /* Ivory / blue / mint: scoped theme; existing dark and light layouts stay intact. */
 html#renaxApp[data-theme=ivory]{
  color-scheme:light;
- --bg:#f3efe4;--panel:#173b4b;--border:#496b76;--text:#f6f1e5;--text-muted:#c2d0cf;
- --orange:#e6d8b7;--cyan:#70d5df;--yellow:#97d4a5;--grey:#285363;--grey-hover:#356879;
- --ivory-ink:#173b4b;--ivory-green:#2d7559;--ivory-surface:#214a5a;--ivory-card:#244f5e;
+ --bg:#f3efe4;--panel:#13363b;--border:#496b76;--text:#f6f1e5;--text-muted:#c2d0cf;
+ --orange:#e6d8b7;--cyan:#70d5df;--yellow:#d9ef62;--grey:#2b5556;--grey-hover:#356766;
+ --ivory-ink:#13363b;--ivory-green:#2d7559;--ivory-surface:#1b4247;--ivory-card:#244f5e;
 }
 html#renaxApp[data-theme=ivory] body{background:var(--bg)!important;color:var(--ivory-ink);letter-spacing:0}
 html#renaxApp[data-theme=ivory] body>header{background:transparent!important;border:0!important;color:var(--ivory-ink)}
@@ -26,93 +26,93 @@ html#renaxApp[data-theme=ivory] #workspaceNav button:focus-visible{outline:2px s
 html#renaxApp[data-theme=ivory] :is(.panel,#songsRoot){color:var(--text)}
 html#renaxApp[data-theme=ivory] .panel{
  background:var(--panel)!important;border:1px solid #214957!important;border-radius:15px!important;
- box-shadow:0 10px 30px #173b4b09;min-width:0;
+ box-shadow:0 10px 30px #13363b09;min-width:0;
 }
-html#renaxApp[data-theme=ivory] .panel-visu{background:#173b4b!important}
+html#renaxApp[data-theme=ivory] .panel-visu{background:#13363b!important}
 html#renaxApp[data-theme=ivory] .panel-visu .sequencer-wrapper{background:transparent!important}
 html#renaxApp[data-theme=ivory] :is(.panel-title,.measure-label,.control-group>label,.workspace-timer-label,.training-row .row-label,.training-row .unit,.tempo-label,.tempo-unit){color:var(--text-muted)!important}
 html#renaxApp[data-theme=ivory] .panel-visu :is(.visu-toolbar,#workspaceControls){
- background:#204858!important;border-color:#456a75!important;box-shadow:none!important;
+ background:#1c4146!important;border-color:#456a75!important;box-shadow:none!important;
 }
 html#renaxApp[data-theme=ivory] .visu-toolbar :is(.workspace-control-group,#workspaceTimer){border-left-color:#4b6e78!important}
 html#renaxApp[data-theme=ivory] :is(.numbox-button,input:not([type=range]):not([type=checkbox]),select,textarea){
- background:#234d5d!important;color:var(--text)!important;border-color:#567882!important;box-shadow:none!important;
+ background:#244d50!important;color:var(--text)!important;border-color:#567882!important;box-shadow:none!important;
 }
 html#renaxApp[data-theme=ivory] input::placeholder,html#renaxApp[data-theme=ivory] textarea::placeholder{color:#b5c9c7}
 html#renaxApp[data-theme=ivory] :is(.numbox-dropdown,.numbox-menu,.numbox-options,.sound-bank-menu,.training-curve-menu,.sequence-more-actions,.multi-actions,.song-more-menu){
- background:#214958!important;color:var(--text)!important;border-color:#5a7d86!important;box-shadow:0 10px 25px #102c3b30!important;
- scrollbar-color:#70d5df #214958;
+ background:#1b4247!important;color:var(--text)!important;border-color:#5a7d86!important;box-shadow:0 10px 25px #102c3b30!important;
+ scrollbar-color:#70d5df #1b4247;
 }
 html#renaxApp[data-theme=ivory] :is(.numbox-option,.training-curve-menu button,.song-more-menu button,.multi-actions button,.sequence-more-actions button){color:var(--text)!important}
 html#renaxApp[data-theme=ivory] :is(.numbox-option:hover,.numbox-option[aria-selected=true],.training-curve-menu button[aria-pressed=true]){
- background:#70d5df!important;color:#173b4b!important;
+ background:#70d5df!important;color:#13363b!important;
 }
 html#renaxApp[data-theme=ivory] :is(input[type=range],.tempo-fader){background:#66828a!important}
-html#renaxApp[data-theme=ivory] input[type=range]::-webkit-slider-thumb{background:#91d6ad!important;box-shadow:none!important}
-html#renaxApp[data-theme=ivory] :is(.tempo-display,.volume-value){color:#a2dfbd!important}
+html#renaxApp[data-theme=ivory] input[type=range]::-webkit-slider-thumb{background:#d9ef62!important;box-shadow:none!important}
+html#renaxApp[data-theme=ivory] :is(.tempo-display,.volume-value){color:#d9ef62!important}
 html#renaxApp[data-theme=ivory] #trainTimer{color:#82e0e7!important}
-html#renaxApp[data-theme=ivory] #tapBtn{background:#295565!important;border-color:#64848c!important;color:var(--text)!important}
+html#renaxApp[data-theme=ivory] #tapBtn{background:#2c585a!important;border-color:#64848c!important;color:var(--text)!important}
 html#renaxApp[data-theme=ivory] :is(.beat-number,.beat-number.pulse){color:var(--text)!important;text-shadow:none!important}
 html#renaxApp[data-theme=ivory] .beat-divider{background:#c6d8d0!important;opacity:.52;box-shadow:none!important}
 html#renaxApp[data-theme=ivory] :is(.sequencer-cross,.sequencer-cross::before,.sequencer-cross::after){background:#b7d0cc!important}
 html#renaxApp[data-theme=ivory] .step{box-shadow:none!important;border-radius:9px!important}
 html#renaxApp[data-theme=ivory] .step[data-state="1"]{background:#70d5df!important}
-html#renaxApp[data-theme=ivory] .step[data-state="2"]{background:#97d4a5!important}
+html#renaxApp[data-theme=ivory] .step[data-state="2"]{background:#d9ef62!important}
 html#renaxApp[data-theme=ivory] .step[data-state="3"]{background:#d6d9a5!important}
 html#renaxApp[data-theme=ivory] .step[data-state="0"]{background:#295262!important;border:1px solid #8baaa9}
-html#renaxApp[data-theme=ivory] .step span{color:#173b4b!important}
+html#renaxApp[data-theme=ivory] .step span{color:#13363b!important}
 html#renaxApp[data-theme=ivory] .step[data-state="0"] span{color:#c2d0cf!important}
-html#renaxApp[data-theme=ivory] .poly-ring.outer{border-color:#97d4a580!important}
+html#renaxApp[data-theme=ivory] .poly-ring.outer{border-color:#d9ef6280!important}
 html#renaxApp[data-theme=ivory] .poly-ring.inner{border-color:#70d5df80!important}
 html#renaxApp[data-theme=ivory] .poly-dot{box-shadow:none!important}
 html#renaxApp[data-theme=ivory] :is(.btn,.multi-add,.playlist-create,.track-create,.track-add-section,.appearance-options button){
- background:#295363!important;border-color:#557b85!important;color:var(--text)!important;box-shadow:none!important;
+ background:#2c585a!important;border-color:#557b85!important;color:var(--text)!important;box-shadow:none!important;
 }
 html#renaxApp[data-theme=ivory] :is(#playBtn,#trainBtn,#trainingVisualBtn){
- background:#70d5df!important;border-color:#70d5df!important;color:#173b4b!important;box-shadow:0 3px 10px #0e2a341a!important;
+ background:#70d5df!important;border-color:#70d5df!important;color:#13363b!important;box-shadow:0 3px 10px #0e2a341a!important;
 }
-html#renaxApp[data-theme=ivory] :is(#playBtn::before,#trainBtn::before){background:#173b4b!important}
-html#renaxApp[data-theme=ivory] #playBtn svg{fill:#173b4b!important;color:#173b4b!important}
+html#renaxApp[data-theme=ivory] :is(#playBtn::before,#trainBtn::before){background:#13363b!important}
+html#renaxApp[data-theme=ivory] #playBtn svg{fill:#13363b!important;color:#13363b!important}
 html#renaxApp[data-theme=ivory] :is(#playBtn:hover,#trainBtn:hover,#trainingVisualBtn:hover){background:#8ae1e7!important}
 html#renaxApp[data-theme=ivory] :is(#sequenceAddMeasure,#multiControls>.multi-add,#multiPresetLibrary .multi-preset-create,#songsRoot .playlist-create,#songsRoot .track-create,#songsRoot .track-add-section){
- background:#2a5965!important;border-color:#6c9a9f!important;color:#b5ead0!important;
+ background:#2a5965!important;border-color:#6c9a9f!important;color:#e1ecac!important;
 }
 html#renaxApp[data-theme=ivory] :is(.measure-card,.multi-track,.multi-preset,.song-section,.song-card,.playlist-choice,.song-block,.song-count-in){
- background:#214a59!important;border-color:#4e7480!important;color:var(--text)!important;box-shadow:none!important;
+ background:#1b4247!important;border-color:#4e7480!important;color:var(--text)!important;box-shadow:none!important;
 }
 html#renaxApp[data-theme=ivory] :is(.measure-card.active,.multi-track.active,.multi-preset.active,.playlist-choice.active,.song-section.selected){
- background:#2b5965!important;border-color:#8fc7c9!important;box-shadow:inset 3px 0 #70d5df!important;
+ background:#2d5b5a!important;border-color:#8fc7c9!important;box-shadow:inset 3px 0 #70d5df!important;
 }
 html#renaxApp[data-theme=ivory] :is(.measure-num,.multi-track-name,.multi-preset-name,.song-title,.playlist-heading-name){color:var(--text)!important}
 html#renaxApp[data-theme=ivory] :is(.multi-preset-meta,.multi-preset-count,.song-block-summary,.song-playlist-summary,.song-note,.multi-preset-status){color:#c2d0cf!important}
 html#renaxApp[data-theme=ivory] :is(.sequence-preview-play,.sequence-more summary,.multi-more summary,.multi-solo,.multi-mute,.reset-undo-tools button,.view-toggle button,.score-view-switch button,.song-back,.song-more,.playlist-direct-play){
- background:#214958!important;border-color:#537984!important;color:#a3dfbb!important;box-shadow:none!important;
+ background:#1b4247!important;border-color:#537984!important;color:#d9ef62!important;box-shadow:none!important;
 }
 html#renaxApp[data-theme=ivory] :is(.multi-solo[aria-pressed=true],.score-view-switch button[aria-pressed=true]){background:#336973!important;border-color:#82d3d7!important;color:#edfaf2!important}
-html#renaxApp[data-theme=ivory] .training-mode-tabs button{background:#234d5c!important;border-color:#557b85!important;color:#c3d1d1!important}
-html#renaxApp[data-theme=ivory] .training-mode-tabs button.active{background:#32616c!important;border-color:#91d3cb!important;color:#f6f1e5!important;box-shadow:inset 0 -3px #91d6ad!important}
-html#renaxApp[data-theme=ivory] .training-mode-tabs svg{color:#a2dfbd!important;stroke:#a2dfbd!important}
+html#renaxApp[data-theme=ivory] .training-mode-tabs button{background:#244d50!important;border-color:#557b85!important;color:#c3d1d1!important}
+html#renaxApp[data-theme=ivory] .training-mode-tabs button.active{background:#315f5b!important;border-color:#bfd77a!important;color:#f6f1e5!important;box-shadow:inset 0 -3px #d9ef62!important}
+html#renaxApp[data-theme=ivory] .training-mode-tabs svg{color:#d9ef62!important;stroke:#d9ef62!important}
 html#renaxApp[data-theme=ivory] .silent-settings.disabled{opacity:1!important}
 html#renaxApp[data-theme=ivory] .silent-settings.disabled :is(label,.numbox-button){color:#aabfc1!important}
 html#renaxApp[data-theme=ivory] :is(#index2SettingsPanel,.index2-settings-panel){
- background:#173b4b!important;border-color:#567782!important;color:var(--text)!important;
+ background:#13363b!important;border-color:#567782!important;color:var(--text)!important;
 }
 html#renaxApp[data-theme=ivory] #index2SettingsPanel .index2-settings-section{
  background:#224b5a!important;border:1px solid #4d7380!important;box-shadow:none!important;
 }
 html#renaxApp[data-theme=ivory] #index2SettingsPanel :is(h3,.index2-setting-row){color:#d0ded7!important}
-html#renaxApp[data-theme=ivory] #index2SettingsPanel :is(button,select,.numbox-button){background:#2a5565!important;border-color:#5a7c86!important;color:var(--text)!important;box-shadow:none!important}
-html#renaxApp[data-theme=ivory] #index2SettingsPanel button[aria-pressed=true]{background:#376c72!important;border-color:#91cdbc!important;box-shadow:inset 0 -2px #91d6ad!important}
-html#renaxApp[data-theme=ivory] #index2SettingsPanel .index2-settings-note{background:#2a5562!important;color:#c7d8d2!important;border-left-color:#91d6ad!important}
-html#renaxApp[data-theme=ivory] :is(.index2-status,.cloud-status){color:#a2dfbd!important}
+html#renaxApp[data-theme=ivory] #index2SettingsPanel :is(button,select,.numbox-button){background:#2c585a!important;border-color:#5a7c86!important;color:var(--text)!important;box-shadow:none!important}
+html#renaxApp[data-theme=ivory] #index2SettingsPanel button[aria-pressed=true]{background:#315f5b!important;border-color:#bfd77a!important;box-shadow:inset 0 -2px #d9ef62!important}
+html#renaxApp[data-theme=ivory] #index2SettingsPanel .index2-settings-note{background:#2a5562!important;color:#c7d8d2!important;border-left-color:#d9ef62!important}
+html#renaxApp[data-theme=ivory] :is(.index2-status,.cloud-status){color:#d9ef62!important}
 html#renaxApp[data-theme=ivory] :is(.song-confirm-dialog,.song-export-dialog,.song-export-panel,.sound-bank-dialog,.bank-menu,.sound-bank-popover){
- background:#214a5a!important;color:var(--text)!important;border-color:#63828b!important;
+ background:#1b4247!important;color:var(--text)!important;border-color:#63828b!important;
 }
-html#renaxApp[data-theme=ivory] :is(.rhythm-score,.rhythm-score-stage){background:#f3efe4!important;color:#173b4b!important;border-color:#d8dfd4!important;border-radius:10px}
+html#renaxApp[data-theme=ivory] :is(.rhythm-score,.rhythm-score-stage){background:#f3efe4!important;color:#13363b!important;border-color:#d8dfd4!important;border-radius:10px}
 html#renaxApp[data-theme=ivory] .rhythm-score .legend{color:#355c61!important}
-html#renaxApp[data-theme=ivory] :is(.rhythm-editor,.beat-editor){background:#214a5a!important;color:var(--text)!important;border-color:#67868d!important}
+html#renaxApp[data-theme=ivory] :is(.rhythm-editor,.beat-editor){background:#1b4247!important;color:var(--text)!important;border-color:#67868d!important}
 html#renaxApp[data-theme=ivory] :is(.rhythm-editor button,.beat-editor button){background:#2b5868!important;color:var(--text)!important;border-color:#698a91!important}
-html#renaxApp[data-theme=ivory] :is(.rhythm-editor button.active,.rhythm-editor button[aria-pressed=true]){background:#70d5df!important;color:#173b4b!important}
+html#renaxApp[data-theme=ivory] :is(.rhythm-editor button.active,.rhythm-editor button[aria-pressed=true]){background:#70d5df!important;color:#13363b!important}
 html#renaxApp[data-theme=ivory] footer{color:#62786f!important}
 html#renaxApp[data-theme=ivory] footer .footer-right{color:#62786f!important}
 html#renaxApp[data-theme=ivory] button:focus-visible,html#renaxApp[data-theme=ivory] summary:focus-visible{outline:2px solid #70d5df;outline-offset:3px}
@@ -159,7 +159,7 @@ html#renaxApp[data-theme=ivory] button:focus-visible,html#renaxApp[data-theme=iv
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{content:'';position:absolute;left:28%;right:28%;bottom:2px;height:2px;background:#2d7559}
  html#renaxApp[data-theme=ivory] #workspaceMobileViews{display:flex!important;gap:18px;padding:0 3px 10px;flex:0 0 auto;min-height:38px}
  html#renaxApp[data-theme=ivory] #workspaceMobileViews button{flex:1;border:0;border-bottom:2px solid transparent;border-radius:0;background:var(--bg);color:#527066;padding:8px 3px;font:500 11px var(--font)}
- html#renaxApp[data-theme=ivory] #workspaceMobileViews button[aria-pressed=true]{border-bottom-color:#2d7559;color:#173b4b;font-weight:700}
+ html#renaxApp[data-theme=ivory] #workspaceMobileViews button[aria-pressed=true]{border-bottom-color:#2d7559;color:#13363b;font-weight:700}
  html#renaxApp[data-theme=ivory] .main-grid{padding:0!important;gap:10px!important}
  html#renaxApp[data-theme=ivory] .panel{border-radius:12px!important}
  html#renaxApp[data-theme=ivory] .panel-visu{padding:12px!important}
@@ -167,7 +167,7 @@ html#renaxApp[data-theme=ivory] button:focus-visible,html#renaxApp[data-theme=iv
  html#renaxApp[data-theme=ivory] footer .footer-center #playBtn{min-height:44px!important}
  html#renaxApp[data-theme=ivory] footer{min-height:60px!important;margin:4px 0 0!important;padding:4px 0!important}
  html#renaxApp[data-theme=ivory] body[data-workspace=training][data-mobile-pane=training] footer{display:none!important}
- html#renaxApp[data-theme=ivory] #workspaceTempoShortcut{background:#295363!important;border-color:#5a7c86!important;color:var(--text)!important}
+ html#renaxApp[data-theme=ivory] #workspaceTempoShortcut{background:#2c585a!important;border-color:#5a7c86!important;color:var(--text)!important}
 }
 @media(prefers-reduced-motion:reduce){html#renaxApp[data-theme=ivory] #workspaceNav button{transition:none}}
 
@@ -183,19 +183,19 @@ html#renaxApp[data-theme=ivory] button:focus-visible,html#renaxApp[data-theme=iv
 html#renaxApp[data-theme=ivory] .volume-row{min-width:0}
 html#renaxApp[data-theme=ivory] #volumeSlider{min-width:0!important;width:auto!important;max-width:100%!important;flex:1 1 0!important}
 html#renaxApp[data-theme=ivory] .volume-value{flex:0 0 30px;min-width:30px}
-html#renaxApp[data-theme=ivory] .orange-ui-icon{stroke:#a3dfbb!important}
-html#renaxApp[data-theme=ivory] .numbox-button::after{border-color:#a3dfbb!important}
+html#renaxApp[data-theme=ivory] .orange-ui-icon{stroke:#d9ef62!important}
+html#renaxApp[data-theme=ivory] .numbox-button::after{border-color:#d9ef62!important}
 html#renaxApp[data-theme=ivory] .step[data-state="3"]{background:#e6d8b7!important}
 html#renaxApp[data-theme=ivory] .subdivision-dot[data-state="3"]{background:#e6d8b7!important}
 html#renaxApp[data-theme=ivory] :is(.subdivision-dot,.poly-dot)[data-state="0"]{background:transparent!important;border:1px solid #9eb7b6!important;opacity:.8!important}
-html#renaxApp[data-theme=ivory] #playBtn::before{border-left-color:#173b4b!important;background:transparent!important}
-html#renaxApp[data-theme=ivory] #playBtn.btn-cyan::before{border:0!important;background:#173b4b!important}
+html#renaxApp[data-theme=ivory] #playBtn::before{border-left-color:#13363b!important;background:transparent!important}
+html#renaxApp[data-theme=ivory] #playBtn.btn-cyan::before{border:0!important;background:#13363b!important}
 html#renaxApp[data-theme=ivory] #playBtn::after{font-size:13px;font-weight:650;letter-spacing:.1px}
 html#renaxApp[data-theme=ivory] :is(#trainBtn,#trainingVisualBtn){font:600 12px/1.4 var(--font)!important;text-transform:none!important;letter-spacing:.1px!important}
-html#renaxApp[data-theme=ivory] :is(#trainBtn,#trainingVisualBtn)::before{content:'';display:inline-block;flex:0 0 10px;width:10px;height:12px;margin-right:8px;background:#173b4b!important;clip-path:polygon(0 0,100% 50%,0 100%)}
+html#renaxApp[data-theme=ivory] :is(#trainBtn,#trainingVisualBtn)::before{content:'';display:inline-block;flex:0 0 10px;width:10px;height:12px;margin-right:8px;background:#13363b!important;clip-path:polygon(0 0,100% 50%,0 100%)}
 html#renaxApp[data-theme=ivory] :is(#trainBtn.active,#trainingVisualBtn.active)::before{height:10px;clip-path:none;border-radius:1px}
 html#renaxApp[data-theme=ivory] .training-mode-tabs button{font-size:11px!important}
-html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]{background:#32616c!important;border-color:#91d3cb!important;color:#f6f1e5!important;box-shadow:inset 0 -3px #91d6ad!important;font-weight:700}
+html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]{background:#315f5b!important;border-color:#bfd77a!important;color:#f6f1e5!important;box-shadow:inset 0 -3px #d9ef62!important;font-weight:700}
 html#renaxApp[data-theme=ivory] .training-row :is(.row-label,.unit){font-size:11px!important;text-transform:none!important;letter-spacing:0}
 html#renaxApp[data-theme=ivory] :is(.multi-preset-create,.sequence-add){text-transform:none!important;letter-spacing:0!important;font-size:12px!important}
 @media(min-width:1101px){
@@ -213,42 +213,42 @@ html#renaxApp[data-theme=ivory] :is(.multi-preset-create,.sequence-add){text-tra
 html#renaxApp[data-theme=ivory] footer :is(.footer-right, .footer-right span, .author-credit){color:#4e695f!important;font-size:10px!important}
 
 html#renaxApp[data-theme=ivory] .poly-dot[data-state="1"]{background:#70d5df!important;border-color:#70d5df!important}
-html#renaxApp[data-theme=ivory] .poly-dot[data-state="2"]{background:#97d4a5!important;border-color:#97d4a5!important}
+html#renaxApp[data-theme=ivory] .poly-dot[data-state="2"]{background:#d9ef62!important;border-color:#d9ef62!important}
 html#renaxApp[data-theme=ivory] .poly-dot[data-state="3"]{background:#e6d8b7!important;border-color:#e6d8b7!important}
 html#renaxApp[data-theme=ivory] .poly-ring.outer{border-color:#e6d8b780!important}
 html#renaxApp[data-theme=ivory] :is(.step.active,.poly-dot.active){outline:2px solid #f6f1e5;outline-offset:4px;box-shadow:0 0 0 6px #70d5df20!important}
 
-html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option{background:#285363!important;border-color:#587a84!important;color:#f6f1e5!important}
+html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option{background:#2b5556!important;border-color:#587a84!important;color:#f6f1e5!important}
 html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option:hover{background:#356873!important;border-color:#86b5b6!important}
-html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option.active{background:#70d5df!important;border-color:#70d5df!important;color:#173b4b!important}
-html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option svg{stroke:#a3dfbb!important}
-html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option.active svg{stroke:#173b4b!important}
-html#renaxApp[data-theme=ivory] :is(dialog,#backupAccount,.backup-profile,.backup-json,.score-group-panel){background:#214a5a!important;color:#f6f1e5!important;border-color:#5a7c86!important}
-html#renaxApp[data-theme=ivory] #songsHome>.song-entry{background:#214a5a!important;color:#f6f1e5!important;border-color:#5a7c86!important}
-html#renaxApp[data-theme=ivory] #songPane .song-playlist-card{background:#214a5a!important;border-color:#5a7c86!important}
-html#renaxApp[data-theme=ivory] #songPane .song-playlist-card.active{background:#2b5965!important;border-color:#8fc7c9!important;box-shadow:inset 3px 0 #70d5df!important}
-html#renaxApp[data-theme=ivory] :is(#mp3ExportSave,#mp3ExportDownload){background:#70d5df!important;color:#173b4b!important;border-color:#70d5df!important}
+html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option.active{background:#70d5df!important;border-color:#70d5df!important;color:#13363b!important}
+html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option svg{stroke:#d9ef62!important}
+html#renaxApp[data-theme=ivory] .sound-bank-cards .numbox-option.active svg{stroke:#13363b!important}
+html#renaxApp[data-theme=ivory] :is(dialog,#backupAccount,.backup-profile,.backup-json,.score-group-panel){background:#1b4247!important;color:#f6f1e5!important;border-color:#5a7c86!important}
+html#renaxApp[data-theme=ivory] #songsHome>.song-entry{background:#1b4247!important;color:#f6f1e5!important;border-color:#5a7c86!important}
+html#renaxApp[data-theme=ivory] #songPane .song-playlist-card{background:#1b4247!important;border-color:#5a7c86!important}
+html#renaxApp[data-theme=ivory] #songPane .song-playlist-card.active{background:#2d5b5a!important;border-color:#8fc7c9!important;box-shadow:inset 3px 0 #70d5df!important}
+html#renaxApp[data-theme=ivory] :is(#mp3ExportSave,#mp3ExportDownload){background:#70d5df!important;color:#13363b!important;border-color:#70d5df!important}
 html#renaxApp[data-theme=ivory] .mp3-credit{color:#c2d0cf!important}
-html#renaxApp[data-theme=ivory] *{scrollbar-color:#70d5df #173b4b!important}
-html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-track,html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-corner{background:#173b4b!important}
-html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-thumb{background:#70d5df!important;border-color:#173b4b!important}
+html#renaxApp[data-theme=ivory] *{scrollbar-color:#70d5df #13363b!important}
+html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-track,html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-corner{background:#13363b!important}
+html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-thumb{background:#70d5df!important;border-color:#13363b!important}
 
-/* Two greens: retain the mint/forest family, add a distinct citrus accent. */
+/* Two greens: retain the deep-green/blue family, add a distinct citrus accent. */
 html#renaxApp[data-theme=ivory]{--ivory-lime:#d9ef62}
 html#renaxApp[data-theme=ivory] .brand-logo{
  content:url("assets/renax-logo-ivory.svg?v=20261015-citron31");filter:none!important;
- width:34px!important;height:46px!important;padding:6px;background:#173b4b;border-radius:9px;box-sizing:content-box;
+ width:34px!important;height:46px!important;padding:6px;background:#13363b;border-radius:9px;box-sizing:content-box;
 }
 html#renaxApp[data-theme=ivory] #bpmDisplay{color:var(--ivory-lime)!important}
 html#renaxApp[data-theme=ivory] .visu-toolbar .orange-ui-icon{stroke:var(--ivory-lime)!important}
 html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]{border-color:#b8d477!important;box-shadow:inset 0 -3px var(--ivory-lime)!important}
 html#renaxApp[data-theme=ivory] :is(.multi-track.active,.multi-preset.active,.measure-card.active,.playlist-choice.active,.song-section.selected){box-shadow:inset 3px 0 var(--ivory-lime)!important}
-html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active){background:var(--ivory-lime)!important;border-color:var(--ivory-lime)!important;color:#173b4b!important}
+html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active){background:var(--ivory-lime)!important;border-color:var(--ivory-lime)!important;color:#13363b!important}
 html#renaxApp[data-theme=ivory] .score-view-switch button[aria-pressed=true] svg{stroke:var(--ivory-lime)!important}
 @media(min-width:1101px){
  html#renaxApp[data-theme=ivory] #workspaceNav button{padding:12px 8px!important;gap:9px}
  html#renaxApp[data-theme=ivory] #workspaceNav button svg{width:18px;height:18px;padding:4px;border-radius:6px;box-sizing:content-box;flex:0 0 18px}
- html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{background:#173b4b;stroke:var(--ivory-lime)!important}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{background:#13363b;stroke:var(--ivory-lime)!important}
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{background:var(--ivory-lime);border:1px solid #61796a;width:6px;height:6px;flex-basis:6px}
 }
 @media(max-width:1100px){
@@ -257,13 +257,18 @@ html#renaxApp[data-theme=ivory] .score-view-switch button[aria-pressed=true] svg
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{background:#7b941f}
 }
 
-/* Reference balance: a clear citrus primary action, alongside mint and deep green. */
-html#renaxApp[data-theme=ivory] :is(#playBtn,#trainBtn,#trainingVisualBtn){background:var(--ivory-lime)!important;border-color:var(--ivory-lime)!important;color:#173b4b!important}
+/* Reference balance: a clear citrus primary action, alongside deep green. */
+html#renaxApp[data-theme=ivory] :is(#playBtn,#trainBtn,#trainingVisualBtn){background:var(--ivory-lime)!important;border-color:var(--ivory-lime)!important;color:#13363b!important}
 html#renaxApp[data-theme=ivory] :is(#playBtn:hover,#trainBtn:hover,#trainingVisualBtn:hover){background:#e5f587!important;border-color:#e5f587!important}
-html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active){background:#91d6ad!important;border-color:#91d6ad!important;color:#173b4b!important}
-html#renaxApp[data-theme=ivory] #workspaceNav button svg{background:#244c41;stroke:var(--ivory-lime)!important}
-html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{background:#173b4b;stroke:var(--ivory-lime)!important}
+html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active){background:#d9ef62!important;border-color:#d9ef62!important;color:#13363b!important}
+html#renaxApp[data-theme=ivory] #workspaceNav button svg{background:#163b30;stroke:var(--ivory-lime)!important}
+html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{background:#13363b;stroke:var(--ivory-lime)!important}
 @media(max-width:1100px){
  html#renaxApp[data-theme=ivory] #workspaceNav button svg{width:15px;height:15px;flex:0 0 15px;padding:3px;border-radius:5px;box-sizing:content-box}
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{stroke:var(--ivory-lime)!important}
 }
+
+/* The references pair a deep green surface with citrus, not a pastel green. */
+html#renaxApp[data-theme=ivory]{--panel:#13363b;--ivory-surface:#1b4247;--ivory-card:#244d50;--yellow:#d9ef62}
+html#renaxApp[data-theme=ivory] #renaxHeaderWave{filter:none;opacity:.62;mix-blend-mode:multiply}
+html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active){background:#70d5df!important;border-color:#70d5df!important;color:#13363b!important}

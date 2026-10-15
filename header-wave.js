@@ -22,7 +22,8 @@
   const theta=2*Math.PI*(elapsed%period)/period,base=height*.88+5,amplitude=height*.50;
   ctx.clearRect(0,0,width,height+12);
   const gradient=ctx.createLinearGradient(0,0,width,0);
-  gradient.addColorStop(0,'#ff7900');gradient.addColorStop(.32,'#ffbb65');gradient.addColorStop(.58,'#cce6c2');gradient.addColorStop(1,'#45d7e7');
+  const ivory=document.documentElement.dataset.theme==='ivory';
+  gradient.addColorStop(0,ivory?'#8fa929':'#ff7900');gradient.addColorStop(.32,ivory?'#d9ef62':'#ffbb65');gradient.addColorStop(.58,ivory?'#4e8065':'#cce6c2');gradient.addColorStop(1,ivory?'#70d5df':'#45d7e7');
   ctx.strokeStyle=gradient;ctx.lineWidth=.65;
   const points=Math.min(240,Math.max(100,Math.round(width/6)));
   for(let k=0;k<30;k++){

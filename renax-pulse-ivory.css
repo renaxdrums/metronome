@@ -505,3 +505,22 @@ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .reset-undo-tools{
   width:13px!important;height:13px!important;
  }
 }
+
+
+/* The real partition module deliberately removes button text nodes;
+   accessible labels remain. Recreate only visible short captions. */
+html#renaxApp[lang=fr][data-theme=ivory] .panel-visu:not(.score-view) #scoreMetronomeBtn::after{content:'Métronome'}
+html#renaxApp[lang=fr][data-theme=ivory] .panel-visu:not(.score-view) #scorePartitionBtn::after{content:'Partition'}
+html#renaxApp[lang=en][data-theme=ivory] .panel-visu:not(.score-view) #scoreMetronomeBtn::after{content:'Metronome'}
+html#renaxApp[lang=en][data-theme=ivory] .panel-visu:not(.score-view) #scorePartitionBtn::after{content:'Score'}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) :is(#scoreMetronomeBtn,#scorePartitionBtn)::after{
+ display:inline-block!important;white-space:nowrap!important;font:700 11px/1 var(--font)!important;
+}
+html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) #scoreViewSwitch button[hidden]{
+ display:none!important;
+}
+@media(max-width:370px){
+ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) :is(#scoreMetronomeBtn,#scorePartitionBtn)::after{
+  font-size:9px!important;
+ }
+}

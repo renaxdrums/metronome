@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Apply before first paint. A system light preference never overrides the default. */
-(()=>{let theme='dark';try{if(localStorage.getItem('renax-appearance')==='light')theme='light';}catch{}document.documentElement.dataset.theme=theme;})();
+(()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['light','ivory'].includes(saved))theme=saved;}catch{}document.documentElement.dataset.theme=theme;})();
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -1680,6 +1680,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
  html#renaxApp body .workspace-controls-grid .control-group:first-child{padding-right:128px!important}
 }
 </style>
+<link rel="stylesheet" href="ivory-theme.css?v=20261015-ivory28">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -1920,6 +1921,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
 <div class="appearance-options" role="group" aria-label="Mode d’affichage">
 <button type="button" data-appearance="dark" aria-pressed="true">Sombre</button>
 <button type="button" data-appearance="light" aria-pressed="false">Clair</button>
+<button type="button" data-appearance="ivory" aria-pressed="false">Ivoire</button>
 </div>
 </section>
     <section class="index2-settings-section">
@@ -4394,8 +4396,8 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 })();</script>
 <script src="multi-clock.js?v=20261012-multi5"></script>
 <script src="multi-metronome.js?v=20261014-polish21"></script>
-<script src="interface-language.js?v=20261014-polish21"></script>
-<script src="workspace-layout.js?v=20261015-training-transport23"></script>
+<script src="interface-language.js?v=20261015-ivory28"></script>
+<script src="workspace-layout.js?v=20261015-ivory28"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=20261015-wave-lower22"></script>
 <script src="console-intro.js?v=20261015-fluid25"></script>
@@ -4421,8 +4423,8 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 </script>
 <script>
 (()=>{const root=document.documentElement,buttons=document.querySelectorAll('[data-appearance]');
-function apply(theme){root.dataset.theme=theme==='light'?'light':'dark';
-document.querySelector('meta[name="theme-color"]')?.setAttribute('content',root.dataset.theme==='light'?'#e4e8eb':'#1c2127');
+function apply(theme){root.dataset.theme=['light','ivory'].includes(theme)?theme:'dark';
+document.querySelector('meta[name="theme-color"]')?.setAttribute('content',root.dataset.theme==='ivory'?'#f3efe4':root.dataset.theme==='light'?'#e4e8eb':'#1c2127');
 buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.appearance===root.dataset.theme)));
 }
 buttons.forEach(b=>b.addEventListener('click',()=>{apply(b.dataset.appearance);try{localStorage.setItem('renax-appearance',root.dataset.theme);}catch{}}));

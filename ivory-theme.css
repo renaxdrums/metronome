@@ -1,0 +1,182 @@
+/* Ivory / blue / mint: scoped theme; existing dark and light layouts stay intact. */
+html#renaxApp[data-theme=ivory]{
+ color-scheme:light;
+ --bg:#f3efe4;--panel:#173b4b;--border:#496b76;--text:#f6f1e5;--text-muted:#c2d0cf;
+ --orange:#91d6ad;--cyan:#70d5df;--yellow:#97d4a5;--grey:#285363;--grey-hover:#356879;
+ --ivory-ink:#173b4b;--ivory-green:#2d7559;--ivory-surface:#214a5a;--ivory-card:#244f5e;
+}
+html#renaxApp[data-theme=ivory] body{background:var(--bg)!important;color:var(--ivory-ink);letter-spacing:0}
+html#renaxApp[data-theme=ivory] body>header{background:transparent!important;border:0!important;color:var(--ivory-ink)}
+html#renaxApp[data-theme=ivory] header :is(h1,h2,.brand p span:first-child){color:var(--ivory-ink)!important}
+html#renaxApp[data-theme=ivory] header .brand p{color:#527066}
+html#renaxApp[data-theme=ivory] header :is(.title-orange,.brand p span:last-child){color:var(--ivory-green)!important}
+html#renaxApp[data-theme=ivory] .brand-logo{filter:hue-rotate(95deg) saturate(.55) brightness(.65)}
+html#renaxApp[data-theme=ivory] header .index2-header-btn{background:#e6e9de!important;border-color:#c3cec3!important;color:var(--ivory-green)!important}
+html#renaxApp[data-theme=ivory] #renaxHeaderWave{opacity:.46;filter:hue-rotate(55deg) brightness(.65) saturate(.65);mix-blend-mode:multiply}
+html#renaxApp[data-theme=ivory] #workspaceNav{background:var(--bg);border:0!important}
+html#renaxApp[data-theme=ivory] #workspaceNav button{
+ position:relative;background:var(--bg)!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+ color:#45645f!important;font-weight:500;letter-spacing:0;transition:color .15s;
+}
+html#renaxApp[data-theme=ivory] #workspaceNav button svg{stroke:var(--ivory-green)!important;color:var(--ivory-green)!important}
+html#renaxApp[data-theme=ivory] #workspaceNav button:hover{color:var(--ivory-ink)!important}
+html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]{color:var(--ivory-ink)!important;font-weight:700}
+html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{stroke:var(--ivory-green)!important}
+html#renaxApp[data-theme=ivory] #workspaceNav button:focus-visible{outline:2px solid var(--ivory-green);outline-offset:3px;border-radius:4px!important}
+html#renaxApp[data-theme=ivory] :is(.panel,#songsRoot){color:var(--text)}
+html#renaxApp[data-theme=ivory] .panel{
+ background:var(--panel)!important;border:1px solid #214957!important;border-radius:15px!important;
+ box-shadow:0 10px 30px #173b4b09;min-width:0;
+}
+html#renaxApp[data-theme=ivory] .panel-visu{background:#173b4b!important}
+html#renaxApp[data-theme=ivory] .panel-visu .sequencer-wrapper{background:transparent!important}
+html#renaxApp[data-theme=ivory] :is(.panel-title,.measure-label,.control-group>label,.workspace-timer-label,.training-row .row-label,.training-row .unit,.tempo-label,.tempo-unit){color:var(--text-muted)!important}
+html#renaxApp[data-theme=ivory] .panel-visu :is(.visu-toolbar,#workspaceControls){
+ background:#204858!important;border-color:#456a75!important;box-shadow:none!important;
+}
+html#renaxApp[data-theme=ivory] .visu-toolbar :is(.workspace-control-group,#workspaceTimer){border-left-color:#4b6e78!important}
+html#renaxApp[data-theme=ivory] :is(.numbox-button,input:not([type=range]):not([type=checkbox]),select,textarea){
+ background:#234d5d!important;color:var(--text)!important;border-color:#567882!important;box-shadow:none!important;
+}
+html#renaxApp[data-theme=ivory] input::placeholder,html#renaxApp[data-theme=ivory] textarea::placeholder{color:#b5c9c7}
+html#renaxApp[data-theme=ivory] :is(.numbox-dropdown,.numbox-menu,.numbox-options,.sound-bank-menu,.training-curve-menu,.sequence-more-actions,.multi-actions,.song-more-menu){
+ background:#214958!important;color:var(--text)!important;border-color:#5a7d86!important;box-shadow:0 10px 25px #102c3b30!important;
+ scrollbar-color:#70d5df #214958;
+}
+html#renaxApp[data-theme=ivory] :is(.numbox-option,.training-curve-menu button,.song-more-menu button,.multi-actions button,.sequence-more-actions button){color:var(--text)!important}
+html#renaxApp[data-theme=ivory] :is(.numbox-option:hover,.numbox-option[aria-selected=true],.training-curve-menu button[aria-pressed=true]){
+ background:#70d5df!important;color:#173b4b!important;
+}
+html#renaxApp[data-theme=ivory] :is(input[type=range],.tempo-fader){background:#66828a!important}
+html#renaxApp[data-theme=ivory] input[type=range]::-webkit-slider-thumb{background:#91d6ad!important;box-shadow:none!important}
+html#renaxApp[data-theme=ivory] :is(.tempo-display,.volume-value){color:#a2dfbd!important}
+html#renaxApp[data-theme=ivory] #trainTimer{color:#82e0e7!important}
+html#renaxApp[data-theme=ivory] #tapBtn{background:#295565!important;border-color:#64848c!important;color:var(--text)!important}
+html#renaxApp[data-theme=ivory] :is(.beat-number,.beat-number.pulse){color:var(--text)!important;text-shadow:none!important}
+html#renaxApp[data-theme=ivory] .beat-divider{background:#c6d8d0!important;opacity:.52;box-shadow:none!important}
+html#renaxApp[data-theme=ivory] :is(.sequencer-cross,.sequencer-cross::before,.sequencer-cross::after){background:#b7d0cc!important}
+html#renaxApp[data-theme=ivory] .step{box-shadow:none!important;border-radius:9px!important}
+html#renaxApp[data-theme=ivory] .step[data-state="1"]{background:#70d5df!important}
+html#renaxApp[data-theme=ivory] .step[data-state="2"]{background:#97d4a5!important}
+html#renaxApp[data-theme=ivory] .step[data-state="3"]{background:#d6d9a5!important}
+html#renaxApp[data-theme=ivory] .step[data-state="0"]{background:#295262!important;border:1px solid #8baaa9}
+html#renaxApp[data-theme=ivory] .step span{color:#173b4b!important}
+html#renaxApp[data-theme=ivory] .step[data-state="0"] span{color:#c2d0cf!important}
+html#renaxApp[data-theme=ivory] .poly-ring.outer{border-color:#97d4a580!important}
+html#renaxApp[data-theme=ivory] .poly-ring.inner{border-color:#70d5df80!important}
+html#renaxApp[data-theme=ivory] .poly-dot{box-shadow:none!important}
+html#renaxApp[data-theme=ivory] .poly-dot.outer{background:#97d4a5!important}
+html#renaxApp[data-theme=ivory] .poly-dot.inner{background:#70d5df!important}
+html#renaxApp[data-theme=ivory] :is(.btn,.multi-add,.playlist-create,.track-create,.track-add-section,.appearance-options button){
+ background:#295363!important;border-color:#557b85!important;color:var(--text)!important;box-shadow:none!important;
+}
+html#renaxApp[data-theme=ivory] :is(#playBtn,#trainBtn,#trainingVisualBtn){
+ background:#70d5df!important;border-color:#70d5df!important;color:#173b4b!important;box-shadow:0 3px 10px #0e2a341a!important;
+}
+html#renaxApp[data-theme=ivory] :is(#playBtn::before,#trainBtn::before){background:#173b4b!important}
+html#renaxApp[data-theme=ivory] #playBtn svg{fill:#173b4b!important;color:#173b4b!important}
+html#renaxApp[data-theme=ivory] :is(#playBtn:hover,#trainBtn:hover,#trainingVisualBtn:hover){background:#8ae1e7!important}
+html#renaxApp[data-theme=ivory] :is(#sequenceAddMeasure,#multiControls>.multi-add,#multiPresetLibrary .multi-preset-create,#songsRoot .playlist-create,#songsRoot .track-create,#songsRoot .track-add-section){
+ background:#2a5965!important;border-color:#6c9a9f!important;color:#b5ead0!important;
+}
+html#renaxApp[data-theme=ivory] :is(.measure-card,.multi-track,.multi-preset,.song-section,.song-card,.playlist-choice,.song-block,.song-count-in){
+ background:#214a59!important;border-color:#4e7480!important;color:var(--text)!important;box-shadow:none!important;
+}
+html#renaxApp[data-theme=ivory] :is(.measure-card.active,.multi-track.active,.multi-preset.active,.playlist-choice.active,.song-section.selected){
+ background:#2b5965!important;border-color:#8fc7c9!important;box-shadow:inset 3px 0 #70d5df!important;
+}
+html#renaxApp[data-theme=ivory] :is(.measure-num,.multi-track-name,.multi-preset-name,.song-title,.playlist-heading-name){color:var(--text)!important}
+html#renaxApp[data-theme=ivory] :is(.multi-preset-meta,.multi-preset-count,.song-block-summary,.song-playlist-summary,.song-note,.multi-preset-status){color:#c2d0cf!important}
+html#renaxApp[data-theme=ivory] :is(.sequence-preview-play,.sequence-more summary,.multi-more summary,.multi-solo,.multi-mute,.reset-undo-tools button,.view-toggle button,.score-view-switch button,.song-back,.song-more,.playlist-direct-play){
+ background:#214958!important;border-color:#537984!important;color:#a3dfbb!important;box-shadow:none!important;
+}
+html#renaxApp[data-theme=ivory] :is(.multi-solo[aria-pressed=true],.score-view-switch button[aria-pressed=true]){background:#336973!important;border-color:#82d3d7!important;color:#edfaf2!important}
+html#renaxApp[data-theme=ivory] .training-mode-tabs button{background:#234d5c!important;border-color:#557b85!important;color:#c3d1d1!important}
+html#renaxApp[data-theme=ivory] .training-mode-tabs button.active{background:#32616c!important;border-color:#91d3cb!important;color:#f6f1e5!important;box-shadow:inset 0 -3px #91d6ad!important}
+html#renaxApp[data-theme=ivory] .training-mode-tabs svg{color:#a2dfbd!important;stroke:#a2dfbd!important}
+html#renaxApp[data-theme=ivory] .silent-settings.disabled{opacity:1!important}
+html#renaxApp[data-theme=ivory] .silent-settings.disabled :is(label,.numbox-button){color:#aabfc1!important}
+html#renaxApp[data-theme=ivory] :is(#index2SettingsPanel,.index2-settings-panel){
+ background:#173b4b!important;border-color:#567782!important;color:var(--text)!important;
+}
+html#renaxApp[data-theme=ivory] #index2SettingsPanel .index2-settings-section{
+ background:#224b5a!important;border:1px solid #4d7380!important;box-shadow:none!important;
+}
+html#renaxApp[data-theme=ivory] #index2SettingsPanel :is(h3,.index2-setting-row){color:#d0ded7!important}
+html#renaxApp[data-theme=ivory] #index2SettingsPanel :is(button,select,.numbox-button){background:#2a5565!important;border-color:#5a7c86!important;color:var(--text)!important;box-shadow:none!important}
+html#renaxApp[data-theme=ivory] #index2SettingsPanel button[aria-pressed=true]{background:#376c72!important;border-color:#91cdbc!important;box-shadow:inset 0 -2px #91d6ad!important}
+html#renaxApp[data-theme=ivory] #index2SettingsPanel .index2-settings-note{background:#2a5562!important;color:#c7d8d2!important;border-left-color:#91d6ad!important}
+html#renaxApp[data-theme=ivory] :is(.index2-status,.cloud-status){color:#a2dfbd!important}
+html#renaxApp[data-theme=ivory] :is(.song-confirm-dialog,.song-export-dialog,.song-export-panel,.sound-bank-dialog,.bank-menu,.sound-bank-popover){
+ background:#214a5a!important;color:var(--text)!important;border-color:#63828b!important;
+}
+html#renaxApp[data-theme=ivory] :is(.rhythm-score,.rhythm-score-stage){background:#f3efe4!important;color:#173b4b!important;border-color:#d8dfd4!important;border-radius:10px}
+html#renaxApp[data-theme=ivory] .rhythm-score .legend{color:#355c61!important}
+html#renaxApp[data-theme=ivory] :is(.rhythm-editor,.beat-editor){background:#214a5a!important;color:var(--text)!important;border-color:#67868d!important}
+html#renaxApp[data-theme=ivory] :is(.rhythm-editor button,.beat-editor button){background:#2b5868!important;color:var(--text)!important;border-color:#698a91!important}
+html#renaxApp[data-theme=ivory] :is(.rhythm-editor button.active,.rhythm-editor button[aria-pressed=true]){background:#70d5df!important;color:#173b4b!important}
+html#renaxApp[data-theme=ivory] footer{color:#62786f!important}
+html#renaxApp[data-theme=ivory] footer .footer-right{color:#62786f!important}
+html#renaxApp[data-theme=ivory] button:focus-visible,html#renaxApp[data-theme=ivory] summary:focus-visible{outline:2px solid #70d5df;outline-offset:3px}
+@media(min-width:1101px){
+ html#renaxApp[data-theme=ivory] body{
+  display:grid!important;grid-template-columns:180px minmax(0,1fr);grid-template-rows:66px minmax(0,1fr) 20px;
+  column-gap:26px;row-gap:22px;padding:22px 26px 12px!important;height:100dvh;min-height:0;overflow:hidden;
+ }
+ html#renaxApp[data-theme=ivory] body>header{grid-column:1/-1;grid-row:1;margin:0!important;padding:0 0 10px!important;min-height:0!important}
+ html#renaxApp[data-theme=ivory] .header-center{left:50%!important}
+ html#renaxApp[data-theme=ivory] #workspaceNav{
+  grid-column:1;grid-row:2;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;
+  gap:10px!important;padding:16px 0 0!important;min-width:0;
+ }
+ html#renaxApp[data-theme=ivory] #workspaceNav button{justify-content:flex-start;min-height:48px;padding:12px 14px 12px 22px!important;font-size:12px;gap:13px}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::before{content:'';position:absolute;left:0;top:13px;bottom:13px;width:3px;border-radius:3px;background:#2d7559}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{content:'';width:5px;height:5px;border-radius:50%;background:#2d7559;margin-left:auto;flex:0 0 5px}
+ html#renaxApp[data-theme=ivory] body>.main-grid{grid-column:2;grid-row:2;margin:0;min-height:0;min-width:0;gap:20px!important}
+ html#renaxApp[data-theme=ivory] body>footer{grid-column:1/-1;grid-row:3;min-height:0;margin:0;padding:0;border:0}
+ html#renaxApp[data-theme=ivory] .main-grid:has(.panel-seq){grid-template-columns:minmax(0,1fr) clamp(330px,27vw,420px)}
+ html#renaxApp[data-theme=ivory] body[data-workspace=metronome] .main-grid{grid-template-columns:minmax(0,1fr)!important}
+ html#renaxApp[data-theme=ivory] .panel-visu{padding:16px!important;gap:14px!important}
+ html#renaxApp[data-theme=ivory] .panel-seq,html#renaxApp[data-theme=ivory] .panel-training{padding:20px!important}
+ html#renaxApp[data-theme=ivory] .panel-visu>.visu-bottom{padding:10px 0 0!important;border:0}
+ html#renaxApp[data-theme=ivory] .visu-toolbar{grid-template-columns:100px minmax(310px,1.7fr) minmax(140px,1fr) 145px 102px;gap:0!important;padding:12px!important}
+ html#renaxApp[data-theme=ivory] .visu-toolbar :is(.workspace-control-group,#workspaceTimer){padding-left:12px;margin-left:12px!important}
+ html#renaxApp[data-theme=ivory] .visu-toolbar :is(.control-group>label,.measure-label,.workspace-timer-label){font-size:10px!important;letter-spacing:0!important;text-transform:none!important}
+ html#renaxApp[data-theme=ivory] .visu-toolbar .numbox-button{font-size:12px!important}
+ html#renaxApp[data-theme=ivory] #playBtn{min-width:168px!important;min-height:46px!important}
+}
+@media(min-width:1101px) and (max-width:1550px){
+ html#renaxApp[data-theme=ivory] body{grid-template-columns:166px minmax(0,1fr);column-gap:22px;padding-left:22px!important;padding-right:22px!important}
+ html#renaxApp[data-theme=ivory] .visu-toolbar{grid-template-columns:100px minmax(0,1fr) 125px!important;row-gap:14px!important}
+ html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-tempo-group{grid-column:2;grid-row:1}
+ html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-control-group:has(#soundBank){grid-column:1/3;grid-row:2;padding-left:0!important;margin-left:0!important;border-left:0!important}
+ html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-control-group:has(#volumeSlider){grid-column:3;grid-row:2}
+ html#renaxApp[data-theme=ivory] .visu-toolbar #workspaceTimer{grid-column:3;grid-row:1}
+}
+@media(max-width:1100px){
+ html#renaxApp[data-theme=ivory] body{padding:10px!important;gap:0}
+ html#renaxApp[data-theme=ivory] header{margin:0 0 8px!important;padding:0 0 8px!important}
+ html#renaxApp[data-theme=ivory] #workspaceNav{gap:0!important;padding:4px 0 10px!important}
+ html#renaxApp[data-theme=ivory] #workspaceNav button{padding:8px 2px!important;min-height:44px;font-size:10px;gap:6px}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{content:'';position:absolute;left:28%;right:28%;bottom:2px;height:2px;background:#2d7559}
+ html#renaxApp[data-theme=ivory] #workspaceMobileViews{display:flex!important;gap:18px;padding:0 3px 10px;flex:0 0 auto;min-height:38px}
+ html#renaxApp[data-theme=ivory] #workspaceMobileViews button{flex:1;border:0;border-bottom:2px solid transparent;border-radius:0;background:var(--bg);color:#527066;padding:8px 3px;font:500 11px var(--font)}
+ html#renaxApp[data-theme=ivory] #workspaceMobileViews button[aria-pressed=true]{border-bottom-color:#2d7559;color:#173b4b;font-weight:700}
+ html#renaxApp[data-theme=ivory] .main-grid{padding:0!important;gap:10px!important}
+ html#renaxApp[data-theme=ivory] .panel{border-radius:12px!important}
+ html#renaxApp[data-theme=ivory] .panel-visu{padding:12px!important}
+ html#renaxApp[data-theme=ivory] .panel-seq,html#renaxApp[data-theme=ivory] .panel-training{padding:15px!important}
+ html#renaxApp[data-theme=ivory] footer .footer-center #playBtn{min-height:44px!important}
+ html#renaxApp[data-theme=ivory] footer{min-height:60px!important;margin:4px 0 0!important;padding:4px 0!important}
+ html#renaxApp[data-theme=ivory] body[data-workspace=training][data-mobile-pane=training] footer{display:none!important}
+ html#renaxApp[data-theme=ivory] #workspaceTempoShortcut{background:#295363!important;border-color:#5a7c86!important;color:var(--text)!important}
+}
+@media(prefers-reduced-motion:reduce){html#renaxApp[data-theme=ivory] #workspaceNav button{transition:none}}
+
+@media(min-width:1101px) and (max-width:1290px){
+ html#renaxApp[data-theme=ivory] .visu-toolbar{grid-template-columns:100px minmax(0,1fr)!important}
+ html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-tempo-group{grid-column:2;grid-row:1}
+ html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-control-group:has(#soundBank){grid-column:1/3;grid-row:3}
+ html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-control-group:has(#volumeSlider){grid-column:1;grid-row:2;padding-left:0!important;margin-left:0!important;border-left:0!important}
+ html#renaxApp[data-theme=ivory] .visu-toolbar #workspaceTimer{grid-column:2;grid-row:2}
+}

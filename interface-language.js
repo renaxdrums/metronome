@@ -2,6 +2,7 @@
 (()=>{
  const storageKey='renax.interfaceLanguage.v1';let language='fr';try{if(localStorage.getItem(storageKey)==='en')language='en';}catch{}
  const translations={
+ 'Ivoire':'Ivory',
  'Lire':'Play','Arrêter':'Stop','Nouvelle piste':'New track','Utilisation':'Using Renax','Le déclenchement MIDI sera disponible dans une prochaine version.':'MIDI triggering will be available in a future version.','Sélectionne une mesure ou une piste pour modifier son rythme. Le crayon ouvre l’éditeur de partition ; la flèche annule la dernière modification.':'Select a bar or track to edit its rhythm. The pencil opens notation editing; the arrow undoes the last edit.',
  'Chronomètre':'Timer',
  'Réglages musicaux':'Musical controls','Vue de travail':'Workspace view','Blocs':'Blocks','Hi-hat fermé naturel':'Natural closed hi-hat','Tambourin naturel':'Natural tambourine',

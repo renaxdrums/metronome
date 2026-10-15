@@ -438,3 +438,40 @@ html#renaxApp[data-theme=ivory] .panel-visu :is(
   min-width:67px!important;padding:4px 3px!important;
  }
 }
+
+
+/* Narrow desktop: nested tempo controls must never spill into the timer. */
+@media(min-width:1101px) and (max-width:1380px){
+ html#renaxApp[data-theme=ivory] .panel-visu .visu-toolbar .workspace-tempo-group{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) minmax(66px,72px)!important;
+  overflow:hidden!important;
+ }
+ html#renaxApp[data-theme=ivory] .panel-visu .visu-toolbar .workspace-tempo-group .tempo-slider-row{
+  min-width:0!important;max-width:100%!important;
+ }
+ html#renaxApp[data-theme=ivory] .panel-visu .visu-toolbar .workspace-tempo-group .tap-tempo-btn{
+  grid-column:3!important;max-width:72px!important;min-width:0!important;width:100%!important;
+ }
+ html#renaxApp[data-theme=ivory] .panel-visu .visu-toolbar #workspaceTimer{
+  overflow:hidden!important;text-align:right!important;
+ }
+}
+/* On exceptionally short phone windows, do not shrink the beats to an
+   untappable 96px dial: the visualizer pane scrolls independently while
+   navigation and the transport stay in place. */
+@media(max-width:370px) and (max-height:630px){
+ html#renaxApp[data-theme=ivory] .main-grid>.panel-visu:not(.score-view){
+  overflow-y:auto!important;overflow-x:hidden!important;
+  scrollbar-width:thin!important;
+ }
+ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .sequencer-wrapper{
+  flex:0 0 246px!important;height:246px!important;min-height:246px!important;
+  overflow:hidden!important;
+ }
+ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) #sequencerContainer{
+  width:min(100%,calc(100cqw - 24px),190px)!important;
+  max-height:190px!important;margin:auto!important;
+ }
+}

@@ -43,7 +43,7 @@ jobs:
               const q=s=>document.querySelector(s),rect=e=>{if(!e)return null;const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};
               const isVisible=e=>!!e&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'&&e.getBoundingClientRect().width>5;
               const nav=[...document.querySelectorAll('#workspaceNav button')],panel=q('.panel-visu'),circle=q('#sequencerContainer'),steps=[...document.querySelectorAll('#sequencerContainer .step')],erase=q('.reset-undo-tools #panicBtn'),undo=q('.reset-undo-tools #undoBtn');
-              return {theme:document.documentElement.dataset.theme,nav:nav.map(n=>({label:n.innerText.trim(),r:rect(n)})),panel:rect(panel),circle:rect(circle),steps:steps.map(rect),eraser:rect(erase),undo:rect(undo),visibleEraser:isVisible(erase),visibleUndo:isVisible(undo),footerEraser:!!q('footer #panicBtn'),footerReset:[...document.querySelectorAll('footer button')].some(b=>b.textContent.trim().toLowerCase()==='reset'),play:isVisible(q('#playBtn')),bodyWidth:document.body.scrollWidth,viewport:innerWidth,bodyHeight:document.body.scrollHeight,screenHeight:innerHeight,panelColor:getComputedStyle(panel).backgroundColor,navColor:getComputedStyle(nav[0]).backgroundColor,navLayout:getComputedStyle(q('#workspaceNav')).display,editorVisible:isVisible(q('#scoreEditBtn')),navRect:rect(q('#workspaceNav')),visibleScore:isVisible(q('#scoreMetronomeBtn'))&&isVisible(q('#scorePartitionBtn')),styleTheme:getComputedStyle(document.body).backgroundColor,errors:[]};
+              return {theme:document.documentElement.dataset.theme,nav:nav.map(n=>({label:n.innerText.trim(),r:rect(n)})),panel:rect(panel),circle:rect(circle),steps:steps.map(rect),eraser:rect(erase),undo:rect(undo),visibleEraser:isVisible(erase),visibleUndo:isVisible(undo),footerEraser:!!q('footer #panicBtn'),footerReset:[...document.querySelectorAll('footer button')].some(b=>b.textContent.trim().toLowerCase()==='reset'),play:isVisible(q('#playBtn')),bodyWidth:document.body.scrollWidth,viewport:innerWidth,bodyHeight:document.body.scrollHeight,screenHeight:innerHeight,panelColor:getComputedStyle(panel).backgroundColor,navColor:getComputedStyle(nav[0]).backgroundColor,navLayout:getComputedStyle(q('#workspaceNav')).display,editorVisible:isVisible(q('#scoreEditBtn')),navRect:rect(q('#workspaceNav')),visibleScore:isVisible(q('#scoreMetronomeBtn'))&&isVisible(q('#scorePartitionBtn')),styleTheme:getComputedStyle(document.body).backgroundColor,orbit:getComputedStyle(circle,'::before').backgroundImage,selectorDirection:getComputedStyle(q('#scoreViewSwitch')).flexDirection,metroCaption:getComputedStyle(q('#scoreMetronomeBtn'),'::after').content,scoreCaption:getComputedStyle(q('#scorePartitionBtn'),'::after').content,errors:[]};
             });
             const tag=width+'x'+height;
             assertion(audit.theme==='ivory','Ivory default',tag);
@@ -53,6 +53,9 @@ jobs:
             assertion(width>1100?audit.navRect.right<=audit.panel.x-5&&audit.nav.every((n,i)=>i===0||n.r.y>audit.nav[i-1].r.y):audit.nav[3].r.y>audit.nav[0].r.y&&audit.nav[0].r.y===audit.nav[1].r.y,'Lateral desktop / 2x3 mobile layout',tag+' '+JSON.stringify(audit.navRect));
             assertion(!audit.editorVisible,'Editor pencil hidden in circular view',tag);
             assertion(audit.visibleScore,'Original visualizer/score selector visible',tag);
+            assertion(audit.orbit.includes('conic-gradient'),'Colored fine orbital dial',tag);
+            assertion(audit.selectorDirection==='row','Horizontal score view selector',tag);
+            assertion(audit.metroCaption.includes('Métronome')&&audit.scoreCaption.includes('Partition'),'Localized score switch captions',tag);
             assertion(audit.circle!==null&&audit.circle.w>140&&audit.circle.bottom<=height+4,'Circular visualizer in viewport',tag+' '+JSON.stringify(audit.circle));
             assertion(audit.steps.length>=4,'Beat controls preserved',tag+' '+audit.steps.length);
             assertion(audit.nav.every(n=>n.r.x>=-3&&n.r.right<=width+3&&n.r.y>=0&&n.r.bottom<=height),'Navigation in viewport',tag);
@@ -73,6 +76,12 @@ jobs:
               assertion(await page.locator('.panel-visu').evaluate(el=>el.classList.contains('score-view')),'Score view switch',tag);
               await page.locator('#scoreMetronomeBtn').click();
               assertion(!(await page.locator('.panel-visu').evaluate(el=>el.classList.contains('score-view'))),'Back to circular view',tag);
+              await page.locator('#playBtn').click();
+              await page.waitForTimeout(220);
+              assertion(await page.locator('#playBtn').getAttribute('aria-pressed')==='true','Native audio playback starts',tag);
+              await page.locator('#playBtn').click();
+              await page.waitForTimeout(150);
+              assertion(await page.locator('#playBtn').getAttribute('aria-pressed')==='false','Native audio playback stops',tag);
               await page.locator('#index2SettingsBtn').click();
               assertion(await page.locator('#index2SettingsPanel').isVisible(),'Settings open',tag);
             }

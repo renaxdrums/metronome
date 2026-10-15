@@ -256,3 +256,14 @@ html#renaxApp[data-theme=ivory] .score-view-switch button[aria-pressed=true] svg
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{stroke:#596a16!important}
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{background:#7b941f}
 }
+
+/* Reference balance: a clear citrus primary action, alongside mint and deep green. */
+html#renaxApp[data-theme=ivory] :is(#playBtn,#trainBtn,#trainingVisualBtn){background:var(--ivory-lime)!important;border-color:var(--ivory-lime)!important;color:#173b4b!important}
+html#renaxApp[data-theme=ivory] :is(#playBtn:hover,#trainBtn:hover,#trainingVisualBtn:hover){background:#e5f587!important;border-color:#e5f587!important}
+html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active){background:#91d6ad!important;border-color:#91d6ad!important;color:#173b4b!important}
+html#renaxApp[data-theme=ivory] #workspaceNav button svg{background:#244c41;stroke:var(--ivory-lime)!important}
+html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{background:#173b4b;stroke:var(--ivory-lime)!important}
+@media(max-width:1100px){
+ html#renaxApp[data-theme=ivory] #workspaceNav button svg{width:15px;height:15px;flex:0 0 15px;padding:3px;border-radius:5px;box-sizing:content-box}
+ html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg{stroke:var(--ivory-lime)!important}
+}

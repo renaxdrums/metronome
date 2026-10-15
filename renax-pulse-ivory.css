@@ -574,29 +574,29 @@ html#renaxApp#renaxApp[data-theme=ivory] body :is(.song-back,button[aria-label^=
 html#renaxApp#renaxApp[data-theme=ivory] body :is(.song-back,button[aria-label^="Retour"],button[aria-label^="Back"],button[title^="Retour"],button[title^="Back"]) :is(svg,.orange-ui-icon){
  color:var(--ivory-lime)!important;stroke:currentColor!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body .training-section :is(.training-curve-select>summary,.training-curve-menu,.training-curve-menu button){
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields :is(.training-curve-select>summary,.training-curve-menu,.training-curve-menu button){
  background:#f3f0e4!important;color:#173e37!important;border-color:#9cac91!important;opacity:1!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body .training-section .training-curve-select svg{
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields .training-curve-select svg{
  stroke:#24554a!important;opacity:1!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body .training-section .training-curve-select .curve-axis{
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields .training-curve-select .curve-axis{
  stroke:#748776!important;opacity:.8!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body .training-section .training-curve-menu button:is(:hover,[aria-pressed=true]){
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields .training-curve-menu button:is(:hover,[aria-pressed=true]){
  background:#f3f0e4!important;border-color:#173e37!important;
  box-shadow:inset 0 -3px var(--ivory-lime)!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body .training-section #dirToggle button{
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields #dirToggle button{
  background:#f3f0e4!important;color:#173e37!important;border:1px solid #9cac91!important;opacity:1!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body .training-section #dirToggle button:is(.active,[aria-pressed=true]){
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields #dirToggle button:is(.active,[aria-pressed=true]){
  background:#173e37!important;color:var(--ivory-lime)!important;border-color:#173e37!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body .training-section #dirToggle button:not(:disabled):hover{
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields #dirToggle button:not(:disabled):hover{
  border-color:#173e37!important;box-shadow:inset 0 -2px var(--ivory-lime)!important;
 }
-html#renaxApp#renaxApp[data-theme=ivory] body .training-section :is(#dirToggle button:disabled,.training-curve-menu button:disabled,.training-curve-select[aria-disabled=true]>summary){
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields :is(#dirToggle button:disabled,.training-curve-menu button:disabled,.training-curve-select[aria-disabled=true]>summary){
  opacity:1!important;border-style:dashed!important;cursor:default!important;
 }
 html#renaxApp#renaxApp[data-theme=ivory] body #index2SettingsPanel .index2-settings-note{
@@ -621,3 +621,5 @@ html#renaxApp#renaxApp[data-theme=ivory] body #songsRoot #songPane .song-back:ho
 html#renaxApp#renaxApp[data-theme=ivory] body #songsRoot #songPane .song-back :is(svg,.orange-ui-icon){
  color:var(--ivory-lime)!important;stroke:currentColor!important;
 }
+
+html#renaxApp#renaxApp[data-theme=ivory] body .training-section #trainingFields .training-curve-row{color:#496357!important}

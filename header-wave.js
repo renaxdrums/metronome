@@ -15,12 +15,12 @@
  function resize(){
   const rect=header.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.max(1,rect.height);
   const dpr=Math.min(devicePixelRatio||1,1.5);
-  canvas.style.width=width+'px';canvas.style.height=height+'px';canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+  canvas.style.width=width+'px';canvas.style.height=(height+12)+'px';canvas.width=Math.round(width*dpr);canvas.height=Math.round((height+12)*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
   draw();
  }
  function draw(){
-  const theta=2*Math.PI*(elapsed%period)/period,base=height*.88,amplitude=height*.42;
-  ctx.clearRect(0,0,width,height);
+  const theta=2*Math.PI*(elapsed%period)/period,base=height*.88+5,amplitude=height*.50;
+  ctx.clearRect(0,0,width,height+12);
   const gradient=ctx.createLinearGradient(0,0,width,0);
   gradient.addColorStop(0,'#ff7900');gradient.addColorStop(.32,'#ffbb65');gradient.addColorStop(.58,'#cce6c2');gradient.addColorStop(1,'#45d7e7');
   ctx.strokeStyle=gradient;ctx.lineWidth=.65;

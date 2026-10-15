@@ -43,6 +43,22 @@
   clickMeasures=state.click;silentMeasures=state.quiet;clickMeasureCountSel.value=String(clickMeasures);silentMeasureCountSel.value=String(silentMeasures);syncNumbox(clickMeasureCountSel);syncNumbox(silentMeasureCountSel);setSilentMode(state.silent);
   measureCountSel.value=String(measures.length);closeBeatEditor();renderSequencerList();renderActiveMeasure();refreshMeasurePreviews();resetCustomizationTimer();
  }
+
+ // One training transport, exposed in the appropriate view on each screen.
+ const trainingButtonHome=document.createComment('training-button-home');trainBtn.before(trainingButtonHome);
+ const trainingVisualButton=document.createElement('button');trainingVisualButton.id='trainingVisualBtn';trainingVisualButton.type='button';trainingVisualButton.className='btn btn-primary';
+ playBtn.after(trainingVisualButton);trainingVisualButton.onclick=()=>trainBtn.click();
+ function syncTrainingTransport(){const label=trainBtn.textContent; if(trainingVisualButton.textContent!==label)trainingVisualButton.textContent=label;trainingVisualButton.disabled=trainBtn.disabled;trainingVisualButton.setAttribute('aria-pressed',trainBtn.getAttribute('aria-pressed')||'false');trainingVisualButton.classList.toggle('active',trainBtn.classList.contains('active'));trainingVisualButton.title=trainBtn.title;}
+ new MutationObserver(syncTrainingTransport).observe(trainBtn,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['disabled','aria-pressed','class','title']});syncTrainingTransport();
+ playBtn.addEventListener('click',event=>{if(page!=='training')return;event.preventDefault();event.stopImmediatePropagation();trainBtn.click();},true);
+ window.addEventListener('keydown',event=>{if(page!=='training'||event.code!=='Space'||isEditingField())return;event.preventDefault();event.stopImmediatePropagation();trainBtn.click();},true);
+ const trainingTransportStyle=document.createElement('style');trainingTransportStyle.textContent=`
+ #trainingVisualBtn{display:none!important}
+ body[data-workspace=training] #playBtn{display:none!important}
+ @media(min-width:1101px){body[data-workspace=training] .footer-center #trainBtn{display:inline-flex!important;align-items:center;justify-content:center;width:auto!important;min-width:210px;min-height:46px;margin:0;padding:12px 22px}}
+ @media(max-width:1100px){body[data-workspace=training][data-mobile-pane=visu] #trainingVisualBtn{display:inline-flex!important;align-items:center;justify-content:center;min-height:44px;padding:10px 20px;background:#173f49;border:1px solid #327b89;color:#c4f1f5;border-radius:7px}html#renaxApp[data-theme=light] body[data-workspace=training] #trainingVisualBtn{background:#087c90!important;border-color:#087c90!important;color:white!important}}
+ `;document.head.append(trainingTransportStyle);
+
  const buttons=new Map();
  const controlOpenByWorkspace=new Map();let shownWorkspace=null,wasDesktop=desktop.matches;
  function rememberControls(){if(!desktop.matches&&shownWorkspace!==null)controlOpenByWorkspace.set(shownWorkspace,controls.open);}
@@ -60,7 +76,7 @@
  function syncAdd(){add.disabled=playbackStarting||measures.length>=8;}
  add.onclick=()=>{if(playbackStarting||!['metronome','polyrhythm'].includes(appMode)||window.RENAX_MULTI?.active||measures.length>=8)return;stopMetronome();measureCountSel.value=String(measures.length+1);measureCountSel.dispatchEvent(new Event('change',{bubbles:true}));activeMeasureIndex=measures.length-1;renderSequencerList();renderActiveMeasure();syncAdd();};
  measureCountSel.addEventListener('change',syncAdd);new MutationObserver(syncAdd).observe(playBtn,{attributes:true,attributeFilter:['disabled','class']});syncAdd();
- function place(){syncTempoShortcut();const group=document.querySelector('.visu-bottom');if(group){if(desktop.matches){if(group.parentNode!==visu)visu.append(group);}else if(group.parentNode!==footer)footer.insertBefore(group,footer.querySelector('.footer-right'));}
+ function place(){syncTempoShortcut();if(desktop.matches&&page==='training'){if(trainBtn.parentNode!==playBtn.parentNode)playBtn.after(trainBtn);}else if(trainBtn.previousSibling!==trainingButtonHome)trainingButtonHome.after(trainBtn);syncTrainingTransport();const group=document.querySelector('.visu-bottom');if(group){if(desktop.matches){if(group.parentNode!==visu)visu.append(group);}else if(group.parentNode!==footer)footer.insertBefore(group,footer.querySelector('.footer-right'));}
   if(trainingSection&&trainingSection.parentNode!==trainHost)trainHost.append(trainingSection);
   const target=!desktop.matches&&page==='training'&&document.body.dataset.mobilePane==='training'?trainPanel:visu;
   if(desktop.matches){const toolbar=visu.querySelector('.visu-toolbar');if(controls.parentNode!==toolbar)toolbar.insertBefore(controls,timerGroup);for(const g of musicGroups)if(g.parentNode!==toolbar)toolbar.insertBefore(g,timerGroup);}

@@ -71,6 +71,17 @@ jobs:
           console.log('SUMMARY:', checks,'checks;',fails,'failures');
           if(fails)process.exit(1);
           JS
+      - name: Show review captures in job log
+        if: always()
+        run: |
+          for img in pulse-1440x900.png pulse-390x844.png; do
+            if [ -s "$img" ]; then
+              echo "RENAX_IMG_${img}_START"
+              base64 -w0 "$img"
+              echo
+              echo "RENAX_IMG_${img}_END"
+            fi
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:

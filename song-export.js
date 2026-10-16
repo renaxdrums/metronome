@@ -217,7 +217,7 @@
       const addSection=[...pane.querySelectorAll('button')].find(b=>b.textContent==='+ Ajouter une section');
       if(!addSection)return;
       button.className=addSection.className;
-      button.style.display='block';button.style.marginTop='6px';button.style.width=getComputedStyle(addSection).width;
+      button.style.display='flex';button.style.marginTop='6px';button.style.width=getComputedStyle(addSection).width;
       addSection.after(button);
     }else actions.append(button);
   }

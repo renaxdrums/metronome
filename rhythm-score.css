@@ -75,18 +75,10 @@
 @media(max-width:600px){.score-duration-tools{grid-auto-columns:30px;grid-template-rows:repeat(2,30px);gap:3px;}.score-duration-tools button{width:30px;height:30px;}.score-tools-panel{gap:8px;}.score-tools-panel .rhythm-editor{padding:8px;}.score-editor-body{gap:8px;}.score-state-tools{display:flex;flex-wrap:wrap;padding:0;border:0;}.score-state-tools button{min-height:26px;padding:3px 6px;font-size:9px;}}
 @media(max-height:500px){.score-tools-panel{max-height:110px;gap:8px;}.score-tools-panel .rhythm-editor{max-height:110px;padding:7px 9px;}.score-editor-title{margin-bottom:5px;}.score-editor-body{gap:6px 12px;}.score-duration-tools{grid-template-rows:repeat(2,27px);grid-auto-columns:29px;gap:3px;}.score-duration-tools button{width:29px;height:27px;}.score-duration-tools button svg{width:23px;height:23px;}.score-editor-message{margin-top:5px;}.score-tools-panel .score-view-switch{gap:4px;}.score-tools-panel .score-view-switch button{width:26px;height:26px;min-width:26px;min-height:26px;padding:4px;}}
 
-/* Application-wide scrollbar identity, including embedded scroll panels. */
-html,body,body *{scrollbar-width:thin!important;scrollbar-color:rgba(0,229,255,.82) #292c34!important;}
-::-webkit-scrollbar{width:4px!important;height:4px!important;}
-::-webkit-scrollbar-track{background:#292c34!important;border-radius:6px;}
-::-webkit-scrollbar-thumb{background:rgba(0,229,255,.78)!important;border:1px solid #292c34!important;border-radius:6px;}
-::-webkit-scrollbar-thumb:hover{background:var(--cyan)!important;}
-::-webkit-scrollbar-button{display:none!important;width:0!important;height:0!important;}
-::-webkit-scrollbar-corner{background:#292c34!important;}
 .score-group-panel{padding-left:12px;border-left:1px solid var(--border);max-width:100%;}
 @media(max-width:600px){.score-group-panel{padding-left:0;border-left:0;}}
 
-@supports selector(::-webkit-scrollbar){html,body,body *{scrollbar-width:auto!important;scrollbar-color:auto!important;}}
+
 
 /* Keep view icons at the top of the visualisation frame in both views. */
 .panel-visu .sequencer-wrapper{justify-content:flex-start;}

@@ -166,3 +166,13 @@
  footer{flex:0 0 auto;min-height:22px;height:22px;margin-top:6px;padding:4px 0 0;display:flex;align-items:center;justify-content:flex-end;border-top:0}
  footer .footer-right{position:static;display:flex;justify-content:flex-end;margin-left:auto}
 }
+
+/* Application-wide scrollbar identity, including embedded scroll panels. */
+html,body,body *{scrollbar-width:thin!important;scrollbar-color:rgba(0,229,255,.82) #292c34!important;}
+::-webkit-scrollbar{width:4px!important;height:4px!important;}
+::-webkit-scrollbar-track{background:#292c34!important;border-radius:6px;}
+::-webkit-scrollbar-thumb{background:rgba(0,229,255,.78)!important;border:1px solid #292c34!important;border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:var(--cyan)!important;}
+::-webkit-scrollbar-button{display:none!important;width:0!important;height:0!important;}
+::-webkit-scrollbar-corner{background:#292c34!important;}
+@supports selector(::-webkit-scrollbar){html,body,body *{scrollbar-width:auto!important;scrollbar-color:auto!important;}}

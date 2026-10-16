@@ -2,9 +2,10 @@
 (()=>{
  const KEY='renax.multimetro.v1',clone=x=>JSON.parse(JSON.stringify(x)),uid=()=>crypto.randomUUID(),pane=document.getElementById('sequencePane'),normalTitle=pane.querySelector('.panel-title');
  let libraryModels=[],librarySignature='',libraryView=true,nextPresetNumber=1,active=false,tracks=[],presets=[],selectedPreset='',draftTempo=tempo,saved=null,solo=null,clock=null,cursors=[],runId=0,startRequest=0,starting=0,dirtyTimer=0,undoQueue=0,baseline='',history=[],collapsedTracks=new Set(),liveOutputs=new Set();
+ let storageReadOnly=false,storageError='';
  const defaultTrack=(name='Piste 1')=>({...createMeasure(4,4,tempo),id:uid(),name,bank:currentBank,mute:false,beatSubdivisions:[1,1,1,1],beatStates:[[1],[1],[1],[1]]});
  function validate(t){if(!t||!Array.isArray(t)||t.length>64)throw Error('Preset incompatible.');return t.map((m,i)=>{if(!m||!Number.isInteger(m.numerator)||m.numerator<1||m.numerator>20||![2,4,8,16,32].includes(m.denominator)||m.beatSubdivisions?.length!==m.numerator||m.beatStates?.length!==m.numerator)throw Error('Preset incompatible.');for(let b=0;b<m.numerator;b++)if(!Number.isInteger(m.beatSubdivisions[b])||m.beatSubdivisions[b]<1||m.beatSubdivisions[b]>8||m.beatStates[b]?.length!==m.beatSubdivisions[b]||m.beatStates[b].some(s=>![0,1,2,3].includes(s)))throw Error('Preset incompatible.');return {...clone(m),id:m.id||uid(),name:String(m.name||'Piste '+(i+1)).slice(0,100),bank:SOUND_BANKS[m.bank]?m.bank:'clic',mute:!!m.mute};});}
- try{const data=JSON.parse(localStorage.getItem(KEY)||'null');if(data){tracks=validate(data.tracks);draftTempo=Math.max(2,Math.min(999,Number(data.bpm||data.tracks?.[0]?.tempo)||tempo));collapsedTracks=new Set(data.collapsedTracks||[]);presets=(data.presets||[]).map(p=>({...p,tracks:validate(p.tracks)}));selectedPreset=presets.some(p=>p.id===data.selectedPreset)?data.selectedPreset:'';nextPresetNumber=Math.max(1,Number(data.nextPresetNumber)||1,...presets.map(p=>(Number(p.number)||Number(p.name.match(/^Preset\s+(\d+)$/i)?.[1])||0)+1));if(!selectedPreset&&!Object.hasOwn(data,'selectedPreset')){const matches=presets.filter(p=>p.tracks.some(t=>tracks.some(current=>current.id===t.id)));if(matches.length===1)selectedPreset=matches[0].id;}}}catch(error){console.warn('MultiMétro: sauvegarde conservée mais non chargée',error);}
+ try{const data=JSON.parse(localStorage.getItem(KEY)||'null');if(data){tracks=validate(data.tracks);draftTempo=Math.max(2,Math.min(999,Number(data.bpm||data.tracks?.[0]?.tempo)||tempo));collapsedTracks=new Set(data.collapsedTracks||[]);presets=(data.presets||[]).map(p=>({...p,tracks:validate(p.tracks)}));selectedPreset=presets.some(p=>p.id===data.selectedPreset)?data.selectedPreset:'';nextPresetNumber=Math.max(1,Number(data.nextPresetNumber)||1,...presets.map(p=>(Number(p.number)||Number(p.name.match(/^Preset\s+(\d+)$/i)?.[1])||0)+1));if(!selectedPreset&&!Object.hasOwn(data,'selectedPreset')){const matches=presets.filter(p=>p.tracks.some(t=>tracks.some(current=>current.id===t.id)));if(matches.length===1)selectedPreset=matches[0].id;}}}catch(error){storageReadOnly=true;storageError='Sauvegarde multipiste illisible : source conservée. Exportez-la avant toute récupération.';console.warn('MultiMétro: sauvegarde conservée mais non chargée',error);}
  if(!tracks.length)tracks=[defaultTrack()];
  const tabs=document.createElement('div');tabs.className='multi-mode-tabs';tabs.setAttribute('role','tablist');
  const sequence=document.createElement('button'),multi=document.createElement('button');for(const [button,label] of [[sequence,'Séquenceur'],[multi,'MultiMétro']]){button.type='button';button.innerHTML=(button===multi?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16M8 3v4M15 10v4M10 17v4"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h4v4H4zM10 5h4v4h-4zM16 5h4v4h-4zM4 15h16M4 19h16"/></svg>')+'<span>'+label+'</span>';button.setAttribute('role','tab');tabs.append(button);}sequence.onclick=()=>switchMode(false);multi.onclick=()=>switchMode(true);normalTitle.before(tabs);normalTitle.hidden=true;
@@ -15,6 +16,12 @@
  const presetStatus=document.createElement('div');presetStatus.className='multi-preset-status';presetStatus.setAttribute('role','status');presetStatus.setAttribute('aria-live','polite');
  controls.append(presetTitle,add,presetStatus);const list=document.createElement('div');list.id='multiTracks';pane.append(controls,list);
  const library=document.createElement('div');library.id='multiPresetLibrary';pane.append(library);
+ const storageNotice=document.createElement('div');storageNotice.id='multiStorageNotice';storageNotice.setAttribute('role','alert');storageNotice.hidden=true;
+ const storageMessage=document.createElement('p');const recover=button('Exporter une copie multipiste',()=>{
+  const raw=storageReadOnly?localStorage.getItem(KEY):JSON.stringify(storageSnapshot(),null,2);
+  const link=document.createElement('a'),url=URL.createObjectURL(new Blob([raw||''],{type:'application/json'}));
+  link.href=url;link.download=storageReadOnly?'renax-multipiste-source-preservee.json':'renax-multipiste-non-enregistre.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ });storageNotice.append(storageMessage,recover);controls.before(storageNotice);
  const back=button('Retour aux presets',()=>{commit();libraryView=true;render();});
  back.className='btn song-back';back.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>';controls.prepend(back);
  function selectPreset(p){if(selectedPreset!==p.id)loadPreset(p.id);render();}
@@ -71,7 +78,13 @@
  });}
  const requestName=(question,initial='')=>modal(question,initial),confirmAction=question=>modal(question,'',true);
 
- function persist(){try{localStorage.setItem(KEY,JSON.stringify({version:1,tracks,presets,selectedPreset,nextPresetNumber,bpm:active?tempo:draftTempo,collapsedTracks:[...collapsedTracks]}));}catch{console.warn('Stockage MultiMétro indisponible');}}
+ function storageSnapshot(){return {version:1,tracks,presets,selectedPreset,nextPresetNumber,bpm:active?tempo:draftTempo,collapsedTracks:[...collapsedTracks]};}
+ function syncStorageNotice(){storageNotice.hidden=!active||!storageError;storageMessage.textContent=storageError;const label=presetStatus.querySelector('span');if(label)label.textContent=storageError?'Modifications non enregistrées':'Sauvegarde automatique';}
+ function persist(){
+  if(storageReadOnly){storageError='Sauvegarde multipiste illisible : source conservée. Exportez-la avant toute récupération.';syncStorageNotice();return false;}
+  try{localStorage.setItem(KEY,JSON.stringify(storageSnapshot()));storageError='';syncStorageNotice();return true;}
+  catch(error){storageError='Modifications multipistes non enregistrées. Exportez une copie avant de quitter.';syncStorageNotice();console.warn('Stockage MultiMétro indisponible',error);return false;}
+ }
  function snapshot(){return JSON.stringify({tracks,bpm:tempo,bank:currentBank});}
  function syncUndo(){if(!active)return;const undo=document.getElementById('undoBtn');if(undo&&undo.disabled!==!history.length)undo.disabled=!history.length;}
  function ensureCurrentPreset(){
@@ -88,13 +101,13 @@
   const p=presets.find(p=>p.id===selectedPreset);
   if(document.activeElement!==presetTitle)presetTitle.value=p?.name||'';
   presetTitle.disabled=!p;presetStatus.replaceChildren();presetStatus.hidden=!p;
-  if(p){const label=document.createElement('span');label.textContent='Sauvegarde automatique';presetStatus.append(label);}
+  if(p){const label=document.createElement('span');label.textContent=storageError?'Modifications non enregistrées':'Sauvegarde automatique';presetStatus.append(label);}syncStorageNotice();
  }
  function loadPreset(id){let p=presets.find(p=>p.id===id);if(!p)return;stopMetronome();commit();p=presets.find(p=>p.id===id);tracks=validate(p.tracks);tempo=p.bpm;draftTempo=tempo;selectedPreset=id;measures=tracks;activeMeasureIndex=0;collapsedTracks.clear();for(const t of tracks)t.tempo=tempo;history=[];baseline=snapshot();bpmSlider.value=tempo;bpmDisplay.innerHTML=tempo+' <span>BPM</span>';persist();choose(tracks[0]);renderPresets();}
  function choose(track){if(!track)return;activeMeasureIndex=tracks.indexOf(track);currentBank=track.bank;soundBankSel.value=currentBank;syncNumbox(soundBankSel);render();renderActiveMeasure();}
  function switchMode(next){if(active===next||starting)return;stopMetronome();endTraining();closeBeatEditor();if(next){window.RENAX_SONGS?.unload();if(appMode!=='metronome')setAppMode('metronome');saved={measures,metronomeMeasures,activeMeasureIndex,currentBank,tempo};active=true;tempo=draftTempo;bpmSlider.value=tempo;bpmDisplay.innerHTML=tempo+' <span>BPM</span>';measures=tracks;activeMeasureIndex=0;for(const t of tracks)t.tempo=tempo;baseline=snapshot();history=[];ensureCurrentPreset();saveCurrentPreset();persist();setSilentMode(false);}else{commit();draftTempo=tempo;active=false;delete activeMeasureLabel.dataset.noTranslate;measures=saved.measures;metronomeMeasures=saved.metronomeMeasures;activeMeasureIndex=Math.min(saved.activeMeasureIndex,measures.length-1);currentBank=saved.currentBank;tempo=saved.tempo;soundBankSel.value=currentBank;syncNumbox(soundBankSel);}
  document.body.classList.toggle('multi-mode',active);controls.hidden=list.hidden=!active;sequence.setAttribute('aria-selected',String(!active));multi.setAttribute('aria-selected',String(active));playBtn.disabled=false;if(active){choose(tracks[0]);render();renderPresets();}else{library.hidden=true;renderSequencerList();renderActiveMeasure();}updateTrainButton();syncUndo();}
- function render(){if(!active){library.hidden=true;return;}controls.hidden=libraryView;list.hidden=libraryView;renderLibrary();list.replaceChildren();document.body.classList.toggle('multi-empty',!tracks.length);playBtn.disabled=!!starting||!tracks.length;for(const [i,t] of tracks.entries()){
+ function render(){syncStorageNotice();if(!active){library.hidden=true;return;}controls.hidden=libraryView;list.hidden=libraryView;renderLibrary();list.replaceChildren();document.body.classList.toggle('multi-empty',!tracks.length);playBtn.disabled=!!starting||!tracks.length;for(const [i,t] of tracks.entries()){
   const card=document.createElement('div');card.className='measure-card multi-track';card.dataset.trackId=t.id;card.tabIndex=0;card.classList.toggle('active',i===activeMeasureIndex);card.setAttribute('aria-label',t.name);card.title='Appuyer et glisser pour déplacer · Alt + flèche pour réordonner';
   const head=document.createElement('div');head.className='multi-track-head';const name=document.createElement('strong');name.className='multi-track-name';name.dataset.noTranslate='';name.textContent=t.name;const sig=document.createElement('span');sig.className='measure-sig';sig.textContent=t.numerator+'/'+t.denominator;
   const play=button('Écouter '+t.name+' en boucle',()=>previewTrack(t));play.className='sequence-preview-play';play.innerHTML=sequenceTransportIcon(isPlaying&&solo===t.id);play.setAttribute('aria-pressed',String(isPlaying&&solo===t.id));play.disabled=!!starting;

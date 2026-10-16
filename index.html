@@ -976,7 +976,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   </style>
   <link rel="stylesheet" href="songs.css?v=20261012-compact-blocks2">
   <link rel="stylesheet" href="mp3-export.css?v=20261013-mobile-download1">
-  <link rel="stylesheet" href="backup-index2.css?v=20261007-account-options">
+  <link rel="stylesheet" href="backup-index2.css?v=20261016-stability1">
   <style>
     /* Index 2 uniquement : ergonomie visuelle, sans modifier les commandes. */
     .song-tabs { gap: 8px; margin-bottom: 4px; }
@@ -1265,14 +1265,14 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   }
 </style>
   <link rel="stylesheet" href="song-entry.css?v=20261007-entries">
-  <link rel="stylesheet" href="navigation-index.css?v=20261011-back-compact3">
+  <link rel="stylesheet" href="navigation-index.css?v=20261016-stability1">
 <style>
 .orange-ui-icon { width: 14px; height: 14px; display: inline-block; vertical-align: -2px; margin-right: 6px; fill: none; stroke: var(--orange); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
     .mobile-tabs button.active .orange-ui-icon { stroke: #000; opacity: 1; visibility: visible; }
 </style>
-  <link rel="stylesheet" href="mobile-landscape.css?v=20261008-landscape">
+  <link rel="stylesheet" href="mobile-landscape.css?v=20261016-stability1">
   <link rel="stylesheet" href="training-modes.css?v=20261011-training-play1">
-  <link rel="stylesheet" href="rhythm-score.css?v=20261014-free-measure3">
+  <link rel="stylesheet" href="rhythm-score.css?v=20261016-stability1">
 
 <style>
   /* Center the main transport independently of the compact reset control. */
@@ -1340,10 +1340,10 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 #beatEditor .beat-editor-division-label select,#beatEditor .beat-editor-division-label .numbox-button{width:100%;min-height:36px;font-family:var(--font);}
 #beatEditor .beat-editor-legend{text-align:center;align-items:center;}
 </style>
-<link rel="stylesheet" href="multi-metronome.css?v=20261014-track-solo6">
+<link rel="stylesheet" href="multi-metronome.css?v=20261016-stability1">
   <link rel="stylesheet" href="workspace-layout.css?v=20261012-workspaces8">
 <link rel="stylesheet" href="pro-interface.css?v=20261012-font-audit2">
-<link rel="stylesheet" href="console-theme.css?v=20261014-action-menu8">
+<link rel="stylesheet" href="console-theme.css?v=20261016-stability1">
 <style>
 body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!important;width:100%}
 #multiPresetLibrary > .btn{background:rgba(66,207,225,.12)!important;color:var(--cyan)!important;border:1px solid var(--border)!important;min-height:44px;border-radius:7px}
@@ -1441,7 +1441,7 @@ html[data-theme=light] #index2SettingsPanel .index2-settings-note{background:#e8
 html[data-theme=light] #index2SettingsPanel button:disabled{opacity:.65}
 /* Shared light surfaces, including controls created by late-loaded modules. */
 html[data-theme=light]{--muted:var(--text-muted);--card:#edf1f5;--card-selected:#e4f0f3;--card-selected-border:#74aab6;--light-surface:#edf1f5;--light-control:#d5dee7;--light-hover:#c8d6e2;--light-active:#bfdde4;--light-outline:#a5b6c6}
-html[data-theme=light] body :is(.numbox-menu,.numbox-dropdown,.sequence-more-actions,.multi-actions,.multi-modal,.backup-dialog){background:var(--light-surface)!important;color:var(--text)!important;border-color:var(--light-outline)!important;box-shadow:0 12px 28px #22334425!important}
+html[data-theme=light] body :is(.numbox-menu,.numbox-dropdown,.sequence-more-actions,.multi-actions,.multi-modal){background:var(--light-surface)!important;color:var(--text)!important;border-color:var(--light-outline)!important;box-shadow:0 12px 28px #22334425!important}
 html[data-theme=light] body .sound-bank-cards .numbox-option{background:var(--light-control)!important;color:var(--text)!important;border-color:var(--light-outline)!important}
 html[data-theme=light] body .sound-bank-cards .numbox-option:hover{background:var(--light-hover)!important;border-color:var(--cyan)!important}
 html[data-theme=light] body .sound-bank-cards .numbox-option.active{background:var(--light-active)!important;color:var(--cyan)!important;border-color:var(--orange)!important}
@@ -3029,6 +3029,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
     }
 
     function animate() {
+      updateTimerDisplay();
       const w = sequencerContainer.clientWidth;
       const h = sequencerContainer.clientHeight;
       if (w === 0 || h === 0) { requestAnimationFrame(animate); return; }
@@ -3038,7 +3039,6 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
         particles.length = 0;
         pulses.length = 0;
         clearProgressTrail();
-        updateTimerDisplay();
         requestAnimationFrame(animate);
         return;
       }
@@ -3071,7 +3071,6 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
         }
       }
 
-      updateTimerDisplay();
       requestAnimationFrame(animate);
     }
 
@@ -4324,7 +4323,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
     });
     prepareAllVoiceAudio().catch(() => {});
   </script>
-  <script src="pro-sound-bank.js?v=20261014-renax-hihat5"></script>
+  <script src="pro-sound-bank.js?v=20261016-stability1"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
 </script>
@@ -4332,8 +4331,8 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
   <script src="local-backup.js?v=20261011-reload-view1"></script>
   <script src="amorce-song.js?v=20261014-block-ramp1"></script>
   <script src="song-tempo-ramp.js?v=20261014-block-ramp1"></script>
-  <script src="songs-index2.js?v=20261014-block-ramp1"></script>
-  <script type="module" src="cloud-backup.js?v=20261012-choice1"></script>
+  <script src="songs-index2.js?v=20261016-stability1"></script>
+  <script type="module" src="cloud-backup.js?v=20261016-stability1"></script>
   <script>
     // Index 2 : ouvrir les morceaux de la playlist avec les sections repliées.
     (() => {
@@ -4352,8 +4351,8 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
       }, true);
     })();
   </script>
-  <script src="midi-export.js?v=20261014-block-ramp1"></script>
-  <script src="song-export.js?v=20261014-block-ramp1"></script>
+  <script src="midi-export.js?v=20261016-stability1"></script>
+  <script src="song-export.js?v=20261016-stability1"></script>
 
   <script>
   (() => {
@@ -4403,10 +4402,10 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
     arrange();desktop.addEventListener('change',arrange);
   })();
   </script>
-  <script src="training-modes.js?v=20261011-tempo-2-999"></script>
+  <script src="training-modes.js?v=20261016-stability1"></script>
   <script src="training-numbox.js?v=20261013-training-numbox1"></script>
   <script src="compact-controls.js?v=20261013-mobile-bank-up1"></script>
-  <script src="navigation-history.js?v=20261011-reload-view1"></script>
+  <script src="navigation-history.js?v=20261016-stability1"></script>
   <script src="rhythm-score.js?v=20261014-free-editor4"></script>
   <script src="edit-history.js?v=20261014-independent20"></script>
 <script>
@@ -4430,9 +4429,9 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
 <script src="multi-clock.js?v=20261012-multi5"></script>
-<script src="multi-metronome.js?v=20261014-polish21"></script>
+<script src="multi-metronome.js?v=20261016-stability1"></script>
 <script src="interface-language.js?v=20261016-beat-hover45"></script>
-<script src="workspace-layout.js?v=20261015-ivory28"></script>
+<script src="workspace-layout.js?v=20261016-stability1"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=20261015-ivory33"></script>
 <script src="console-intro.js?v=20261015-intro-repair38"></script>

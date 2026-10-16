@@ -55,3 +55,25 @@
   #songsHome[hidden] {display:none;}
   #songsHome > button.song-entry {margin:4px 0;min-height:48px;}
 }
+
+/* The workspace navigation also needs a compact row in phone landscape. */
+@media (orientation:landscape) and (pointer:coarse) and (max-width:1100px) and (max-height:600px){
+ html#renaxApp[data-theme] body[data-workspace]{padding:4px 6px!important}
+ html#renaxApp[data-theme] body[data-workspace] header{height:28px!important;min-height:28px!important;padding:0!important;margin:0 0 2px!important}
+ html#renaxApp[data-theme] body[data-workspace] .brand-logo{width:25px!important;height:25px!important}
+ html#renaxApp[data-theme] body[data-workspace] .brand h1{font-size:10px!important}
+ html#renaxApp[data-theme] body[data-workspace] .brand p{font-size:6px!important}
+ html#renaxApp[data-theme] body[data-workspace] .index2-header-actions button{height:26px!important;min-height:26px!important;width:30px!important;padding:4px!important}
+ html#renaxApp[data-theme] body[data-workspace] #workspaceNav{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:3px!important;padding:0!important;margin:0 0 3px!important}
+ html#renaxApp[data-theme] body[data-workspace] #workspaceNav button{height:30px!important;min-height:30px!important;padding:3px!important;gap:4px!important;font-size:9px!important}
+ html#renaxApp[data-theme] body[data-workspace] #workspaceNav svg{width:12px!important;height:12px!important}
+ html#renaxApp[data-theme] body[data-workspace] #workspaceMobileViews{margin:0 0 3px!important;padding:0!important;min-height:26px!important}
+ html#renaxApp[data-theme] body[data-workspace] #workspaceMobileViews button{height:26px!important;min-height:26px!important;padding:3px!important;font-size:10px!important}
+ html#renaxApp[data-theme] body[data-workspace] footer{min-height:40px!important;height:40px!important;margin-top:3px!important;padding-top:3px!important}
+ html#renaxApp[data-theme] body[data-workspace] footer .footer-center #playBtn,html#renaxApp[data-theme] body[data-workspace] footer .footer-center #trainingVisualBtn{height:34px!important;min-height:34px!important}
+ html#renaxApp[data-theme] body[data-workspace] .main-grid > .panel-visu.mobile-active{display:grid!important;grid-template-columns:minmax(200px,.9fr) minmax(0,1.1fr)!important;grid-template-rows:auto minmax(0,1fr)!important;gap:6px 12px!important}
+ html#renaxApp[data-theme] body[data-workspace] .panel-visu .visu-toolbar{grid-column:1!important;grid-row:1 / 3!important;min-width:0}
+ html#renaxApp[data-theme] body[data-workspace] .panel-visu .sequencer-wrapper{grid-column:2!important;grid-row:1 / 3!important;min-height:0!important;height:100%!important;padding:0!important}
+ html#renaxApp[data-theme] body[data-workspace] .panel-visu .score-tools-panel{min-height:26px!important;margin-bottom:4px!important}
+ html#renaxApp[data-theme] body[data-workspace] .panel-visu .score-view-switch{flex-direction:row!important}
+}

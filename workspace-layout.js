@@ -99,7 +99,10 @@
  const observer=new MutationObserver(sync);observer.observe(songTabs,{subtree:true,attributes:true,attributeFilter:['aria-selected']});observer.observe(multiTabs,{subtree:true,attributes:true,attributeFilter:['aria-selected']});observer.observe(nativeMode,{subtree:true,attributes:true,attributeFilter:['class']});
  new MutationObserver(place).observe(visu,{childList:true});window.addEventListener('resize',place);desktop.addEventListener('change',()=>{if(!wasDesktop&&shownWorkspace!==null)controlOpenByWorkspace.set(shownWorkspace,controls.open);wasDesktop=desktop.matches;restoreControls(page);place();if(!desktop.matches)switchTab(page==='training'?'training':['sequence','multi','tracks'].includes(page)?'seq':'visu');requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});});
  controls.addEventListener('toggle',()=>{rememberControls();syncTempoShortcut();requestAnimationFrame(()=>{resizeCanvas();updateRingRadius();});});
- go('metronome');window.addEventListener('load',()=>{sync();place();});
+ window.RENAX_WORKSPACE={go,get current(){return page;}};
+ const restored=history.state?.renaxNavigation?.screen;
+ const initial=restored?.workspace||(restored?.songs?.pane==='songs'?'tracks':'metronome');
+ go(buttons.has(initial)?initial:'metronome');window.addEventListener('load',()=>{sync();place();});
 })();
 
 /* Text fitting is presentation only; option names and handlers are preserved. */

@@ -54,3 +54,7 @@
 :is(#songPane,#profilePane,.playlist-heading,#songPane .song-detail-toolbar) > button.song-back{width:36px!important;min-width:36px!important;max-width:36px!important;flex:0 0 36px!important;padding:0!important;gap:0;height:36px;min-height:36px;}
 #songPane .playlist-heading{grid-template-columns:36px minmax(0,1fr) 36px;}
 @media(max-width:1100px){:is(#songPane,#profilePane,.playlist-heading) > button.song-back{height:44px;min-height:44px;}}
+@media(max-width:1100px){#songsRoot #songPane .song-actions.song-detail-toolbar>.btn.song-back{height:44px;min-height:44px;}}
+/* All return buttons share one size; the former Profile-only override was removed. */
+#songsRoot .song-back{height:36px!important;min-height:36px!important}
+@media(max-width:1100px){#songsRoot .song-back{height:44px!important;min-height:44px!important}}

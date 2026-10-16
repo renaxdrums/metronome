@@ -15,7 +15,9 @@ for(const [text,language] of [['Introduction','fr'],['Couplet personnalisé','fr
  const started=Date.now(),audio=await neuralAudio(runtime,model,tokenizer,data,input),candidate=lastSyllableCandidate(audio.events,language);
  let peak=0;for(const v of audio.pcm)peak=Math.max(peak,Math.abs(v));
  assert(audio.pcm.length>2400&&candidate.anchorSeconds<audio.pcm.length/24000);
- assert.equal(audio.anchorVerified,false);assert(peak<=.801);assert(audio.level.activeRmsAfter<=.120001);
+ assert.equal(audio.anchorVerified,false);assert(peak<=.801);
+ assert.equal(audio.level.targetLufs,-20);
+ assert(audio.level.peakLimited?audio.level.loudnessAfter<=-20:Math.abs(audio.level.loudnessAfter+20)<.001);
  results.push({text,language,phones:input.text,duration:audio.pcm.length/24000,inferenceMs:Date.now()-started,peak,level:audio.level,voice:'bm_george',candidate,timingSource:audio.timingSource});
  console.log(results.at(-1));
 }

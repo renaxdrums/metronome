@@ -3,7 +3,10 @@
 .multi-mode-tabs button[aria-selected=true]{background:rgba(0,207,232,.10);border-color:var(--cyan)}
 #multiControls{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
 #multiControls[hidden],#multiTracks[hidden]{display:none!important}
-.multi-mode #sequencePane>:not(.multi-mode-tabs):not(#multiControls):not(#multiTracks):not(#multiPresetLibrary){display:none!important}
+.multi-mode #sequencePane>:not(.multi-mode-tabs):not(#multiControls):not(#multiTracks):not(#multiPresetLibrary):not(#multiStorageNotice){display:none!important}
+#multiStorageNotice{border:1px solid var(--orange);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;overflow-wrap:anywhere}
+#multiStorageNotice[hidden]{display:none!important}
+#multiStorageNotice p{margin:0 0 8px}
 .multi-mode #modeSwitch button[data-mode=polyrhythm]{display:none}
 .multi-mode #modeSwitch button[data-mode=metronome]{flex:1;pointer-events:none}
 .multi-mode.multi-empty .sequencer-wrapper{visibility:hidden}

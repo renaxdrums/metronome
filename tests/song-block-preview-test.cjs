@@ -3,7 +3,7 @@ const {start,save}=require('./audio-harness.cjs');
 (async()=>{const h=await start();try{
  const p=await h.browser.newPage({viewport:{width:1280,height:850}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
  await p.goto(h.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
- await p.getByRole('tab',{name:'Morceaux',exact:true}).click();await p.getByRole('button',{name:'Playlist',exact:true}).click();await p.getByRole('button',{name:'Ouvrir la playlist Morceaux',exact:true}).click();await p.getByRole('button',{name:'Nouveau morceau',exact:true}).click();
+ await require('./audio-harness.cjs').openPlaylist(p);await p.getByRole('button',{name:'Nouveau track',exact:true}).click();
  assert.equal(await p.locator('#songPane > .song-actions > button').filter({hasText:'Dupliquer'}).count(),0);
  await p.evaluate(()=>{
   const lib=JSON.parse(JSON.stringify(RENAX_SONGS.library)),s=lib.profiles[0].songs[0];
@@ -22,13 +22,13 @@ const {start,save}=require('./audio-harness.cjs');
  const times=[0,.1,.2,.2+1/30,.2+2/30,.3,.4,.5,.5+1/30,.5+2/30];
  preview.clicks.forEach((c,i)=>assert(Math.abs(c.time-preview.clicks[0].time-times[i])<1e-8));
  await p.evaluate(()=>{previewClicks=[];previewCounts=[];});
- await p.getByRole('button',{name:'Lire le morceau',exact:true}).click();await p.waitForFunction(()=>isPlaying);await p.waitForFunction(()=>!isPlaying,{timeout:5000});
+ await p.getByRole('button',{name:'Lire le track',exact:true}).click();await p.waitForFunction(()=>isPlaying);await p.waitForFunction(()=>!isPlaying,{timeout:5000});
  const whole=await p.evaluate(()=>({sections:[...new Set(previewClicks.map(c=>c.section))],countIn:previewCounts.length,clicks:previewClicks.length,preserved:beforePreview===JSON.stringify(RENAX_SONGS.library)}));
  assert.deepEqual(whole.sections,['a','b','c']);assert.equal(whole.countIn,2);assert(whole.preserved);
  await button.click();await p.waitForFunction(()=>isPlaying);await p.locator('#playBtn').click();await p.waitForFunction(()=>!isPlaying);
  await p.getByRole('button',{name:'Écouter uniquement le bloc Intro',exact:true}).click();await p.waitForFunction(()=>isPlaying);
  await button.click();await p.waitForFunction(()=>isPlaying&&RENAX_SONGS.loaded.preview&&RENAX_SONGS.loaded.song.sections[0].id==='b');await p.waitForFunction(()=>!isPlaying,{timeout:5000});
- await p.setViewportSize({width:390,height:844});await p.locator('#mobileTabs button[data-tab=seq]').click();
+ await p.setViewportSize({width:390,height:844});if(await p.locator('#workspaceMobileViews [data-pane=seq]').isVisible())await p.locator('#workspaceMobileViews [data-pane=seq]').click();
  await p.locator('[data-section-id="b"] .song-block-header').click();
  // If preview left this block open, the first click folds it; ensure expanded.
  if(await p.locator('[data-section-id="b"] .song-block-header').getAttribute('aria-expanded')==='false')await p.locator('[data-section-id="b"] .song-block-header').click();
@@ -41,7 +41,7 @@ const {start,save}=require('./audio-harness.cjs');
  await p.locator('[data-section-id="b"] .song-more:not(.song-block-play)').click();assert(await p.locator('[data-section-id="b"] .song-more-menu').isVisible());
  await p.keyboard.press('Escape');assert.deepEqual(errors,[]);
  await p.getByRole('button',{name:'Retour à la playlist',exact:true}).click();
- await p.locator('.song-playlist-card .song-more').first().click();
+ await p.locator('.song-playlist-card .song-more[aria-haspopup=menu]').first().click();
  await p.getByRole('menuitem',{name:'Dupliquer',exact:true}).click();
  assert.equal(await p.locator('.song-open').count(),2);
  const report={preview,whole,manualStop:true,switchBlock:true,alignment,duplicateButtonRemoved:true,duplicateMenuWorks:true,errors};save('song-block-preview-results.json',report);console.log(report);

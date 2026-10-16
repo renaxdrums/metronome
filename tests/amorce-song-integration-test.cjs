@@ -9,7 +9,7 @@ const result=await p.evaluate(async(real)=>{
  const library={version:1,activeProfile:'test',profiles:[{id:'test',name:'Test',songs:[song]}]};RENAX_SONGS.replaceLibrary(library);RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',song:song.id,profile:'test'});
  const button=document.getElementById('songAmorceBtn');const plan=await RENAX_AMORCE.prepare(song);
  const midiA=new Uint8Array(await RENAX_MIDI_EXPORT.exportSong({...song,amorce:false}).blob.arrayBuffer()),midiB=new Uint8Array(await RENAX_MIDI_EXPORT.exportSong(song).blob.arrayBuffer());
- const trace=[],original=playClick;playClick=(state,time,first,context)=>{trace.push({bank:currentBank,state,time,first,...context});return original(state,time,first,context);};currentBank='claves';await startMetronome();const start=nextNoteTime,enabled=RENAX_AMORCE.active;
+ const trace=[],original=playClick,originalCount=renderVoiceCount;renderVoiceCount=(gender,dest,time,state,first,context,settings)=>{if(context.mode==='song-guide')trace.push({bank:'guideMale',state,time,first,...context});return originalCount(gender,dest,time,state,first,context,settings);};playClick=(state,time,first,context)=>{trace.push({bank:currentBank,state,time,first,...context});return original(state,time,first,context);};currentBank='claves';await startMetronome();const start=nextNoteTime,enabled=RENAX_AMORCE.active;
  await new Promise(r=>setTimeout(r,(plan.duration+.6)*1000));const stopped=!isPlaying,unchanged=JSON.stringify(RENAX_SONGS.library)===JSON.stringify(library);
  const rendered=await RENAX_MP3_EXPORT.isolatedRender(song,'claves',.8);let peak=0;for(const x of rendered.pcm)peak=Math.max(peak,Math.abs(x));
  const encoded=await RENAX_MP3_EXPORT.exportSong(song,'claves',.8);
@@ -17,5 +17,5 @@ const result=await p.evaluate(async(real)=>{
 },!!process.env.REAL_AMORCE);
 if(process.env.REAL_AMORCE){assert.deepEqual(result.voices,['fr_FR-siwis-medium','bm_george','fr_FR-siwis-medium']);assert(!result.separateNumber);}
 assert(result.encodedBytes>1000&&result.encodedPeak<1);
-assert(result.button&&result.pressed==='true'&&result.countIn>=2&&result.enabled&&result.stopped&&result.unchanged&&result.midiEqual);assert(result.trace.some(e=>e.bank==='voiceMale'&&e.beatNumber===2));assert(result.trace.some(e=>e.bank==='claves'));assert(result.mp3PcmPeak>0&&result.mp3PcmPeak<1);assert.deepEqual(errors,[]);fs.writeFileSync('tests/amorce-song-integration-results.json',JSON.stringify({...result,errors},null,2));console.log({...result,trace:result.trace.length});
+assert(result.button&&result.pressed==='true'&&result.countIn>=2&&result.enabled&&result.stopped&&result.unchanged&&result.midiEqual);assert(result.trace.some(e=>e.bank==='guideMale'&&e.beatNumber===2));assert(result.trace.some(e=>e.bank==='claves'));assert(result.mp3PcmPeak>0&&result.mp3PcmPeak<1);assert.deepEqual(errors,[]);fs.writeFileSync('tests/amorce-song-integration-results.json',JSON.stringify({...result,errors},null,2));console.log({...result,trace:result.trace.length});
 }finally{await h.browser.close();h.server.close();closeAssets?.();}})().catch(e=>{console.error(e);process.exitCode=1;});

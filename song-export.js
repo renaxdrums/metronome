@@ -13,6 +13,7 @@
     RENAX_SONGS.validateLibrary({version:1,profiles:[{id:'export',name:'Export',songs:[song]}]});
     if(!SOUND_BANKS[bank]||!Number.isFinite(volume)||volume<0||volume>1)throw Error('Réglages audio incorrects.');
     if(song.amorce){amorcePlan=amorcePlan||await RENAX_AMORCE.prepare(song);song={...song,sections:amorcePlan.sections};await prepareAllVoiceAudio();}
+    else song={...song,sections:RENAX_SONGS.playbackSections(song)};
     const voice=!!SOUND_BANKS[bank].isVoice;
     if(voice)await prepareAllVoiceAudio();
     else {
@@ -46,7 +47,11 @@
           const subdivisions=m.beatSubdivisions[beat];
           for(let sub=0;sub<subdivisions;sub++){
             const state=m.beatStates[beat][sub];
-            if(!RENAX_AMORCE.step(time,state,beat===0&&sub===0,sub,beat)&&state){playClick(state,time,beat===0&&sub===0,{mode:'metronome',beatNumber:beat%group===0?Math.floor(beat/group)+1:0,subIndex:sub,beatDurationSec:beatDuration*group});events++;}
+            if(!RENAX_AMORCE.step(time,state,beat===0&&sub===0,sub,beat)&&state){
+              if(m.countIn)playCountIn(time,beat===0&&sub===0);
+              else playClick(state,time,beat===0&&sub===0,{mode:'metronome',isMainBeat:sub===0,isOtherStrongBeat:isOtherStrongBeat(m,beat,sub),beatNumber:beat%group===0?Math.floor(beat/group)+1:0,subIndex:sub,beatDurationSec:beatDuration*group});
+              events++;
+            }
             time+=RENAX_SONG_TEMPO.stepDuration(section,bar,beat,sub,subdivisions);
             if(++steps%4096===0)await pause();
           }
@@ -114,7 +119,7 @@
     const midiNote=document.createElement('p');midiNote.textContent='MIDI : clics sur le canal 10, note 37, trois vélocités pour les accents. Le son est choisi dans ton logiciel musical.';midiNote.hidden=true;
     format.onchange=()=>{midiNote.hidden=format.value!=='midi';credit.hidden=format.value==='midi';clearDownload();status.textContent='';};
     const label=document.createElement('label');label.htmlFor='mp3ExportSong';label.textContent='Morceau de la playlist';
-    const select=document.createElement('select');select.id='mp3ExportSong';
+    const select=document.createElement('select');select.id='mp3ExportSong';select.dataset.noTranslate='';
     for(const song of playlistSongs()){const option=document.createElement('option');option.value=song.id;option.textContent=song.name;select.append(option);}
     if(songId)select.value=songId;
     select.onchange=()=>{clearDownload();status.textContent='';};

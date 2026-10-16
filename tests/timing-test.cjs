@@ -39,11 +39,12 @@ const fs=require('fs');
      for(let j=-240;j<240;j+=4)energy+=(raw[ref+j]||0)**2;
      if(energy<1e-7)throw Error('Missing vowel nucleus in '+bank+' '+expected[i].number);
      for(let ms=-250;ms<=250;ms++){
-      let error=0;
-      for(let j=-240;j<240;j+=4){const target=(raw[ref+j]||0)*volume,actual=x[center+ms*48+j]||0;error+=(actual-target)**2;}
+      // Correlate shape independently of the approved loudness normalization.
+      let xy=0,yy=0;for(let j=-240;j<240;j+=4){const target=raw[ref+j]||0,actual=x[center+ms*48+j]||0;xy+=target*actual;yy+=actual*actual;}
+      const error=yy>1e-12&&xy>0?Math.max(0,1-xy*xy/(energy*yy)):Infinity;
       if(error<bestError){bestError=error;bestDelta=ms;}
      }
-     if(bestError/energy>1e-3)throw Error('Rendered word/landmark differs from reference');
+     if(bestError>1e-3)throw Error('Rendered word/landmark differs from reference');
      const err=bestDelta;errors.push(err);maxAttackError=Math.max(maxAttackError,Math.abs(err));
      if(i)maxIntervalError=Math.max(maxIntervalError,Math.abs(err-errors[i-1]));
     }

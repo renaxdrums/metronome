@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {start}=require('./audio-harness.cjs');
 (async()=>{const h=await start();let closeAssets;try{
  const page=await h.browser.newPage({viewport:{width:390,height:844}}),errors=[];
- page.on('pageerror',e=>errors.push(e.message));
+ page.on('pageerror',e=>errors.push(e.message));page.on('crash',()=>console.error('Browser page crashed during neural preparation'));
  page.on('console',m=>{if(m.type()==='error')console.log('Browser:',m.text());});
  page.on('requestfailed',r=>console.log('Request failed:',r.url(),r.failure()?.errorText));
  closeAssets=await require('./amorce-neural-route.cjs').install(page.context(),h.url);
@@ -22,8 +22,8 @@ const {start}=require('./audio-harness.cjs');
  try{await page.waitForFunction(()=>window.amorceTest||!document.getElementById('run').disabled,undefined,{timeout:180000});}finally{clearInterval(progress);}
  if(!await page.evaluate(()=>!!window.amorceTest))throw new Error(await page.locator('#status').textContent());
  const r=await page.evaluate(()=>{const {speeches,...r}=window.amorceTest;return r;});
- assert.deepEqual(r.voices.map(v=>v.voice),['bm_george','bm_george','bm_george']);
- assert(r.voices.every(v=>v.backend==='wasm'&&v.level.peakAfter<=.801&&v.level.activeRmsAfter<=.120001));
+ assert.deepEqual(r.voices.map(v=>v.voice),['bm_george','fr_FR-siwis-medium','bm_george']);
+ assert(r.voices.every(v=>v.backend==='wasm'&&v.level.peakAfter<=.801&&v.level.targetLufs===-20&&(v.level.peakLimited?v.level.loudnessAfter<=-20:Math.abs(v.level.loudnessAfter+20)<.001)));
  assert.equal(r.result.layout.length,3);assert.equal(r.result.anchorVerified,false);
  assert(r.result.countInMeasures>=2);
  for(const a of r.result.layout){const e=r.result.events.filter(e=>e.announcing&&e.subIndex===0&&e.time>=a.target-1e-9&&e.time<a.blockStart-1e-9);assert.equal(e.length,3);assert(e.every(x=>x.bank==='voiceMale'&&x.number>=2));}

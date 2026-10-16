@@ -12,9 +12,9 @@ async function make(text,language){const voice=language==='fr'?'ff_siwis':'bm_ge
 for(const [text,language] of [['Solo','fr'],['Introduction','fr'],['Chorus','en'],['My custom drum breakdown','en'],['Couplet 1','fr'],['Refrain 1','fr']]){
  const numbered=text.match(/^(.*) 1$/u);
  const audio=numbered?joinNumber(await make(numbered[1],'fr'),await make('1','fr')):await make(text,language);
- const file='/tmp/renax-voice-level.f32';await writeFile(file,Buffer.from(audio.pcm.buffer));
+ const file=new URL('renax-voice-level.f32',new URL('file:///'+process.env.TEST_OUTPUT_DIR.replaceAll('\\','/')+'/')).pathname.replace(/^\/(\w:)/,'$1');await writeFile(file,Buffer.from(audio.pcm.buffer));
  const stderr=spawnSync('ffmpeg',['-hide_banner','-f','f32le','-ar','24000','-ac','1','-i',file,'-af','ebur128','-f','null','-'],{encoding:'utf8'}).stderr;
- const matches=[...stderr.matchAll(/I:\s*(-?[\d.]+) LUFS/g)],lufs=Number(matches.at(-1)[1]);
+ const matches=[...stderr.matchAll(/I:\s*(-?[\d.]+) LUFS/g)];assert(matches.length,'FFmpeg must report integrated loudness: '+stderr);const lufs=Number(matches.at(-1)[1]);
  assert(Math.abs(lufs+20)<=.2);assert(audio.level.peakAfter<=.80001);
  const anchor=lastSyllableCandidate(audio.events,language);
  if(numbered){assert(audio.separateNumber);assert(!audio.events.some(e=>e.id==='z'));assert.equal(anchor.nucleusPhone,'ˈœ̃');}

@@ -8,7 +8,7 @@ const {start,save}=require('./audio-harness.cjs');const assert=require('assert')
    const m=createMeasure(n,d,t);m.beatSubdivisions.fill(sub);m.beatStates=m.beatSubdivisions.map((s,b)=>Array.from({length:s},(_,j)=>(b+j)%4));song.sections.push({id:String(d)+n,label:n+'/'+d,count,measure:m});
   }
   const result=[];
-  for(const bank of ['clic','cloche','claves','clic808','beep','voiceMale','voiceFemale']){
+  for(const bank of ['clic','cloche','claves','clic808','beep','voiceMale','voiceFemale']){if(!SOUND_BANKS[bank].isVoice)await ensureInstrumentBankReady(bank);
    const frame=document.createElement('iframe');frame.hidden=true;frame.src=new URL('?mp3-render=1',location.href);await new Promise(resolve=>{frame.onload=resolve;document.body.append(frame);});
    const originalChildPlay=frame.contentWindow.playClick;const exportEvents=[];frame.contentWindow.playClick=(s,t,f,c)=>{exportEvents.push({state:s,time:t,first:f,context:c});originalChildPlay(s,t,f,c);};
    const raw=await frame.contentWindow.RENAX_MP3_RENDER.renderPCM(song,bank,.8);frame.remove();

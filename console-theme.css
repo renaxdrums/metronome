@@ -184,8 +184,8 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
 #sequenceAddMeasure:hover,#multiControls>.multi-add:hover,#songsRoot .playlist-create:hover,#songsRoot .track-create:hover,#songsRoot .track-add-section:hover{background:#31525c!important;border-color:var(--cyan)!important}
 #songsRoot :is(button,input,select){font-family:var(--font)}
 #songsRoot .song-actions{gap:8px}
-#songsRoot .playlist-overview-head{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:center;gap:12px;margin:0 0 16px}
-#songsRoot .playlist-heading-name{font:600 14px/1.4 var(--font);letter-spacing:0;color:var(--text);text-align:left}
+#songsRoot .playlist-overview-head{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;gap:12px;margin:0 0 16px}
+#songsRoot .playlist-heading-name{font:600 14px/1.4 var(--font);letter-spacing:0;color:var(--text);text-align:center}
 #songsRoot .playlist-heading-name span{color:inherit!important}
 #songsRoot .playlist-create{grid-column:1/-1;width:100%;padding:10px 12px;margin:0;letter-spacing:0;text-transform:none}
 #songsRoot .playlist-list{display:flex;flex-direction:column;gap:9px}
@@ -232,7 +232,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
 #songsRoot .song-count-in.measure-card{background:#2b323c!important;border-color:#48525e!important;border-radius:7px;padding:12px}
 #songsRoot .song-count-in-summary,#songsRoot .song-count-in-tempo{color:var(--text-muted);font:500 11px/1.5 var(--font);margin:8px 0 0}
 #songsRoot .song-actions>.btn:not(.track-create):not(.song-back){background:#343b45!important;border-color:#505b69!important;color:var(--text)!important;border-radius:6px;min-height:38px;font:500 11px/1.4 var(--font);box-shadow:none}
-#songsRoot .playlist-manager .playlist-heading{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#songsRoot .playlist-manager .playlist-heading{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;gap:12px;margin-bottom:12px}
 
 /* Shared surfaces: training choices, Track cards, popups and menus. */
 :root{--card-selected:#1d2b32;--card-selected-border:#3b707c}
@@ -241,7 +241,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
 .training-section .training-mode-tabs button svg,.training-section .training-curve-options button svg{stroke:var(--orange)!important}
 .training-section .training-mode-tabs button[aria-selected=true] svg,.training-section .training-curve-options button[aria-pressed=true] svg{stroke:var(--cyan)!important}
 #songsRoot .song-section.measure-card,#songsRoot .song-count-in.measure-card{background:var(--card-selected)!important;border-color:var(--card-selected-border)!important}
-#songsRoot #profilePane>.song-back{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;margin:0 0 4px;padding:0!important;border:1px solid #505b69!important;border-radius:6px;color:var(--orange)!important}
+#songsRoot #profilePane>.song-back{margin:0 0 4px;}
 #songsRoot #profilePane>.song-back::before,#songsRoot #profilePane>.song-back::after{content:none!important}
 #profilePane>.song-back svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 dialog,#beatEditor,#index2SettingsPanel{background:#272d35!important;border-color:#505b69!important;color:var(--text)!important;font-family:var(--font)!important;border-radius:9px}

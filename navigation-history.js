@@ -5,21 +5,24 @@
   const settings=document.getElementById('index2SettingsPanel');
   const backdrop=document.getElementById('index2SettingsBackdrop');
   function capture(){return {
-    tab:document.querySelector('#mobileTabs button.active')?.dataset.tab||'visu',
-    settings:settings.classList.contains('open'),
+    workspace:document.body.dataset.workspace||'metronome',
+    tab:document.body.dataset.mobilePane||document.querySelector('#mobileTabs button.active')?.dataset.tab||'visu',
+    settings:settings.classList.contains('open')||document.body.dataset.mobilePane==='settings',
     songs:window.RENAX_SONGS.navigation
   };}
   let current=capture();
   function restore(state){
     restoring=true;clearTimeout(pending);
+    if(window.RENAX_WORKSPACE)window.RENAX_WORKSPACE.go(state.workspace||(state.songs?.pane==='songs'?'tracks':'metronome'));
+    else document.body.dataset.workspace=state.workspace||(state.songs?.pane==='songs'?'tracks':'metronome');
     window.RENAX_SONGS.restoreNavigation(state.songs);
     switchTab(state.tab||'visu');
-    settings.classList.toggle('open',!!state.settings);
-    backdrop.classList.toggle('open',!!state.settings);
+    settings.classList.toggle('open',!!state.settings&&innerWidth>1100);
+    backdrop.classList.toggle('open',!!state.settings&&innerWidth>1100);
     current=capture();restoring=false;
   }
   const previous=history.state?.[key];
-  if(previous?.screen){const screen=previous.version===2?previous.screen:{...previous.screen,songs:{...previous.screen.songs,view:'home',song:null}};restore(screen);}
+  if(previous?.screen){restore(previous.screen);}
   history.replaceState({...history.state,[key]:{...previous,version:2,screen:current,depth:previous?.depth||0}},'');
   window.addEventListener('renax-navigation-restored',()=>{
     if(restoring)return;
@@ -32,7 +35,7 @@
     if(JSON.stringify(next)===JSON.stringify(current))return;
     // Editing or duplicating a song changes its identity, not the screen.
     // Keep the playlist as the preceding entry instead of adding another detail entry.
-    const sameScreen=next.tab===current.tab&&next.settings===current.settings&&
+    const sameScreen=next.workspace===current.workspace&&next.tab===current.tab&&next.settings===current.settings&&
       next.songs.pane===current.songs.pane&&next.songs.view===current.songs.view;
     const replace=sameScreen||semanticBack;semanticBack=false;
     const entry=history.state?.[key];

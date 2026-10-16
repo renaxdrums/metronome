@@ -10,7 +10,7 @@
     const events=[];let tick=0,notes=0;
     const meta=(at,type,data)=>events.push({at,order:0,data:[255,type,...variable(data.length),...data]});
     meta(0,3,bytes(song.name));
-    for(const section of song.sections){const m=section.measure;
+    for(const section of RENAX_SONGS.playbackSections(song)){const m=section.measure;
       meta(tick,6,bytes(section.label));
       const tempo=Math.round(60000000/m.tempo);
       meta(tick,0x51,[tempo>>>16&255,tempo>>>8&255,tempo&255]);

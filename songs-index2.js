@@ -410,7 +410,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       for(const item of library.profiles){
         const entry=el('div',undefined,list);entry.style.position='relative';
         const choice=button('',entry,()=>openPlaylist(item));choice.style.paddingRight='96px';choice.classList.add('playlist-choice');choice.setAttribute('aria-label','Ouvrir la playlist '+(item.name==='Mon profil'?'Tracks':item.name));
-        const name=el('strong',item.name==='Mon profil'?'Tracks':item.name,choice,'playlist-choice-name');if(item.name==='Mon profil')name.textContent='Tracks';
+        const name=el('strong',item.name==='Mon profil'?'Tracks':item.name,choice,'playlist-choice-name');name.dataset.noTranslate='';if(item.name==='Mon profil')name.textContent='Tracks';
         el('span',item.songs.length+' morceau'+(item.songs.length===1?'':'x'),choice,'playlist-choice-count');
         const controls=el('div',undefined,entry,'song-more-wrap');controls.style.top='8px';controls.style.bottom='auto';controls.style.display='inline-flex';controls.style.gap='6px';
         const direct=button('',controls,async()=>{
@@ -436,7 +436,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
     }
     const localProfiles=el('section',undefined,songPane,'playlist-manager');localProfiles.hidden=songView!=='playlist';
     const playlistHeading=el('div',undefined,localProfiles,'playlist-heading');
-    const playlistTitle=el('strong',p.name==='Mon profil'?'Tracks':p.name,playlistHeading,'playlist-heading-name');if(p.name==='Mon profil')playlistTitle.textContent='Tracks';
+    const playlistTitle=el('strong',p.name==='Mon profil'?'Tracks':p.name,playlistHeading,'playlist-heading-name');playlistTitle.dataset.noTranslate='';if(p.name==='Mon profil')playlistTitle.textContent='Tracks';
     if(songView==='playlist')playlistHeading.prepend(backSong);
     const actions=songView==='playlists'?null:el('div',undefined,songPane,'song-actions');
     const s=songView==='detail'?song():null;
@@ -451,7 +451,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         row.addEventListener('dblclick',e=>{if(!e.target.closest('.song-more-wrap'))openSong();});
         row.addEventListener('keydown',e=>{if(e.target===row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();if(e.key==='Enter')openSong();else selectPlaylistSong(item);}});
         const open=button('',row,()=>selectPlaylistSong(item));open.className='song-open measure-head';open.setAttribute('aria-label','Sélectionner '+item.name);open.setAttribute('aria-pressed',String(selectedSong===item.id));
-        el('span',item.name,open,'measure-num');
+        el('span',item.name,open,'measure-num').dataset.noTranslate='';
         const meters=[...new Set(item.sections.map(s=>s.measure.numerator+'/'+s.measure.denominator))];
         const signature=el('span',meters.length===1?meters[0]:'Mixte',open,'measure-sig');signature.title=meters.join(' · ');
         const tempos=item.sections.flatMap(s=>RENAX_SONG_TEMPO.active(s)?[s.measure.tempo,s.tempoRamp.endTempo]:[s.measure.tempo]),min=Math.min(...tempos),max=Math.max(...tempos);
@@ -495,7 +495,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       }
       s.sections.forEach((section,i)=>{const card=el('div',undefined,songPane,'song-section measure-card');card.dataset.sectionId=section.id;enableSongDrag(card,section,s,true);card.style.touchAction='none';card.tabIndex=0;card.setAttribute('role','group');
         const head=el('button',undefined,card,'measure-head song-block-header');head.type='button';
-        const title=el('span',section.label||'Bloc '+(i+1),head,'measure-num');
+        const title=el('span',section.label||'Bloc '+(i+1),head,'measure-num');title.dataset.noTranslate='';
         const countLabel=el('span',section.count+' M',head,'song-block-count');countLabel.style.cssText='margin-left:auto;white-space:nowrap;font-size:11px;color:var(--muted)';countLabel.setAttribute('aria-label',section.count+' mesures');
         el('span',section.measure.numerator+'/'+section.measure.denominator,head,'measure-sig');
         const summary=el('div',section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+tempoDescription(section)+' BPM',card,'song-block-summary');
@@ -556,6 +556,20 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
     songPane.querySelectorAll('.song-more-menu').forEach(menu=>menu.hidden=true);
     songPane.querySelectorAll('.song-more').forEach(trigger=>trigger.setAttribute('aria-expanded','false'));
   },true);
+  // Keep menus inside the scrollable panel, including short landscape screens.
+  function positionSongMenus(){
+    const bounds=panel.getBoundingClientRect(),left=Math.max(8,bounds.left+8),right=Math.min(innerWidth-8,bounds.right-8),top=Math.max(8,bounds.top+8),bottom=Math.min(innerHeight-8,bounds.bottom-8);
+    for(const menu of songPane.querySelectorAll('.song-more-menu:not([hidden])')){
+      const anchor=menu.parentElement.getBoundingClientRect();
+      menu.style.width=Math.max(80,Math.min(176,right-left))+'px';menu.style.boxSizing='border-box';
+      menu.style.maxHeight=Math.max(40,bottom-top)+'px';menu.style.overflowY='auto';menu.style.bottom='auto';
+      const rect=menu.getBoundingClientRect(),x=Math.max(left,Math.min(anchor.right-rect.width,right-rect.width));
+      const y=anchor.bottom+4+rect.height<=bottom?anchor.bottom+4:Math.max(top,Math.min(anchor.top-rect.height-4,bottom-rect.height));
+      menu.style.left=(x-anchor.left)+'px';menu.style.right='auto';menu.style.top=(y-anchor.top)+'px';
+    }
+  }
+  new MutationObserver(positionSongMenus).observe(songPane,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
+  panel.addEventListener('scroll',positionSongMenus,{passive:true});window.addEventListener('resize',positionSongMenus);
   const actionStyle=document.createElement('style');
   actionStyle.textContent='#songPane .song-playlist-card{position:relative;}\n#songPane .song-more-wrap{position:absolute;bottom:8px;right:8px;z-index:12;}\n#songPane .song-more{width:32px;height:32px;padding:0;border:1px solid #363640;border-radius:6px;background:#15151b;color:var(--text-muted);font:700 18px/1 var(--font);cursor:pointer;}\n#songPane .song-more:hover,#songPane .song-more[aria-expanded=true]{border-color:#a45427;color:var(--orange);background:#211a16;}\n#songPane .song-more-menu{position:absolute;bottom:36px;right:0;width:176px;padding:5px;border:1px solid #363640;border-radius:7px;background:#101116;box-shadow:0 10px 28px rgba(0,0,0,.38);}\n#songPane .song-more-menu[hidden]{display:none;}\n#songPane .song-more-menu .btn{display:block;width:100%;min-height:40px;padding:7px 9px;border:0;border-radius:5px;background:transparent;color:var(--text);font:600 11px/1.25 var(--font);text-align:left;text-transform:none;letter-spacing:0;}\n#songPane .song-more-menu .btn:hover{background:#211a16;color:var(--orange);}\n';
   actionStyle.textContent+='#songPane .song-direct-play[aria-pressed="true"]{border-color:#a45427;color:var(--orange);background:#211a16;}';
@@ -565,7 +579,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
   actionStyle.textContent+='.song-name-label{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;color:var(--text-muted);font:500 12px/1.4 var(--font);}.song-name-input{width:100%;min-width:0;box-sizing:border-box;min-height:44px;padding:10px 12px;border:1px solid #505b69;border-radius:6px;background:#343b45;color:var(--text);font:500 14px/1.4 var(--font);}.song-name-input:focus{outline:2px solid var(--cyan);outline-offset:2px;}.song-name-dialog .btn:disabled{opacity:.4;cursor:not-allowed;}';
   document.head.append(actionStyle);
   render();
-  window.RENAX_SONGS={validateLibrary,loadSong,unload,locate,
+  window.RENAX_SONGS={playbackSections,validateLibrary,loadSong,unload,locate,
     replaceLibrary(value,preserveNavigation=false){validateLibrary(value);unload();library=clone(value);if(!preserveNavigation){selectedSong=null;openSectionId=null;songView='home';}else if(!profile().songs.some(s=>s.id===selectedSong)){selectedSong=null;openSectionId=null;if(songView==='detail')songView='playlist';}render();},
     get navigation(){return {pane:songsRoot.hidden?'sequence':'songs',view:songView,song:selectedSong,profile:library.activeProfile};},
     restoreNavigation(state){

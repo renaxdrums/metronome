@@ -25,3 +25,14 @@ These tests validate explicit reviewed vowel landmarks and actual waveform timin
 Subdivision checks: node tests/subdivision-test.cjs; node tests/subdivision-live-test.cjs; node tests/subdivision-mix-test.cjs. Optional SUBDIVISION_BASELINE points to an old local index.html for before/after levels and defect reproduction. Current subdivision reports: validation-2026-10-06-subdivisions/. Live edits adopt the changed audio subdivision layout on the next pass of the measure, while visuals preserve musical phase.
 
 Pulse popup checks: node tests/pulse-popup-test.cjs and node tests/pulse-popup-live-test.cjs. Validate denominator-aware choices, constant pulse block count, editor state changes, desktop/mobile bounds and continuous playback through editor changes. Current reports: validation-2026-10-06-pulse-popup/.
+
+## Local QA environment (Windows)
+
+Install the pinned dependencies with pnpm install --frozen-lockfile, then run node tests/setup.mjs for the cached speech models. Set CHROME_PATH to an installed Chrome executable when using another location. ffmpeg and ffprobe are required for decoded audio measurements. The optional Firebase emulator tests require Java 21 and run against demo-renax-backup only.
+
+Run node tests/run.cjs. Set QA_OUTPUT to a separate absolute results directory. Use --only=filename.cjs to run a single historical test. The native picker test requires a person to select the destination; it is not certified by a simulated picker contract. The independent current-ui-test.cjs and qa-regressions-test.cjs add coverage; historical tests remain separate.
+
+The PCM non-regression test now compares the audited commit c7d2d3103ed6c530fb9edaadcabe4883da19f595, with all compared instrument banks loaded in both pages. Earlier October versions intentionally contain different sounds. The subdivision gain test uses a controlled reference with only the approved +4.5 dB multiplier removed unless SUBDIVISION_BASELINE is explicitly supplied. It retains exact gain, unchanged other signals and clipping assertions.
+
+This local repair branch is not a certified release. Consult the per-test results and remaining failures before publishing.
+The default automated suite reports the native Windows picker as MANUAL REQUIRED rather than claiming success. Run pnpm test:native with a person choosing the displayed destination. Run pnpm test:rules for the emulator-only integration suite, including account-scope-test.cjs. intro-lifecycle-test.cjs explicitly enables the real startup animation; other UI cases disable it for stable interaction while its lifecycle is checked separately.

@@ -31,6 +31,7 @@
 .score-view-switch button[hidden],.rhythm-editor[hidden],.score-pulse[hidden]{display:none;}
 .rhythm-score{max-height:calc(100% - var(--score-controls-height,75px));}
 .rhythm-score .vf-notehead path{fill:var(--note-state-color,#111);stroke:var(--note-state-color,#111);}
+.rhythm-score .score-active-head path{fill:var(--cyan,#00e5ff);stroke:var(--cyan,#00e5ff);}
 
 .rhythm-score .score-selected{filter:drop-shadow(0 0 2px rgba(0,229,255,.35));}
 .rhythm-score [data-event]{cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;}
@@ -135,3 +136,6 @@ html,body,body *{scrollbar-width:thin!important;scrollbar-color:rgba(0,229,255,.
  .score-tools-panel,.score-tools-panel .rhythm-editor{max-height:none!important}
  .score-tools-panel .rhythm-editor{overflow:visible;padding:7px}
 }
+
+/* Reserve the complete icon column before laying out the score. */
+.score-tools-panel{min-height:min-content;}

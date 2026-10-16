@@ -5,6 +5,7 @@ await storage.ready;
 let account=null,remote=null,sdk=null,auth=null,db=null,unsubscribe=null,generation=0,running=false,retry=0,timer=null,deferred=false,message='Sauvegardé dans ce navigateur',failure='',confirmed=false;
 let pendingLocalChoice=null;
 const rememberKey='renax-index2-remember-auth';
+const guestAutoOwnerKey='renax-index2-guest-auto-owner-v1';
 let remember=false;try{remember=localStorage.getItem(rememberKey)==='1';}catch{}
 const deviceKey='renax-index2-device';
 let device;try{device=localStorage.getItem(deviceKey);}catch{}
@@ -79,11 +80,16 @@ async function ensureFirebase(){
       // Preserve the anonymous library before switching to the account scope.
       // A song created before sign-in must follow the user into the account automatically.
       const guestBeforeSignIn=user?storage.guestLibrary():null;
+      const otherAccountCopies=user&&Object.keys(localStorage).some(key=>key.startsWith('renax-index2-store-v1:user:')&&key!=='renax-index2-store-v1:user:'+user.uid);
       await storage.switchScope(user?'user:'+user.uid:'guest',blank());
       if(token!==generation)return;
       if(!user){say('Sauvegardé dans ce navigateur');return;}
-      if(guestBeforeSignIn){
+      // Anonymous recovery belongs to the first account that claims this browser.
+      // Other accounts can still choose the explicit, confirmed import action.
+      const guestAutoOwner=user?localStorage.getItem(guestAutoOwnerKey):null;
+      if(guestBeforeSignIn&&(guestAutoOwner===user.uid||!guestAutoOwner&&!otherAccountCopies)){
         api.validateLibrary(guestBeforeSignIn);
+        if(!guestAutoOwner)localStorage.setItem(guestAutoOwnerKey,user.uid);
         const accountState=storage.state;
         let next=core.mergeLibraries(api.library,guestBeforeSignIn);
         api.validateLibrary(next);
@@ -137,20 +143,6 @@ async function importGuest(){
     profile.songs.push(...core.copy(songs));songs.forEach(s=>known.add(signature(s)));
   }
   api.validateLibrary(next);storage.write(next);const receipt=storage.state;receipt.importDecisions.guestProfiles=mapping;storage.update(receipt);storage.reconcile();queue();
-}
-async function history(){
-  if(!account)return;const dialog=element('dialog',undefined,document.body);dialog.className='backup-dialog';element('h2','Historique et restauration',dialog);
-  element('p','Les 20 dernières révisions de chaque élément sont affichées. Aucune version distante n’est purgée automatiquement.',dialog);
-  button('Fermer',dialog,()=>{dialog.close();dialog.remove();});dialog.showModal();
-  try{const uid=account.uid,token=generation;
-    for(const [id,base] of Object.entries(storage.state.base)){
-      const ref=recordRef(uid,id),query=sdk.firestore.query(sdk.firestore.collection(ref,'history'),sdk.firestore.orderBy('revision','desc'),sdk.firestore.limit(20));const snapshot=await sdk.firestore.getDocsFromServer(query);if(token!==generation){dialog.close();dialog.remove();return;}
-      snapshot.forEach(doc=>{const record=decode(doc);if(record.deleted)return;let payload;try{payload=JSON.parse(record.payload);}catch{return;}if(payload.type!=='song')return;
-        const row=element('div',undefined,dialog);element('p',payload.song.name+' · version '+record.revision+' · '+(record.updatedAt?new Date(record.updatedAt).toLocaleString():'date inconnue'),row);
-        button('Restaurer cette version',row,()=>{if(!confirm('Restaurer cette version de « '+payload.song.name+' » ? La version actuelle reste dans l’historique.'))return;const next=putSong(api.library,payload);api.validateLibrary(next);storage.write(next);storage.reconcile();queue();dialog.close();dialog.remove();});
-      });
-    }
-  }catch(error){element('p',friendly(error),dialog);}
 }
 let backupView='';
 const backupIcons={

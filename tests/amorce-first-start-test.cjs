@@ -25,7 +25,7 @@ const {start}=require('./audio-harness.cjs');
   await p.locator('#playBtn').click();
   await p.waitForFunction(()=>isPlaying&&audioCtx.state==='running',{timeout:120000});
   const result=await p.evaluate(()=>({prepareAudioStates,starts:firstStartTrace.length,state:audioCtx.state,button:playBtn.textContent,loaded:RENAX_SONGS.loaded.song.sections.map(x=>x.label)}));
-  assert.deepEqual(result.prepareAudioStates,['running']);assert.equal(result.starts,1);assert.equal(result.button,'STOP');
+  assert.deepEqual(result.prepareAudioStates,['running']);assert.equal(result.starts,1);assert.equal(result.button,'Arrêter');
   await p.locator('#playBtn').click();await p.waitForFunction(()=>!isPlaying);
   await p.locator('#playBtn').click();await p.waitForFunction(()=>isPlaying);assert.equal(await p.evaluate(()=>firstStartTrace.length),2);
   await p.locator('#playBtn').click();assert.deepEqual(errors,[]);

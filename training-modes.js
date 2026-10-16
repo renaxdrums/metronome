@@ -2,7 +2,7 @@
 (() => {
   const section=document.querySelector('.training-section');
   const svg=path=>'<svg viewBox="0 0 32 24" aria-hidden="true" focusable="false"><path d="M3 2v19h27" class="curve-axis"/><path d="'+path+'"/></svg>';
-  const icons={linearUp:'M6 18 28 4',linearDown:'M6 4 28 18',up:'M6 18C18 18 24 14 28 4',down:'M6 4C10 14 16 18 28 18',steps:'M6 18h7v-5h7V8h8V3'};
+  const icons={up:'M6 18C18 18 24 14 28 4',steps:'M6 18h7v-5h7V8h8V3'};
   let mode='progressive',curve='linear-up';
   const profiles=[
     ['linear-up','Montée linéaire','M6 18L28 4'],

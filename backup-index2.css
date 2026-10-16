@@ -29,7 +29,4 @@
 .backup-auth label {font-size:11px;}
 .backup-error {color:#ffb17d;}
 .backup-conflict {border:1px solid var(--orange);padding:10px;border-radius:6px;}
-.backup-dialog {background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:18px;margin:auto;max-width:560px;width:calc(100% - 32px);max-height:85dvh;overflow:auto;}
-.backup-dialog p {font-size:12px;line-height:1.5;margin:10px 0;}
-.backup-dialog::backdrop {background:#0009;}
 @media(max-width:1100px){#profilePane button.btn,#profilePane .backup-profile select{min-height:44px;} .backup-options summary{min-height:44px;line-height:44px;}}

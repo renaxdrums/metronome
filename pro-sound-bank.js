@@ -15,6 +15,8 @@ let volume=state===3?.55:state===2?.50:.45;if(isFirst||context.isOtherStrongBeat
 source.connect(gain);gain.connect(dest);scheduledVoiceSources.add(source);source.onended=()=>{scheduledVoiceSources.delete(source);source.disconnect();gain.disconnect();};source.start(time);
 }};
 BANK_GAINS[sample.key]=drumBankGains[sample.key]??.96;
+// Electric coincident streams need 0.2 dB more headroom at full volume.
+if(sample.key==='userElectric')BANK_GAINS[sample.key]*=Math.pow(10,-.2/20);
 if(sample.key!=='proShaker'){const option=document.createElement('option');option.value=sample.key;option.textContent=sample.name;option.title=sample.sourceTitle||(['proDigital','proQuartz','proTick','proSoft'].includes(sample.key)?'Sample de métronome · CC0 · Ludwig Peter Müller':'Sample acoustique · CC0 · Versilian Studios');if(sample.userProvided){option.title='Sample fourni par Renax';menu.insertBefore(option,firstExistingOption);}else menu.append(option);}
 }
 // Preserve saved Beep identifiers while replacing the arcade sound.

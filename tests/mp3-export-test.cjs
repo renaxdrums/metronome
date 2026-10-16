@@ -19,8 +19,8 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
     const lib=RENAX_SONGS.library;lib.profiles.find(x=>x.id===lib.activeProfile).songs=[a,b,c,d];RENAX_SONGS.validateLibrary(lib);RENAX_STORAGE.write(lib);return [a,b,c,d];
   });
   await p.reload();await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
-  await p.getByRole('tab',{name:'Morceaux',exact:true}).click();await p.getByRole('button',{name:'Playlist',exact:true}).click();
-  await p.getByRole('button',{name:'Ouvrir la playlist Morceaux',exact:true}).click();
+  await require('./audio-harness.cjs').openPlaylist(p);
+
   await p.locator('#mp3ExportOpen').click();
   await p.locator('#mp3ExportDialog').waitFor({state:'visible'});
   assert.deepStrictEqual(await p.locator('#mp3ExportSong option').allTextContents(),fixtures.map(s=>s.name));
@@ -35,7 +35,7 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
     await p.selectOption('#mp3ExportSong',song.id);await p.locator('#mp3ExportSave').click();await p.waitForFunction(()=>document.getElementById('mp3ExportStatus').textContent.startsWith('MP3 enregistré'),{timeout:120000});
     const file=path.join(destination,song.name+'.mp3');assert(fs.existsSync(file));
     const info=probe(file),expected=song.sections.reduce((n,s)=>n+s.count*s.measure.numerator*60/s.measure.tempo*4/s.measure.denominator,0);
-    assert.strictEqual(info.streams[0].codec_name,'mp3');assert(Math.abs(Number(info.format.duration)-expected-.055)<.06,'Wrong song selected');
+    assert.strictEqual(info.streams[0].codec_name,'mp3');const timing=await p.evaluate(async song=>(await RENAX_MP3_EXPORT.isolatedRender(song,currentBank,masterVolume)).score,song);assert(Math.abs(timing.duration-expected)<1e-10);assert(Math.abs(Number(info.format.duration)-expected-timing.lead-timing.tail)<.06,'Wrong song selected');
   }
   const after=await p.evaluate(()=>({storage:localStorage.getItem('renax-index2-store-v1:'+RENAX_STORAGE.scope),bank:currentBank,volume:masterVolume,measures:JSON.stringify(measures),ctx:audioCtx.state,playing:isPlaying,chrono:document.querySelector('#workTimer')?.textContent}));assert.deepStrictEqual(after,before);
   assert.strictEqual(writes.length,2);assert.deepStrictEqual(pickerOptions.map(x=>x.suggestedName),['Essai A.mp3','Essai B.mp3']);
@@ -67,12 +67,12 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
   assert.strictEqual(await p.evaluate(()=>JSON.stringify(RENAX_SONGS.library)),JSON.stringify(JSON.parse(before.storage).library));
   const running=await p.evaluate(async song=>{
     window.exportLiveEvents=[];const original=playClick;playClick=(s,t,f,c)=>{exportLiveEvents.push({time:t,beat:c.beatNumber});return original(s,t,f,c);};
-    const originalCtx=audioCtx,originalMeasures=measures;await startMetronome();
+    await startMetronome();const originalCtx=audioCtx,originalMeasures=measures;
     await Promise.all([RENAX_MP3_EXPORT.exportSong(song,'clic',.8),new Promise(resolve=>setTimeout(resolve,3000))]);
     const stillRunning=isPlaying,sameContext=audioCtx===originalCtx,sameMeasures=measures===originalMeasures;stopMetronome();playClick=original;
-    return {stillRunning,sameContext,sameMeasures,events:exportLiveEvents};
-  },fixtures[2]);assert(running.stillRunning&&running.sameContext&&running.sameMeasures);assert(running.events.length>4);for(let i=1;i<running.events.length;i++)assert(Math.abs(running.events[i].time-running.events[i-1].time-.5)<1e-9);
-  await p.setViewportSize({width:390,height:844});await p.locator('#mobileTabs button[data-tab=seq]').click();await p.locator('#mp3ExportOpen').click();const bounds=await p.locator('#mp3ExportDialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=390);await p.screenshot({path:path.join(out,'mp3-export-mobile.png')});await p.getByRole('button',{name:'Fermer',exact:true}).click();
+    const m=measures[0];const expectedStep=60/getEffectiveTempo(m)*4/m.denominator/m.beatSubdivisions[0];return {stillRunning,sameContext,sameMeasures,expectedStep,events:exportLiveEvents};
+  },fixtures[2]);assert(running.stillRunning&&running.sameContext&&running.sameMeasures);assert(running.events.length>4);for(let i=1;i<running.events.length;i++)assert(Math.abs(running.events[i].time-running.events[i-1].time-running.expectedStep)<1e-9,JSON.stringify(running));
+  await p.setViewportSize({width:390,height:844});if(await p.locator('#workspaceMobileViews [data-pane=seq]').isVisible())await p.locator('#workspaceMobileViews [data-pane=seq]').click();await p.locator('#mp3ExportOpen').click();const bounds=await p.locator('#mp3ExportDialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=390);await p.screenshot({path:path.join(out,'mp3-export-mobile.png')});await p.getByRole('button',{name:'Fermer',exact:true}).click();
   assert.deepStrictEqual(errors,[]);
   const report={playlistButton:true,allSongsInSelect:true,multipleSelections:true,destination:{method:'File System Access API contract stub, writes to actual chosen-destination directory; native OS dialog not automated',pickerOptions,writes:writes.map(f=>path.basename(f)),cancel:true},defaultFilenames:true,liveStateUnchanged:true,running,noPerBlockVolume:true,limiter,silent,errors,exports};save('mp3-export-results.json',report);console.log('MP3 export tests passed');
  }finally{await r.browser.close();r.server?.close();}

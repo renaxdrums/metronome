@@ -7,6 +7,9 @@ on:
       - '.github/workflows/audio-cc0-validation.yml'
       - 'index.html'
       - 'song-export.js'
+      - 'mp3-export-worker.js'
+      - 'mp3-export.css'
+      - 'tests/mp3-output-level-test.cjs'
       - 'assets/metronome/**'
       - 'tests/instrument-samples-test.cjs'
       - 'tests/mp3-export-test.cjs'
@@ -39,3 +42,7 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/mp3-export-test.cjs
+      - name: MP3 output level and export dialog
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/mp3-output-level-test.cjs

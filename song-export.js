@@ -66,7 +66,7 @@
     window.RENAX_MP3_RENDER={renderPCM};return;
   }
   function workerClient(){
-    const worker=new Worker(new URL('mp3-export-worker.js',document.baseURI));
+    const worker=new Worker(new URL('mp3-export-worker.js?v=20261016-output-level1',document.baseURI));
     let busy=false;
     return {close:()=>worker.terminate(),call:(message,transfer=[])=>new Promise((resolve,reject)=>{
       if(busy){reject(Error('Analyse audio déjà en cours.'));return;}busy=true;
@@ -85,12 +85,12 @@
       return await frame.contentWindow.RENAX_MP3_RENDER.renderPCM(song,bank,volume,prepared);
     }finally{frame.remove();}
   }
-  async function exportSong(song,bank,volume,progress=()=>{}){
+  async function exportSong(song,bank,volume,progress=()=>{},level='original'){
     progress('Rendu du morceau complet…');
     const rendered=await isolatedRender(clone(song),bank,volume),client=workerClient();
     try{
       progress('Gain global, limiteur et encodage MP3…');
-      let result=await client.call({op:'prepare',pcm:rendered.pcm,rate:rendered.rate},[rendered.pcm.buffer]);
+      let result=await client.call({op:'prepare',pcm:rendered.pcm,rate:rendered.rate,level},[rendered.pcm.buffer]);
       let decodedPeak=0,decodedDuration=0;
       for(let attempt=0;attempt<5;attempt++){
         progress('Vérification du niveau du MP3…');
@@ -117,12 +117,17 @@
     const format=document.createElement('select');format.id='songExportFormat';
     for(const [value,text] of [['mp3','MP3 — audio'],['midi','MIDI — notes et tempo']]){const option=document.createElement('option');option.value=value;option.textContent=text;format.append(option);}
     const midiNote=document.createElement('p');midiNote.textContent='MIDI : clics sur le canal 10, note 37, trois vélocités pour les accents. Le son est choisi dans ton logiciel musical.';midiNote.hidden=true;
-    format.onchange=()=>{midiNote.hidden=format.value!=='midi';credit.hidden=format.value==='midi';clearDownload();status.textContent='';};
+    format.onchange=()=>{midiNote.hidden=format.value!=='midi';credit.hidden=format.value==='midi';levelGroup.hidden=format.value==='midi';clearDownload();status.textContent='';};
     const label=document.createElement('label');label.htmlFor='mp3ExportSong';label.textContent='Morceau de la playlist';
     const select=document.createElement('select');select.id='mp3ExportSong';select.dataset.noTranslate='';
     for(const song of playlistSongs()){const option=document.createElement('option');option.value=song.id;option.textContent=song.name;select.append(option);}
     if(songId)select.value=songId;
     select.onchange=()=>{clearDownload();status.textContent='';};
+    const levelLabel=document.createElement('label');levelLabel.htmlFor='mp3ExportLevel';levelLabel.textContent='Volume du fichier';
+    const levelSelect=document.createElement('select');levelSelect.id='mp3ExportLevel';
+    for(const [value,text] of [['boost','Renforcé'],['original','Dynamique d’origine']]){const option=document.createElement('option');option.value=value;option.textContent=text;levelSelect.append(option);}
+    const levelGroup=document.createElement('div');levelGroup.className='mp3-export-level';levelGroup.append(levelLabel,levelSelect);
+    levelSelect.onchange=()=>{clearDownload();status.textContent='';};
     const actions=document.createElement('div');actions.className='mp3-actions';
     const save=document.createElement('button');save.id='mp3ExportSave';save.className='btn';save.textContent=canPickFile?'Choisir l’emplacement et exporter':'Préparer le téléchargement';save.type='button';
     const close=document.createElement('button');close.className='btn';close.textContent='Fermer';close.type='button';close.onclick=()=>dialog.close();
@@ -153,9 +158,9 @@
       const song=playlistSongs().find(s=>s.id===select.value);if(!song||busy)return;
       clearDownload();
       const snapshot=clone(song),bank=currentBank,volume=masterVolume;
-      const midi=format.value==='midi';
+      const midi=format.value==='midi',level=levelSelect.value;
       const suggestedName=midi?filename(song.name).replace(/\.mp3$/,'.mid'):filename(song.name);
-      busy=true;select.disabled=true;format.disabled=true;save.disabled=true;close.disabled=true;
+      busy=true;select.disabled=true;format.disabled=true;levelSelect.disabled=true;save.disabled=true;close.disabled=true;
       try{
         let handle=null,pickerError=null;
         // Ask for the destination immediately on PC while the click is still a user gesture.
@@ -174,7 +179,7 @@
           }
         }
         status.textContent=midi?'Création du MIDI…':'Rendu du morceau…';
-        const result=midi?RENAX_MIDI_EXPORT.exportSong(snapshot):await exportSong(snapshot,bank,volume,message=>status.textContent=message);
+        const result=midi?RENAX_MIDI_EXPORT.exportSong(snapshot):await exportSong(snapshot,bank,volume,message=>status.textContent=message,level);
         if(handle){
           try{
             const writable=await handle.createWritable();
@@ -199,12 +204,12 @@
       }catch(error){
         status.textContent=error.name==='AbortError'?'Export annulé.':(error.message||'Échec de l’export.');
       }finally{
-        busy=false;select.disabled=false;format.disabled=false;save.disabled=false;close.disabled=false;
+        busy=false;select.disabled=false;format.disabled=false;levelSelect.disabled=false;save.disabled=false;close.disabled=false;
       }
     };
     dialog.addEventListener('cancel',e=>{if(busy)e.preventDefault();});
     dialog.addEventListener('close',()=>{if(closeTimer)clearTimeout(closeTimer);clearDownload();dialog.remove();dialog=null;});
-    actions.append(save,close);dialog.append(title,label,select,formatLabel,format,midiNote,actions,status,downloadLink,credit);document.body.append(dialog);dialog.showModal();
+    actions.append(save,close);dialog.append(title,label,select,formatLabel,format,levelGroup,midiNote,actions,status,downloadLink,credit);document.body.append(dialog);dialog.showModal();
   }
   function install(){
     const pane=document.getElementById('songPane');if(!pane||pane.hidden||document.getElementById('mp3ExportOpen'))return;

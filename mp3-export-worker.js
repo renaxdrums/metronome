@@ -22,8 +22,8 @@ function truePeak(a) {
   }
   return peak;
 }
-function limit(a, rate, ceiling=CEILING) {
-  const look=Math.ceil(rate*.005), release=Math.exp(-1/(rate*.05));
+function limit(a, rate, ceiling=CEILING, reinforced=false) {
+  const look=Math.ceil(rate*(reinforced ? .001 : .005)), release=Math.exp(-1/(rate*(reinforced ? .005 : .05)));
   const deque=new Int32Array(a.length), out=new Float32Array(a.length);
   let head=0,tail=0,gain=1,minGain=1;
   for(let i=0;i<a.length+look;i++) {
@@ -57,12 +57,14 @@ self.onmessage=({data})=>{
     if(data.op==='limiterTest'){const result=limit(data.pcm,data.rate,data.ceiling);self.postMessage(result,[result.pcm.buffer]);return;}
     if(data.op==='prepare') {
       rate=data.rate;const input=data.pcm,peak=truePeak(input);
-      const gain=peak>0?CEILING/peak:1;
+      // A bounded lift; shorter recovery keeps subsequent soft clicks from ducking.
+      const boostDb=data.level==='boost'?2:0;
+      const gain=peak>0?CEILING/peak*Math.pow(10,boostDb/20):1;
       for(let i=0;i<input.length;i++)input[i]*=gain;
-      const limited=limit(input,rate);rendered=limited.pcm;
+      const limited=limit(input,rate,CEILING,data.level==='boost');rendered=limited.pcm;
       const limitedPeak=truePeak(rendered);
       if(limitedPeak>CEILING)for(let i=0;i<rendered.length;i++)rendered[i]*=CEILING/limitedPeak;
-      report={sourceTruePeak:peak,gainDb:20*Math.log10(gain),limiterMinGain:limited.minGain,preEncodingTruePeak:truePeak(rendered)};
+      report={level:data.level==='boost'?'boost':'original',boostDb,sourceTruePeak:peak,gainDb:20*Math.log10(gain),limiterMinGain:limited.minGain,preEncodingTruePeak:truePeak(rendered)};
     }
     if(!rendered)throw Error('Rendu audio absent.');
     const correction=data.correction||1;

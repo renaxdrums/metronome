@@ -975,7 +975,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 @media(max-width:1100px){body.training-tab-open #playBtn,body.training-tab-open #panicBtn{display:none!important;}#trainBtn:not(.active)::before{content:"";display:inline-block;width:12px;height:12px;margin-right:7px;vertical-align:-1px;background:currentColor;clip-path:polygon(15% 0,100% 50%,15% 100%);}}
   </style>
   <link rel="stylesheet" href="songs.css?v=20261012-compact-blocks2">
-  <link rel="stylesheet" href="mp3-export.css?v=20261013-mobile-download1">
+  <link rel="stylesheet" href="mp3-export.css?v=20261016-output-level1">
   <link rel="stylesheet" href="backup-index2.css?v=20261016-stability1">
   <style>
     /* Index 2 uniquement : ergonomie visuelle, sans modifier les commandes. */
@@ -1199,7 +1199,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 </style>
 <style>
   /* Vue mobile centrée sur le métronome : commandes compactes, cercle prioritaire. */
-  #songExportFormat { display: block; margin: 0 0 16px; min-height: 40px; }
+  #songExportFormat,#mp3ExportLevel { display: block; margin: 0 0 16px; min-height: 40px; }
   #mp3ExportDialog > p:not(#mp3ExportStatus) { margin: 0 0 16px; color: var(--text-muted); font-size: 11px; line-height: 1.5; }
   @media (max-width: 1100px) {
     body { padding: 6px; }
@@ -4352,7 +4352,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
     })();
   </script>
   <script src="midi-export.js?v=20261016-stability1"></script>
-  <script src="song-export.js?v=20261016-export-center1"></script>
+  <script src="song-export.js?v=20261016-output-level1"></script>
 
   <script>
   (() => {
@@ -4430,7 +4430,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 })();</script>
 <script src="multi-clock.js?v=20261012-multi5"></script>
 <script src="multi-metronome.js?v=20261016-stability1"></script>
-<script src="interface-language.js?v=20261016-beat-hover45"></script>
+<script src="interface-language.js?v=20261016-output-level1"></script>
 <script src="workspace-layout.js?v=20261016-stability1"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=20261015-ivory33"></script>

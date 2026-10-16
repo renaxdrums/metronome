@@ -36,3 +36,10 @@ The PCM non-regression test now compares the audited commit c7d2d3103ed6c530fb9e
 
 This local repair branch is not a certified release. Consult the per-test results and remaining failures before publishing.
 The default automated suite reports the native Windows picker as MANUAL REQUIRED rather than claiming success. Run pnpm test:native with a person choosing the displayed destination. Run pnpm test:rules for the emulator-only integration suite, including account-scope-test.cjs. intro-lifecycle-test.cjs explicitly enables the real startup animation; other UI cases disable it for stable interaction while its lifecycle is checked separately.
+
+
+## MP3 file level
+
+The export dialog defaults to Boosted (Renforcé). This adds a bounded 2 dB drive into an export-only limiter (1 ms lookahead, 5 ms release), followed by reconstructed-peak analysis and verification of the decoded MP3. Original dynamics keeps the prior audio path. The programmatic exportSong API retains Original dynamics by default for compatibility; the dialog passes the selected mode explicitly. MIDI has no audio-level option.
+
+Run node tests/mp3-output-level-test.cjs for before/after FFmpeg loudness and 8x true-peak measurements, bounded gain reduction, distinct click-level ordering, unchanged duration, silence, responsive dialog and byte comparisons between selected UI modes and direct renders. The historical mp3-export-test.cjs still checks exact original accent ratios, original limiter inactivity, timing, cancellation and playback isolation. The boosted mode intentionally moderates transient peaks; it is not represented as preserving every amplitude ratio or reaching a fixed LUFS target for every tempo and silence pattern.

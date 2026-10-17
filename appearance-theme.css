@@ -1,0 +1,267 @@
+
+/* Appearance: the approved graphite interface remains the default. */
+html{color-scheme:dark}
+html[data-theme=light]{color-scheme:light;--bg:#dde4eb;--panel:#edf1f5;--border:#c5cdd6;--text:#222d38;--text-muted:#526170;--orange:#b84b00;--cyan:#087c90;--yellow:#15783e;--grey:#dce2e8;--grey-hover:#cfd8e1}
+html[data-theme=light] body{background:var(--bg);color:var(--text)}
+html[data-theme=light] header{border-bottom-color:#cbd3dc}
+html[data-theme=light] :is(.panel,.measure-card,.song-section,.song-card,.song-block,.song-count-in,.multi-track,#multiPresetLibrary .multi-preset-card){background:#edf1f5!important;border-color:var(--border)!important;color:var(--text)!important}
+html[data-theme=light] .main-grid>.panel-visu{background:radial-gradient(ellipse at 50% 60%,#e8eef3,#cdd9e3 75%)!important}
+html[data-theme=light] :is(.panel-visu .visu-toolbar,#workspaceControls){background:#e5ebf1!important;border-color:var(--border)!important}
+html[data-theme=light] :is(input:not([type=range]):not([type=checkbox]),select,textarea,.numbox-button){background:#d5dee7!important;border-color:#b8c5d1!important;color:var(--text)!important}
+html[data-theme=light] :is(.numbox-menu,.numbox-dropdown,.sequence-more-actions,.multi-actions,dialog,#beatEditor,#index2SettingsPanel,#songsRoot #songPane .song-more-menu){background:#edf1f5!important;border-color:#aebdca!important;color:var(--text)!important;box-shadow:0 12px 28px #22334425}
+html[data-theme=light] :is(.numbox-option,.index2-setting-row,.index2-settings-title,.index2-settings-section h3,.workspace-timer-label,.measure-label,.control-group>label,.measure-sig,.legend){color:var(--text)!important}
+html[data-theme=light] :is(.numbox-option:hover,.numbox-option.active,.numbox-option[aria-selected=true]){background:#dceef2!important;color:var(--cyan)!important}
+html[data-theme=light] #workspaceNav button{background:#edf1f5!important;border-color:var(--border)!important;color:var(--text-muted)!important}
+html[data-theme=light] #workspaceNav button[aria-selected=true]{background:#deedf1!important;border-color:var(--cyan)!important;color:var(--text)!important}
+html[data-theme=light] :is(.measure-card.active,.multi-track.active,.song-section.active,#songPane .song-playlist-card.active,#multiPresetLibrary .multi-preset-card.active){background:#e4f0f3!important;border-color:var(--cyan)!important}
+html[data-theme=light] :is(#songsHome>.song-entry,#songsRoot .playlist-choice){background:#edf1f5!important;border-color:var(--border)!important;color:var(--text)!important}
+html[data-theme=light] :is(#songsHome>.song-entry:hover,#songsRoot .playlist-choice:hover){background:#e9eff4!important}
+html[data-theme=light] :is(#playBtn,#trainBtn,#sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,#songsRoot .track-create,#songsRoot .track-add-section,#songPane .song-selected-open,#songPane .playlist-direct-play[aria-pressed=true],#multiPresetLibrary .multi-preset-create){background:#deedf1!important;border-color:#74aab6!important;color:var(--cyan)!important}
+html[data-theme=light] :is(#playBtn:hover,#trainBtn:hover){background:#cce5eb!important}
+html[data-theme=light] :is(#tapBtn,.training-mode-tabs button,.dir-toggle button,.rhythm-editor button,.rhythm-editor summary){background:#d5dee7!important;border-color:#b8c5d1!important;color:var(--text)!important}
+html[data-theme=light] :is(.training-mode-tabs button.active,.dir-toggle button.active,.rhythm-editor button.active){background:#dceef2!important;border-color:var(--cyan)!important}
+html[data-theme=light] :is(.sequence-preview-play,.sequence-more summary,.multi-more summary,.multi-solo,.multi-mute,#songsRoot #songPane .song-more,#songsRoot .song-back,#multiPresetLibrary button,.index2-header-btn,.console-intro-replay,.view-toggle button,.reset-undo-tools button){background:transparent!important;border-color:#b8c5d1!important;color:var(--orange)!important}
+html[data-theme=light] #songsRoot #songPane .song-more-menu .btn{color:var(--text)!important}
+html[data-theme=light] #songsRoot #songPane .song-more-menu .btn:hover{background:#e9eff4!important;color:var(--orange)!important}
+html[data-theme=light] .beat-number{color:var(--text);text-shadow:0 2px 8px #ffffff90}
+html[data-theme=light] .beat-number.pulse{color:var(--cyan);text-shadow:0 0 12px #087c9020}
+html[data-theme=light] :is(.sequencer-cross,.sequencer-cross::before,.sequencer-cross::after){background:#526170}
+html[data-theme=light] .visu-toolbar :is(.workspace-control-group,#workspaceTimer){border-left-color:var(--border)!important}
+html[data-theme=light] .numbox-menu{scrollbar-color:var(--cyan) #d5dee7}
+html[data-theme=light] input[type=range]{background:#c5cdd6}
+html[data-theme=light] #workspaceTempoShortcut{background:#d5dee7;border-color:var(--border)}
+html[data-theme=light] #songsRoot #songPane :is(.song-section.playing,.song-count-in.playing)::after{background:#567080}
+html[data-theme=light] .rhythm-score{border:1px solid var(--border)}
+html[data-theme=light] :is(.index2-settings-note,.index2-status,footer){color:var(--text-muted)!important}
+.appearance-options{display:flex;gap:8px}
+.appearance-options button{flex:1;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--grey);color:var(--text);font:600 12px var(--font);cursor:pointer}
+.appearance-options button[aria-pressed=true]{border-color:var(--cyan);box-shadow:inset 0 -2px var(--cyan)}
+/* Smartphone: theme choices first, close control retained, preferences independently scrollable. */
+@media(max-width:1100px){
+  #index2SettingsPanel .index2-settings-title{order:-2}
+  #index2SettingsPanel #appearanceSettings{order:-1}
+  #index2SettingsPanel.mobile-active{height:auto!important;flex:1 1 0;min-height:0;overflow-y:auto}
+}
+
+html[data-theme=light] .brand p span:first-child{color:var(--text)!important}
+html[data-theme=light] .beat-divider{background:#536c83!important}
+html[data-theme=light] .step[data-state="1"] span,html[data-theme=light] .poly-dot[data-state="1"]{color:#fff!important}
+html[data-theme=light] .panel-visu{background:radial-gradient(ellipse at 50% 60%,#e8eef3,#cdd9e3 75%)!important}
+html[data-theme=light] .panel-visu .sequencer-wrapper{background:transparent!important}
+html[data-theme=light] .view-toggle button[aria-pressed=true]{background:#deedf1!important;border-color:var(--cyan)!important}
+html[data-theme=light] .numbox-menu::-webkit-scrollbar-track{background:#d5dee7}
+html[data-theme=light] .numbox-menu::-webkit-scrollbar-thumb{background:var(--cyan)}
+
+html[data-theme=light] .training-section #dirToggle button,html[data-theme=light] .training-curve-menu button{background:#d5dee7!important;border-color:#b8c5d1!important;color:var(--text)!important}
+html[data-theme=light] .training-section #dirToggle button.active,html[data-theme=light] .training-curve-menu button[aria-pressed=true]{background:#deedf1!important;border-color:var(--cyan)!important}
+html[data-theme=light] :is(.training-curve-picker,.training-curve-menu){background:#edf1f5!important;border-color:var(--border)!important}
+html[data-theme=light] #renaxHeaderWave{opacity:.9;filter:brightness(.48) contrast(1.35) saturate(.8);mix-blend-mode:multiply}
+
+html[data-theme=light] #index2SettingsPanel .index2-settings-section{background:#dce4ec!important;border-color:#b5c3d0!important}
+html[data-theme=light] #index2SettingsPanel :is(.index2-settings-section h3,.index2-setting-row label,.console-arrival-setting){color:#34495b!important}
+html[data-theme=light] #index2SettingsPanel :is(button,.numbox-button){background:#cbd7e2!important;border-color:#9caebe!important;color:#263b4c!important}
+html[data-theme=light] #index2SettingsPanel button[aria-pressed=true]{background:#bfdde4!important;border-color:var(--cyan)!important;color:#145c6d!important}
+html[data-theme=light] #index2SettingsPanel .index2-settings-note{background:#e8edf2!important;color:#465969!important}
+html[data-theme=light] #index2SettingsPanel button:disabled{opacity:.65}
+/* Shared light surfaces, including controls created by late-loaded modules. */
+html[data-theme=light]{--muted:var(--text-muted);--card:#edf1f5;--card-selected:#e4f0f3;--card-selected-border:#74aab6;--light-surface:#edf1f5;--light-control:#d5dee7;--light-hover:#c8d6e2;--light-active:#bfdde4;--light-outline:#a5b6c6}
+html[data-theme=light] body :is(.numbox-menu,.numbox-dropdown,.sequence-more-actions,.multi-actions,.multi-modal){background:var(--light-surface)!important;color:var(--text)!important;border-color:var(--light-outline)!important;box-shadow:0 12px 28px #22334425!important}
+html[data-theme=light] body .sound-bank-cards .numbox-option{background:var(--light-control)!important;color:var(--text)!important;border-color:var(--light-outline)!important}
+html[data-theme=light] body .sound-bank-cards .numbox-option:hover{background:var(--light-hover)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body .sound-bank-cards .numbox-option.active{background:var(--light-active)!important;color:var(--cyan)!important;border-color:var(--orange)!important}
+html[data-theme=light] body :is(.sequence-more-actions,.multi-actions) button{color:var(--text)!important;background:transparent!important}
+html[data-theme=light] body :is(.sequence-more-actions,.multi-actions) button:hover{background:var(--light-hover)!important;color:var(--orange)!important}
+html[data-theme=light] body .score-tools-panel .rhythm-editor{background:#dce4ec!important;border-color:var(--light-outline)!important;scrollbar-color:var(--cyan) var(--light-control)!important}
+html[data-theme=light] body .rhythm-editor :is(button,select){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body .rhythm-editor button:not(:disabled):hover{background:var(--light-hover)!important;border-color:var(--orange)!important}
+html[data-theme=light] body .rhythm-editor button[aria-pressed=true]{background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body .score-editor-message[data-error=true],html[data-theme=light] body .backup-error{color:#a13c12!important}
+html[data-theme=light] body :is(.score-editor-title,.score-editor-message,.score-editor-hint,.song-hint,.song-status,.training-curve-row){color:var(--text-muted)!important}
+html[data-theme=light] body .training-section :is(.training-mode-tabs button,.training-curve-options button){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body .training-section :is(.training-mode-tabs button[aria-selected=true],.training-curve-options button[aria-pressed=true]){background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body :is(.silent-toggle,.multi-mode-tabs button,.multi-collapse,.multi-modal-actions button,.song-confirm-actions .btn){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body :is(.silent-toggle.active,.multi-mode-tabs button[aria-selected=true],.multi-modal-actions button:last-child){background:var(--light-active)!important;border-color:var(--cyan)!important;color:var(--cyan)!important}
+html[data-theme=light] body .song-confirm-actions .song-confirm-accept{color:var(--orange)!important;border-color:var(--orange)!important}
+html[data-theme=light] body :is(.step,.poly-dot)[data-state="2"],html[data-theme=light] body :is(.step,.poly-dot)[data-state="3"]{color:#fff!important}
+html[data-theme=light] body .step[data-state="2"] span,html[data-theme=light] body .step[data-state="3"] span{color:#fff!important}
+html[data-theme=light] body #beatEditor button[data-state="0"]{color:var(--text)!important}
+html[data-theme=light] body #beatEditor button:not([data-state="0"])[data-state]{color:#fff!important}
+html[data-theme=light] body .preview-dot[data-state="0"]{background:#bcc9d6!important}
+html[data-theme=light] body .song-tabs button{background:var(--light-control)!important;color:var(--text)!important;border-color:var(--light-outline)!important}
+html[data-theme=light] body .song-tabs button[aria-selected=true]{background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body #songsRoot :is(.song-section.measure-card,.song-count-in.measure-card,.song-section.measure-card:hover){background:var(--light-surface)!important;border-color:var(--light-outline)!important}
+html[data-theme=light] body #songsRoot :is(.song-section.active,.song-section.playing,.song-count-in.playing){background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body #songsRoot :is(.song-actions>.btn:not(.track-create):not(.song-back),.song-count-in-button,.song-block-body .song-actions .btn,.playlist-tools>.btn,.playlist-rename){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #songsRoot .song-count-in-button[aria-pressed=true]{background:var(--light-active)!important;border-color:var(--cyan)!important;color:var(--cyan)!important}
+html[data-theme=light] body #songsRoot :is(input[type=text],.song-inline-field .numbox-button){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #songsRoot .song-playlist-summary{color:var(--text-muted)!important}
+html[data-theme=light] body #songsRoot :is(.backup-profile,.backup-json,#backupAccount){background:#dce4ec!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #songsRoot #profilePane .btn,html[data-theme=light] body #directAccountDialog .btn{background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #songsRoot #profilePane .btn:hover,html[data-theme=light] body #directAccountDialog .btn:hover{background:var(--light-hover)!important}
+html[data-theme=light] body #mp3ExportDialog :is(select,.numbox-button){background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #mp3ExportDialog .mp3-actions .btn{background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #mp3ExportDialog .mp3-actions #mp3ExportSave,html[data-theme=light] body #mp3ExportDownload:not([hidden]){background:var(--light-active)!important;border-color:var(--cyan)!important;color:var(--cyan)!important}
+html[data-theme=light] body #workspaceMobileViews button{background:var(--light-control)!important;border-color:var(--light-outline)!important;color:var(--text)!important}
+html[data-theme=light] body #workspaceMobileViews button[aria-pressed=true]{background:var(--light-active)!important;border-color:var(--cyan)!important}
+html[data-theme=light] body #index2SettingsPanel{color-scheme:light}
+html[data-theme=light],html[data-theme=light] body,html[data-theme=light] body *{scrollbar-color:var(--cyan) var(--light-control)!important}
+html[data-theme=light] body *::-webkit-scrollbar-track,html[data-theme=light] body *::-webkit-scrollbar-corner{background:var(--light-control)!important}
+html[data-theme=light] body *::-webkit-scrollbar-thumb{background:var(--cyan)!important;border-color:var(--light-control)!important}
+html[data-theme=light] body button:disabled{cursor:not-allowed}
+
+
+/* Explicit dialog and return controls, outside the songs workspace root. */
+html[data-theme=light] .song-confirmation .song-confirm-actions button.btn{background:#d5dee7!important;border-color:#a5b6c6!important;color:#222d38!important}
+html[data-theme=light] .song-confirmation .song-confirm-actions button.song-confirm-accept{color:var(--orange)!important;border-color:var(--orange)!important}
+html[data-theme=light] #multiControls button.song-back{background:#d5dee7!important;border-color:#a5b6c6!important;color:var(--orange)!important}
+
+/* Light Studio: surfaces describe function, accent describes interaction. */
+html#renaxApp[data-theme=light]{--bg:#e4e8eb;--panel:#f6f7f8;--text:#202d38;--text-muted:#52616d;--border:#cbd3da;--grey:#e9edf0;--grey-hover:#dce4e9;--light-surface:#fff;--light-control:#fff;--light-hover:#edf2f5;--light-active:#e1eef0;--light-outline:#c4cdd5;--card:#fff;--card-selected:#f1f8f9;--card-selected-border:#6fa3ad}
+html#renaxApp[data-theme=light] body{background:var(--bg);letter-spacing:.05px}
+html#renaxApp[data-theme=light] header{border-bottom:0;min-height:54px}
+html#renaxApp[data-theme=light] #renaxHeaderWave{opacity:.66;filter:brightness(.5) contrast(1.25) saturate(.65)}
+html#renaxApp[data-theme=light] #workspaceNav{gap:4px;padding:5px 0 14px;border-bottom:0}
+html#renaxApp[data-theme=light] #workspaceNav button{position:relative;background:transparent!important;border:0!important;border-radius:8px!important;box-shadow:none!important;min-height:44px;font-weight:500;color:#52616d!important}
+html#renaxApp[data-theme=light] #workspaceNav button:hover{background:#ffffff70!important;color:var(--text)!important}
+html#renaxApp[data-theme=light] #workspaceNav button[aria-selected=true]{background:#ffffff!important;color:#126375!important;font-weight:650;box-shadow:0 2px 7px #243b4810!important}
+html#renaxApp[data-theme=light] #workspaceNav button[aria-selected=true]::after{content:'';position:absolute;bottom:0;left:24%;right:24%;height:2px;border-radius:2px;background:var(--cyan)}
+html#renaxApp[data-theme=light] .main-grid>.panel-visu,html#renaxApp[data-theme=light] .panel-visu{background:radial-gradient(ellipse at 50% 55%,#fafbfc,#f1f3f5 82%)!important;border-radius:12px!important}
+html#renaxApp[data-theme=light] :is(.main-grid>.panel-seq,.main-grid>.panel-training){background:#f6f7f8!important;border-color:#cbd3da!important;border-radius:12px;box-shadow:0 3px 14px #243b4808}
+html#renaxApp[data-theme=light] .panel-visu .visu-toolbar,html#renaxApp[data-theme=light] #workspaceControls{background:#eff2f4!important;border-color:#d2d9df!important;box-shadow:none!important}
+html#renaxApp[data-theme=light] .panel-visu .visu-toolbar{border-radius:12px!important}
+html#renaxApp[data-theme=light] :is(input:not([type=range]):not([type=checkbox]),select,textarea,.numbox-button){background:#fff!important;border-color:#c4cdd5!important;box-shadow:none!important;border-style:solid!important;color:var(--text)!important}
+html#renaxApp[data-theme=light] #songsRoot input[type=text],html#renaxApp[data-theme=light] body #songsRoot input[type=text],html#renaxApp[data-theme=light] body #songsRoot .song-inline-field .numbox-button{background:#fff!important;border-color:#c4cdd5!important;color:var(--text)!important}
+html#renaxApp[data-theme=light] :is(input:not([type=range]):not([type=checkbox]),textarea):focus{outline:2px solid #087c9060;outline-offset:2px}
+html#renaxApp[data-theme=light] body .numbox-button:hover{border-color:#8eabb9!important;background:#f9fbfc!important}
+html#renaxApp[data-theme=light] body .numbox-custom.open>.numbox-button{border-color:var(--cyan)!important;box-shadow:0 0 0 2px #087c9014!important}
+html#renaxApp[data-theme=light] body :is(.numbox-menu,.numbox-dropdown,.sequence-more-actions,.multi-actions){background:#fff!important;border-color:#c4cdd5!important;box-shadow:0 10px 28px #243b4826!important}
+html#renaxApp[data-theme=light] body .sound-bank-cards .numbox-option{background:#f5f7f9!important;border-color:#d8e0e6!important}
+html#renaxApp[data-theme=light] body .sound-bank-cards .numbox-option:hover{background:#eaf1f4!important}
+html#renaxApp[data-theme=light] body .sound-bank-cards .numbox-option.active{background:#e1eef0!important;border-color:#73a3ae!important;color:#116373!important}
+html#renaxApp[data-theme=light] body #playBtn,html#renaxApp[data-theme=light] body .training-section #trainBtn{background:#087c90!important;border-color:#087c90!important;color:#fff!important;box-shadow:0 4px 10px #087c9026!important;min-height:46px!important;border-radius:8px!important;letter-spacing:.1px!important}
+html#renaxApp[data-theme=light] body #playBtn{min-width:144px!important;height:46px!important}
+html#renaxApp[data-theme=light] body #playBtn::after{font-size:13px;font-weight:650}
+html#renaxApp[data-theme=light] body #playBtn::before{border-left-color:#fff!important}
+html#renaxApp[data-theme=light] body #playBtn.btn-cyan::before{background:#fff!important;border:0!important}
+html#renaxApp[data-theme=light] body :is(#playBtn:hover,#trainBtn:hover){background:#086b7e!important;box-shadow:0 5px 12px #087c9030!important}
+html#renaxApp[data-theme=light] body #playBtn.btn-cyan,html#renaxApp[data-theme=light] body #trainBtn.active{background:#155965!important;border-color:#155965!important;color:#fff!important}
+html#renaxApp[data-theme=light] #tapBtn{background:#fff!important;border-color:#c4cdd5!important;color:#364957!important;box-shadow:none!important}
+html#renaxApp[data-theme=light] #tapBtn.hit{background:#fae6d8!important;border-color:var(--orange)!important}
+html#renaxApp[data-theme=light] input[type=range]{height:4px;background:#c5cfd6!important;border-radius:6px}
+html#renaxApp[data-theme=light] input[type=range]::-webkit-slider-thumb{box-shadow:none!important;border:2px solid #fff;width:18px;height:18px}
+html#renaxApp[data-theme=light] input[type=range]::-moz-range-thumb{box-shadow:none;border:2px solid #fff;width:14px;height:14px;background:var(--orange)}
+html#renaxApp[data-theme=light] .step{box-shadow:none!important}
+html#renaxApp[data-theme=light] .beat-number{font-weight:750;text-shadow:none!important}
+html#renaxApp[data-theme=light] .beat-divider{background:#82949f!important}
+html#renaxApp[data-theme=light] body :is(.measure-card,.multi-track,.song-playlist-card,.multi-preset-card){background:#fff!important;border-color:#d5dde3!important;box-shadow:0 2px 6px #263b4906!important;border-radius:9px!important}
+html#renaxApp[data-theme=light] body :is(.measure-card.active,.multi-track.active,.song-playlist-card.active,.multi-preset-card.active){background:#f1f8f9!important;border-color:#74a3ae!important;box-shadow:inset 3px 0 #087c90,0 2px 7px #263b4908!important}
+html#renaxApp[data-theme=light] body #songsRoot :is(.song-section.measure-card,.song-count-in.measure-card){background:#fff!important;border-color:#d5dde3!important}
+html#renaxApp[data-theme=light] body #songsRoot :is(.song-section.active,.song-section.playing,.song-count-in.playing){background:#f1f8f9!important;border-color:#74a3ae!important;box-shadow:inset 3px 0 #087c90!important}
+html#renaxApp[data-theme=light] #songsRoot .playlist-choice{background:#fff!important;border-color:#d5dde3!important;box-shadow:0 2px 6px #263b4906!important}
+html#renaxApp[data-theme=light] body #songsRoot .playlist-choice:hover{background:#f3f8fa!important;border-color:#9bb4c0!important}
+html#renaxApp[data-theme=light] body #songsRoot #songPane .song-more-menu{background:#fff!important;border-color:#c4cdd5!important;box-shadow:0 10px 28px #243b4826!important}
+html#renaxApp[data-theme=light] body .multi-preset-name{font-size:15px;font-weight:600;padding:10px 12px!important;border-width:1px!important;border-radius:7px!important;min-height:42px}
+html#renaxApp[data-theme=light] body .multi-preset-status{font-size:11px;line-height:1.4;color:#52616d;margin:0}
+html#renaxApp[data-theme=light] body :is(.multi-track-name,.measure-num){font-size:13px;font-weight:650}
+html#renaxApp[data-theme=light] body .multi-bank-row label{color:#52616d;font-size:11px}
+html#renaxApp[data-theme=light] body .preview-dot{width:5px;height:5px;border-radius:1px}
+html#renaxApp[data-theme=light] body .measure-preview{gap:3px}
+html#renaxApp[data-theme=light] body .multi-track .measure-preview{min-height:8px;align-items:center}
+html#renaxApp[data-theme=light] body :is(.sequence-preview-play,.multi-more summary,.multi-solo,.multi-mute){border-color:#c7d2da!important;box-shadow:none!important}
+html#renaxApp[data-theme=light] body :is(.sequence-preview-play:hover,.multi-more summary:hover,.multi-solo:hover,.multi-mute:hover){background:#e8f0f3!important;border-color:#93adb9!important}
+html#renaxApp[data-theme=light] body .multi-track :is(.sequence-preview-play[aria-pressed=true],.multi-solo[aria-pressed=true]){border-color:var(--cyan)!important;background:#e1eef0!important}
+html#renaxApp[data-theme=light] body .score-tools-panel .rhythm-editor{background:#eff2f4!important}
+html#renaxApp[data-theme=light] body .rhythm-score{background:#fff;border-color:#d2d9df;box-shadow:0 3px 12px #243b4810}
+html#renaxApp[data-theme=light] body *::-webkit-scrollbar{width:6px!important;height:6px!important}
+html#renaxApp[data-theme=light] body *::-webkit-scrollbar-track,html#renaxApp[data-theme=light] body *::-webkit-scrollbar-corner{background:transparent!important}
+html#renaxApp[data-theme=light] body *::-webkit-scrollbar-thumb{background:#8ea4b0!important;border:1px solid transparent!important;border-radius:10px!important}
+html#renaxApp[data-theme=light] body *::-webkit-scrollbar-thumb:hover{background:#648694!important}
+html#renaxApp[data-theme=light] body *::-webkit-scrollbar-button{display:none!important;width:0!important;height:0!important}
+html#renaxApp[data-theme=light] body,html#renaxApp[data-theme=light] body *{scrollbar-color:#8ea4b0 transparent!important}
+html#renaxApp[data-theme=light] body :is(.index2-settings-note,.song-note,.song-block-summary,.song-playlist-summary){color:#52616d!important}
+@media(min-width:1101px){
+ html#renaxApp[data-theme=light] body .main-grid{grid-template-columns:minmax(0,1fr) clamp(350px,27vw,460px)!important;gap:18px!important}
+ html#renaxApp[data-theme=light] body[data-workspace=metronome] .main-grid{grid-template-columns:minmax(0,1fr)!important}
+ html#renaxApp[data-theme=light] body .main-grid>.panel-seq,html#renaxApp[data-theme=light] body .main-grid>.panel-training{padding:16px!important}
+ html#renaxApp[data-theme=light] body .multi-track{padding:11px 12px!important;margin:0!important;flex-shrink:0}
+ html#renaxApp[data-theme=light] body #multiTracks{gap:10px!important}
+ html#renaxApp[data-theme=light] body .multi-track-head{margin-bottom:8px!important}
+ html#renaxApp[data-theme=light] body .multi-bank-row{margin:0 0 5px!important}
+ html#renaxApp[data-theme=light] body .multi-track-body .numbox-button{min-height:32px!important;height:32px!important}
+ html#renaxApp[data-theme=light] body #multiControls{gap:10px!important}
+ html#renaxApp[data-theme=light] body .panel-visu>.visu-bottom{padding:12px 0 8px!important}
+ html#renaxApp[data-theme=light] body .visu-toolbar :is(.measure-label,.control-group>label,.workspace-timer-label){font-size:11px!important;color:#52616d!important}
+}
+@media(max-width:1250px) and (min-width:1101px){html#renaxApp[data-theme=light] body .main-grid{grid-template-columns:minmax(0,1fr) 350px!important;gap:14px!important}html#renaxApp[data-theme=light] body .visu-toolbar :is(.measure-label,.control-group>label,.workspace-timer-label){font-size:10px!important}}
+@media(max-width:1100px){
+ html#renaxApp[data-theme=light] #workspaceNav{gap:5px;padding:6px 0 10px}
+ html#renaxApp[data-theme=light] #workspaceNav button{min-height:44px;background:#f5f7f980!important;font-size:11px}
+ html#renaxApp[data-theme=light] .multi-track{padding:12px!important}
+ html#renaxApp[data-theme=light] body .main-grid>.panel-seq,html#renaxApp[data-theme=light] body .main-grid>.panel-training{padding:12px!important}
+ html#renaxApp[data-theme=light] #workspaceControls>summary{font-weight:600;color:#354c5d}
+}
+@media(prefers-reduced-motion:no-preference){html#renaxApp[data-theme=light] :is(button,.numbox-button,.measure-card){transition:background-color .15s,border-color .15s,box-shadow .15s}}
+
+
+
+@media(min-width:1101px){
+ html#renaxApp[data-theme=light] body #multiControls{display:grid;grid-template-columns:36px minmax(0,1fr);align-items:center;gap:10px!important;margin-bottom:8px!important}
+ html#renaxApp[data-theme=light] body #multiControls>button.song-back{grid-column:1;grid-row:1;align-self:center;margin:0!important}
+ html#renaxApp[data-theme=light] body #multiControls>.multi-preset-name{grid-column:2;grid-row:1;min-width:0}
+ html#renaxApp[data-theme=light] body #multiControls>:is(.multi-add,.multi-preset-status){grid-column:1/-1}
+}
+
+
+/* Proposal: consistent creation actions and explicit musical context. */
+html#renaxApp[data-theme=light] body #multiPresetLibrary>.btn{
+ display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;
+ background:#e1eef0!important;border:1px solid #83aeba!important;color:#116373!important;
+ font:600 12px/1.4 var(--font)!important;text-transform:none!important;letter-spacing:.1px!important;box-shadow:none!important;
+}
+html#renaxApp[data-theme=light] body #multiPresetLibrary>.btn::before{content:'+';font:400 20px/1 var(--font);}
+html#renaxApp[data-theme=light] body #multiPresetLibrary>.btn:hover{background:#d0e7eb!important;border-color:var(--cyan)!important}
+html#renaxApp[data-theme=light] body.multi-mode #activeMeasureLabel[data-preset-context]{display:flex!important;align-items:center;gap:4px;max-width:100%;white-space:nowrap;}
+html#renaxApp[data-theme=light] body.multi-mode #activeMeasureLabel[data-preset-context]::before{content:attr(data-preset-context) ' ·';color:#52616d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 1 auto;}
+html#renaxApp[data-theme=light] #multiPresetLibrary>h3{font:650 16px/1.4 var(--font);margin-bottom:14px;color:var(--text);}
+@media(min-width:1101px){
+ html#renaxApp[data-theme=light] header{min-height:50px}
+ html#renaxApp[data-theme=light] #workspaceNav{padding:4px 0 10px}
+ html#renaxApp[data-theme=light] #workspaceNav button{min-height:42px}
+ html#renaxApp[data-theme=light] .main-grid>.panel-visu{gap:10px!important}
+ html#renaxApp[data-theme=light] .visu-toolbar{padding:12px!important}
+}
+
+
+/* Tap Tempo: allow real breathing room around the icon and label. */
+html#renaxApp[data-theme=light] .visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(48px,1fr) 116px!important}
+html#renaxApp[data-theme=light] .visu-toolbar #tapBtn{width:116px!important;min-width:116px!important;padding:8px 12px!important;font-size:10px!important;overflow:hidden}
+html#renaxApp[data-theme=light] #tapBtn>span:first-child{justify-content:center;gap:7px!important}
+@media(max-width:1100px){
+ html#renaxApp[data-theme=light] .workspace-controls-grid #tapBtn{width:116px!important;min-width:116px!important;padding:8px 12px!important;font-size:10px!important}
+ html#renaxApp[data-theme=light] .workspace-controls-grid .control-group:first-child{padding-right:126px}
+}
+
+
+/* Final light contrast and state hierarchy across training and rhythm cards. */
+html#renaxApp[data-theme=light] body .training-section :is(.row-label,.training-row>span,.training-curve-row),
+html#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label){
+ color:#52616d!important;opacity:1!important;font-size:11px!important;font-weight:600;letter-spacing:.1px!important;text-transform:none!important;
+}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button{
+ background:#fff!important;border:1px solid #bac8d1!important;color:#344957!important;box-shadow:none!important;font-size:11px!important;
+}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button[aria-selected=true]{
+ background:#d8edf1!important;border-color:#087c90!important;color:#075c6d!important;font-weight:700!important;box-shadow:inset 0 -3px #087c90!important;
+}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button[aria-selected=true] svg{stroke:#087c90!important}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button:not([aria-selected=true]) svg{stroke:#667b89!important}
+html#renaxApp[data-theme=light] body .silent-section{border-color:#cbd3da!important}
+html#renaxApp[data-theme=light] body .silent-settings.disabled{opacity:1!important}
+html#renaxApp[data-theme=light] body .silent-settings.disabled :is(select,.numbox-button){background:#eef1f3!important;color:#687684!important;border-color:#cbd3da!important;opacity:1!important;box-shadow:none!important}
+html#renaxApp[data-theme=light] body .silent-settings.disabled .numbox-button::after{border-color:#687684!important}
+html#renaxApp[data-theme=light] body .silent-settings.disabled label{color:#687684!important;opacity:1!important}
+html#renaxApp[data-theme=light] body .measure-preview .preview-dot{width:6px;height:6px}
+html#renaxApp[data-theme=light] body .multi-preset-status,
+html#renaxApp[data-theme=light] body #songsRoot :is(.song-block-summary,.song-note,.song-playlist-summary){font-size:11px!important;color:#52616d!important;line-height:1.5}
+html#renaxApp[data-theme=light] body .training-section :is(.training-curve-menu button[aria-pressed=true],#dirToggle button.active){background:#d8edf1!important;color:#075c6d!important;border-color:#087c90!important;box-shadow:inset 0 -2px #087c90!important}
+html#renaxApp[data-theme=light] body .training-section .training-mode-tabs button:focus-visible{outline:2px solid #087c90;outline-offset:3px}

@@ -56,7 +56,7 @@ function metrics(file){
   await p.exposeFunction('levelTestWrite',data=>{const file=path.join(out,'ui-'+writes.length+'.mp3');fs.writeFileSync(file,Buffer.from(data));writes.push(file)});
   await p.evaluate(()=>{window.showSaveFilePicker=async o=>({name:o.suggestedName,createWritable:async()=>({write:async b=>levelTestWrite(Array.from(new Uint8Array(await b.arrayBuffer()))),close:async()=>{},abort:async()=>{}})})});
   for(const level of ['boost','original']){
-   const wrapper=p.locator('#mp3ExportLevel').locator('..');await wrapper.locator('.numbox-button').click();await wrapper.locator('.numbox-menu').getByRole('button',{name:level==='boost'?'Renforcé':'Dynamique d’origine',exact:true}).click();assert.equal(await p.locator('#mp3ExportLevel').inputValue(),level);await p.locator('#mp3ExportSave').click();
+   const wrapper=p.locator('#mp3ExportLevel').locator('..');await wrapper.locator('.numbox-button').click();await wrapper.locator('.numbox-menu').getByRole('option',{name:level==='boost'?'Renforcé':'Dynamique d’origine',exact:true}).click();assert.equal(await p.locator('#mp3ExportLevel').inputValue(),level);await p.locator('#mp3ExportSave').click();
    await p.waitForFunction(()=>document.querySelector('#mp3ExportStatus').textContent.startsWith('MP3 enregistré'));
    assert(fs.readFileSync(writes.at(-1)).equals(fs.readFileSync(path.join(out,'userMetroclic-'+level+'.mp3'))),'UI must export the selected level');
   }

@@ -10,7 +10,7 @@
  const volumeLabel=document.getElementById('volumeSlider').closest('.control-group').querySelector('label');volumeLabel.insertAdjacentHTML('afterbegin','<svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m11 5-6 4H2v6h3l6 4V5Z M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></svg>');
  const timerGroup=document.createElement('div');timerGroup.id='workspaceTimer';timerGroup.innerHTML='<span class="workspace-timer-label"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2M12 9v4l3 2"/></svg>Chronomètre</span>';const timer=document.getElementById('trainTimer');timer.before(timerGroup);timerGroup.append(timer);
  const tempoShortcut=document.createElement('button');tempoShortcut.id='workspaceTempoShortcut';tempoShortcut.type='button';tempoShortcut.hidden=true;
- tempoShortcut.setAttribute('aria-controls','workspaceControls');tempoShortcut.innerHTML='<strong></strong><span>BPM</span>';
+ tempoShortcut.setAttribute('aria-controls','workspaceControls');tempoShortcut.innerHTML='<strong></strong><span> BPM</span>';
  timerGroup.before(tempoShortcut);
  function syncTempoShortcut(){
   const value=bpmDisplay.textContent.match(/\d+/)?.[0]||String(bpmSlider.value);
@@ -87,7 +87,7 @@
   const viewButton=mobileViews.querySelector('button:last-child');viewButton.dataset.pane=page==='training'?'training':'seq';const viewLabel=page==='training'?'Paramètres':page==='multi'?'Pistes':page==='tracks'?'Playlist':'Mesures';if(viewButton.textContent!==viewLabel)viewButton.textContent=viewLabel;for(const b of mobileViews.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.pane===document.body.dataset.mobilePane));
   for(const [id,b] of buttons){const selected=id===page;b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1;}try{localStorage.setItem('renax.workspace.v1',page);}catch{}place();syncAdd();
  }
- function go(next){if(next===page&&shownWorkspace!==null)return;rememberControls();window.RENAX_EDIT_HISTORY?.leaveWorkspace();stopMetronome();endTraining();if(nativeWorkspaces.has(page)&&!window.RENAX_MULTI?.active&&document.getElementById('songsRoot').hidden)musicalStates.set(page,captureMusic());changing=true;try{
+ function go(next){if(next===page&&shownWorkspace!==null){if(next==='training'&&!desktop.matches&&document.body.dataset.mobilePane!=='training')switchTab('training');return;}rememberControls();window.RENAX_EDIT_HISTORY?.leaveWorkspace();stopMetronome();endTraining();if(nativeWorkspaces.has(page)&&!window.RENAX_MULTI?.active&&document.getElementById('songsRoot').hidden)musicalStates.set(page,captureMusic());changing=true;try{
   if(next==='tracks'){if(appMode!=='metronome')nativeMode.querySelector('[data-mode="metronome"]').click();songTabs.querySelector('[data-pane="songs"]').click();}
   else{if(window.RENAX_MULTI?.active&&next!=='multi')multiTabs.querySelector('button:first-child').click();
    if(!document.getElementById('songsRoot').hidden)songTabs.querySelector('[data-pane="sequence"]').click();

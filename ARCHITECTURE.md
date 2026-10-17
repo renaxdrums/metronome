@@ -1,0 +1,59 @@
+# Architecture
+
+Le site reste une application statique. L’extraction conserve des scripts classiques et leur ordre : elle ne convertit pas le moteur audio en modules ES et n’altère pas les sons approuvés.
+
+```mermaid
+flowchart TD
+  Page[index.html : assemblage et interface] --> Core[metronome-core.js : transport et planificateur]
+  Page --> Styles[Styles de base, séquenceur et thèmes]
+  Page --> Controls[numbox-controls.js : listes et clavier]
+  Page --> Songs[songs-index2.js : bibliothèque et vues]
+  Songs --> Local[local-backup.js : copie atomique et périmètre]
+  Songs --> Emergency[emergency-backup.js : copie IndexedDB de secours]
+  Local --> Sync[sync-core.js : file persistante et fusion]
+  Sync --> Cloud[cloud-backup.js : compte et serveur]
+  Core --> Banks[Banques et tampons audio préparés]
+  Core --> Guide[amorce-song.js et amorce-plan.mjs]
+  Page --> Export[song-export.js et worker MP3]
+  Page --> Offline[offline-cache.js et service-worker.js]
+```
+
+## Moteur et interface
+
+`metronome-core.js` contient les fonctions historiques de transport, le planificateur et les références musicales partagées. Les variables lexicales globales restent un contrat existant avec les modules. Ne pas déplacer une fonction de rendu sans comparer le PCM.
+
+`numbox-controls.js` ne connaît ni le stockage ni l’audio. `compact-controls.js` dimensionne les listes ; `training-numbox.js` garde la liste virtuelle des grandes plages. Le nom accessible inclut le contexte et la valeur visible. Les cartes contenant des commandes sont des groupes et non des boutons imbriqués.
+
+`settings-accessibility.js` fournit les rôles du panneau Préférences, la limitation du focus, Échap, le retour du focus et l’inertie du fond. `workspace-layout.js` conserve la navigation et le placement. Les raccourcis globaux sont suspendus dans les dialogues.
+
+`app-base.css`, `sequencer-layout.css` et `appearance-theme.css` sont extraits à leur position initiale dans la cascade. `accessibility.css` regroupe le focus visible, les contrastes mesurés et le retour d’erreur. Les fichiers historiques de thèmes demeurent nécessaires ; les supprimer sans comparaison changerait le rendu.
+
+## Données
+
+La bibliothèque est le modèle en mémoire. Le stockage principal conserve ensemble la bibliothèque, les révisions et la file d’attente. L’écriture compare la chaîne brute précédente : un onglet périmé ne remplace pas une nouvelle copie. Une source illisible passe en lecture seule.
+
+Le délai de 400 ms concerne les frappes, pas les autres mutations. `flushPending()` échoue tant qu’une écriture refusée n’a pas réussi. Un changement de compte et une fusion distante doivent d’abord l’appeler. La synchronisation exige que le périmètre local corresponde à l’utilisateur authentifié ; un changement de périmètre échoué ne doit pas transférer l’ancien catalogue.
+
+IndexedDB contient seulement des copies de secours, séparées par périmètre et onglet. Elles mémorisent le jeton de la copie principale dont elles sont issues. La récupération automatique exige ce même jeton et un modèle encore intact. Les versions en concurrence restent exportables ; une confirmation principale ne supprime que les secours au contenu identique.
+
+## Audio et erreurs
+
+La voix est préchauffée après le rendu initial, avec chargement immédiat si elle est demandée avant. Une voix manquante ne bloque pas un clic instrumental. Une erreur du périphérique audio libère le transport, affiche une explication et autorise une nouvelle tentative.
+
+Le contexte audio utilisé par les échantillons est celui de la destination. Les fichiers supplémentaires gardent leurs PCM, gains, transpositions et résonances. L’export MP3 reste un traitement distinct de la lecture.
+
+`ui-feedback.js` capture les erreurs non traitées sans empêcher leur signalement natif. Les messages utilisent du texte ; le journal est borné en mémoire, sans télémétrie distante. Les cas d’échec prévus gardent leur traitement métier et leurs tests de récupération.
+
+## Cache et déploiement
+
+`tools/stamp-assets.cjs` calcule les paramètres de cache de la page, les empreintes des ressources publiques et la révision du Service Worker. Les sources texte sont normalisées LF pour la comparaison entre Windows et Linux.
+
+Le Service Worker prépare un nouveau cache séparé et vérifie chaque fichier. Il conserve le cache actif si l’installation échoue, n’emploie pas `skipWaiting` et ne recharge pas une page en lecture. Le HTML de secours et ses ressources appartiennent à une même révision ; une demande portant une nouvelle empreinte ne reçoit pas un ancien script. Les importations historiques datées préfèrent le réseau et disposent d’un secours vérifié.
+
+Les caches sont limités au chemin de cette application. Les comptes et leurs réponses restent hors cache ; les données métiers restent dans leur stockage. Le cache vocal borne le nombre d’entrées et ne déclare disponibles que les réponses effectivement conservées. La synthèse naturelle distante n’est pas promise hors ligne.
+
+## Preuves
+
+Les tests de caractérisation comparent 36 dispositions avec les mêmes sources réintégrées à leurs positions d’origine. Les tests audio comparent les rendus approuvés. Les tests de panne vérifient quota, secours, conflit d’onglets, changement de compte, Web Audio indisponible et cache incohérent. Le test hors ligne utilise réellement un Service Worker, coupe le réseau puis recharge et produit un MP3 décodable.
+
+Les autres scénarios du banc de tests désactivent les Service Workers pour éviter qu’un cache ne masque une modification ou une interception de panne ; le test dédié les active explicitement.

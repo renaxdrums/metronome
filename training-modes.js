@@ -76,7 +76,7 @@
     .training-curve-select[aria-disabled="true"]>summary{opacity:.45;cursor:default}
   `;document.head.append(curveStyle);
   const selector=document.createElement('details');selector.className='training-curve-select';
-  const summary=document.createElement('summary');summary.setAttribute('aria-label','Choisir la courbe du tempo');
+  const summary=document.createElement('summary');summary.title='Choisir la courbe du tempo';
   const menu=document.createElement('div');menu.className='training-curve-menu';menu.setAttribute('role','group');menu.setAttribute('aria-label','Courbes du tempo');
   selector.append(summary,menu);curves.append(selector);
   const curveButtons=[];

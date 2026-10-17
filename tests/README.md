@@ -34,7 +34,7 @@ Run node tests/run.cjs. Set QA_OUTPUT to a separate absolute results directory. 
 
 The PCM non-regression test now compares the audited commit c7d2d3103ed6c530fb9edaadcabe4883da19f595, with all compared instrument banks loaded in both pages. Earlier October versions intentionally contain different sounds. The subdivision gain test uses a controlled reference with only the approved +4.5 dB multiplier removed unless SUBDIVISION_BASELINE is explicitly supplied. It retains exact gain, unchanged other signals and clipping assertions.
 
-This local repair branch is not a certified release. Consult the per-test results and remaining failures before publishing.
+Consult the per-test results for the exact revision being reviewed; earlier logs describe historical versions. See `../MAINTENANCE.md` for module boundaries and release checks.
 The default automated suite reports the native Windows picker as MANUAL REQUIRED rather than claiming success. Run pnpm test:native with a person choosing the displayed destination. Run pnpm test:rules for the emulator-only integration suite, including account-scope-test.cjs. intro-lifecycle-test.cjs explicitly enables the real startup animation; other UI cases disable it for stable interaction while its lifecycle is checked separately.
 
 
@@ -43,3 +43,15 @@ The default automated suite reports the native Windows picker as MANUAL REQUIRED
 The export dialog defaults to Boosted (Renforcé). This adds a bounded 2 dB drive into an export-only limiter (1 ms lookahead, 5 ms release), followed by reconstructed-peak analysis and verification of the decoded MP3. Original dynamics keeps the prior audio path. The programmatic exportSong API retains Original dynamics by default for compatibility; the dialog passes the selected mode explicitly. MIDI has no audio-level option.
 
 Run node tests/mp3-output-level-test.cjs for before/after FFmpeg loudness and 8x true-peak measurements, bounded gain reduction, distinct click-level ordering, unchanged duration, silence, responsive dialog and byte comparisons between selected UI modes and direct renders. The historical mp3-export-test.cjs still checks exact original accent ratios, original limiter inactivity, timing, cancellation and playback isolation. The boosted mode intentionally moderates transient peaks; it is not represented as preserving every amplitude ratio or reaching a fixed LUFS target for every tempo and silence pattern.
+
+## Maintenance regressions
+
+Run `node tests/run.cjs --only=resilience-test.cjs,numbox-accessibility-test.cjs,pro-sound-context-test.cjs` for storage failure/retry, missing voice, start cancellation, keyboard and exact pro-bank waveform comparisons. The pro-bank characterization test requires commit `f38d9b3f76acd05a608151c663ba2706d6fb4431` in Git history. It compares all 18 banks and verifies preparation outside playback, destination-context independence and zero obsolete Beep requests. Run `pnpm build` after changing an entry-page asset and `pnpm check:assets` before committing.
+
+## Offline, failure recovery and accessibility
+
+The normal shared browser harness blocks Service Workers so a cache cannot mask source changes or a deliberate request interception. `offline-cache-test.cjs` explicitly enables a real worker, installs the verified snapshot, checks waiting updates and failed deployment integrity, cuts the network, reloads, plays audio and downloads a decodable MP3. The native Windows picker remains a separate human validation.
+
+`emergency-backup-test.cjs` waits for committed IndexedDB transactions using awaited browser evaluations, then reloads and checks the recovered primary copy. It also verifies a newer primary wins, account isolation, rescue JSON download and failure of both storage paths. Do not treat a Promise returned to Playwright 1.56 `waitForFunction` as a polling condition for IndexedDB.
+
+`accessibility-test.cjs` scans 60 module/dialog/theme/viewport states with axe-core; finite visual transitions settle before contrast measurements. It preserves `incomplete` findings for manual review. No rules are disabled or offending elements excluded. It does not claim full WCAG certification or screen-reader coverage. `module-extraction-test.cjs` compares 36 real computed layouts against the same sources inlined at their original positions.

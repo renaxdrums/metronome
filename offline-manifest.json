@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "revision": "a4085672ad04bb41",
+  "resources": [
+    {
+      "path": "accessibility.css",
+      "sha256": "d4b6b8ceee79b143a63b59873baf4d2f5624bda080712cd0aef9f493698621c9",
+      "text": true
+    },
+    {
+      "path": "amorce-plan.mjs",
+      "sha256": "0dc51815bb107268efae1ff967a1c2ad2f96b6e62ab19309a207fb5fc04f59d9",
+      "text": true
+    },
+    {
+      "path": "amorce-song.js",
+      "sha256": "9f00d2d74e2cb6835288da52525470db2486978d5a7748abfd83c14efc7f1107",
+      "text": true
+    },
+    {
+      "path": "app-base.css",
+      "sha256": "fd55babb2eb4b533f9e670161fa451e09296b831d6cafc15a03b2c1d409c0cb9",
+      "text": true
+    },
+    {
+      "path": "appearance-theme.css",
+      "sha256": "c05ea8675343bcd0a22c4011a6e4e5c602940c6b1f5f0e48bb0b1e008a692790",
+      "text": true
+    },
+    {
+      "path": "assets/icons/apple-touch-icon.png",
+      "sha256": "7242e06ad4d079c5d567381e64656e814faa6cd56d38d514c3d34d84c43f0e17",
+      "text": false
+    },
+    {
+      "path": "assets/icons/icon-192.png",
+      "sha256": "c84131a02597370def30a50e176b3598f1cd11b8ffc15a96858be4781dda2a00",
+      "text": false
+    },
+    {
+      "path": "assets/icons/icon-32.png",
+      "sha256": "158648d88665b21082bebc289994c7c5d350240f79e4b87cf594108a16ef3937",
+      "text": false
+    },
+    {
+      "path": "assets/icons/icon-512.png",
+      "sha256": "221a2972b17038fe8d1976b540635c325073c30a35ff5d1eeacc47211ce7a2ad",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/claves-1.wav",
+      "sha256": "569812aca160bf35d71ac16e678f5528b2093ece086300cd97a0064e17d23f20",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/claves-2.wav",
+      "sha256": "ae0493fa57d0d1dd57693e8639dfe5fd9675b520a1c0c0eb45cf992f2a23ca9c",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/claves-3.wav",
+      "sha256": "5561306630b21fd9c0bfaf843c36bff29c90ea1bf84ee03c95b8996af24c0a4b",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/clic-1.wav",
+      "sha256": "2c21a5de6f3ddd51ce851325ba6caa4a187422c51299da7b2fdc4f51ae5e9ee1",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/clic-2.wav",
+      "sha256": "00b76f9fe96c118f29dfc69866c12ec11f2e1264f6cb9c0b36912c2210b015fe",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/clic-3.wav",
+      "sha256": "9a911c66212d50a09494821bf9af8ce6e007612e232b5905f838348cb1d63b75",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/clic808-1.wav",
+      "sha256": "20d5cd385c0f8c3a24bbfe78c2e2747776841ede6185bc0fe93f97f0b455b89c",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/clic808-2.wav",
+      "sha256": "c9f30ff2b4d73b03f41960e504e03c54e9a59697af666fe4d155bab9cd1ccae6",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/clic808-3.wav",
+      "sha256": "27ce0d3966e9d50f684c6ec20f6e2edfc93dd47166a1f35574ff16607ca93c75",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/cloche-1.wav",
+      "sha256": "5b416225570170af468f898eda2a57e3e2945c2cc25dc634f5d148118a38ab05",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/cloche-2.wav",
+      "sha256": "7d9f6e6b6b36fd792aead29df0268c53255b95a886aaf765e57b7593562ff9a6",
+      "text": false
+    },
+    {
+      "path": "assets/metronome/cloche-3.wav",
+      "sha256": "9904e9c62e9a15258742095d1c48f0fac7d13ce3bcf242823912b17f3fabd7b7",
+      "text": false
+    },
+    {
+      "path": "audio-landscape.js",
+      "sha256": "d6b42e560193705b23cb02675f2e9dcfceeb64d20dcf903f2697113b0b2e7636",
+      "text": true
+    },
+    {
+      "path": "backup-index2.css",
+      "sha256": "125aa2c15eecc2f2dbf789b2f0c296b786a057b35c2e736629f1e63d3bca8e47",
+      "text": true
+    },
+    {
+      "path": "cloud-backup.js",
+      "sha256": "0e14c6c306303a72b197701c191375146a148bbb0b59d0f9618ee34e93d2308f",
+      "text": true
+    },
+    {
+      "path": "compact-controls.js",
+      "sha256": "b329c4777674972638672b81e2839603e4b67de245cb9e11221cc203f96ce510",
+      "text": true
+    },
+    {
+      "path": "console-intro.js",
+      "sha256": "c98ebce90fec67b06b1ce3932daf12b207fb1e583b38acf9113a7babd06e6cdf",
+      "text": true
+    },
+    {
+      "path": "console-theme.css",
+      "sha256": "4ab10514ea7301d3b975cacbd9344299cdbafa5975d0df111e06bd501796e7c8",
+      "text": true
+    },
+    {
+      "path": "edit-history.js",
+      "sha256": "0e5a27a29b3b49f4428096bb460002b09fc8051ba3a21f5a3ebd73723895363e",
+      "text": true
+    },
+    {
+      "path": "emergency-backup.js",
+      "sha256": "ffc0a16005b2a296d370c480d80492b6f21858bbae1a6da8beb09356bcc1d01e",
+      "text": true
+    },
+    {
+      "path": "firebase-config.js",
+      "sha256": "475b45ed8b77650ce3e789e8ba190b2e4d36ae2918ed6dc64792a59c9ab46b12",
+      "text": true
+    },
+    {
+      "path": "header-wave.js",
+      "sha256": "94e73145c59c6c22571f7486f5c297a0b3b2488f4cd5835a54a13a3da6577c03",
+      "text": true
+    },
+    {
+      "path": "index.html",
+      "sha256": "33bf5c0a92a7aa4e14c4d1e180d7efd132c541b9529928e4cc1cbb118ea0d16f",
+      "text": true
+    },
+    {
+      "path": "interface-language.js",
+      "sha256": "252645fc6d41a925aea67f1590434f4133c036b37dc72228a5660bd94543298b",
+      "text": true
+    },
+    {
+      "path": "ivory-theme.css",
+      "sha256": "7328d83e934078877f966e0bab150cb5d3d15496a6c3708129cde88be7635e09",
+      "text": true
+    },
+    {
+      "path": "local-backup.js",
+      "sha256": "f40f0ce49852b4a9e20de3636dc4a675ece658f67bad4811e0952ddbb9b48457",
+      "text": true
+    },
+    {
+      "path": "manifest.webmanifest",
+      "sha256": "a8a2fca6567bd9793cdd30b4e2d6ab9777b2aaa956aa0e9aae7095f2011ba67a",
+      "text": true
+    },
+    {
+      "path": "metronome-core.js",
+      "sha256": "ac8da97df90f9092ac35cda97750ac4489ca51b04cae0738dc38fa27f0d4209a",
+      "text": true
+    },
+    {
+      "path": "midi-export.js",
+      "sha256": "883ecef697292fdf7c376df09bcddc3d2ec2709def2ca596c62db1eec86bb314",
+      "text": true
+    },
+    {
+      "path": "mobile-landscape.css",
+      "sha256": "0ba5481b8488ef6722a5c0dc810a95c5af27056cd7b0c3c18b439b7766971cd8",
+      "text": true
+    },
+    {
+      "path": "mp3-export-worker.js",
+      "sha256": "9359a5d0d72ee445f880b847ea3ec35a0982a9bdefe71f8cd94e317deed0577d",
+      "text": true
+    },
+    {
+      "path": "mp3-export.css",
+      "sha256": "b0417b0140492f7a9403e3c62ceca29cb42b829807a021ce65e82b4c55064406",
+      "text": true
+    },
+    {
+      "path": "mp3-export.js",
+      "sha256": "6da695e66ac8f9d72761f920edd9618e2edbb327b20216476f3b7f81f92134f6",
+      "text": true
+    },
+    {
+      "path": "multi-clock.js",
+      "sha256": "e13d4c26ebe608d46b245acb403e41d3c0215b618b6c05c24e0314559e840517",
+      "text": true
+    },
+    {
+      "path": "multi-metronome.css",
+      "sha256": "1f1df82d778f6612a75310c6da8044d02b3b55af628896189fb504af5d9919f4",
+      "text": true
+    },
+    {
+      "path": "multi-metronome.js",
+      "sha256": "fbdef29bb46903bf79c33d9af09cdb49ae50bc7cc17de16699ec58acff8e0928",
+      "text": true
+    },
+    {
+      "path": "navigation-history.js",
+      "sha256": "0fb4d8833b37ccd50ad740291f98602a74440711b7066d1c2ba4752341d875d1",
+      "text": true
+    },
+    {
+      "path": "navigation-index.css",
+      "sha256": "e72d6940e586dcb49121658a6e1b6ac7179343e6bbcc06da184d3b3813ef5803",
+      "text": true
+    },
+    {
+      "path": "numbox-controls.js",
+      "sha256": "ce94a8848171aaf3ddcb4d3961831e004c33c0248ae22ad46a57fdf63de2978f",
+      "text": true
+    },
+    {
+      "path": "offline-cache.js",
+      "sha256": "f41c06ec6200ebc6023c24da74523491eefcfe91b3bb2c000ebd1d8b9cf9ce5c",
+      "text": true
+    },
+    {
+      "path": "pro-interface.css",
+      "sha256": "58585adca440c15586546cc65a4148dcdfb29af677bf531bc8a733a33cdd1d9b",
+      "text": true
+    },
+    {
+      "path": "pro-sound-bank.js",
+      "sha256": "4380a78e5f34ea485db008e688ace7168cd4d5642d1d6bdef41e0a73ecca7506",
+      "text": true
+    },
+    {
+      "path": "renax-pulse-ivory.css",
+      "sha256": "b510a84084829a67319b8b88c4e3b518805b4d4d0e902ff8990694794218ce46",
+      "text": true
+    },
+    {
+      "path": "rhythm-editor-core.mjs",
+      "sha256": "773ebb1a99313c9db26a1e19b76297921ca8a96c499dfb4bbd1978afd059818d",
+      "text": true
+    },
+    {
+      "path": "rhythm-score-core.mjs",
+      "sha256": "43c0f19cd33cdecbafb0185575a91f1b3f71b35323744dae66d5545f56016bdf",
+      "text": true
+    },
+    {
+      "path": "rhythm-score.css",
+      "sha256": "1952315176ed2f121e1b7469150a485ad895184b6a943294ccd95320ad5ab17e",
+      "text": true
+    },
+    {
+      "path": "rhythm-score.js",
+      "sha256": "20ddb94d7dae048d749a34fae4321b62ca95a0d2f5459b0ffe8e43e584632084",
+      "text": true
+    },
+    {
+      "path": "sequencer-layout.css",
+      "sha256": "a6c348058b2730a6d8d9daf1ad44013d26ca72ce8096c0abd1da819bc3599f35",
+      "text": true
+    },
+    {
+      "path": "settings-accessibility.js",
+      "sha256": "4ed7dbc3b618389f4869d47e2256b4b6303fb54066c86127aeb2b8d5ef875516",
+      "text": true
+    },
+    {
+      "path": "song-entry.css",
+      "sha256": "74acde869b307409ca3b089365713ce666c248e8019c54f19d3b2cfffca7b5d2",
+      "text": true
+    },
+    {
+      "path": "song-export.js",
+      "sha256": "1ba2f86f345ff214df82c70599bea7f9929eb6ed5c5b0720ca38b8c5f5cf83e3",
+      "text": true
+    },
+    {
+      "path": "song-tempo-ramp.js",
+      "sha256": "a4131fe65280642fa331547173f83a145f0cda61a1637dafd03ee005360518d3",
+      "text": true
+    },
+    {
+      "path": "songs-index2.js",
+      "sha256": "fdc0f02e7efa7ca7bba3a259091e003e08c206178c9b3276c77902d40c8529ad",
+      "text": true
+    },
+    {
+      "path": "songs.css",
+      "sha256": "4b41ea054fb94fd8659f468edcdf0b155e47c557c2798064d35591fce831af2c",
+      "text": true
+    },
+    {
+      "path": "sound-bank-menu.js",
+      "sha256": "ccaf886df669f67b0e9523f2ad64a2c7472f9fed0d51b6d56f9a0aafc2e82bea",
+      "text": true
+    },
+    {
+      "path": "sync-core.js",
+      "sha256": "35544d3da795adf9b62ecc67f1bfaf4dfdba9e2eb4b8cb5bafbdad1f5a22755b",
+      "text": true
+    },
+    {
+      "path": "training-modes.css",
+      "sha256": "c54b8f2f7df9508120cd637512bf313470f9d167a74a80049a3c59261e92f112",
+      "text": true
+    },
+    {
+      "path": "training-modes.js",
+      "sha256": "5b004b076af38616dc5faea2d1ac8845c6f44e1e8c5545c15940240c1324b73b",
+      "text": true
+    },
+    {
+      "path": "training-numbox.js",
+      "sha256": "2c35b75c25929201660b33a952f07f3ade176fd37f9da00f80ab22e18f2eeac4",
+      "text": true
+    },
+    {
+      "path": "ui-feedback.js",
+      "sha256": "4fbe19900b0230961fd13a9ab14521cb71f5d0b6e069084cba82b6893aa860fc",
+      "text": true
+    },
+    {
+      "path": "vendor/lamejs/lame.min.js",
+      "sha256": "15d285e2587b3bdbfd18a68de6ce07cc074f7480a82c3815da2dc1c348ec6df4",
+      "text": true
+    },
+    {
+      "path": "vendor/vexflow-bravura-4.2.5.js",
+      "sha256": "d632111c9dc0eedc095e22b1a61913c23c5d166865e4fece61e1554535de355e",
+      "text": true
+    },
+    {
+      "path": "workspace-layout.css",
+      "sha256": "e26cf6b2d1ab485ad99491633d26ce004dd7dd7b03b176a06c410fa59ac60d22",
+      "text": true
+    },
+    {
+      "path": "workspace-layout.js",
+      "sha256": "60d894870b1164b41109030ed7e81076fbb9e188e13531e6e76d959dae358a80",
+      "text": true
+    }
+  ]
+}

@@ -19,11 +19,12 @@
  function stop(){generation++;session=null;for(const source of sources){try{source.stop();}catch{}}sources.clear();}
  function install(plan){session={plan,origin:null};}
  function begin(context,origin,plan=session?.plan){if(!plan)return;session={plan,origin};
-  for(const a of plan.announcements){const speech=plan.speeches[a.index],buffer=context.createBuffer(1,speech.pcm.length,speech.sampleRate);buffer.copyToChannel(speech.pcm,0);const source=context.createBufferSource(),gain=context.createGain();source.buffer=buffer;gain.gain.value=.25*masterVolume;source.connect(gain);gain.connect(getAudioMixDestination(context));source.start(origin+a.start);sources.add(source);source.onended=()=>sources.delete(source);}
+  for(const a of plan.announcements){const speech=plan.speeches[a.index],buffer=context.createBuffer(1,speech.pcm.length,speech.sampleRate);buffer.copyToChannel(speech.pcm,0);const source=context.createBufferSource(),gain=context.createGain();source.buffer=buffer;gain.gain.value=.25*masterVolume;source.connect(gain);gain.connect(getAudioMixDestination(context));const planned=origin+a.start,late=Math.max(0,context.currentTime-planned);if(late>0)console.warn('Guide vocal : annonce en retard de '+Math.round(late*1000)+' ms.');if(late<buffer.duration){source.start(Math.max(planned,context.currentTime),late);sources.add(source);source.onended=()=>{sources.delete(source);source.disconnect();gain.disconnect();};}else{source.disconnect();gain.disconnect();}}
  }
  function step(time,state,isFirst,subIndex,beat){if(!session||session.origin===null||subIndex!==0)return false;const t=time-session.origin,a=session.plan.announcements.find(a=>t>=a.target-1e-6&&t<a.blockStart-1e-6);if(!a)return false;
   if(Math.abs(t-a.target)<1e-6)return false;
-  if(state)playGuideCount(state,time,isFirst,{mode:'song-guide',beatNumber:beat+1,subIndex:0,beatDurationSec:60/a.measure.tempo*4/a.measure.denominator});return false;
+  const group=a.measure.denominator>=16?a.measure.denominator/4:1;
+  if(state&&beat%group===0)playGuideCount(state,time,isFirst,{mode:'song-guide',beatNumber:Math.floor(beat/group)+1,subIndex:0,beatDurationSec:60/a.measure.tempo*4/a.measure.denominator*group});return false;
  }
  window.RENAX_AMORCE={maxAttackSeconds:Math.max(...guideVoice.anchors)/guideVoice.playbackRate,prepare,install,begin,step,stop,get active(){return !!session;},get generation(){return generation;}};
 })();

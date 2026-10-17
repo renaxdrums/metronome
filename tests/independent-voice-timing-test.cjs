@@ -1,5 +1,5 @@
 const fs=require('node:fs');const assert=require('node:assert/strict');const path=require('node:path');
-const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'index.html'),'utf8'),guide=fs.readFileSync(path.join(root,'amorce-song.js'),'utf8');
+const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'metronome-core.js'),'utf8'),guide=fs.readFileSync(path.join(root,'amorce-song.js'),'utf8');
 const anchors=JSON.parse(fs.readFileSync(path.join(__dirname,'voice-anchors.json'),'utf8'));
 const table=Function('return ('+html.match(/const VOICE_ATTACK_SECONDS = (\{[\s\S]*?\});/)[1]+')')();
 for(const anchor of anchors)assert.equal(table[anchor.gender][anchor.number],anchor.anchor_ms/1000);

@@ -1,7 +1,8 @@
 /* Atomic local snapshots and persistent outbox, isolated from index.html. */
 (() => {
   const LEGACY='renax-drums-songs-v1',PREFIX='renax-index2-store-v1:',SESSION='renax-index2-scope';
-  let scope=sessionStorage.getItem(SESSION)||'guest',state=null,core=null,healthy=true,readOnly=false,lastRaw=null;
+  let scope='guest',state=null,core=null,healthy=true,readOnly=false,lastRaw=null;
+  try{scope=sessionStorage.getItem(SESSION)||'guest';}catch{}
   if(!/^(guest|user:[A-Za-z0-9_-]+)$/.test(scope))scope='guest';
   const clone=v=>JSON.parse(JSON.stringify(v));
   function notify(){window.dispatchEvent(new CustomEvent('renax-storage',{detail:{scope,healthy}}));}
@@ -15,9 +16,10 @@
   const ready=import('./sync-core.js?v=20261008-auto-sync').then(module=>{core=module;});
   window.RENAX_STORAGE={ready,read,
     write(library){try{const initial=state||{version:1,library:clone(library),base:{},pending:{},conflicts:{},importDecisions:{}};const next=core?core.stage(initial,library,()=>crypto.randomUUID()):{...initial,library:clone(library)};save(next);return true;}catch(e){healthy=false;notify();throw e;}},
-    get scope(){return scope;},get healthy(){return healthy;},get state(){return clone(state);},
+    matches(library){return !!state&&JSON.stringify(state.library)===JSON.stringify(library);},
+    get rawToken(){return lastRaw;},get readOnly(){return readOnly;},get scope(){return scope;},get healthy(){return healthy;},get state(){return clone(state);},
     update(next){save(clone(next));},
-    async switchScope(nextScope,empty){await ready;if(!/^(guest|user:[A-Za-z0-9_-]+)$/.test(nextScope))throw Error('Identité de stockage incorrecte.');const preserveNavigation=scope===nextScope;scope=nextScope;sessionStorage.setItem(SESSION,scope);state=null;readOnly=false;lastRaw=null;const raw=read();const library=raw?JSON.parse(raw):clone(empty);try{RENAX_SONGS.validateLibrary(library);}catch(e){readOnly=true;healthy=false;throw e;}if(!state)save(core.blankState(library));RENAX_SONGS.replaceLibrary(library,preserveNavigation);window.dispatchEvent(new Event('renax-navigation-restored'));notify();},
+    async switchScope(nextScope,empty){if(window.RENAX_SONGS?.flushPending?.()===false)throw Error('Sauvegarde en attente : conservez votre copie avant de changer de compte.');await ready;if(!/^(guest|user:[A-Za-z0-9_-]+)$/.test(nextScope))throw Error('Identité de stockage incorrecte.');const preserveNavigation=scope===nextScope;sessionStorage.setItem(SESSION,nextScope);scope=nextScope;state=null;readOnly=false;lastRaw=null;const raw=read();const library=raw?JSON.parse(raw):clone(empty);try{RENAX_SONGS.validateLibrary(library);}catch(e){readOnly=true;healthy=false;throw e;}if(!state)save(core.blankState(library));RENAX_SONGS.replaceLibrary(library,preserveNavigation);window.dispatchEvent(new Event('renax-navigation-restored'));notify();},
     guestState(){const raw=localStorage.getItem(PREFIX+'guest');return raw?JSON.parse(raw):null;},
     guestLibrary(){const raw=localStorage.getItem(PREFIX+'guest');return raw?JSON.parse(raw).library:JSON.parse(localStorage.getItem(LEGACY)||'null');},
     reconcile(){RENAX_SONGS.replaceLibrary(state.library,true);},

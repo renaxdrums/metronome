@@ -1,5 +1,6 @@
 /* Approved Console presentation; original controls and engines remain in place. */
-:root{--bg:#101113;--panel:#17191d;--border:#303238;--text:#edf0f2;--text-muted:#a9afb8;--orange:#ff8c42;--cyan:#4cd7e8;--grey:#27292f;--grey-hover:#33363d}
+:root{--card-active-bg:#1d2b32;--bg:#1c2026;--panel:#272d35;--border:#414a56;--text:#edf0f2;--text-muted:#bcc5ce;--orange:#ff8c42;--cyan:#4cd7e8;--grey:#343b45;--grey-hover:#414a56;--card-selected:#1d2b32;--card-selected-border:#3b707c;--numeric-font-size:11px;--numeric-radius:6px}
+@media(max-width:1100px){:root{--numeric-font-size:12px}}
 body{background:var(--bg);color:var(--text)}
 header{background:transparent;border-bottom:0;min-height:52px}
 .brand-logo{mix-blend-mode:normal!important;width:36px!important;height:44px!important}
@@ -32,7 +33,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#2
 #playBtn::after{font-weight:600;letter-spacing:.1px}
 #playBtn.btn-cyan,#trainBtn.active{background:#1b505e!important;border-color:var(--cyan)!important}
 .measure-card,.song-section,.song-card,.playlist-choice,.song-block{background:#1b1e23;border-color:#30343c!important;border-radius:7px;box-shadow:none}
-.measure-card.active,.measure-card.multi-track.active,.song-section.active,.song-block.active{background:#1d2b32;border-color:#3b707c!important}
+.measure-card.active,.measure-card.multi-track.active,.song-section.active,.song-block.active{background:var(--card-active-bg);border-color:#3b707c!important}
 .measure-card.playing{border-color:var(--cyan)!important}
 .measure-num,.multi-track-name{font-weight:600;letter-spacing:.1px}
 .measure-sig{font-weight:500;color:var(--text-muted)}
@@ -142,7 +143,7 @@ body[data-workspace=training] .silent-section:not(.is-expanded){padding-bottom:0
 body[data-workspace=training] .silent-collapse:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 
 /* Graphite contrast and consistent workspace icons. */
-:root{--bg:#1c2026;--panel:#272d35;--border:#414a56;--text-muted:#bcc5ce;--grey:#343b45;--grey-hover:#414a56}
+
 header{border-bottom:1px solid #ffffff0c}
 .panel{background:var(--panel);border-color:var(--border)}
 #workspaceNav{gap:8px}
@@ -202,7 +203,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
 #songsRoot #songPane .song-more-menu .btn{background:transparent!important;color:var(--text)!important;border:0!important;min-height:40px}
 #songsRoot #songPane .song-more-menu .btn:hover{background:#414a56!important;color:var(--orange)!important}
 #songsRoot .song-section.measure-card{background:#2b323c!important;border-color:#48525e!important;border-radius:7px!important;margin:9px 0!important;padding:12px!important}
-#songsRoot .song-section.active,#songsRoot .song-section.playing{background:#28424b!important;border-color:#4b7884!important}
+#songsRoot .song-section.active,#songsRoot .song-section.playing{background:var(--card-active-bg)!important;border-color:#4b7884!important}
 #songsRoot .song-open{background:transparent!important;border:0!important}
 #songsRoot .song-playlist-summary,#songsRoot .song-block-summary,#songsRoot .song-note{color:var(--text-muted);font:500 11px/1.5 var(--font)}
 #songsRoot .song-tempo-value{font-family:var(--font);font-variant-numeric:tabular-nums;color:var(--orange)}
@@ -235,7 +236,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
 #songsRoot .playlist-manager .playlist-heading{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;gap:12px;margin-bottom:12px}
 
 /* Shared surfaces: training choices, Track cards, popups and menus. */
-:root{--card-selected:#1d2b32;--card-selected-border:#3b707c}
+
 .training-section .training-mode-tabs button,.training-section .training-curve-options button,.training-section #dirToggle button{background:#343b45!important;border:1px solid #505b69!important;color:var(--text)!important;box-shadow:none!important}
 .training-section .training-mode-tabs button[aria-selected=true],.training-section .training-curve-options button[aria-pressed=true],.training-section #dirToggle button.active{background:#28424b!important;border-color:#4b7884!important}
 .training-section .training-mode-tabs button svg,.training-section .training-curve-options button svg{stroke:var(--orange)!important}
@@ -404,7 +405,7 @@ header{isolation:isolate;}
 #songsRoot .playlist-choice{padding-right:110px!important;}
 #songsRoot .playlist-choice::after{right:90px;}
 #songPane .song-selected-open[hidden]{display:none!important;}
-#songPane .song-playlist-card.active{background:#20333b!important;border-color:var(--cyan)!important;box-shadow:inset 3px 0 0 var(--cyan)!important;}
+#songPane .song-playlist-card.active{background:var(--card-active-bg)!important;border-color:var(--cyan)!important;box-shadow:inset 3px 0 0 var(--cyan)!important;}
 #songPane .song-playlist-card .measure-preview{padding-right:112px;}
 #songPane .playlist-direct-play[aria-pressed="true"],#songPane .song-selected-open{color:var(--cyan)!important;border-color:#4b7884!important;background:#28424b!important;}
 #songPane .playlist-direct-play:disabled{opacity:.4;cursor:not-allowed;}

@@ -75,7 +75,7 @@
  #workspaceNav button{min-width:0;min-height:44px;padding:6px 2px;font-size:10px;gap:5px;background:#ffffff03;border-color:var(--border)}
  #workspaceNav svg{width:15px;height:15px;flex:0 0 15px}
  #workspaceMobileViews{gap:6px;padding:0 0 8px}
- body[data-workspace=sequence] #workspaceMobileViews,body[data-workspace=multi] #workspaceMobileViews,body[data-workspace=tracks] #workspaceMobileViews,body[data-workspace=polyrhythm] #workspaceMobileViews{display:flex!important}
+ body[data-workspace=training] #workspaceMobileViews,body[data-workspace=sequence] #workspaceMobileViews,body[data-workspace=multi] #workspaceMobileViews,body[data-workspace=tracks] #workspaceMobileViews,body[data-workspace=polyrhythm] #workspaceMobileViews{display:flex!important}
  #workspaceMobileViews button{flex:1;min-height:36px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font:600 10px var(--font);border-radius:5px}
  #workspaceMobileViews button[aria-pressed=true]{color:var(--text);background:#00cee510;border-color:#009cab}
  .main-grid{display:block!important;flex:1;min-height:0;overflow:hidden}
@@ -176,3 +176,6 @@ html,body,body *{scrollbar-width:thin!important;scrollbar-color:rgba(0,229,255,.
 ::-webkit-scrollbar-button{display:none!important;width:0!important;height:0!important;}
 ::-webkit-scrollbar-corner{background:#292c34!important;}
 @supports selector(::-webkit-scrollbar){html,body,body *{scrollbar-width:auto!important;scrollbar-color:auto!important;}}
+
+/* Preserve usable preference space in short browser windows. */
+@media(max-width:1100px) and (max-height:600px){body[data-mobile-pane=settings] footer{display:none!important}}

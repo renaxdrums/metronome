@@ -10,7 +10,7 @@ const { start, save } = require('./audio-harness.cjs');
       await initAudio();
       const bankNames = ['clic', 'cloche', 'claves', 'clic808', 'beep'];
       const prepared = [];
-      for (const bank of bankNames) {
+      for (const bank of bankNames.filter(bank=>bank!=='beep')) {
         await ensureInstrumentBankReady(bank);
         const samples = instrumentSamples[bank];
         if (samples?.length !== 3) throw Error('Missing 3 samples in ' + bank);
@@ -19,6 +19,8 @@ const { start, save } = require('./audio-harness.cjs');
           gain: s.gain, duration: s.duration
         }))});
       }
+      const shaker=await ensureInstrumentBankReady('beep');
+      if(SOUND_BANKS.beep!==SOUND_BANKS.proShaker||!shaker?.getChannelData||!shaker.getChannelData(0).some(x=>x!==0))throw Error('Actual shaker sample not prepared');
       const saved = {context: audioCtx, bank: currentBank, volume: masterVolume,
         mixer: getAudioMixDestination};
       // Bypass only the unchanged safety limiter IN THIS TEST, so the measured
@@ -90,7 +92,7 @@ const { start, save } = require('./audio-harness.cjs');
         'Limiter would engage: ' + JSON.stringify(s));
     }
     save('instrument-samples-validation.json', result);
-    console.log('CC0 instrumental samples: 15 audio sources prepared, ' +
+    console.log('CC0 instrumental samples: 12 original audio sources and actual shaker prepared, ' +
       result.scenarios.length + ' stereo offline renders below safety ceiling.');
   } finally {
     await runner.browser.close();

@@ -1,0 +1,141 @@
+{
+  "format": "mono PCM signed 16-bit little endian",
+  "samples": [
+    {
+      "key": "proClaves",
+      "name": "Claves acoustiques",
+      "rate": 24000,
+      "frames": 2880,
+      "pcmSha256": "2917966535e98b37281f1f70140bbe26ab9a48ec58dcacefde9104d4c93cb86f"
+    },
+    {
+      "key": "proCowbell",
+      "name": "Cowbell acoustique",
+      "rate": 24000,
+      "frames": 2880,
+      "pcmSha256": "2e3b73f2a24eab71c6483f01f579af97194f57aa08a1e49a4015d23e296e38d1"
+    },
+    {
+      "key": "proTriangle",
+      "name": "Triangle étouffé",
+      "rate": 24000,
+      "frames": 2880,
+      "pcmSha256": "f7eee33beda1c9de44060a8353f58222ffef0c0127bbc25892e5ae35858d8b30"
+    },
+    {
+      "key": "proShaker",
+      "name": "Shaker acoustique",
+      "rate": 24000,
+      "frames": 2880,
+      "pcmSha256": "652e8cde0ac6099f21a68060d859879758171850db9574509643666d896b9899"
+    },
+    {
+      "key": "proDigital",
+      "name": "Clic studio",
+      "rate": 24000,
+      "frames": 2880,
+      "pcmSha256": "73b87cd43cb7342e8c20c602ead860c28a7d4a061b72ed37e3d2966f674f58bd"
+    },
+    {
+      "key": "proQuartz",
+      "name": "Métronome quartz",
+      "rate": 24000,
+      "frames": 2880,
+      "pcmSha256": "a786665703ed55cf0c35f63777d418232c8a22b2e0df3ef0c031ecc9e4c1341b"
+    },
+    {
+      "key": "proTick",
+      "name": "Tick sec",
+      "rate": 24000,
+      "frames": 2880,
+      "pcmSha256": "d3ac1bcd4fe70c9ee07d05635b06c95baf667259e994a098649a8f68d4e6a470"
+    },
+    {
+      "key": "proSoft",
+      "name": "Bloc électronique",
+      "rate": 24000,
+      "frames": 2880,
+      "pcmSha256": "13a4fdcae46a99957eb67db20c0b79aaaf509ffd069eabae5e8b6591e552fa9e"
+    },
+    {
+      "key": "userElectric",
+      "name": "Electric metronome",
+      "rate": 24000,
+      "userProvided": true,
+      "frames": 2880,
+      "pcmSha256": "ece612924ff979af4cb05282c89aa7ff6b7b7ebc1f89caa48a5587cc40b4add1"
+    },
+    {
+      "key": "userDrumsticks",
+      "name": "Drumsticks",
+      "rate": 24000,
+      "userProvided": true,
+      "frames": 2880,
+      "pcmSha256": "7d006c216c9a1fbfa23853acadce16ccb2c1eca84263df6c4a0cbce74cfe9ee5"
+    },
+    {
+      "key": "userViii",
+      "name": "Viii Metronome",
+      "rate": 24000,
+      "userProvided": true,
+      "frames": 2880,
+      "pcmSha256": "164f27a8d0b36b1ca33fb87254e5bd985faacd20a4f6bc9a2e614bcdf5790417"
+    },
+    {
+      "key": "userWater",
+      "name": "Water",
+      "rate": 24000,
+      "userProvided": true,
+      "frames": 2880,
+      "pcmSha256": "126bbb3e7ee811d8e5a1e8406a0e11d8db37759ebf070af7ab328cec2ae45cc3"
+    },
+    {
+      "key": "userMetroclic",
+      "name": "Metroclic",
+      "rate": 24000,
+      "userProvided": true,
+      "frames": 2880,
+      "pcmSha256": "aa3a5212917d476d50fa72a2def8dbe6a5e3de7cb967d77d3a0361f0387284ec"
+    },
+    {
+      "key": "userTicking",
+      "name": "Ticking",
+      "rate": 24000,
+      "userProvided": true,
+      "frames": 2880,
+      "pcmSha256": "e5121cbd153b5dc4f63c83272fb1da62255d96540f8972f646c5af1e091d8bd8"
+    },
+    {
+      "key": "gospelTambourine",
+      "name": "Tambourin naturel",
+      "rate": 44100,
+      "sourceTitle": "Tambourin acoustique frappé · VCSL · Versilian Studios · CC0",
+      "frames": 12348,
+      "pcmSha256": "d5e5f4b29155f0fa76777954e347399306d5d6815fa42ed62a3464a9281203b0"
+    },
+    {
+      "key": "gospelKick",
+      "name": "Kick Tama Rockstar",
+      "rate": 44100,
+      "sourceTitle": "Sample acoustique · CC0 · Matias Reccius",
+      "frames": 10584,
+      "pcmSha256": "e90f52212b253b10cf0c5a02e8f58144b8de2875a84a331c22fb9ddba961cab6"
+    },
+    {
+      "key": "gospelSnare",
+      "name": "Snare Tama Artwood",
+      "rate": 44100,
+      "sourceTitle": "Sample acoustique · CC0 · Matias Reccius",
+      "frames": 8820,
+      "pcmSha256": "f048363e6b73351c5ce70f972c7363ae40ede7e27e420aa226a128c5ef22b4b0"
+    },
+    {
+      "key": "gospelHiHat",
+      "name": "Hi-hat fermé naturel",
+      "rate": 44100,
+      "sourceTitle": "Sample de hi-hat fourni par Renax",
+      "frames": 9702,
+      "pcmSha256": "ba0ccc53c1e1c7b5f6d5f92307cb190515034f0f4f983ae0fc3264b5050974dd"
+    }
+  ]
+}

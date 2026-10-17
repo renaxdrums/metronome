@@ -2,8 +2,9 @@
    Aucun séquenceur, moteur audio, état musical ou écouteur n'est remplacé.
    La navigation latérale utilise le #workspaceNav existant. */
 html#renaxApp[data-theme=ivory]{
+ --numeric-font-size:12px;--numeric-radius:9px;
  --bg:#e4e0d1;--panel:#eeeadd;--border:#d6d9c9;
- --text:#173e37;--text-muted:#5a7165;--orange:#c9bb98;
+ --text:#173e37;--text-muted:#52685d;--orange:#c9bb98;
  --cyan:#58bfc4;--yellow:#d7ed56;--grey:#b5c3b7;--grey-hover:#d6dfcd;
  --ivory-ink:#173e37;--ivory-green:#365e50;--ivory-lime:#d7ed56;
  color-scheme:light;
@@ -111,7 +112,7 @@ html#renaxApp[data-theme=ivory] :is(.measure-card.active,.multi-track.active,.mu
  background:#e7edd8!important;border-color:#98b48d!important;box-shadow:inset 3px 0 #a8bd32!important;
 }
 html#renaxApp[data-theme=ivory] :is(.measure-num,.multi-track-name,.multi-preset-name,.song-title,.playlist-heading-name,.song-block-header,.song-section-header){color:#173e37!important}
-html#renaxApp[data-theme=ivory] :is(.multi-preset-meta,.multi-preset-count,.song-block-summary,.song-playlist-summary,.song-note,.multi-preset-status){color:#5a7165!important}
+html#renaxApp[data-theme=ivory] :is(.multi-preset-meta,.multi-preset-count,.song-block-summary,.song-playlist-summary,.song-note,.multi-preset-status){color:#52685d!important}
 html#renaxApp[data-theme=ivory] :is(.sequence-preview-play,.sequence-more summary,.multi-more summary,.multi-solo,.multi-mute,.view-toggle button,.song-back,.song-more,.playlist-direct-play){
  background:#f0f2e7!important;border-color:#d0d8c8!important;color:#345f51!important;
 }

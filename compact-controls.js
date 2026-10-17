@@ -18,7 +18,7 @@
       button.style.height=Math.max(30,rect.height||32)+'px';
     }
     const label=select.getAttribute('aria-label')||document.querySelector('label[for="'+select.id+'"]')?.textContent||select.closest('label')?.firstChild?.textContent||select.id;
-    if(label)button.setAttribute('aria-label',label.trim());button.disabled=select.disabled;
+    if(label&&!select.hasAttribute('aria-label'))select.setAttribute('aria-label',label.trim());numboxWidgets.get(select)?.sync();button.disabled=select.disabled;
   }
   document.querySelectorAll('select').forEach(enhance);
   const observer=new MutationObserver(records=>{

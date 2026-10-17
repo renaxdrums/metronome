@@ -34,17 +34,20 @@ async function writeAtomic(uid,id,pending){
 }
 async function sync(){
   if(!account||!sdk||!storage.healthy||running)return;
+  if(storage.scope!=='user:'+account.uid){say('Synchronisation suspendue','Le changement de compte n’a pas pu être terminé. Exportez la copie locale avant de réessayer.');return;}
   if(!navigator.onLine){say('Hors connexion');return;}
   const uid=account.uid,token=generation;running=true;say('Synchronisation en cours');
   try{
     const snapshot=await sdk.firestore.getDocsFromServer(sdk.firestore.collection(db,'users',uid,'records'));
     if(token!==generation)return;
     const records={};snapshot.forEach(doc=>records[doc.id]=decode(doc));
+    if(!api.flushPending())return;
     deferApply(core.mergeRemote(storage.state,records));
     for(const id of Object.keys(storage.state.pending)){
       if(token!==generation)return;
       const pending=storage.state.pending[id];if(!pending)continue;
       const result=await writeAtomic(uid,id,pending);if(token!==generation)return;
+      if(!api.flushPending())return;
       let next=storage.state;
       if(result.conflict){next=core.mergeRemote(next,{[id]:result.conflict});}
       else{
@@ -67,7 +70,7 @@ async function ensureFirebase(){
   if(sdk)return;
   if(!firebaseConfig)throw Error('Firebase n’est pas configuré. Aucun morceau n’a été transmis.');
   const version='12.16.0',base='https://www.gstatic.com/firebasejs/'+version+'/';
-  const [app,authModule,firestore]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]);
+  const [app,authModule,firestore]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]).catch(cause=>{const error=new Error('Service de connexion indisponible. Les données locales restent disponibles.',{cause});error.code='backup/network-unavailable';throw error;});
   sdk={app,auth:authModule,firestore};const instance=app.initializeApp(firebaseConfig,'renax-index2');
   auth=authModule.initializeAuth(instance,{persistence:remember?authModule.browserLocalPersistence:authModule.browserSessionPersistence,popupRedirectResolver:authModule.browserPopupRedirectResolver});
   // Memory cache plus persistent business outbox: no cross-account disk cache.
@@ -79,6 +82,7 @@ async function ensureFirebase(){
     try{
       // Preserve the anonymous library before switching to the account scope.
       // A song created before sign-in must follow the user into the account automatically.
+      if(!api.flushPending())throw Error('Sauvegarde locale en attente.');
       const guestBeforeSignIn=user?storage.guestLibrary():null;
       const otherAccountCopies=user&&Object.keys(localStorage).some(key=>key.startsWith('renax-index2-store-v1:user:')&&key!=='renax-index2-store-v1:user:'+user.uid);
       await storage.switchScope(user?'user:'+user.uid:'guest',blank());
@@ -187,6 +191,12 @@ function renderPanel(){
   const state=element('p',storage.healthy?message:'Sauvegarde locale impossible : exportez une copie JSON.',root);state.className='backup-status';state.classList.toggle('is-confirmed',confirmed);state.setAttribute('role','status');state.setAttribute('aria-live','polite');
   if(failure)element('p',failure,root).className='backup-error';
   if(!storage.healthy)button('Exporter la source locale préservée',root,()=>{const raw=storage.recoverSource();if(!raw)throw Error('Aucune source trouvée.');const url=URL.createObjectURL(new Blob([raw],{type:'application/json'})),link=element('a');link.href=url;link.download='renax-source-preservee.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+  const emergencyHost=element('div',undefined,root),emergencyScope=storage.scope;
+  window.RENAX_EMERGENCY?.list(emergencyScope).then(copies=>{
+    if(!root.isConnected||storage.scope!==emergencyScope)return;
+    for(const [index,copy]of copies.entries())button('Exporter la copie de secours '+(index+1),emergencyHost,()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(copy.library,null,2)],{type:'application/json'})),link=element('a');link.href=url;link.download='renax-secours-'+(index+1)+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+  });
+
   if(!account){
     element('p','Copie locale automatique. Connectez-vous pour retrouver vos morceaux sur vos appareils.',root).className='backup-hint';
     if(!firebaseConfig)element('p','Connexion en ligne indisponible : projet Firebase non configuré.',root);
@@ -229,6 +239,7 @@ const backupNavigationObserver=new MutationObserver(()=>{
 backupNavigationObserver.observe(backupPane,{childList:true,attributes:true,attributeFilter:['hidden']});
 backupNavigationObserver.observe(backupPane.parentElement,{attributes:true,attributeFilter:['hidden']});
 window.addEventListener('renax-storage',()=>{renderPanel();});
+window.addEventListener('renax-emergency-saved',()=>renderPanel());
 window.addEventListener('renax-other-tab',()=>say('Conflit local à résoudre','Un autre onglet a modifié cette bibliothèque. Exportez votre copie puis rechargez pour récupérer l’autre version.'));
 window.addEventListener('online',queue);window.addEventListener('offline',()=>{if(account)say('Hors connexion');});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&account)queue();});

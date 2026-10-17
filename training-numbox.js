@@ -21,9 +21,7 @@
   const widgets = [];
   function refreshAll() { for (const widget of widgets) widget.sync(); }
   function closeOthers(except) {
-    document.querySelectorAll('.numbox-custom.open').forEach(wrap => {
-      if (wrap !== except) wrap.classList.remove('open');
-    });
+    closeAllNumboxes(except);
   }
 
   function enhance(input) {
@@ -57,8 +55,8 @@
     }
     function sync() {
       text.textContent = input.value;
-      button.setAttribute('aria-label', input.getAttribute('aria-label') ||
-        (wrap.closest('.training-row')?.querySelector('.row-label')?.textContent || 'Valeur numérique'));
+      button.setAttribute('aria-label', (input.getAttribute('aria-label') ||
+        (wrap.closest('.training-row')?.querySelector('.row-label')?.textContent || 'Valeur numérique'))+' : '+input.value);
       button.disabled = input.disabled;
       button.setAttribute('aria-expanded', String(wrap.classList.contains('open')));
       if (input.disabled && wrap.classList.contains('open')) wrap.classList.remove('open');

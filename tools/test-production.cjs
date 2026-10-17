@@ -15,6 +15,7 @@ const available = [
   'tests/mp3-output-level-test.cjs',
   'tests/security-text-test.cjs',
   'tests/diagnostics-test.cjs',
+  'tests/audio-activation-test.cjs',
   'tools/check-production-csp.cjs',
   'tools/check-production-equivalence.cjs',
   'tools/check-production-offline.cjs',

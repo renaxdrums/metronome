@@ -6,7 +6,7 @@ const {start,save}=require('./audio-harness.cjs');const assert=require('assert')
  async function checkStop(label){const x=await p.evaluate(()=>({playing:isPlaying,elapsed:getWorkElapsed(),stored:workElapsed,start:workStartTime,text:trainTimerEl.textContent}));assert(!x.playing&&x.elapsed===0&&x.stored===0&&x.start===0&&x.text==='0:00');states.push({label,...x});}
  for(let n=0;n<2;n++){
   await p.evaluate(()=>{workElapsed=65000;updateTimerDisplay();});await p.getByRole('button',{name:'Lire',exact:true}).click();await checkStart('metronome start '+n);
-  await p.waitForFunction(()=>getWorkElapsed()>1000);assert.notStrictEqual(await p.evaluate(()=>trainTimerEl.textContent),'0:00');
+  await p.waitForFunction(()=>getWorkElapsed()>1000);await p.waitForFunction(()=>trainTimerEl.textContent!=='0:00',null,{timeout:1000});assert.notStrictEqual(await p.evaluate(()=>trainTimerEl.textContent),'0:00');
   await p.locator('#playBtn').click();await checkStop('metronome stop '+n);
  }
  await p.evaluate(()=>{workElapsed=65000;updateTimerDisplay();document.activeElement.blur();});await p.keyboard.press('Space');await p.waitForFunction(()=>isPlaying);await checkStart('keyboard start');await p.keyboard.press('Space');await checkStop('keyboard stop');

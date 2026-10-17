@@ -14,6 +14,16 @@ const { start } = require('../tests/audio-harness.cjs');
     for (const name of (process.env.COMPAT_ENGINES || 'chromium,firefox,webkit').split(',')) {
       const browser = await engines[name].launch({
         headless: true,
+        // The CI browser explicitly grants autoplay; physical-device permission
+        // handling remains a separate check, including bounded activation failure.
+        ...(name === 'firefox'
+          ? {
+              firefoxUserPrefs: {
+                'media.autoplay.default': 0,
+                'media.autoplay.block-webaudio': false,
+              },
+            }
+          : {}),
         ...(name === 'chromium'
           ? process.env.CHROME_PATH
             ? { executablePath: process.env.CHROME_PATH }

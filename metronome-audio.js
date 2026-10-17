@@ -52,7 +52,17 @@
       const Context=window.AudioContext||window.webkitAudioContext;
       if(!Context)throw Error('Web Audio n’est pas disponible dans ce navigateur.');
       if (!audioCtx||audioCtx.state==='closed') audioCtx = new Context();
-      if (audioCtx.state === 'suspended'||audioCtx.state==='interrupted') await audioCtx.resume();
+      if (audioCtx.state === 'suspended'||audioCtx.state==='interrupted') {
+        // Some browsers leave resume pending when audio activation is denied.
+        // Bound only activation, without changing the clock or rendered signal.
+        let activationTimeout;
+        try {
+          await Promise.race([
+            audioCtx.resume(),
+            new Promise((_,reject)=>{activationTimeout=setTimeout(()=>reject(Error('Activation audio sans réponse. Autorisez le son puis réessayez.')),8000);})
+          ]);
+        } finally { clearTimeout(activationTimeout); }
+      }
       if(audioCtx.state!=='running')throw Error('La sortie audio est suspendue. Réessayez après avoir autorisé le son.');
       return audioCtx;
     }

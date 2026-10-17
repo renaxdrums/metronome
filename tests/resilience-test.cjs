@@ -37,6 +37,7 @@ async function seed(page){await page.evaluate(async value=>{await RENAX_STORAGE.
     try{RENAX_SONGS.replaceLibrary(RENAX_SONGS.library,true);}finally{delete pane.replaceChildren;}
     if(!entered||calls!==1)throw Error('Re-entrant DOM rebuild was not prevented');
   });
+  await p.getByLabel('Titre du track',{exact:true}).waitFor({state:'visible'});
   assert.equal(await p.getByLabel('Titre du track',{exact:true}).count(),1);
   // Flush a just-typed edit before changing account scope; the delayed task must not leak.
   await title.fill('Before scope');await p.evaluate(()=>RENAX_STORAGE.switchScope('user:qa-maintenance',{version:1,activeProfile:'empty',profiles:[{id:'empty',name:'Empty',songs:[]}]}));

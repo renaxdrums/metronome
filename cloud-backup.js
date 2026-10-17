@@ -246,7 +246,8 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&account)q
 setInterval(()=>{if(deferred&&!playing()){storage.reconcile();deferred=false;}},1500);
 window.addEventListener('renax-library-edited',queue);
 renderPanel();
-if(firebaseConfig&&(remember||sessionStorage.getItem('renax-index2-auth-enabled')==='1'))ensureFirebase().catch(error=>say('Sauvegardé dans ce navigateur',friendly(error)));
+let sessionAuthEnabled=false;try{sessionAuthEnabled=sessionStorage.getItem('renax-index2-auth-enabled')==='1';}catch{}
+if(firebaseConfig&&(remember||sessionAuthEnabled))ensureFirebase().catch(error=>say('Sauvegardé dans ce navigateur',friendly(error)));
 window.RENAX_BACKUP={sync,resolve,importGuest,get status(){return {message,failure,account:account?.uid??null,confirmed};},openChoices(onLocal){pendingLocalChoice=typeof onLocal==='function'?onLocal:null;backupView='';renderPanel();accountDialog.append(document.getElementById('backupAccount'));if(!accountDialog.open)accountDialog.showModal();positionAccount();}};
 
 const accountDialog=document.createElement('dialog');accountDialog.id='directAccountDialog';accountDialog.setAttribute('aria-label','Connexion et compte');accountDialog.style.cssText='width:min(390px,calc(100vw - 28px));max-height:85vh;overflow:auto;background:#111116;color:var(--text);border:1px solid #30303a;border-radius:10px;padding:18px;';

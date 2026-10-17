@@ -3,30 +3,8 @@ name: CC0 metronome audio validation
 on:
   push:
     branches: [main, audio/cc0-pro-20261011]
-    paths:
-      - '.github/workflows/audio-cc0-validation.yml'
-      - 'index.html'
-      - 'tools/stamp-assets.cjs'
-      - 'numbox-controls.js'
-      - 'songs-index2.js'
-      - 'local-backup.js'
-      - 'pro-sound-bank.js'
-      - 'song-export.js'
-      - 'mp3-export-worker.js'
-      - 'mp3-export.css'
-      - 'tests/mp3-output-level-test.cjs'
-      - 'tests/resilience-test.cjs'
-      - 'tests/accessibility-test.cjs'
-      - 'tests/emergency-backup-test.cjs'
-      - 'tests/performance-resilience-test.cjs'
-      - 'tests/offline-cache-test.cjs'
-      - 'tests/module-extraction-test.cjs'
-      - 'tests/numbox-accessibility-test.cjs'
-      - 'tests/pro-sound-context-test.cjs'
-      - 'assets/metronome/**'
-      - 'tests/instrument-samples-test.cjs'
-      - 'tests/mp3-export-test.cjs'
-      - 'tests/audio-harness.cjs'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -52,8 +30,16 @@ jobs:
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm exec playwright install chromium --with-deps
+      - name: Lint and incremental formatting
+        run: |
+          pnpm lint
+          pnpm format:check
       - name: Install MP3 inspection tools
         run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Five confirmed robustness regressions
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/robustness-boundaries-test.cjs
       - name: Audio headroom and sample integration
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
@@ -80,3 +66,26 @@ jobs:
           node tests/performance-resilience-test.cjs
           node tests/offline-cache-test.cjs
           node tests/module-extraction-test.cjs
+
+  firebase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm exec playwright install chromium --with-deps
+      - name: Isolated account and database checks
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          export RENAX_CHROME="$CHROME_PATH"
+          pnpm exec firebase emulators:exec --only auth,firestore --project demo-renax-backup "node tests/run.cjs --firebase"

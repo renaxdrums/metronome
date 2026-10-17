@@ -16,7 +16,7 @@ files=files.filter(f=>!exclude.some(x=>f===x||path.basename(f)===x));
 const results=[];let current;
 process.on('SIGINT',()=>{current?.kill();process.exit(130)});
 function run(file){return new Promise(resolve=>{const begin=Date.now(),name=file.replaceAll('/','_'),dir=path.join(out,'artifacts',name);fs.mkdirSync(dir,{recursive:true});let output='';console.log('RUN '+file);
- const child=current=cp.spawn(process.execPath,['--require',path.join(__dirname,'test-output.cjs'),file],{cwd:root,env:{...process.env,...defaults,TEST_OUTPUT_DIR:dir,TEMP:out,TMP:out},windowsHide:true});
+ const child=current=cp.spawn(process.execPath,['--require',path.join(__dirname,'test-output.cjs'),file],{cwd:root,env:{...defaults,...process.env,TEST_OUTPUT_DIR:dir,TEMP:out,TMP:out},windowsHide:true});
  const limit=file.includes('audio-headroom')?1200000:file.includes('rapid-interactions')?600000:file.includes('neural')||file.includes('voice-levels')||file.includes('amorce-page')||file.includes('piper-speed')?600000:180000;
  let timedOut=false;const timer=setTimeout(()=>{timedOut=true;child.kill();},limit);
  for(const stream of [child.stdout,child.stderr])stream.on('data',d=>{output+=d;if(/AUDIT |Progress:|PASS|passed|dBFS/.test(String(d)))process.stdout.write(d)});

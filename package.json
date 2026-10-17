@@ -9,16 +9,22 @@
     "build": "node tools/stamp-assets.cjs",
     "check:assets": "node tools/stamp-assets.cjs --check",
     "test:accessibility": "node tests/run.cjs --only=accessibility-test.cjs,numbox-accessibility-test.cjs",
-    "test:resilience": "node tests/run.cjs --only=resilience-test.cjs,emergency-backup-test.cjs,performance-resilience-test.cjs,offline-cache-test.cjs"
+    "test:resilience": "node tests/run.cjs --only=resilience-test.cjs,emergency-backup-test.cjs,performance-resilience-test.cjs,offline-cache-test.cjs",
+    "lint": "eslint .",
+    "format:check": "prettier --check eslint.config.mjs .prettierrc.json",
+    "format": "prettier --write eslint.config.mjs .prettierrc.json"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
     "@firebase/rules-unit-testing": "5.0.0",
     "@huggingface/transformers": "3.8.1",
+    "eslint": "10.13.0",
     "firebase": "12.16.0",
     "firebase-tools": "15.15.0",
+    "globals": "17.13.0",
     "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",
-    "playwright": "1.56.0"
+    "playwright": "1.56.0",
+    "prettier": "3.9.10"
   },
   "packageManager": "pnpm@11.25.0"
 }

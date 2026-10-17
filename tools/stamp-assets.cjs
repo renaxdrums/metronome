@@ -24,7 +24,7 @@ if(process.argv.includes('--check')){
 const textFile=name=>/\.(?:js|mjs|css|svg|json|webmanifest|html)$/.test(name);
 const normalize=(bytes,name)=>textFile(name)?bytes.toString('utf8').replace(/^\uFEFF/,'').replace(/\r\n/g,'\n'):bytes;
 const walk=directory=>fs.readdirSync(path.join(root,directory),{withFileTypes:true}).flatMap(entry=>entry.isDirectory()?walk(directory+'/'+entry.name):[directory+'/'+entry.name]);
-const names=[...fs.readdirSync(root).filter(name=>/\.(?:js|mjs|css)$/.test(name)&&!['service-worker.js','songs.js'].includes(name)),
+const names=[...fs.readdirSync(root).filter(name=>/\.(?:js|mjs|css)$/.test(name)&&!['service-worker.js','songs.js','eslint.config.mjs'].includes(name)),
  'index.html','manifest.webmanifest',...walk('vendor').filter(name=>/\.js$/.test(name)),...walk('assets/icons').filter(name=>/\.(?:png|svg)$/.test(name)),
  ...walk('assets/metronome').filter(name=>name.endsWith('.wav')&&!path.basename(name).startsWith('beep-'))].sort();
 const resources=names.map(name=>{const bytes=name==='index.html'?Buffer.from(updated):fs.readFileSync(path.join(root,name));return{path:name,sha256:crypto.createHash('sha256').update(normalize(bytes,name)).digest('hex'),text:textFile(name)};});

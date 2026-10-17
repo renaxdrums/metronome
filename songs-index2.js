@@ -424,7 +424,14 @@
     wrap.addEventListener('click',e=>e.stopPropagation());
     wrap.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.focus();}});
   }
-  function render(){songPane.replaceChildren();profilePane.replaceChildren();songsHome.replaceChildren();
+  let rendering=false;
+  function render(){
+    // Removing a focused field can synchronously dispatch change and request another render.
+    if(rendering)return;
+    rendering=true;
+    try{renderContent();}finally{rendering=false;}
+  }
+  function renderContent(){songPane.replaceChildren();profilePane.replaceChildren();songsHome.replaceChildren();
     songsHome.hidden=songView!=='home';profilePane.hidden=songView!=='profile';songPane.hidden=!['playlists','playlist','detail'].includes(songView);
     button('Sauvegarde',songsHome,()=>navigate('profile')).classList.add('song-entry');
     button('Playlist',songsHome,()=>navigate('playlists')).classList.add('song-entry');

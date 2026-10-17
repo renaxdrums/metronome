@@ -25,6 +25,19 @@ async function seed(page){await page.evaluate(async value=>{await RENAX_STORAGE.
   const title=p.getByLabel('Titre du track',{exact:true});await title.fill('');await title.pressSequentially('abcdefgh',{delay:15});
   assert.equal(await p.evaluate(()=>RENAX_SONGS.library.profiles[0].songs[0].name),'abcdefgh');assert.equal(await p.evaluate(()=>_writes),0);
   await p.waitForFunction(()=>_writes===1);assert.equal(await p.evaluate(()=>_edits),1);
+  // Deterministically exercise synchronous re-entry while a focused subtree is being removed.
+  await p.evaluate(()=>{
+    const pane=document.querySelector('#songPane'),original=pane.replaceChildren;
+    let entered=false,calls=0;
+    pane.replaceChildren=function(...nodes){
+      calls++;
+      if(!entered){entered=true;RENAX_SONGS.replaceLibrary(RENAX_SONGS.library,true);}
+      return original.apply(this,nodes);
+    };
+    try{RENAX_SONGS.replaceLibrary(RENAX_SONGS.library,true);}finally{delete pane.replaceChildren;}
+    if(!entered||calls!==1)throw Error('Re-entrant DOM rebuild was not prevented');
+  });
+  assert.equal(await p.getByLabel('Titre du track',{exact:true}).count(),1);
   // Flush a just-typed edit before changing account scope; the delayed task must not leak.
   await title.fill('Before scope');await p.evaluate(()=>RENAX_STORAGE.switchScope('user:qa-maintenance',{version:1,activeProfile:'empty',profiles:[{id:'empty',name:'Empty',songs:[]}]}));
   assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('renax-index2-store-v1:guest')).library.profiles[0].songs[0].name),'Before scope');

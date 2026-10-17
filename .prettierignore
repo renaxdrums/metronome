@@ -1,0 +1,8 @@
+node_modules/
+.qa-cache/
+vendor/
+assets/
+tests/results/
+dist/
+offline-manifest.json
+pnpm-lock.yaml

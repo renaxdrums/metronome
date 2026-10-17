@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "e44660d0b4bcea5d",
+  "revision": "bfdffc6b32fdd128",
   "resources": [
     {
       "path": "accessibility.css",
@@ -119,7 +119,7 @@
     },
     {
       "path": "cloud-backup.js",
-      "sha256": "0e14c6c306303a72b197701c191375146a148bbb0b59d0f9618ee34e93d2308f",
+      "sha256": "a027a775ddc4edef0bfb11ac73bb7cae85890e6057b05c4e366c3cf82e06d82d",
       "text": true
     },
     {
@@ -159,12 +159,12 @@
     },
     {
       "path": "index.html",
-      "sha256": "0f548bc369e5a11ee38c2be0dc8f763425d7d05cbd9eb068c193025418d8b4fb",
+      "sha256": "32ad4c225ba204d8e4dd124998a3bfe40b997d0df6addc1fc189219b45fb1184",
       "text": true
     },
     {
       "path": "interface-language.js",
-      "sha256": "252645fc6d41a925aea67f1590434f4133c036b37dc72228a5660bd94543298b",
+      "sha256": "11f0d63cc44fd36ad8a83ca5554122f902d41c6b38c5e8cc37d323f97c0a7030",
       "text": true
     },
     {
@@ -184,12 +184,12 @@
     },
     {
       "path": "metronome-core.js",
-      "sha256": "ac8da97df90f9092ac35cda97750ac4489ca51b04cae0738dc38fa27f0d4209a",
+      "sha256": "1680b25b46edcb04239ac540beed4aee9709bc9b3cb81e2aa9760038d2116779",
       "text": true
     },
     {
       "path": "midi-export.js",
-      "sha256": "883ecef697292fdf7c376df09bcddc3d2ec2709def2ca596c62db1eec86bb314",
+      "sha256": "3d9936ad7f07869579f0a968b6218979407247cc1b1beec227a5820d83cc8de9",
       "text": true
     },
     {
@@ -224,7 +224,7 @@
     },
     {
       "path": "multi-metronome.js",
-      "sha256": "fbdef29bb46903bf79c33d9af09cdb49ae50bc7cc17de16699ec58acff8e0928",
+      "sha256": "179d438846ee9883ddf88ea75937d49cff7735b08c3f3e19d6d808d6998c7b48",
       "text": true
     },
     {
@@ -309,7 +309,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "89a937482eb39779fbad208aff1ab50647925935a1171f95af8fd2089120ef74",
+      "sha256": "924dd92eb5b3ab47fe7196ff6990dc7fda00f29c13f977b2a18d2360d3d2cb20",
       "text": true
     },
     {

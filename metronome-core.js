@@ -1726,6 +1726,7 @@
     }
 
     const renderSequencerListMetronome = renderSequencerList;
+    // eslint-disable-next-line no-func-assign -- Preserve the shared classic-script rendering wrapper.
     renderSequencerList = function() {
       if (appMode === 'polyrhythm') renderPolyrhythmList();
       else renderSequencerListMetronome();
@@ -1733,6 +1734,7 @@
     };
 
     const renderActiveMeasureMetronome = renderActiveMeasure;
+    // eslint-disable-next-line no-func-assign -- Preserve the shared classic-script rendering wrapper.
     renderActiveMeasure = function() {
       if (appMode !== 'polyrhythm') return renderActiveMeasureMetronome();
       const m=measures[activeMeasureIndex]; if(!m) return;

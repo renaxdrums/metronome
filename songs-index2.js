@@ -26,12 +26,16 @@
     const ids=new Set();
     for(const p of data.profiles) {
       if(typeof p.id!=='string'||ids.has(p.id)||typeof p.name!=='string'||!Array.isArray(p.songs))throw Error('Profil incorrect.');ids.add(p.id);
+      const songIds=new Set();
       for(const song of p.songs) {
         if(typeof song.id!=='string'||typeof song.name!=='string'||!Array.isArray(song.sections)||!song.sections.length)throw Error('Morceau incorrect.');
+        if(songIds.has(song.id))throw Error('Identifiant de morceau dupliqué.');songIds.add(song.id);
+        const sectionIds=new Set();
         for(const language of [song.amorceDefaultLanguage,...song.sections.map(section=>section.amorceLanguage)])if(language!==undefined&&!['fr','en'].includes(language))throw Error('Langue du guide vocal incorrecte.');
         if(song.countIn){const c=song.countIn;if(!Number.isSafeInteger(c.count)||c.count<1||!Number.isInteger(c.numerator)||c.numerator<1||c.numerator>20||![2,4,8,16,32].includes(c.denominator))throw Error('Décompte incorrect.');}
         let total=countInBars(song);
         for(const section of song.sections) {
+          if(typeof section.id!=='string'||sectionIds.has(section.id))throw Error('Identifiant de section incorrect ou dupliqué.');sectionIds.add(section.id);
           const m=section.measure;
           if(typeof section.label!=='string'||!Number.isSafeInteger(section.count)||section.count<1||!m||!Number.isInteger(m.numerator)||m.numerator<1||m.numerator>20||![2,4,8,16,32].includes(m.denominator)||!Number.isFinite(m.tempo)||m.tempo<2||m.tempo>999)throw Error('Section incorrecte.');
           if(section.tempoRamp?.enabled&&(!Number.isFinite(section.tempoRamp.endTempo)||section.tempoRamp.endTempo<=m.tempo||section.tempoRamp.endTempo>999))throw Error('Accélération du bloc incorrecte.');

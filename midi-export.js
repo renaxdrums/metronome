@@ -4,7 +4,7 @@
   const PPQ=960;
   const bytes=text=>Array.from(new TextEncoder().encode(text));
   const u32=n=>[n>>>24&255,n>>>16&255,n>>>8&255,n&255];
-  function variable(n){if(!Number.isSafeInteger(n)||n<0||n>0xfffffff)throw Error('Intervalle MIDI trop long.');const out=[n&127];while(n=Math.floor(n/128))out.unshift((n&127)|128);return out;}
+  function variable(n){if(!Number.isSafeInteger(n)||n<0||n>0xfffffff)throw Error('Intervalle MIDI trop long.');const out=[n&127];while((n=Math.floor(n/128)))out.unshift((n&127)|128);return out;}
   function exportSong(song){
     RENAX_SONGS.validateLibrary({version:1,profiles:[{id:'midi',name:'Export',songs:[song]}]});
     const events=[];let tick=0,notes=0;
@@ -13,6 +13,7 @@
     for(const section of RENAX_SONGS.playbackSections(song)){const m=section.measure;
       meta(tick,6,bytes(section.label));
       const tempo=Math.round(60000000/m.tempo);
+      if(tempo>0xffffff||tempo<1)throw Error('Tempo trop lent pour cet export MIDI. Le morceau est conservé ; choisissez un tempo d’au moins 4 BPM pour cet export.');
       meta(tick,0x51,[tempo>>>16&255,tempo>>>8&255,tempo&255]);
       meta(tick,0x58,[m.numerator,Math.log2(m.denominator),24,8]);
       const beatTicks=PPQ*4/m.denominator,sectionStart=tick;

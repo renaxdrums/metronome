@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "7e13c5d3800787d0",
+  "revision": "e68b0b3e09539ef8",
   "resources": [
     {
       "path": "accessibility.css",
@@ -169,7 +169,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "7be98e4b25d1f1d467ced8d025a2bb6d03a2c8b4c1557fb2ef5c201187f9b42e",
+      "sha256": "151df6b773b1a926598ee5bc2733f49083cb0d7c69944484f4c1a93b07748b17",
       "text": true
     },
     {
@@ -179,7 +179,7 @@
     },
     {
       "path": "interface-translations.js",
-      "sha256": "ba31a100cfd977af8f9c04a3442692cb7a658db0ff9b2c98ed5e1ccc728f9fab",
+      "sha256": "761b1bcdda0741beba193aa27b8d3d89b76edadca88048891b2ea17dfcecf7c8",
       "text": true
     },
     {
@@ -329,7 +329,7 @@
     },
     {
       "path": "song-tempo-ramp.js",
-      "sha256": "ed68cf47cb49ab85d308effc47e420fd670379b13ccb685e5a94578d587864b1",
+      "sha256": "84e7c800f4690a95424dafa4b1c14039e1372a6ef5987c1c9db2634dd4a69832",
       "text": true
     },
     {
@@ -349,7 +349,7 @@
     },
     {
       "path": "sync-core.js",
-      "sha256": "f75c444f62d8511d721eb1ee19c112848ba648ef0d0730d55d165f41736eabd7",
+      "sha256": "29ca118783a4f61ae570c140360d51a8eeb367a7eb5077aa53627d6d23071274",
       "text": true
     },
     {
@@ -394,7 +394,7 @@
     },
     {
       "path": "workspace-layout.js",
-      "sha256": "4002a90b29b59af7f2d5e0e8779fb28adf891deb1f6011cbf525e285cc2a8fad",
+      "sha256": "feb90c501f2d549159b4fb1bcf7a09922f8ff0c3a6da059be6e135533be2ad53",
       "text": true
     }
   ]

@@ -59,3 +59,8 @@ export interface SyncState {
   >;
   importDecisions: Record<string, boolean>;
 }
+
+export type StoredEntity =
+  | { type: 'catalog'; profileIds: string[] }
+  | { type: 'profile'; id: string; name: string; songIds: string[] }
+  | { type: 'song'; profileId: string; song: Song };

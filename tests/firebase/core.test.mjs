@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {copy,flatten,blankState,stage,mergeRemote,visibleRecords,materialize,resolveConflict,key} from '../../sync-core.js';
+import {copy,flatten,blankState,stage,mergeRemote,visibleRecords,materialize,resolveConflict,key,canonical} from '../../sync-core.js';
 const song={id:'s',name:'Original',sections:[{id:'sec',label:'Intro',count:4,measure:{numerator:6,denominator:8,tempo:120,beatSubdivisions:[1,1,1,1,1,1],beatStates:[[3],[1],[1],[2],[1],[1]]}}]};
 const library={version:1,activeProfile:'p',profiles:[{id:'p',name:'Profil',songs:[song]}]};let seq=0;const id=()=>String(++seq).padStart(36,'0'),record=(payload,revision=1,operationId='remote')=>({payload,revision,deleted:false,operationId});
 const flat=flatten(library),base=Object.fromEntries(Object.entries(flat).map(([id,payload])=>[id,record(payload)])),skey=key('song','p','s');
@@ -23,3 +23,12 @@ const independent=copy(library);independent.profiles[0].songs.push({...copy(song
 const newer=stage(a,{...edited,profiles:[{...edited.profiles[0],songs:[{...edited.profiles[0].songs[0],name:'Encore'}]}]},id);assert.equal(newer.pending[skey].expected,2);
 console.log('Core PASS: versioned roundtrip, effective edits, coalescing, simultaneous edits, per-song conflicts, delete/edit, resolutions, idempotence, restart and no source mutation');
 console.log('Representative library bytes:',new TextEncoder().encode(JSON.stringify(library)).length,'; song payload bytes:',new TextEncoder().encode(flat[skey]).length);
+
+// Strict contracts preserve the canonicalizer's historical optional result.
+assert.equal(canonical(undefined),undefined);
+assert.equal(canonical({b:2,a:1}),'{"a":1,"b":2}');
+const wrongCatalog={catalog:record(JSON.stringify({type:'song',song}))};
+assert.throws(()=>materialize(wrongCatalog,library),/Données distantes incompatibles/);
+const wrongSong={...base,[skey]:record(JSON.stringify({type:'catalog',profileIds:[]}))};
+assert.throws(()=>materialize(wrongSong,library),/Données distantes incompatibles/);
+assert.equal(library.profiles[0].songs[0].name,'Original');

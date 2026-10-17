@@ -1,0 +1,16 @@
+# Reproducible source formatting on Windows and Linux; binary assets stay binary.
+*.js text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.wav -text
+*.mp3 -text
+*.png -text
+*.woff2 -text
+*.wasm -text

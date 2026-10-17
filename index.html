@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr" id="renaxApp">
 <head>
+  <meta charset="UTF-8">
 <script>
 /* Apply before first paint. A system light preference never overrides the default. */
 (()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory'].includes(saved))theme=saved;}catch{}document.documentElement.dataset.theme=theme;})();
 </script>
-  <meta charset="UTF-8">
+  <style>html[data-workspace-loading] .main-grid{visibility:hidden}</style>
+  <script>
+  (()=>{const root=document.documentElement;root.dataset.workspaceLoading='';
+    const release=()=>{delete root.dataset.workspaceLoading;document.querySelector('.main-grid')?.removeAttribute('aria-busy');};
+    window.RENAX_RELEASE_LAYOUT=release;setTimeout(release,3000);
+  })();
+  </script>
   <meta name="description" content="Métronome pour batteurs : tempo, subdivisions, polyrythmies, entraînement progressif et export de morceaux en MP3 ou MIDI.">
   <link rel="canonical" href="https://renaxdrums.github.io/metronome/">
   <meta property="og:title" content="RENAX DRUMS — Métronome">
@@ -369,7 +376,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
 }
 </style><link rel="stylesheet" href="accessibility.css?v=d4b6b8ceee79">
 </head>
-<body>
+<body data-workspace="metronome" data-mobile-pane="visu">
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
 <div class="console-arrival-lines" aria-hidden="true"><span></span><span></span><span></span></div>
 <div class="console-arrival-center"><img class="console-arrival-logo" src="assets/renax-logo-approved.svg?v=67d3e5dbff6a" alt="Renax Drums">
@@ -402,7 +409,8 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
     <button data-tab="training"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2M12 9v4l3 2"/></svg>Entraînement</button>
   </nav>
 
-  <div class="main-grid">
+<nav id="workspaceNav" role="tablist" aria-label="Espaces de travail"><button type="button" data-workspace="metronome" role="tab" aria-controls="sequencerContainer" aria-selected="true" tabindex="0"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 20h10L14 4h-4L7 20Z M12 16l6-9 M9 20v-3h6v3"></path></svg><span data-i18n-key="workspace.metronome">Métronome</span></button><button type="button" data-workspace="polyrhythm" role="tab" aria-controls="sequencerContainer" aria-selected="false" tabindex="-1"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="12" r="6"></circle><circle cx="15" cy="12" r="6"></circle></svg><span data-i18n-key="workspace.polyrhythm">Polyrythmie</span></button><button type="button" data-workspace="training" role="tab" aria-controls="mobileTrainingHost" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M9 2h6M12 5V2M12 9v4l3 2"></path></svg><span data-i18n-key="workspace.training">Entraînement</span></button><button type="button" data-workspace="sequence" role="tab" aria-controls="sequencePane" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h4v4H4zM10 5h4v4h-4zM16 5h4v4h-4zM4 15h16M4 19h16"></path></svg><span data-i18n-key="workspace.sequence">Séquenceur</span></button><button type="button" data-workspace="multi" role="tab" aria-controls="sequencePane" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16M8 3v4M15 10v4M10 17v4"></path></svg><span data-i18n-key="workspace.multi">Multipiste</span></button><button type="button" data-workspace="tracks" role="tab" aria-controls="songsRoot" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"></path></svg><span data-i18n-key="workspace.tracks">Track</span></button></nav>
+  <div class="main-grid" aria-busy="true">
     <div class="panel panel-params" data-panel="params">
       <div class="panel-title"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg>RÉGLAGES</div>
 
@@ -674,7 +682,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
   <script src="emergency-backup.js?v=ffc0a16005b2"></script>
 <script src="local-backup.js?v=f40f0ce49852"></script>
   <script src="amorce-song.js?v=9f00d2d74e2c"></script>
-  <script src="song-tempo-ramp.js?v=ed68cf47cb49"></script>
+  <script src="song-tempo-ramp.js?v=84e7c800f469"></script>
   <script src="songs-index2.js?v=924dd92eb5b3"></script>
   <script type="module" src="cloud-backup.js?v=f9e5598ca18a"></script>
   <script>
@@ -776,9 +784,9 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="multi-clock.js?v=e13d4c26ebe6"></script>
 <script src="multi-metronome.js?v=179d438846ee"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
-<script src="interface-translations.js?v=ba31a100cfd9"></script>
+<script src="interface-translations.js?v=761b1bcdda07"></script>
 <script src="interface-language.js?v=147f6b309b94"></script>
-<script src="workspace-layout.js?v=4002a90b29b5"></script>
+<script src="workspace-layout.js?v=feb90c501f2d"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=94e73145c59c"></script>
 <script src="console-intro.js?v=c98ebce90fec"></script>

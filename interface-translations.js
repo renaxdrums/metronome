@@ -45,12 +45,26 @@
  };
  const messages={
   "fr": {
+    "workspace.metronome": "Métronome",
+    "workspace.polyrhythm": "Polyrythmie",
+    "workspace.training": "Entraînement",
+    "workspace.sequence": "Séquenceur",
+    "workspace.multi": "Multipiste",
+    "workspace.tracks": "Track",
+
     "diagnostics.heading": "Aide en cas de problème",
     "diagnostics.export": "Exporter le diagnostic",
     "voices.heading": "Voix de comptage",
     "voices.prepareOffline": "Préparer les voix hors connexion"
   },
   "en": {
+    "workspace.metronome": "Metronome",
+    "workspace.polyrhythm": "Polyrhythm",
+    "workspace.training": "Practice",
+    "workspace.sequence": "Sequencer",
+    "workspace.multi": "Multitrack",
+    "workspace.tracks": "Track",
+
     "diagnostics.heading": "Troubleshooting",
     "diagnostics.export": "Export diagnostics",
     "voices.heading": "Counting voices",

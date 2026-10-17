@@ -141,6 +141,13 @@ jobs:
           version: '11.25.0'
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm exec playwright install chromium firefox webkit --with-deps
+      - name: Provide an actual audio service on the headless runner
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y pulseaudio
+          pulseaudio --start --exit-idle-time=-1 --log-target=stderr
+          pactl load-module module-null-sink sink_name=qa_audio
+          pactl set-default-sink qa_audio
+          pactl info
       - name: Desktop and mobile browser engines
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"

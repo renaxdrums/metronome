@@ -28,6 +28,8 @@ Après un changement des ressources, exécuter `pnpm build`, puis `pnpm check:as
 
 Le moteur et les banques ont des tests de rendu audio. Les références Git doivent être disponibles ; un clone superficiel peut empêcher les comparaisons. Le workflow utilise l’historique complet et les dépendances verrouillées.
 
+Une activation Web Audio qui ne répond pas est interrompue après huit secondes avec un message et une possibilité de réessai. Cette limite concerne l'autorisation de démarrage ; elle ne modifie ni l'horloge musicale ni le signal rendu.
+
 ## Données et récupération
 
 La copie principale et sa file d’attente restent locales, isolées par compte. La connexion Firebase est facultative. Une panne réseau ne signifie pas « synchronisé » et ne supprime pas les copies locales.

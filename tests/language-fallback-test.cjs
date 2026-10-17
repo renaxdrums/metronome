@@ -22,12 +22,18 @@ const { start, save } = require('./audio-harness.cjs');
     await p.reload();
     await p.waitForFunction(() => window.RENAX_I18N?.language === 'en');
     assert.equal(await p.evaluate(() => RENAX_I18N.t('diagnostics.export')), 'Export diagnostics');
+    await p.waitForFunction(() =>
+      document.getElementById('directAccountBtn')?.title.startsWith('Sign in and account · '),
+    );
     await p.evaluate(() => RENAX_I18N.setLanguage('fr'));
     assert.equal(
       await p.evaluate(() => RENAX_I18N.t('diagnostics.export')),
       'Exporter le diagnostic',
     );
     assert.deepEqual(errors, []);
+    await p.waitForFunction(() =>
+      document.getElementById('directAccountBtn')?.title.startsWith('Connexion et compte · '),
+    );
     save('language-fallback-results.json', {
       missingData: 'French usable',
       savedPreference: 'preserved',

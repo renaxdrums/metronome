@@ -11,20 +11,33 @@
     "test:accessibility": "node tests/run.cjs --only=accessibility-test.cjs,numbox-accessibility-test.cjs",
     "test:resilience": "node tests/run.cjs --only=resilience-test.cjs,emergency-backup-test.cjs,performance-resilience-test.cjs,offline-cache-test.cjs",
     "lint": "eslint .",
-    "format:check": "prettier --check eslint.config.mjs .prettierrc.json",
-    "format": "prettier --write eslint.config.mjs .prettierrc.json"
+    "format:check": "prettier --check eslint.config.mjs .prettierrc.json tsconfig.json types/library.d.ts ui-feedback.js tools/build-production.cjs tools/version-release.cjs tools/test-production.cjs tools/check-production-csp.cjs tools/check-production-equivalence.cjs tools/check-production-offline.cjs tools/browser-compat.cjs tools/long-session.cjs tools/benchmark-browser.cjs tools/measure-assets.cjs tests/robustness-boundaries-test.cjs tests/diagnostics-test.cjs tests/security-text-test.cjs tests/language-fallback-test.cjs tests/midi-resource-test.cjs",
+    "format": "prettier --write eslint.config.mjs .prettierrc.json tsconfig.json types/library.d.ts ui-feedback.js tools/build-production.cjs tools/version-release.cjs tools/test-production.cjs tools/check-production-csp.cjs tools/check-production-equivalence.cjs tools/check-production-offline.cjs tools/browser-compat.cjs tools/long-session.cjs tools/benchmark-browser.cjs tools/measure-assets.cjs tests/robustness-boundaries-test.cjs tests/diagnostics-test.cjs tests/security-text-test.cjs tests/language-fallback-test.cjs tests/midi-resource-test.cjs",
+    "build:production": "node tools/build-production.cjs --csp",
+    "measure:assets": "node tools/measure-assets.cjs",
+    "type-check": "tsc --project tsconfig.json",
+    "test:compat": "node tools/browser-compat.cjs",
+    "test:production": "node tools/test-production.cjs",
+    "test:long-session": "node tools/long-session.cjs",
+    "benchmark:browser": "node tools/benchmark-browser.cjs",
+    "test:coverage:core": "node --experimental-test-coverage --test --test-coverage-include=sync-core.js tests/firebase/core.test.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
     "@firebase/rules-unit-testing": "5.0.0",
     "@huggingface/transformers": "3.8.1",
+    "esbuild": "0.28.2",
     "eslint": "10.13.0",
+    "espree": "11.2.0",
     "firebase": "12.16.0",
     "firebase-tools": "15.15.0",
     "globals": "17.13.0",
+    "html-minifier-terser": "7.2.0",
     "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",
     "playwright": "1.56.0",
-    "prettier": "3.9.10"
+    "prettier": "3.9.10",
+    "typescript": "5.9.3",
+    "web-vitals": "6.2.3"
   },
   "packageManager": "pnpm@11.25.0"
 }

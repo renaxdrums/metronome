@@ -5,7 +5,9 @@ const {start,save}=require('./audio-harness.cjs');
  await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_FEEDBACK&&window.RENAX_SONGS);await p.waitForTimeout(500);
  assert.equal(voice.length,0,'Voice recordings are outside the initial load');
  await p.locator('#playBtn').click();await p.waitForFunction(()=>isPlaying);assert.equal(voice.length,0,'Instrumental click does not need voices');await p.locator('#playBtn').click();
- await p.waitForFunction(()=>allVoiceAudioReady);assert.equal(voice.length,40);assert.deepEqual(external,[]);
+ await p.waitForTimeout(3000);assert.equal(voice.length,0,'No automatic voice warmup after idle');
+ await p.locator('#index2SettingsBtn').click();await p.getByRole('button',{name:'Préparer les voix hors connexion',exact:true}).click();
+ await p.waitForFunction(()=>allVoiceAudioReady);await p.locator('#index2SettingsClose').click();assert.equal(voice.length,40);assert.deepEqual(external,[]);
  const htmlBytes=Buffer.byteLength(fs.readFileSync(path.join(__dirname,'../index.html')));assert(htmlBytes<80000,'HTML budget: 80 KB');
  proof.push({htmlBytes,initialVoiceRequests:0,eventualVoiceRequests:voice.length,googleFontRequests:external.length,localVitals:await p.evaluate(()=>RENAX_FEEDBACK.measurements)});await p.close();
  // Constructor failure is a real browser API fault; the original API is restored for retry.

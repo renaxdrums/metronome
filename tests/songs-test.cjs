@@ -1,7 +1,7 @@
 const {start,save}=require('./audio-harness.cjs');
 (async()=>{
  const r=await start(),p=await r.browser.newPage({viewport:{width:1280,height:850}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
- await p.goto(r.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
+ await p.goto(r.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
  await require('./audio-harness.cjs').openPlaylist(p);
  if(await p.locator('.song-section').count())throw Error('Unexpected initial songs');
  await p.getByRole('button',{name:'Nouveau track',exact:true}).click();

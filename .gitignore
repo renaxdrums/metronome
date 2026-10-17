@@ -5,3 +5,4 @@ tests/_neural-assets
 firebase-debug.log
 firestore-debug.log
 outputs/
+dist/

@@ -1,21 +1,217 @@
-const assert=require('node:assert/strict'),fs=require('node:fs');
-const {start,save}=require('./audio-harness.cjs');
-const key='renax.multimetro.v1';
-(async()=>{const h=await start(),proof=[];try{
- const context=await h.browser.newContext({acceptDownloads:true}),a=await context.newPage();await a.goto(h.url);await a.waitForFunction(()=>window.RENAX_SONGS);await a.getByRole('tab',{name:'Multipiste',exact:true}).click();await a.getByRole('button',{name:'Ouvrir Preset 1',exact:true}).click();
- const b=await context.newPage();await b.goto(h.url);await b.waitForFunction(()=>window.RENAX_SONGS);await b.getByRole('tab',{name:'Multipiste',exact:true}).click();await b.getByRole('button',{name:'Nouveau preset',exact:true}).click();await b.getByRole('textbox',{name:'Nom du preset',exact:true}).fill('B preserved');
- const shared=await b.evaluate(key=>localStorage.getItem(key),key);assert.equal(JSON.parse(shared).presets.length,2);
- await a.getByRole('textbox',{name:'Nom du preset',exact:true}).fill('A draft');assert.equal(await a.evaluate(key=>localStorage.getItem(key),key),shared);assert(await a.locator('#multiStorageNotice').isVisible());
- const downloadPromise=a.waitForEvent('download');await a.getByRole('button',{name:'Exporter une copie multipiste',exact:true}).click();const download=await downloadPromise;const draft=JSON.parse(fs.readFileSync(await download.path(),'utf8'));assert.equal(draft.presets[0].name,'A draft');
- await a.close();assert.equal(await b.evaluate(key=>localStorage.getItem(key),key),shared);await context.close();proof.push({id:'R01',staleWriteBlocked:true,draftExported:true,pagehidePreservesOtherTab:true});
- const p=await h.browser.newPage();await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_MIDI_EXPORT);const midi=await p.evaluate(async()=>{
-  const result=[];for(const tempo of [2,3,4,120,999]){const song={id:'s',name:'Tempo boundary',sections:[{id:'b',label:'Part',count:1,measure:{numerator:4,denominator:4,tempo,beatSubdivisions:[1,1,1,1],beatStates:[[1],[1],[1],[1]]}}]},before=JSON.stringify(song);try{const exported=RENAX_MIDI_EXPORT.exportSong(song),bytes=new Uint8Array(await exported.blob.arrayBuffer());let encoded;for(let i=0;i<bytes.length-5;i++)if(bytes[i]===255&&bytes[i+1]===81&&bytes[i+2]===3){encoded=bytes[i+3]*65536+bytes[i+4]*256+bytes[i+5];break;}result.push({tempo,encoded,unchanged:before===JSON.stringify(song)});}catch(error){result.push({tempo,error:error.message,unchanged:before===JSON.stringify(song)});}}return result;
- });for(const r of midi){assert(r.unchanged);if(r.tempo<4)assert.match(r.error,/Tempo trop lent/);else assert.equal(r.encoded,Math.round(60000000/r.tempo));}proof.push({id:'R02',midi});
- const validation=await p.evaluate(()=>{const measure={numerator:4,denominator:4,tempo:120,beatSubdivisions:[1,1,1,1],beatStates:[[1],[1],[1],[1]]},song={id:'song',name:'Original',sections:[{id:'part',label:'Intro',count:1,measure}]},library={version:1,profiles:[{id:'p',name:'Profile',songs:[song]}]};RENAX_SONGS.validateLibrary(library);let songsRejected=false,sectionsRejected=false;const duplicate=structuredClone(library);duplicate.profiles[0].songs.push(structuredClone(song));try{RENAX_SONGS.validateLibrary(duplicate)}catch{songsRejected=true;}const parts=structuredClone(library);parts.profiles[0].songs[0].sections.push(structuredClone(song.sections[0]));try{RENAX_SONGS.validateLibrary(parts)}catch{sectionsRejected=true;}const differentProfile=structuredClone(library);differentProfile.profiles.push({...structuredClone(library.profiles[0]),id:'other'});RENAX_SONGS.validateLibrary(differentProfile);return {songsRejected,sectionsRejected,differentProfilesAccepted:true};});assert(validation.songsRejected&&validation.sectionsRejected);proof.push({id:'R04',...validation});
- await p.getByRole('tab',{name:'Multipiste',exact:true}).click();await p.getByRole('button',{name:'Ouvrir Preset 1',exact:true}).click();
- await p.addInitScript(key=>{if(sessionStorage.getItem('qa-limit'))return;sessionStorage.setItem('qa-limit','1');const data=JSON.parse(localStorage.getItem(key)),base=data.tracks[0];data.tracks=Array.from({length:64},(_,i)=>({...structuredClone(base),id:'track-'+i,name:'Piste '+(i+1)}));data.presets[0].tracks=structuredClone(data.tracks);localStorage.setItem(key,JSON.stringify(data));},key);
- await p.reload();await p.waitForFunction(()=>window.RENAX_SONGS);await p.getByRole('tab',{name:'Multipiste',exact:true}).click();await p.getByRole('button',{name:'Ouvrir Preset 1',exact:true}).click();assert.equal(await p.locator('#multiTracks .measure-card').count(),64);assert(await p.getByRole('button',{name:'Nouvelle piste',exact:true}).isDisabled());await p.reload();await p.waitForFunction(()=>window.RENAX_SONGS);assert.equal(await p.evaluate(key=>JSON.parse(localStorage.getItem(key)).tracks.length,key),64);await p.close();proof.push({id:'R03',limit64:true,reloadPreserves64:true});
- const legacy=await h.browser.newPage();await legacy.addInitScript(()=>{const measure={id:'x',name:'Piste',bank:'clic',numerator:4,denominator:4,tempo:120,beatSubdivisions:[1,1,1,1],beatStates:[[1],[1],[1],[1]]},tracks=Array.from({length:65},(_,i)=>({...measure,id:String(i)}));localStorage.setItem('renax.multimetro.v1',JSON.stringify({version:1,tracks,presets:[{id:'legacy',name:'Legacy 65',bpm:120,tracks}],selectedPreset:'legacy',bpm:120}));});await legacy.goto(h.url);await legacy.waitForFunction(()=>window.RENAX_SONGS);await legacy.getByRole('tab',{name:'Multipiste',exact:true}).click();await legacy.getByRole('button',{name:'Ouvrir Legacy 65',exact:true}).click();assert.equal(await legacy.locator('#multiTracks .measure-card').count(),65);assert(await legacy.getByRole('button',{name:'Nouvelle piste',exact:true}).isDisabled());assert(!await legacy.locator('#multiStorageNotice').isVisible());await legacy.close();proof.push({id:'R03-recovery',existing65RecoveredWithoutDroppingTracks:true});
- const denied=await h.browser.newPage(),errors=[];denied.on('pageerror',e=>errors.push(e.message));await denied.addInitScript(()=>{for(const name of ['getItem','setItem'])Storage.prototype[name]=()=>{throw new DOMException('Injected denied storage','SecurityError')};});await denied.goto(h.url);await denied.waitForFunction(()=>window.RENAX_BACKUP&&window.RENAX_SONGS);await denied.waitForFunction(()=>document.querySelectorAll('#playBtn').length===1);await denied.getByRole('tab',{name:'Métronome',exact:true}).click();await denied.locator('#playBtn').click();await denied.waitForFunction(()=>isPlaying);await denied.locator('#playBtn').click();assert.deepEqual(errors,[]);proof.push({id:'R05',backupInitialized:true,instrumentWorks:true,errors});await denied.close();save('robustness-boundaries.json',proof);console.log('PASS five robustness boundaries, stale draft recovery and legacy 65-track recovery');
- }finally{await h.browser.close();h.server?.close();}
-})().catch(error=>{console.error(error);process.exitCode=1});
+const assert = require('node:assert/strict'),
+  fs = require('node:fs');
+const { start, save } = require('./audio-harness.cjs');
+const key = 'renax.multimetro.v1';
+(async () => {
+  const h = await start(),
+    proof = [];
+  try {
+    const context = await h.browser.newContext({ acceptDownloads: true }),
+      a = await context.newPage();
+    await a.goto(h.url);
+    await a.waitForFunction(() => window.RENAX_SONGS);
+    await a.getByRole('tab', { name: 'Multipiste', exact: true }).click();
+    await a.getByRole('button', { name: 'Ouvrir Preset 1', exact: true }).click();
+    const b = await context.newPage();
+    await b.goto(h.url);
+    await b.waitForFunction(() => window.RENAX_SONGS);
+    await b.getByRole('tab', { name: 'Multipiste', exact: true }).click();
+    await b.getByRole('button', { name: 'Nouveau preset', exact: true }).click();
+    await b.getByRole('textbox', { name: 'Nom du preset', exact: true }).fill('B preserved');
+    const shared = await b.evaluate((key) => localStorage.getItem(key), key);
+    assert.equal(JSON.parse(shared).presets.length, 2);
+    await a.getByRole('textbox', { name: 'Nom du preset', exact: true }).fill('A draft');
+    assert.equal(await a.evaluate((key) => localStorage.getItem(key), key), shared);
+    assert(await a.locator('#multiStorageNotice').isVisible());
+    const downloadPromise = a.waitForEvent('download');
+    await a.getByRole('button', { name: 'Exporter une copie multipiste', exact: true }).click();
+    const download = await downloadPromise;
+    const draft = JSON.parse(fs.readFileSync(await download.path(), 'utf8'));
+    assert.equal(draft.presets[0].name, 'A draft');
+    await a.close();
+    assert.equal(await b.evaluate((key) => localStorage.getItem(key), key), shared);
+    await context.close();
+    proof.push({
+      id: 'R01',
+      staleWriteBlocked: true,
+      draftExported: true,
+      pagehidePreservesOtherTab: true,
+    });
+    const p = await h.browser.newPage();
+    await p.goto(h.url);
+    await p.waitForFunction(() => window.RENAX_MIDI_EXPORT);
+    const midi = await p.evaluate(async () => {
+      const result = [];
+      for (const tempo of [2, 3, 4, 120, 999]) {
+        const song = {
+            id: 's',
+            name: 'Tempo boundary',
+            sections: [
+              {
+                id: 'b',
+                label: 'Part',
+                count: 1,
+                measure: {
+                  numerator: 4,
+                  denominator: 4,
+                  tempo,
+                  beatSubdivisions: [1, 1, 1, 1],
+                  beatStates: [[1], [1], [1], [1]],
+                },
+              },
+            ],
+          },
+          before = JSON.stringify(song);
+        try {
+          const exported = RENAX_MIDI_EXPORT.exportSong(song),
+            bytes = new Uint8Array(await exported.blob.arrayBuffer());
+          let encoded;
+          for (let i = 0; i < bytes.length - 5; i++)
+            if (bytes[i] === 255 && bytes[i + 1] === 81 && bytes[i + 2] === 3) {
+              encoded = bytes[i + 3] * 65536 + bytes[i + 4] * 256 + bytes[i + 5];
+              break;
+            }
+          result.push({ tempo, encoded, unchanged: before === JSON.stringify(song) });
+        } catch (error) {
+          result.push({ tempo, error: error.message, unchanged: before === JSON.stringify(song) });
+        }
+      }
+      return result;
+    });
+    for (const r of midi) {
+      assert(r.unchanged);
+      if (r.tempo < 4) assert.match(r.error, /Tempo trop lent/);
+      else assert.equal(r.encoded, Math.round(60000000 / r.tempo));
+    }
+    proof.push({ id: 'R02', midi });
+    const validation = await p.evaluate(() => {
+      const measure = {
+          numerator: 4,
+          denominator: 4,
+          tempo: 120,
+          beatSubdivisions: [1, 1, 1, 1],
+          beatStates: [[1], [1], [1], [1]],
+        },
+        song = {
+          id: 'song',
+          name: 'Original',
+          sections: [{ id: 'part', label: 'Intro', count: 1, measure }],
+        },
+        library = { version: 1, profiles: [{ id: 'p', name: 'Profile', songs: [song] }] };
+      RENAX_SONGS.validateLibrary(library);
+      let songsRejected = false,
+        sectionsRejected = false;
+      const duplicate = structuredClone(library);
+      duplicate.profiles[0].songs.push(structuredClone(song));
+      try {
+        RENAX_SONGS.validateLibrary(duplicate);
+      } catch {
+        songsRejected = true;
+      }
+      const parts = structuredClone(library);
+      parts.profiles[0].songs[0].sections.push(structuredClone(song.sections[0]));
+      try {
+        RENAX_SONGS.validateLibrary(parts);
+      } catch {
+        sectionsRejected = true;
+      }
+      const differentProfile = structuredClone(library);
+      differentProfile.profiles.push({ ...structuredClone(library.profiles[0]), id: 'other' });
+      RENAX_SONGS.validateLibrary(differentProfile);
+      return { songsRejected, sectionsRejected, differentProfilesAccepted: true };
+    });
+    assert(validation.songsRejected && validation.sectionsRejected);
+    proof.push({ id: 'R04', ...validation });
+    await p.getByRole('tab', { name: 'Multipiste', exact: true }).click();
+    await p.getByRole('button', { name: 'Ouvrir Preset 1', exact: true }).click();
+    await p.addInitScript((key) => {
+      if (sessionStorage.getItem('qa-limit')) return;
+      sessionStorage.setItem('qa-limit', '1');
+      const data = JSON.parse(localStorage.getItem(key)),
+        base = data.tracks[0];
+      data.tracks = Array.from({ length: 64 }, (_, i) => ({
+        ...structuredClone(base),
+        id: 'track-' + i,
+        name: 'Piste ' + (i + 1),
+      }));
+      data.presets[0].tracks = structuredClone(data.tracks);
+      localStorage.setItem(key, JSON.stringify(data));
+    }, key);
+    await p.reload();
+    await p.waitForFunction(() => window.RENAX_SONGS);
+    await p.getByRole('tab', { name: 'Multipiste', exact: true }).click();
+    await p.getByRole('button', { name: 'Ouvrir Preset 1', exact: true }).click();
+    assert.equal(await p.locator('#multiTracks .measure-card').count(), 64);
+    assert(await p.getByRole('button', { name: 'Nouvelle piste', exact: true }).isDisabled());
+    await p.reload();
+    await p.waitForFunction(() => window.RENAX_SONGS);
+    assert.equal(
+      await p.evaluate((key) => JSON.parse(localStorage.getItem(key)).tracks.length, key),
+      64,
+    );
+    await p.close();
+    proof.push({ id: 'R03', limit64: true, reloadPreserves64: true });
+    const legacy = await h.browser.newPage();
+    await legacy.addInitScript(() => {
+      const measure = {
+          id: 'x',
+          name: 'Piste',
+          bank: 'clic',
+          numerator: 4,
+          denominator: 4,
+          tempo: 120,
+          beatSubdivisions: [1, 1, 1, 1],
+          beatStates: [[1], [1], [1], [1]],
+        },
+        tracks = Array.from({ length: 65 }, (_, i) => ({ ...measure, id: String(i) }));
+      localStorage.setItem(
+        'renax.multimetro.v1',
+        JSON.stringify({
+          version: 1,
+          tracks,
+          presets: [{ id: 'legacy', name: 'Legacy 65', bpm: 120, tracks }],
+          selectedPreset: 'legacy',
+          bpm: 120,
+        }),
+      );
+    });
+    await legacy.goto(h.url);
+    await legacy.waitForFunction(() => window.RENAX_SONGS);
+    await legacy.getByRole('tab', { name: 'Multipiste', exact: true }).click();
+    await legacy.getByRole('button', { name: 'Ouvrir Legacy 65', exact: true }).click();
+    assert.equal(await legacy.locator('#multiTracks .measure-card').count(), 65);
+    assert(await legacy.getByRole('button', { name: 'Nouvelle piste', exact: true }).isDisabled());
+    assert(!(await legacy.locator('#multiStorageNotice').isVisible()));
+    await legacy.close();
+    proof.push({ id: 'R03-recovery', existing65RecoveredWithoutDroppingTracks: true });
+    const denied = await h.browser.newPage(),
+      errors = [];
+    denied.on('pageerror', (e) => errors.push(e.message));
+    await denied.addInitScript(() => {
+      for (const name of ['getItem', 'setItem'])
+        Storage.prototype[name] = () => {
+          throw new DOMException('Injected denied storage', 'SecurityError');
+        };
+    });
+    await denied.goto(h.url);
+    await denied.waitForFunction(() => window.RENAX_BACKUP && window.RENAX_SONGS);
+    await denied.waitForFunction(() => document.querySelectorAll('#playBtn').length === 1);
+    await denied.getByRole('tab', { name: 'Métronome', exact: true }).click();
+    await denied.locator('#playBtn').click();
+    await denied.waitForFunction(() => isPlaying);
+    await denied.locator('#playBtn').click();
+    assert.deepEqual(errors, []);
+    proof.push({ id: 'R05', backupInitialized: true, instrumentWorks: true, errors });
+    await denied.close();
+    save('robustness-boundaries.json', proof);
+    console.log(
+      'PASS five robustness boundaries, stale draft recovery and legacy 65-track recovery',
+    );
+  } finally {
+    await h.browser.close();
+    h.server?.close();
+  }
+})().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

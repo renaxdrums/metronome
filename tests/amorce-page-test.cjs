@@ -41,7 +41,7 @@ const {start}=require('./audio-harness.cjs');
    const blocks=original.map((b,i)=>({...b,numerator,denominator,bank:['claves','cloche','voiceFemale'][i]}));
    const p=planSequence(blocks.map((b,i)=>({...b,anchorSeconds:candidates[i].anchorSeconds,audioDuration:speeches[i].pcm.length/24000,anchorVerified:false})),{bpm,experimentalCandidates:true});
    const ctx=new OfflineAudioContext(1,Math.ceil((p.end+1)*48000),48000);
-   renderSequence(ctx,blocks,speeches,candidates,{bpm,subdivisions:4},createAudioAdapter(document.getElementById('audio-app')));
+   renderSequence(ctx,blocks,speeches,candidates,{bpm,subdivisions:4},await createAudioAdapter(document.getElementById('audio-app')));
    const pcm=(await ctx.startRendering()).getChannelData(0);let peak=0,clipped=0;
    for(const x of pcm){peak=Math.max(peak,Math.abs(x));if(Math.abs(x)>=1)clipped++;}
    results.push({bpm,numerator,denominator,peak,clipped,blocks:3,subdivisions:4,anchorVerified:false});

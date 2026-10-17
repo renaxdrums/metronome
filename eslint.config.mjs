@@ -15,7 +15,7 @@ export default [
     ],
   },
   {
-    files: ['*.js', '*.mjs', 'tools/**/*.cjs', 'tests/**/*.{cjs,mjs}'],
+    files: ['*.js', '*.mjs', 'prototypes/**/*.{js,mjs}', 'tools/**/*.cjs', 'tests/**/*.{cjs,mjs}'],
     languageOptions: { ecmaVersion: 'latest', globals: { ...globals.browser, ...globals.node } },
     rules: {
       'constructor-super': 'error',

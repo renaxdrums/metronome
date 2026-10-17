@@ -9,7 +9,7 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
 (async()=>{
  const r=await start(),p=await r.browser.newPage({viewport:{width:1280,height:850}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
  try{
-  await p.goto(r.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
+  await p.goto(r.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
   const fixtures=await p.evaluate(()=>{
     const section=(label,count,n,d,t,subs)=>{const m=createMeasure(n,d,t);if(subs)for(let b=0;b<n;b++){m.beatSubdivisions[b]=subs;m.beatStates[b]=Array.from({length:subs},(_,s)=>s===0?(b===0?2:1):3);}return {id:crypto.randomUUID(),label,count,measure:m};};
     const a={id:'a',name:'Essai A',sections:[section('Intro',2,4,4,120,2),section('Refrain',2,3,4,97,3),section('Bridge',1,5,4,150)]};
@@ -18,7 +18,7 @@ function rms(a,start,end){let sum=0,n=0;for(let i=Math.floor(start*48000);i<Math
     const d={id:'d',name:'Morceau complet',sections:[section('Intro',4,4,4,97),section('Couplet 1',8,4,4,97),section('Refrain 1',8,5,4,120)]};
     const lib=RENAX_SONGS.library;lib.profiles.find(x=>x.id===lib.activeProfile).songs=[a,b,c,d];RENAX_SONGS.validateLibrary(lib);RENAX_STORAGE.write(lib);return [a,b,c,d];
   });
-  await p.reload();await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
+  await p.reload();await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
   await require('./audio-harness.cjs').openPlaylist(p);
 
   await p.locator('#mp3ExportOpen').click();

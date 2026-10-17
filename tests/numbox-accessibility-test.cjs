@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict');const {start,save,openTracks}=require('./audio-harness.cjs');
 (async()=>{const h=await start(),p=await h.browser.newPage(),errors=[],proof=[];p.on('pageerror',e=>errors.push(e.message));try{
- await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_SONGS&&allVoiceAudioReady);
+ await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>window.RENAX_SONGS&&allVoiceAudioReady);
  assert.equal(await p.evaluate(()=>document.documentElement.dataset.theme),'dark','Fresh browser defaults to dark');
  const viewport=await p.locator('meta[name=viewport]').getAttribute('content');assert(!/user-scalable=no|maximum-scale=1/.test(viewport));
  await p.getByRole('tab',{name:'Séquenceur',exact:true}).click();

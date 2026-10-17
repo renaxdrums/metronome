@@ -34,6 +34,9 @@ jobs:
         run: |
           pnpm lint
           pnpm format:check
+          pnpm type-check
+          pnpm test:coverage:core
+          node tests/midi-resource-test.cjs
       - name: Install MP3 inspection tools
         run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
       - name: Five confirmed robustness regressions
@@ -66,6 +69,9 @@ jobs:
           node tests/performance-resilience-test.cjs
           node tests/offline-cache-test.cjs
           node tests/module-extraction-test.cjs
+          node tests/language-fallback-test.cjs
+          node tests/diagnostics-test.cjs
+          node tests/security-text-test.cjs
 
   firebase:
     runs-on: ubuntu-latest
@@ -89,3 +95,74 @@ jobs:
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           export RENAX_CHROME="$CHROME_PATH"
           pnpm exec firebase emulators:exec --only auth,firestore --project demo-renax-backup "node tests/run.cjs --firebase"
+
+  production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm exec playwright install chromium --with-deps
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Build and verify actual release
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tools/build-production.cjs --csp
+          pnpm test:production
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: production-verification
+          path: tests/results/production
+      - uses: actions/upload-pages-artifact@v4
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          path: dist/site
+
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm exec playwright install chromium firefox webkit --with-deps
+      - name: Desktop and mobile browser engines
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          pnpm test:compat
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-compatibility
+          path: tests/results/browser-compat.json
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [sampled-audio, firebase, production, compatibility]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Publish verified production artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

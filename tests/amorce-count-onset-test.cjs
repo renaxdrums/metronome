@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {start}=require('./audio-harness.cjs');
 (async()=>{const h=await start();try{
- const p=await h.browser.newPage();await p.goto(h.url);await p.waitForFunction(()=>allVoiceAudioReady);
+ const p=await h.browser.newPage();await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady);
  const results=await p.evaluate(async()=>{
   const results=[];let oscillatorCalls=0;const tone=oscTone;oscTone=(...args)=>{oscillatorCalls++;return tone(...args);};
   for(const bpm of [40,60,120,240,320])for(const number of [2,3,4]){

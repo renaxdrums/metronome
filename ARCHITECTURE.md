@@ -54,6 +54,22 @@ Les caches sont limités au chemin de cette application. Les comptes et leurs r�
 
 ## Preuves
 
+## Contrats et frontières du deuxième lot
+
+Les trois scripts classiques `metronome-audio.js`, `metronome-core.js` et `metronome-transport.js` restent chargés dans cet ordre. Ils regroupent respectivement les sons et le décodage, le modèle et les contrôles, puis la planification et l'initialisation. Leurs variables historiques restent partagées : ce découpage facilite la lecture, sans prétendre supprimer toutes les dépendances globales. Les gains et les algorithmes de synthèse sont préservés.
+
+L'aperçu du guide utilise le contrat explicite et figé `RENAX_AUDIO_ADAPTER` (`prepare`, `ready`, `configure`, `destination`, `click`, `count`), sans évaluation de chaînes dans la fenêtre enfant. `prepare` est asynchrone et prépare les enregistrements nécessaires avant le rendu. Les 40 voix enregistrées se chargent à la première demande vocale ou à l'action explicite de préparation hors connexion. Les modèles de synthèse naturelle restent distincts.
+
+`types/library.d.ts` décrit bibliothèque, morceaux, sections et opérations de synchronisation. Le contrôle JSDoc de `sync-core.js` et `song-tempo-ramp.js` fonctionne sans émettre de JavaScript. Il est progressif et non strict ; il ne couvre pas encore tout le DOM ni le moteur audio. La validation des imports à l'exécution reste obligatoire.
+
+`interface-translations.js` contient le dictionnaire FR/EN, indépendant du parcours DOM. Le contrôleur crée sa propre copie pour ses compléments historiques ; les nouveaux messages utilisent des clés. En l'absence du fichier de données, l'interface reste française et conserve la préférence anglaise pour la prochaine ouverture réussie. Les noms des utilisateurs ne sont pas des clés de traduction.
+
+`pnpm build:production` prépare `dist/site` : HTML sans commentaires, JavaScript compacté sans renommer les identifiants ni transformer les expressions, CSS regroupé dans l'ordre de la cascade. La feuille paysage reste séparée pour préserver son activation indépendante. Les sources et cartes de débogage restent disponibles. Les imports locaux identifiables sont versionnés après transformation ; les ressources finales alimentent ensuite les empreintes du cache. Les URL historiques, dont `index2.html`, restent présentes.
+
+La CSP est appliquée par balise meta dans cette sortie. Les scripts inline maîtrisés sont autorisés par empreinte ; les dépendances vocales et Firebase ont des origines explicites. Cette balise ne fournit ni `frame-ancestors`, ni observation Report-Only, ni en-tête HTTP. Le diagnostic JSON est local, borné et exclut morceaux, comptes et messages d'erreur bruts. L'INP local dépend du support navigateur et ne constitue pas une mesure de terrain.
+
+## Preuves
+
 Les tests de caractérisation comparent 36 dispositions avec les mêmes sources réintégrées à leurs positions d’origine. Les tests audio comparent les rendus approuvés. Les tests de panne vérifient quota, secours, conflit d’onglets, changement de compte, Web Audio indisponible et cache incohérent. Le test hors ligne utilise réellement un Service Worker, coupe le réseau puis recharge et produit un MP3 décodable.
 
 Les autres scénarios du banc de tests désactivent les Service Workers pour éviter qu’un cache ne masque une modification ou une interception de panne ; le test dédié les active explicitement.

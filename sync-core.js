@@ -1,8 +1,10 @@
 /* Pure, versioned synchronization model. No audio or browser dependencies. */
 export const VERSION=1;
+/** Clone JSON-compatible model data only. @template T @param {T} value @returns {T} */
 export const copy=value=>JSON.parse(JSON.stringify(value));
 export function canonical(value){if(Array.isArray(value))return '['+value.map(canonical).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical(value[k])).join(',')+'}';return JSON.stringify(value);}
 export const key=(type,...ids)=>type+'_'+encodeURIComponent(JSON.stringify(ids));
+/** @param {import('./types/library').Library} library */
 export function flatten(library){
   const out={};out.catalog=canonical({type:'catalog',profileIds:library.profiles.map(p=>p.id)});
   for(const p of library.profiles){out[key('profile',p.id)]=canonical({type:'profile',id:p.id,name:p.name,songIds:p.songs.map(s=>s.id)});for(const song of p.songs)out[key('song',p.id,song.id)]=canonical({type:'song',profileId:p.id,song});}return out;
@@ -14,6 +16,7 @@ export function materialize(records,fallback){
   if(!profiles.length)return copy(fallback);
   return {version:1,activeProfile:profiles.some(p=>p.id===fallback.activeProfile)?fallback.activeProfile:profiles[0].id,profiles};
 }
+/** @param {import('./types/library').Library} library @returns {import('./types/library').SyncState} */
 export function blankState(library){return {version:VERSION,library:copy(library),base:{},pending:{},conflicts:{},importDecisions:{}};}
 export function timestampedOperation(operationId,time){
   const raw=operationId().replaceAll('-','');
@@ -21,6 +24,7 @@ export function timestampedOperation(operationId,time){
   return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20);
 }
 export function operationTime(id){return /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-/i.test(id||'')?parseInt(id.slice(0,8)+id.slice(9,13),16):0;}
+/** @param {import('./types/library').SyncState} state @param {import('./types/library').Library} library @param {()=>string} operationId @param {()=>number} [now] */
 export function stage(state,library,operationId,now=Date.now){
   const next=copy(state),current=flatten(library);next.library=copy(library);
   const ids=new Set([...Object.keys(next.base),...Object.keys(next.pending),...Object.keys(current)]);
@@ -46,6 +50,7 @@ function mergePayload(id,local,remote,base){
 const editTime=r=>r?.modifiedAt||operationTime(r?.operationId)||r?.updatedAt||0;
 // Stable tie break when clocks give the same millisecond.
 const newer=(a,b)=>editTime(a)!==editTime(b)?editTime(a)>editTime(b):String(a.operationId)>String(b.operationId);
+/** @param {import('./types/library').SyncState} state @param {Record<string,import('./types/library').RemoteRecord>} remote @param {()=>string} [operationId] */
 export function mergeRemote(state,remote,operationId=()=>crypto.randomUUID()){
   const next=copy(state);
   // Convert existing manual conflicts to the automatic policy as well.
@@ -74,6 +79,7 @@ export function mergeRemote(state,remote,operationId=()=>crypto.randomUUID()){
 }
 // Guest and account libraries share song identities. Keep each unique song;
 // resolve edits later against record modification timestamps.
+/** @param {import('./types/library').Library} account @param {import('./types/library').Library} guest */
 export function mergeLibraries(account,guest){
   const next=copy(account);
   const signature=({id,...song})=>canonical({...song,sections:song.sections.map(({id,...section})=>section)});
@@ -85,7 +91,15 @@ export function mergeLibraries(account,guest){
   }
   return next;
 }
-export function visibleRecords(state){const out=copy(state.base);for(const [id,p] of Object.entries(state.pending))out[id]=p;for(const [id,c] of Object.entries(state.conflicts))out[id]=c.local;return out;}
+/** @param {import('./types/library').SyncState} state */
+export function visibleRecords(state){
+  /** @type {Record<string,Pick<import('./types/library').Payload,'payload'|'deleted'>>} */
+  const out=copy(state.base);
+  for(const [id,p] of Object.entries(state.pending))out[id]=p;
+  for(const [id,c] of Object.entries(state.conflicts))out[id]=c.local;
+  return out;
+}
+/** @param {import('./types/library').SyncState} state @param {string} id @param {'local'|'remote'} choice @param {()=>string} operationId */
 export function resolveConflict(state,id,choice,operationId){
   const next=copy(state),conflict=next.conflicts[id];if(!conflict)throw Error('Conflit absent.');
   next.base[id]=copy(conflict.remote);delete next.conflicts[id];

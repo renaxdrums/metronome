@@ -3,7 +3,7 @@ const {start,save}=require('./audio-harness.cjs');
 (async()=>{
  const r=await start(),p=await r.browser.newPage();p.on("console",m=>{if(m.text().startsWith("AUDIT "))console.log(m.text());});
  try {
-  await p.goto(r.url);await p.waitForFunction(()=>allVoiceAudioReady);
+  await p.goto(r.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady);
   const report=await p.evaluate(async()=>{
    // Audit the incoming signal, before the safety ceiling. No protection can hide an excess.
    const originalMix=getAudioMixDestination;

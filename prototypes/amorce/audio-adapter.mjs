@@ -1,4 +1,7 @@
-// Separate instance of the existing app engine, inside the test iframe.
-export function createAudioAdapter(frame){
- return frame.contentWindow.eval(`({ready:()=>typeof allVoiceAudioReady!=='undefined'&&allVoiceAudioReady,configure:context=>{audioCtx=context;masterVolume=1;},destination:context=>getAudioMixDestination(context),click:(bank,number,time,state,first,subIndex,beatDurationSec)=>{currentBank=bank;playClick(state,time,first,{beatNumber:number,subIndex,beatDurationSec});},count:(number,time,state,first,beatDurationSec)=>{const buffer=VOICE_METRONOME_BUFFERS.male[String(number)];if(!buffer)throw new Error('Sample de comptage anglais indisponible. Réessayez après le chargement.');let onset=buffer.length;for(let channel=0;channel<buffer.numberOfChannels;channel++){const samples=buffer.getChannelData(channel);const index=samples.findIndex(v=>Math.abs(v)>1e-5);if(index>=0)onset=Math.min(onset,index);}if(onset===buffer.length)throw new Error('Sample de comptage silencieux.');currentBank='voiceMale';playClick(state,time,first,{beatNumber:number,subIndex:0,beatDurationSec});}})`);
+// The frame owns its audio context and scheduler; the parent only uses this explicit bridge.
+export async function createAudioAdapter(frame) {
+  const adapter=frame.contentWindow.RENAX_AUDIO_ADAPTER;
+  if(!adapter)throw new Error('Audio preview is not ready.');
+  await adapter.prepare();
+  return adapter;
 }

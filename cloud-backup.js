@@ -11,6 +11,7 @@ const deviceKey='renax-index2-device';
 let device;try{device=localStorage.getItem(deviceKey);}catch{}
 if(!device){device=crypto.randomUUID();try{localStorage.setItem(deviceKey,device);}catch{/* Keep the recovery interface usable when local storage is full. */}}
 const blank=()=>({version:1,activeProfile:'default',profiles:[{id:'default',name:'Mon profil',songs:[]}]});
+function syncAccountStatus(text){const button=document.getElementById('directAccountBtn');if(button){button.title='Connexion et compte · '+text;button.setAttribute('aria-describedby','backupSyncStatus');}}
 const say=(state,error='')=>{message=state;failure=error;renderPanel();};
 const queue=()=>{confirmed=false;if(!account)return;clearTimeout(timer);say(navigator.onLine?'Modifications locales en attente':'Hors connexion');timer=setTimeout(sync,900);};
 function validatedLibrary(state){const value=core.materialize(core.visibleRecords(state),state.library);api.validateLibrary(value);return value;}
@@ -188,7 +189,7 @@ function renderPanel(){
   const localControl=choose('Sauvegarde locale','local','local',()=>{if(pendingLocalChoice){const action=pendingLocalChoice;pendingLocalChoice=null;if(accountDialog.open)accountDialog.close();queueMicrotask(action);return;}backupView=backupView==='local'?'':'local';renderPanel();});localControl.style.borderColor='var(--cyan)';localControl.querySelector('svg').style.color='var(--orange)';
   if(json){json.id='backup-local';json.style.display=backupView==='local'?'flex':'none';root.append(json);const title=json.querySelector('h3');if(title)title.textContent='Sauvegarde locale';json.querySelectorAll('button').forEach((control,index)=>{if(!control.querySelector('svg'))backupIcon(control,index===0?'export':'import');});}
 
-  const state=element('p',storage.healthy?message:'Sauvegarde locale impossible : exportez une copie JSON.',root);state.className='backup-status';state.classList.toggle('is-confirmed',confirmed);state.setAttribute('role','status');state.setAttribute('aria-live','polite');
+  const state=element('p',storage.healthy?message:'Sauvegarde locale impossible : exportez une copie JSON.',root);state.className='backup-status';state.id='backupSyncStatus';syncAccountStatus(state.textContent);state.classList.toggle('is-confirmed',confirmed);state.setAttribute('role','status');state.setAttribute('aria-live','polite');
   if(failure)element('p',failure,root).className='backup-error';
   if(!storage.healthy)button('Exporter la source locale préservée',root,()=>{const raw=storage.recoverSource();if(!raw)throw Error('Aucune source trouvée.');const url=URL.createObjectURL(new Blob([raw],{type:'application/json'})),link=element('a');link.href=url;link.download='renax-source-preservee.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
   const emergencyHost=element('div',undefined,root),emergencyScope=storage.scope;
@@ -255,7 +256,7 @@ const closeAccount=document.createElement('button');closeAccount.type='button';c
 accountDialog.addEventListener('close',()=>{pendingLocalChoice=null;const root=document.getElementById('backupAccount');if(root){const back=backupPane.querySelector('.song-back');if(back)back.after(root);else backupPane.prepend(root);}renderPanel();});
 const accountButton=document.createElement('button');accountButton.type='button';accountButton.id='directAccountBtn';accountButton.className='index2-header-btn';accountButton.title='Connexion et compte';accountButton.setAttribute('aria-label','Connexion et compte');accountButton.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3h7v18h-7M3 12h13m-4-4 4 4-4 4"/></svg>';
 accountButton.onclick=()=>{pendingLocalChoice=null;backupView=account?'':'login';renderPanel();accountDialog.append(document.getElementById('backupAccount'));accountDialog.showModal();positionAccount();};
-document.querySelector('.index2-header-actions').prepend(accountButton);
+document.querySelector('.index2-header-actions').prepend(accountButton);syncAccountStatus(document.getElementById('backupSyncStatus')?.textContent||message);
 
 function positionAccount(){
  if(!accountDialog.open)return;

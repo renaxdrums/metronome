@@ -12,7 +12,7 @@ const {start}=require('./audio-harness.cjs');
    if(u.pathname.endsWith('/neural-worker.mjs')){const root=require('./amorce-neural-route.cjs').assetURL;body=`const originalFetch=globalThis.fetch;globalThis.fetch=(input,options)=>{const url=typeof input==='string'?input:input.url;if(url.startsWith('https://huggingface.co/'))return originalFetch(${JSON.stringify(root)}+'/'+url.split('/resolve/')[1].split('/').slice(1).join('/'),options);return originalFetch(input,options);};\n`+body;}
    return route.fulfill({contentType:'text/javascript',body});
   });
-  await p.goto(h.url,{waitUntil:'domcontentloaded'});await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
+  await p.goto(h.url,{waitUntil:'domcontentloaded'});await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
   await p.evaluate(()=>{
    const measure={numerator:4,denominator:4,tempo:120,beatSubdivisions:[1,1,1,1],beatStates:[[3],[1],[1],[1]]};
    const s={id:'cold',name:'Cold start',amorce:true,sections:[{id:'one',label:'1',count:2,measure},{id:'un',label:'un',count:2,measure:JSON.parse(JSON.stringify(measure))}]};

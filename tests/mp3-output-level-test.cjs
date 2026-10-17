@@ -16,7 +16,7 @@ function metrics(file){
  const h=await start(),p=await h.browser.newPage({viewport:{width:1280,height:850},hasTouch:true}),rows=[],errors=[];
  p.on('pageerror',e=>errors.push(e.message));
  try{
-  await p.goto(h.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
+  await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
   const song=await p.evaluate(()=>({id:'level',name:'Niveau',sections:[{id:'s',label:'Test',count:3,measure:{...createMeasure(4,4,120),beatSubdivisions:[1,1,1,1],beatStates:[[2],[1],[3],[0]]}}]}));
   for(const bank of ['clic','userMetroclic','claves','voiceMale','voiceFemale','beep']){
    const row={bank};

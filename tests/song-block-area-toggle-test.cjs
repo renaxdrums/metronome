@@ -1,6 +1,6 @@
 const {start,save}=require('./audio-harness.cjs');const assert=require('assert');
 (async()=>{const r=await start(),p=await r.browser.newPage({viewport:{width:1280,height:850}}),errors=[];p.on('pageerror',e=>errors.push(e.message));try{
- await p.goto(r.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);await require('./audio-harness.cjs').openPlaylist(p);await p.getByRole('button',{name:'Nouveau track',exact:true}).click();await p.getByRole('button',{name:'+ Ajouter une section',exact:true}).click();
+ await p.goto(r.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);await require('./audio-harness.cjs').openPlaylist(p);await p.getByRole('button',{name:'Nouveau track',exact:true}).click();await p.getByRole('button',{name:'+ Ajouter une section',exact:true}).click();
  const cards=p.locator('#songPane [data-section-id]'),card=cards.nth(1);const opened=()=>card.locator('.song-block-header').getAttribute('aria-expanded');
  for(const selector of ['.song-block-summary','.measure-preview','.song-block-controls']){
   assert.strictEqual(await opened(),'true');

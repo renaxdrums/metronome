@@ -1,7 +1,7 @@
 // Compare export PCM to events produced by the untouched live scheduler.
 const {start,save}=require('./audio-harness.cjs');const assert=require('assert');
 (async()=>{const r=await start(),p=await r.browser.newPage();try{
- await p.goto(r.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
+ await p.goto(r.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
  const results=await p.evaluate(async()=>{
   const song={id:'reference',name:'Grid reference',sections:[]};
   for(const [n,d,t,sub,count] of [[4,4,60,3,2],[3,4,120,2,2],[5,8,97,7,2],[7,16,123,3,2],[20,32,120,1,2]]){

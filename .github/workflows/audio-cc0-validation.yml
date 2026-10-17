@@ -74,6 +74,7 @@ jobs:
           node tests/security-text-test.cjs
           node tests/audio-activation-test.cjs
           node tests/settings-resize-test.cjs
+          node tests/startup-layout-test.cjs
 
   firebase:
     runs-on: ubuntu-latest

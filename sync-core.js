@@ -2,28 +2,41 @@
 export const VERSION=1;
 /** Clone JSON-compatible model data only. @template T @param {T} value @returns {T} */
 export const copy=value=>JSON.parse(JSON.stringify(value));
-export function canonical(value){if(Array.isArray(value))return '['+value.map(canonical).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical(value[k])).join(',')+'}';return JSON.stringify(value);}
+/**
+ * @overload
+ * @param {Record<string,unknown>|unknown[]|string|number|boolean|null} value
+ * @returns {string}
+ */
+/** @overload @param {unknown} value @returns {string|undefined} */
+/** @param {unknown} value @returns {string|undefined} */
+export function canonical(value){if(Array.isArray(value))return '['+value.map(canonical).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical(/** @type {Record<string,unknown>} */ (value)[k])).join(',')+'}';return JSON.stringify(value);}
+/** @param {string} type @param {...string} ids */
 export const key=(type,...ids)=>type+'_'+encodeURIComponent(JSON.stringify(ids));
 /** @param {import('./types/library').Library} library */
 export function flatten(library){
+  /** @type {Record<string,string>} */
   const out={};out.catalog=canonical({type:'catalog',profileIds:library.profiles.map(p=>p.id)});
   for(const p of library.profiles){out[key('profile',p.id)]=canonical({type:'profile',id:p.id,name:p.name,songIds:p.songs.map(s=>s.id)});for(const song of p.songs)out[key('song',p.id,song.id)]=canonical({type:'song',profileId:p.id,song});}return out;
 }
+/** @param {Record<string,import('./types/library').Payload>} records @param {import('./types/library').Library} fallback */
 export function materialize(records,fallback){
+  /** @type {Record<string,import('./types/library').StoredEntity>} */
   const live={};for(const [id,r] of Object.entries(records))if(!r.deleted&&r.payload!==null)live[id]=JSON.parse(r.payload);
-  const catalog=live.catalog;if(!catalog)return copy(fallback);
-  const profiles=[];for(const id of catalog.profileIds){const p=live[key('profile',id)];if(!p)continue;const songs=[];for(const songId of p.songIds){const s=live[key('song',id,songId)];if(s)songs.push(copy(s.song));}profiles.push({id:p.id,name:p.name,songs});}
+  const catalog=live.catalog;if(!catalog)return copy(fallback);if(catalog.type!=='catalog')throw Error('Données distantes incompatibles. Aucune bibliothèque remplacée.');
+  const profiles=[];for(const id of catalog.profileIds){const p=live[key('profile',id)];if(!p)continue;if(p.type!=='profile')throw Error('Données distantes incompatibles. Aucune bibliothèque remplacée.');const songs=[];for(const songId of p.songIds){const s=live[key('song',id,songId)];if(s){if(s.type!=='song')throw Error('Données distantes incompatibles. Aucune bibliothèque remplacée.');songs.push(copy(s.song));}}profiles.push({id:p.id,name:p.name,songs});}
   if(!profiles.length)return copy(fallback);
   return {version:1,activeProfile:profiles.some(p=>p.id===fallback.activeProfile)?fallback.activeProfile:profiles[0].id,profiles};
 }
 /** @param {import('./types/library').Library} library @returns {import('./types/library').SyncState} */
 export function blankState(library){return {version:VERSION,library:copy(library),base:{},pending:{},conflicts:{},importDecisions:{}};}
+/** @param {()=>string} operationId @param {number} time */
 export function timestampedOperation(operationId,time){
   const raw=operationId().replaceAll('-','');
   const hex=Math.trunc(time).toString(16).padStart(12,'0')+ '7'+raw.slice(13);
   return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20);
 }
-export function operationTime(id){return /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-/i.test(id||'')?parseInt(id.slice(0,8)+id.slice(9,13),16):0;}
+/** @param {string|undefined} id */
+export function operationTime(id){return /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-/i.test(id||'')?parseInt((id||'').slice(0,8)+(id||'').slice(9,13),16):0;}
 /** @param {import('./types/library').SyncState} state @param {import('./types/library').Library} library @param {()=>string} operationId @param {()=>number} [now] */
 export function stage(state,library,operationId,now=Date.now){
   const next=copy(state),current=flatten(library);next.library=copy(library);
@@ -37,18 +50,21 @@ export function stage(state,library,operationId,now=Date.now){
   }return next;
 }
 // Membership changes merge against their common base; unrelated additions survive.
+/** @param {string} id @param {import('./types/library').Payload} local @param {import('./types/library').Payload} remote @param {import('./types/library').Payload|undefined} base */
 function mergePayload(id,local,remote,base){
-  if(local.deleted||remote.deleted)return null;
-  const l=JSON.parse(local.payload),r=JSON.parse(remote.payload),b=base&&!base.deleted?JSON.parse(base.payload):null;
+  if(local.deleted||remote.deleted||local.payload===null||remote.payload===null)return null;
+  const l=JSON.parse(local.payload),r=JSON.parse(remote.payload),b=base&&!base.deleted&&base.payload!==null?JSON.parse(base.payload):null;
   const field=l.type==='catalog'?'profileIds':l.type==='profile'?'songIds':null;
   if(!field)return null;
   const previous=new Set(b?.[field]||[]),ls=new Set(l[field]),rs=new Set(r[field]);
   const ids=[...new Set([...r[field],...l[field]])].filter(x=>!previous.has(x)||(ls.has(x)&&rs.has(x)));
   const winner=newer(local,remote)?l:r;
-  return canonical({...winner,[field]:ids});
+  return canonical(/** @type {Record<string,unknown>} */ ({...winner,[field]:ids}));
 }
+/** @param {Partial<import('./types/library').Payload>|undefined} r */
 const editTime=r=>r?.modifiedAt||operationTime(r?.operationId)||r?.updatedAt||0;
 // Stable tie break when clocks give the same millisecond.
+/** @param {import('./types/library').Payload} a @param {import('./types/library').Payload} b */
 const newer=(a,b)=>editTime(a)!==editTime(b)?editTime(a)>editTime(b):String(a.operationId)>String(b.operationId);
 /** @param {import('./types/library').SyncState} state @param {Record<string,import('./types/library').RemoteRecord>} remote @param {()=>string} [operationId] */
 export function mergeRemote(state,remote,operationId=()=>crypto.randomUUID()){
@@ -82,6 +98,7 @@ export function mergeRemote(state,remote,operationId=()=>crypto.randomUUID()){
 /** @param {import('./types/library').Library} account @param {import('./types/library').Library} guest */
 export function mergeLibraries(account,guest){
   const next=copy(account);
+  /** @param {import('./types/library').Song} value */
   const signature=({id,...song})=>canonical({...song,sections:song.sections.map(({id,...section})=>section)});
   const known=new Set(next.profiles.flatMap(p=>p.songs.map(signature)));
   for(const p of guest.profiles){

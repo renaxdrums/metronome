@@ -60,7 +60,7 @@ Les trois scripts classiques `metronome-audio.js`, `metronome-core.js` et `metro
 
 L'aperçu du guide utilise le contrat explicite et figé `RENAX_AUDIO_ADAPTER` (`prepare`, `ready`, `configure`, `destination`, `click`, `count`), sans évaluation de chaînes dans la fenêtre enfant. `prepare` est asynchrone et prépare les enregistrements nécessaires avant le rendu. Les 40 voix enregistrées se chargent à la première demande vocale ou à l'action explicite de préparation hors connexion. Les modèles de synthèse naturelle restent distincts.
 
-`types/library.d.ts` décrit bibliothèque, morceaux, sections et opérations de synchronisation. Le contrôle JSDoc de `sync-core.js` et `song-tempo-ramp.js` fonctionne sans émettre de JavaScript. Il est progressif et non strict ; il ne couvre pas encore tout le DOM ni le moteur audio. La validation des imports à l'exécution reste obligatoire.
+`types/library.d.ts` décrit bibliothèque, morceaux, sections et opérations de synchronisation. Le contrôle JSDoc de `sync-core.js` et `song-tempo-ramp.js` fonctionne sans émettre de JavaScript. Il est strict sur ces deux modules et progressif pour le reste du projet ; il ne couvre pas encore tout le DOM ni le moteur audio. La validation des imports à l'exécution reste obligatoire.
 
 `interface-translations.js` contient le dictionnaire FR/EN, indépendant du parcours DOM. Le contrôleur crée sa propre copie pour ses compléments historiques ; les nouveaux messages utilisent des clés. En l'absence du fichier de données, l'interface reste française et conserve la préférence anglaise pour la prochaine ouverture réussie. Les noms des utilisateurs ne sont pas des clés de traduction.
 
@@ -73,3 +73,5 @@ La CSP est appliquée par balise meta dans cette sortie. Les scripts inline maî
 Les tests de caractérisation comparent 36 dispositions avec les mêmes sources réintégrées à leurs positions d’origine. Les tests audio comparent les rendus approuvés. Les tests de panne vérifient quota, secours, conflit d’onglets, changement de compte, Web Audio indisponible et cache incohérent. Le test hors ligne utilise réellement un Service Worker, coupe le réseau puis recharge et produit un MP3 décodable.
 
 Les autres scénarios du banc de tests désactivent les Service Workers pour éviter qu’un cache ne masque une modification ou une interception de panne ; le test dédié les active explicitement.
+
+La navigation principale est présente dès le HTML. Seule la grille musicale en cours d’assemblage reste invisible jusqu’au chargement, aux polices et au redimensionnement du canevas (deux trames). Un secours de 3 secondes rétablit la visibilité même si un script échoue. Le temps de révélation est mesuré séparément du CLS pour éviter de masquer une attente excessive. L’ajustement des libellés réutilise les mesures identiques et invalide son cache lors d’un changement de dimensions, langue, thème ou police.

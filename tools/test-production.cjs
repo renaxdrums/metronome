@@ -17,6 +17,7 @@ const available = [
   'tests/diagnostics-test.cjs',
   'tests/audio-activation-test.cjs',
   'tests/language-fallback-test.cjs',
+  'tests/settings-resize-test.cjs',
   'tools/check-production-csp.cjs',
   'tools/check-production-equivalence.cjs',
   'tools/check-production-offline.cjs',

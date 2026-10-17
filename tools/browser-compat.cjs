@@ -10,6 +10,7 @@ const { start } = require('../tests/audio-harness.cjs');
   const h = await start();
   await h.browser.close();
   const results = [];
+  const firstGestures = [];
   try {
     for (const name of (process.env.COMPAT_ENGINES || 'chromium,firefox,webkit').split(',')) {
       const browser = await engines[name].launch({
@@ -31,6 +32,40 @@ const { start } = require('../tests/audio-harness.cjs');
           : {}),
       });
       try {
+        // Exercise the real first-gesture fullscreen path separately. Firefox
+        // fullscreen changes the actual headless screen size, beyond its viewport.
+        const native = await browser.newPage({
+          viewport: { width: 390, height: 900 },
+          serviceWorkers: 'block',
+        });
+        await native.addInitScript(() => {
+          localStorage.setItem('renax.arrival.enabled.v1', 'false');
+          const original = Element.prototype.requestFullscreen;
+          if (original)
+            Element.prototype.requestFullscreen = function (...args) {
+              const attempt = Reflect.apply(original, this, args);
+              window.__qaFullscreenAttempt = attempt;
+              return attempt;
+            };
+        });
+        await native.goto(h.url);
+        await native.waitForFunction(() => window.RENAX_SONGS && window.RENAX_I18N);
+        await native.locator('#index2SettingsBtn').click();
+        await native.evaluate(async () => {
+          try {
+            await window.__qaFullscreenAttempt;
+          } catch {}
+        });
+        await native.locator('[data-appearance=dark]').waitFor({ state: 'visible' });
+        firstGestures.push(
+          await native.evaluate(() => ({
+            width: innerWidth,
+            entered: !!document.fullscreenElement,
+            preferencesVisible: true,
+          })),
+        );
+        firstGestures[firstGestures.length - 1].browser = name;
+        await native.close();
         for (const width of [1440, 390]) {
           const p = await browser.newPage({
             viewport: { width, height: 900 },
@@ -38,9 +73,22 @@ const { start } = require('../tests/audio-harness.cjs');
           });
           const errors = [];
           p.on('pageerror', (error) => errors.push(error.message));
-          await p.addInitScript(() => localStorage.setItem('renax.arrival.enabled.v1', 'false'));
+          await p.addInitScript(() => {
+            localStorage.setItem('renax.arrival.enabled.v1', 'false');
+            // A denied permission keeps the intended viewport. The native
+            // fullscreen path above remains unmodified and independently tested.
+            if (Element.prototype.requestFullscreen)
+              Element.prototype.requestFullscreen = () =>
+                Promise.reject(
+                  new DOMException(
+                    'Fixed viewport test: fullscreen permission denied',
+                    'NotAllowedError',
+                  ),
+                );
+          });
           await p.goto(h.url);
           await p.waitForFunction(() => window.RENAX_SONGS && window.RENAX_I18N);
+          assert.equal(await p.evaluate(() => innerWidth), width);
           for (const theme of ['dark', 'light', 'ivory']) {
             await p.locator('#index2SettingsBtn').click();
             try {
@@ -70,6 +118,7 @@ const { start } = require('../tests/audio-harness.cjs');
               throw error;
             }
             await p.locator('#index2SettingsClose').click();
+            assert.equal(await p.evaluate(() => innerWidth), width);
             for (const tab of [
               'Métronome',
               'Polyrythmie',
@@ -181,6 +230,10 @@ const { start } = require('../tests/audio-harness.cjs');
   } finally {
     const out = process.env.TEST_OUTPUT_DIR || path.join(__dirname, '../tests/results');
     fs.mkdirSync(out, { recursive: true });
+    fs.writeFileSync(
+      path.join(out, 'browser-first-gesture.json'),
+      JSON.stringify(firstGestures, null, 2) + '\n',
+    );
     fs.writeFileSync(
       path.join(out, 'browser-compat.json'),
       JSON.stringify(results, null, 2) + '\n',

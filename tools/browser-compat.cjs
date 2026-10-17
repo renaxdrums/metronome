@@ -43,7 +43,32 @@ const { start } = require('../tests/audio-harness.cjs');
           await p.waitForFunction(() => window.RENAX_SONGS && window.RENAX_I18N);
           for (const theme of ['dark', 'light', 'ivory']) {
             await p.locator('#index2SettingsBtn').click();
-            await p.locator('[data-appearance=' + theme + ']').click();
+            try {
+              await p.locator('[data-appearance=' + theme + ']').click();
+            } catch (error) {
+              const state = await p.evaluate(() => {
+                const panel = document.getElementById('index2SettingsPanel');
+                return {
+                  ready: document.readyState,
+                  width: innerWidth,
+                  mobilePane: document.body.dataset.mobilePane,
+                  panelClass: panel.className,
+                  panelDisplay: getComputedStyle(panel).display,
+                  panelVisibility: getComputedStyle(panel).visibility,
+                  panelHidden: panel.hidden,
+                  workspace: document.body.dataset.workspace,
+                };
+              });
+              console.error(
+                JSON.stringify({ browser: name, width, theme, failed: 'settings', state, errors }),
+              );
+              const out = process.env.TEST_OUTPUT_DIR || path.join(__dirname, '../tests/results');
+              fs.mkdirSync(out, { recursive: true });
+              await p.screenshot({
+                path: path.join(out, name + '-' + width + '-settings-failure.png'),
+              });
+              throw error;
+            }
             await p.locator('#index2SettingsClose').click();
             for (const tab of [
               'Métronome',

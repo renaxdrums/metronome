@@ -4,7 +4,7 @@ const fs=require('fs');
  const runtime=await start();const browser=runtime.browser;
  const page=await browser.newPage();
  if(process.env.BASELINE_INDEX)await page.route('**/*',r=>new URL(r.request().url()).pathname==='/'?r.fulfill({contentType:'text/html',body:fs.readFileSync(process.env.BASELINE_INDEX,'utf8')}):r.continue());
- await page.goto(runtime.url);await page.waitForFunction(()=>allVoiceAudioReady);
+ await page.goto(runtime.url);await page.evaluate(()=>prepareAllVoiceAudio());await page.waitForFunction(()=>allVoiceAudioReady);
  const result=await page.evaluate(async anchors=>{
   const realCtx=audioCtx, originalClick=playClick, originalVisual=scheduleVisualUpdate;
   const nativeTimeout=window.setTimeout;window.setTimeout=()=>0;scheduleVisualUpdate=()=>{};

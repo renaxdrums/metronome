@@ -6,7 +6,7 @@ const {start}=require('./audio-harness.cjs');
   const page=await h.browser.newPage();
   await require('./amorce-runtime-route.cjs').install(page);
   await page.route('**/*.mjs',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync(path.join(__dirname,'..',new URL(route.request().url()).pathname),'utf8')}));
-  await page.goto(h.url);await page.waitForFunction(()=>allVoiceAudioReady);
+  await page.goto(h.url);await page.evaluate(()=>prepareAllVoiceAudio());await page.waitForFunction(()=>allVoiceAudioReady);
   const result=await page.evaluate(async()=>{
    const {synthesize}=await import('/prototypes/amorce/engine.mjs');
    const {lastSyllableCandidate}=await import('/prototypes/amorce/syllables.mjs');

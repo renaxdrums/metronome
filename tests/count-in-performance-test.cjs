@@ -3,7 +3,7 @@ const {start,save}=require('./audio-harness.cjs');
 (async()=>{
  const r=await start(),p=await r.browser.newPage({viewport:{width:390,height:844}});
  try {
-  await p.goto(r.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
+  await p.goto(r.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
   await p.evaluate(()=>{
    const s={id:'count-test',name:'Décompte test',sections:[{id:'a',label:'Intro',count:2,measure:createMeasure(4,4,120)},{id:'b',label:'Refrain',count:2,measure:createMeasure(4,4,180)}]};
    RENAX_SONGS.library.profiles[0].songs.push(s);RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',song:s.id,profile:RENAX_SONGS.library.profiles[0].id});

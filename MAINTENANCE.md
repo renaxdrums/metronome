@@ -53,3 +53,17 @@ Les tests navigateur mobiles utilisent l’émulation Chrome. Ils ne certifient 
 Consulter `ARCHITECTURE.md` avant de modifier la récupération IndexedDB, les changements de périmètre ou le Service Worker. Une mise à jour ne doit jamais recharger automatiquement une lecture. Un cache incomplet ne doit pas remplacer le cache actif. Le build recalcule également `offline-manifest.json` et la révision du worker ; `--check` vérifie ces deux fichiers.
 
 Le script principal extrait conserve les mêmes fonctions audio. Les deux tests qui lisaient directement ses constantes lisent désormais `metronome-core.js` ; le contrôle de gain compare toujours la même expression +4,5 dB, et échoue si cette expression n’est plus trouvée. Les comparaisons de dimensions, de signal et d’accents ne sont pas assouplies.
+
+## Protection et contrôles avant fusion
+
+La branche main exige une pull request, les contrôles sampled-audio et firebase réussis et une branche à jour. Suppression, envois forcés et contournement administrateur sont interdits. Le workflow couvre toutes les PR vers main ; les jobs de production et de compatibilité complètent les contrôles existants. La publication dépend de leur réussite à tous.
+
+Le lint contrôle les constructions dangereuses dans le code maintenu, les outils et les tests. Le contrôle des variables non définies et inutilisées n'est pas généralisé aux contrats historiques entre scripts classiques. Le formatage porte progressivement sur les nouveaux fichiers entretenus, sans réécriture générale des sources historiques.
+
+## Production distincte
+
+`pnpm build:production` génère `dist/site`, les cartes de sources et un rapport de tailles. Les identifiants et expressions JavaScript restent préservés. Le regroupement CSS conserve l'ordre de la cascade et la feuille paysage indépendante. Les versions des dépendances locales puis les empreintes finales du cache sont recalculées. Deux constructions identiques doivent produire les mêmes fichiers.
+
+Avant publication : comparer les dispositions, le PCM, les niveaux des exports, la récupération et le véritable mode hors connexion. Ne pas reconstruire une sortie pendant qu'un navigateur en teste l'installation du cache. Le déploiement GitHub Pages publie l'artefact contrôlé, après réussite des quatre jobs. Le site utilise une CSP meta ; GitHub Pages ne transforme pas un fichier arbitraire en en-tête HTTP.
+
+`pnpm measure:assets` fournit les tailles brutes/gzip, pas le trafic initial exact ou un LCP sur appareil réel. Les voix restent en WAV : aucune conversion avec pertes n'est autorisée par une seule estimation de taille. Les tests qui demandent les voix les préparent explicitement ; les assertions historiques de PCM, dimensions et gains restent applicables.

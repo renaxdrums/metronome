@@ -3,7 +3,7 @@ const measure=(n=4,d=4,t=120)=>({numerator:n,denominator:d,tempo:t,beatSubdivisi
 const library=(count=1)=>({version:1,activeProfile:'qa',profiles:[{id:'qa',name:'QA playlist',songs:Array.from({length:count},(_,i)=>({id:'s'+i,name:'QA '+(i+1),sections:[{id:'a'+i,label:'Intro',count:1,measure:measure()}]}))}]});
 async function seed(p,n=1){await p.evaluate(l=>RENAX_SONGS.replaceLibrary(l),library(n));}
 async function detail(p){await openPlaylist(p);await p.locator('.song-playlist-card').first().dblclick();}
-async function run(name){const h=await start(),p=await h.browser.newPage({viewport:{width:1440,height:1000}}),errors=[],observations={};p.on('pageerror',e=>errors.push(e.message));try{await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_SONGS&&allVoiceAudioReady);await seed(p,3);
+async function run(name){const h=await start(),p=await h.browser.newPage({viewport:{width:1440,height:1000}}),errors=[],observations={};p.on('pageerror',e=>errors.push(e.message));try{await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>window.RENAX_SONGS&&allVoiceAudioReady);await seed(p,3);
 switch(name){
 case 'account-back-regression':{
  await openTracks(p);await p.locator('#songsHome').getByRole('button',{name:'Playlist',exact:true}).click();await p.waitForFunction(()=>RENAX_SONGS.navigation.view==='playlists');await p.reload();await p.waitForFunction(()=>window.RENAX_SONGS);await openTracks(p);await p.locator('#songPane .song-back').click();await p.waitForFunction(()=>RENAX_SONGS.navigation.view==='home');

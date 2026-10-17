@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {start,save}=require('./audio-harness.cjs');
 (async()=>{const h=await start();try{
  const p=await h.browser.newPage({viewport:{width:1280,height:850}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
- await p.goto(h.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
+ await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
  await require('./audio-harness.cjs').openPlaylist(p);await p.getByRole('button',{name:'Nouveau track',exact:true}).click();
  assert.equal(await p.locator('#songPane > .song-actions > button').filter({hasText:'Dupliquer'}).count(),0);
  await p.evaluate(()=>{

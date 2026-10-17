@@ -2,7 +2,7 @@
 
 Métronome pour batteurs : séquenceur, polyrythmie, entraînement progressif/par paliers, multipiste, bibliothèque Tracks et exports MP3/MIDI/JSON. Le thème sombre est le défaut ; les préférences existantes sont conservées.
 
-Le site public est servi depuis la racine du dépôt : https://renaxdrums.github.io/metronome/ . `index2.html` conserve l’ancien lien et redirige vers la page principale. `index-legacy.html` reste une archive séparée.
+Le site public est https://renaxdrums.github.io/metronome/ . Les sources restent à la racine ; le workflow prépare et vérifie la sortie `dist/site` pour sa publication. `index2.html` conserve l’ancien lien et redirige vers la page principale. `index-legacy.html` reste une archive séparée.
 
 ## Développement
 
@@ -20,8 +20,15 @@ Après un changement des ressources, exécuter `pnpm build`, puis `pnpm check:as
 - `pnpm test:resilience` : pannes audio/réseau, quota, secours IndexedDB et vraie réouverture hors ligne.
 - `pnpm test:rules` : émulateurs Auth/Firestore du projet **demo-renax-backup**, avec Java 21. Aucun compte réel n’est requis.
 - `pnpm test:native` : une personne choisit la destination dans la fenêtre Windows. Cette validation reste séparée de l’automatisation.
+- `pnpm lint`, `pnpm format:check`, `pnpm type-check` : erreurs de code, formatage progressif et contrats des modules purs.
+- `pnpm build:production`, puis `pnpm test:production` : construire la sortie minifiée avec CSP et contrôler le rendu, les signaux, les exports et le véritable rechargement hors connexion.
+- `pnpm test:compat` : Chrome/Chromium, Firefox et WebKit installés par Playwright, formats PC et mobile. Ce n'est pas une certification Safari/iPhone physique.
+- `pnpm test:long-session` : dix minutes de lecture et navigation répétées dans Chrome, observations mémoire après collecte.
+- `pnpm test:coverage:core` : couverture de `sync-core.js` uniquement ; elle ne représente pas celle de toute l'application.
 
 Le moteur et les banques ont des tests de rendu audio. Les références Git doivent être disponibles ; un clone superficiel peut empêcher les comparaisons. Le workflow utilise l’historique complet et les dépendances verrouillées.
+
+Une activation Web Audio qui ne répond pas est interrompue après huit secondes avec un message et une possibilité de réessai. Cette limite concerne l'autorisation de démarrage ; elle ne modifie ni l'horloge musicale ni le signal rendu.
 
 ## Données et récupération
 
@@ -31,7 +38,7 @@ Les saisies de titres/libellés sont enregistrées après 400 ms d’inactivité
 
 ## Hors connexion et mises à jour
 
-La première installation du cache nécessite le réseau. Le panneau Préférences indique sa disponibilité. L’application, les banques instrumentales et les outils d’export sont vérifiés avant de rendre le cache utilisable. Les voix sont ajoutées après leur téléchargement. Les modèles de synthèse naturelle distants ne sont pas préchargés dans ce cache ; le repli sans guide vocal reste disponible.
+La première installation du cache nécessite le réseau. Le panneau Préférences indique sa disponibilité. L’application, les banques instrumentales et les outils d’export sont vérifiés avant de rendre le cache utilisable. Les voix se chargent à la première action vocale et sont ajoutées au cache après leur téléchargement. Le bouton « Préparer les voix hors connexion » dans les paramètres permet de les charger explicitement avant une séance sans réseau. Le statut hors connexion confirme ensuite si leur conservation a réussi. Les modèles de synthèse naturelle distants ne sont pas préchargés dans ce cache ; le repli sans guide vocal reste disponible.
 
 Les réponses des comptes Firebase ne sont jamais mises en cache par le Service Worker. Les bibliothèques locales sont séparées du cache statique. Une nouvelle version attend la fermeture des anciens onglets ; aucune lecture n’est interrompue par un rechargement forcé. Un déploiement incomplet est rejeté par empreinte.
 
@@ -43,4 +50,4 @@ Les réponses des comptes Firebase ne sont jamais mises en cache par le Service 
 - `tests/README.md` : environnement et portée des tests.
 - `assets/metronome/pro-samples-manifest.json` : métadonnées et empreintes des échantillons supplémentaires.
 
-Les mesures locales LCP/CLS et les 30 dernières erreurs sont consultables via `RENAX_FEEDBACK` dans le navigateur. Elles restent en mémoire et ne sont envoyées à aucun service. Ce dispositif ne mesure pas l’INP de terrain et ne remplace pas un audit manuel.
+Les mesures locales LCP/CLS et les 30 dernières erreurs sont consultables via `RENAX_FEEDBACK` dans le navigateur. Elles restent en mémoire et ne sont envoyées à aucun service. L’INP local est également observé avec web-vitals ; il peut rester absent si le navigateur ne fournit pas les événements nécessaires ou si aucune interaction mesurable n’a eu lieu. Un diagnostic sans morceaux ni informations de connexion peut être téléchargé dans les paramètres. Ces observations ne constituent pas une distribution de visites réelles ni une certification sur appareil physique.

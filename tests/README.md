@@ -55,3 +55,15 @@ The normal shared browser harness blocks Service Workers so a cache cannot mask 
 `emergency-backup-test.cjs` waits for committed IndexedDB transactions using awaited browser evaluations, then reloads and checks the recovered primary copy. It also verifies a newer primary wins, account isolation, rescue JSON download and failure of both storage paths. Do not treat a Promise returned to Playwright 1.56 `waitForFunction` as a polling condition for IndexedDB.
 
 `accessibility-test.cjs` scans 60 module/dialog/theme/viewport states with axe-core; finite visual transitions settle before contrast measurements. It preserves `incomplete` findings for manual review. No rules are disabled or offending elements excluded. It does not claim full WCAG certification or screen-reader coverage. `module-extraction-test.cjs` compares 36 real computed layouts against the same sources inlined at their original positions.
+
+## Production and progressive contracts
+
+Recorded voices load on demand. Fixtures that require them call `prepareAllVoiceAudio()` explicitly before checking readiness. Audio and layout assertions remain unchanged. Exact layout comparisons wait for the five-second ready notification to reach the same settled state. Back/forward checks wait for the target element to become visible before asserting it; the timer check waits for its next display refresh after crossing one second.
+
+`audio-activation-test.cjs` leaves the real context's resume promise pending, verifies a visible error after the eight-second activation bound, restores the native method, then plays and stops real audio. This tests recovery, not a replacement audio implementation. `midi-resource-test.cjs` compares four encoded files with SHA-256 references from commit `5291936`, then bounds oversized audible, silent and ramped inputs without mutating them; library validation is separately tested in the browser.
+
+`pnpm test:production` serves the generated release and checks its CSP, exact appearance in 36 states, PCM banks, mobile layout, decoded MP3, diagnostic privacy, bounded activation, translation recovery and actual offline reload. Its normal cases require Chrome and ffprobe. The optional real neural integration case also needs the assets described above; its intercepted models are local test fixtures, not proof of remote model-host uptime.
+
+`pnpm test:compat` uses real Chromium, Firefox and WebKit engines at desktop and mobile viewport sizes. Linux CI starts PulseAudio with a null output sink so audio clocks can advance on a machine without speakers; autoplay is explicitly allowed for the Firefox test browser. This does not certify permission prompts, physical Safari or sound hardware. A platform without Web Audio is reported as a tested degraded mode, never as successful audio playback.
+
+The JSDoc type check is non-strict and currently limited to sync-core and song-tempo-ramp. Coverage percentages from `test:coverage:core` apply to sync-core alone. Whole-app, screen-reader, physical-device and field-performance coverage must not be inferred from those numbers.

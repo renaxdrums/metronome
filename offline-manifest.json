@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "bfdffc6b32fdd128",
+  "revision": "7e13c5d3800787d0",
   "resources": [
     {
       "path": "accessibility.css",
@@ -108,6 +108,16 @@
       "text": false
     },
     {
+      "path": "assets/renax-logo-approved.svg",
+      "sha256": "67d3e5dbff6a034278e05fa50224051516096dd5a62136a659fedad22495ef84",
+      "text": true
+    },
+    {
+      "path": "assets/renax-logo-ivory.svg",
+      "sha256": "cc89489b1b0e94b0a782c7e241138d560d1a5ed1aff6b0c79129c8bd36f5a9b6",
+      "text": true
+    },
+    {
       "path": "audio-landscape.js",
       "sha256": "d6b42e560193705b23cb02675f2e9dcfceeb64d20dcf903f2697113b0b2e7636",
       "text": true
@@ -119,7 +129,7 @@
     },
     {
       "path": "cloud-backup.js",
-      "sha256": "a027a775ddc4edef0bfb11ac73bb7cae85890e6057b05c4e366c3cf82e06d82d",
+      "sha256": "f9e5598ca18ab436672ed62620721b02c618810808bd8d7e1e51b56d0fd4996f",
       "text": true
     },
     {
@@ -159,12 +169,17 @@
     },
     {
       "path": "index.html",
-      "sha256": "32ad4c225ba204d8e4dd124998a3bfe40b997d0df6addc1fc189219b45fb1184",
+      "sha256": "7be98e4b25d1f1d467ced8d025a2bb6d03a2c8b4c1557fb2ef5c201187f9b42e",
       "text": true
     },
     {
       "path": "interface-language.js",
-      "sha256": "11f0d63cc44fd36ad8a83ca5554122f902d41c6b38c5e8cc37d323f97c0a7030",
+      "sha256": "147f6b309b945d9f4e46ff270b4ea849f7c73999a34793136e5a0400cb2fa1d3",
+      "text": true
+    },
+    {
+      "path": "interface-translations.js",
+      "sha256": "ba31a100cfd977af8f9c04a3442692cb7a658db0ff9b2c98ed5e1ccc728f9fab",
       "text": true
     },
     {
@@ -183,13 +198,23 @@
       "text": true
     },
     {
+      "path": "metronome-audio.js",
+      "sha256": "00b4f3d4c9085dddfc563441477311e7a700cdb08530aa913763afb527f9f791",
+      "text": true
+    },
+    {
       "path": "metronome-core.js",
-      "sha256": "1680b25b46edcb04239ac540beed4aee9709bc9b3cb81e2aa9760038d2116779",
+      "sha256": "f71989a09a664889c9a9aaa2404ce592104585b66fb9a662a814b43f3a419a49",
+      "text": true
+    },
+    {
+      "path": "metronome-transport.js",
+      "sha256": "f6ec7404af879a9e110f5a3d45402532abdf7bb5ebc8b152cf4f1f2e0bbc3ee4",
       "text": true
     },
     {
       "path": "midi-export.js",
-      "sha256": "3d9936ad7f07869579f0a968b6218979407247cc1b1beec227a5820d83cc8de9",
+      "sha256": "20642ff1b5a65ad7de7df6ef37c852d925f0c4ae91f5c9be5f1195a4dfcbd3ab",
       "text": true
     },
     {
@@ -304,7 +329,7 @@
     },
     {
       "path": "song-tempo-ramp.js",
-      "sha256": "a4131fe65280642fa331547173f83a145f0cda61a1637dafd03ee005360518d3",
+      "sha256": "ed68cf47cb49ab85d308effc47e420fd670379b13ccb685e5a94578d587864b1",
       "text": true
     },
     {
@@ -324,7 +349,7 @@
     },
     {
       "path": "sync-core.js",
-      "sha256": "35544d3da795adf9b62ecc67f1bfaf4dfdba9e2eb4b8cb5bafbdad1f5a22755b",
+      "sha256": "f75c444f62d8511d721eb1ee19c112848ba648ef0d0730d55d165f41736eabd7",
       "text": true
     },
     {
@@ -344,7 +369,7 @@
     },
     {
       "path": "ui-feedback.js",
-      "sha256": "4fbe19900b0230961fd13a9ab14521cb71f5d0b6e069084cba82b6893aa860fc",
+      "sha256": "a841029440a1fa2e9d9946df5f263317e9875e47850fa6719b3963391df5b7a9",
       "text": true
     },
     {
@@ -358,13 +383,18 @@
       "text": true
     },
     {
+      "path": "vendor/web-vitals-6.2.3.js",
+      "sha256": "bc5c6069604dc4c9026acc93f3926071ee223ebd69fd6ddfea531bc218ce18b6",
+      "text": true
+    },
+    {
       "path": "workspace-layout.css",
       "sha256": "e26cf6b2d1ab485ad99491633d26ce004dd7dd7b03b176a06c410fa59ac60d22",
       "text": true
     },
     {
       "path": "workspace-layout.js",
-      "sha256": "60d894870b1164b41109030ed7e81076fbb9e188e13531e6e76d959dae358a80",
+      "sha256": "4002a90b29b59af7f2d5e0e8779fb28adf891deb1f6011cbf525e285cc2a8fad",
       "text": true
     }
   ]

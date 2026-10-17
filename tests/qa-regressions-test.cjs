@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict');const fs=require('node:fs'),path=require('node:path');const {start,save,openPlaylist}=require('./audio-harness.cjs');
 (async()=>{const h=await start(),results=[];try{
- const p=await h.browser.newPage({viewport:{width:1440,height:1000}});await p.goto(h.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
+ const p=await h.browser.newPage({viewport:{width:1440,height:1000}});await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
  const fixture={version:1,activeProfile:'qa',profiles:[{id:'qa',name:'QA',songs:[{id:'s',name:'QA track',countIn:{count:1,numerator:4,denominator:4},sections:[{id:'a',label:'Intro',count:1,measure:{numerator:4,denominator:4,tempo:120,beatSubdivisions:[1,1,1,1],beatStates:[[2],[1],[1],[1]]}}]}]}]};
  await p.evaluate(l=>RENAX_SONGS.replaceLibrary(l),fixture);
  const countIn=await p.evaluate(async()=>{const song=RENAX_SONGS.library.profiles[0].songs[0],before=JSON.stringify(song),audio=await RENAX_MP3_EXPORT.isolatedRender(song,'claves',.8),midi=RENAX_MIDI_EXPORT.exportSong(song);return {duration:audio.score.duration,events:audio.score.events,labels:audio.score.sections.map(x=>x.label),ticks:midi.report.ticks,notes:midi.report.notes,unchanged:before===JSON.stringify(song)};});

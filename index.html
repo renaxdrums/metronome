@@ -6,6 +6,20 @@
 (()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory'].includes(saved))theme=saved;}catch{}document.documentElement.dataset.theme=theme;})();
 </script>
   <meta charset="UTF-8">
+  <meta name="description" content="Métronome pour batteurs : tempo, subdivisions, polyrythmies, entraînement progressif et export de morceaux en MP3 ou MIDI.">
+  <link rel="canonical" href="https://renaxdrums.github.io/metronome/">
+  <meta property="og:title" content="RENAX DRUMS — Métronome">
+  <meta property="og:description" content="Travaillez votre tempo, vos subdivisions et vos morceaux avec le métronome RENAX DRUMS.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://renaxdrums.github.io/metronome/">
+  <meta property="og:image" content="https://renaxdrums.github.io/metronome/assets/icons/icon-512.png">
+  <meta property="og:image:alt" content="RENAX DRUMS Métronome">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RENAX DRUMS — Métronome">
+  <meta name="twitter:description" content="Tempo, subdivisions, polyrythmies et entraînement pour batteurs.">
+  <meta name="twitter:image" content="https://renaxdrums.github.io/metronome/assets/icons/icon-512.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"RENAX DRUMS Métronome","url":"https://renaxdrums.github.io/metronome/","applicationCategory":"MultimediaApplication","inLanguage":["fr","en"],"image":"https://renaxdrums.github.io/metronome/assets/icons/icon-512.png"}</script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="manifest" href="manifest.webmanifest?v=a8a2fca6567b">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png?v=7242e06ad4d0">
@@ -647,9 +661,11 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
     <div class="footer-right"><span>V3.0.1</span><span class="author-credit">David Arens</span></div>
   </footer>
 
-  <script src="ui-feedback.js?v=4fbe19900b02"></script>
+  <script src="ui-feedback.js?v=a841029440a1"></script>
 <script src="numbox-controls.js?v=ce94a8848171"></script>
-  <script src="metronome-core.js?v=1680b25b46ed"></script>
+  <script src="metronome-audio.js?v=00b4f3d4c908"></script>
+  <script src="metronome-core.js?v=f71989a09a66"></script>
+  <script src="metronome-transport.js?v=f6ec7404af87"></script>
   <script src="pro-sound-bank.js?v=4380a78e5f34"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
@@ -658,9 +674,9 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
   <script src="emergency-backup.js?v=ffc0a16005b2"></script>
 <script src="local-backup.js?v=f40f0ce49852"></script>
   <script src="amorce-song.js?v=9f00d2d74e2c"></script>
-  <script src="song-tempo-ramp.js?v=a4131fe65280"></script>
+  <script src="song-tempo-ramp.js?v=ed68cf47cb49"></script>
   <script src="songs-index2.js?v=924dd92eb5b3"></script>
-  <script type="module" src="cloud-backup.js?v=a027a775ddc4"></script>
+  <script type="module" src="cloud-backup.js?v=f9e5598ca18a"></script>
   <script>
     // Index 2 : ouvrir les morceaux de la playlist avec les sections repliées.
     (() => {
@@ -679,7 +695,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
       }, true);
     })();
   </script>
-  <script src="midi-export.js?v=3d9936ad7f07"></script>
+  <script src="midi-export.js?v=20642ff1b5a6"></script>
   <script src="song-export.js?v=1ba2f86f345f"></script>
 
   <script>
@@ -760,8 +776,9 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="multi-clock.js?v=e13d4c26ebe6"></script>
 <script src="multi-metronome.js?v=179d438846ee"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
-<script src="interface-language.js?v=11f0d63cc44f"></script>
-<script src="workspace-layout.js?v=60d894870b11"></script>
+<script src="interface-translations.js?v=ba31a100cfd9"></script>
+<script src="interface-language.js?v=147f6b309b94"></script>
+<script src="workspace-layout.js?v=4002a90b29b5"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=94e73145c59c"></script>
 <script src="console-intro.js?v=c98ebce90fec"></script>

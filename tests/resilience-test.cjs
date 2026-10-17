@@ -10,7 +10,7 @@ async function seed(page){await page.evaluate(async value=>{await RENAX_STORAGE.
   // A missing vocal recording cannot disable an instrumental click.
   const voice=await h.browser.newPage();voice.on('pageerror',e=>errors.push(e.message));let blocked=true,attempts=0;
   await voice.route('**/assets/voices/voice-men-en/01.wav*',r=>{attempts++;return blocked?r.abort('failed'):r.continue()});
-  await voice.goto(h.url);await voice.waitForFunction(()=>Object.keys(VOICE_METRONOME_BUFFERS.male).length===19&&Object.keys(VOICE_METRONOME_BUFFERS.female).length===20&&allVoiceAudioPromise===null);
+  await voice.goto(h.url);await voice.evaluate(()=>prepareAllVoiceAudio().catch(()=>{}));await voice.waitForFunction(()=>Object.keys(VOICE_METRONOME_BUFFERS.male).length===19&&Object.keys(VOICE_METRONOME_BUFFERS.female).length===20&&allVoiceAudioPromise===null);
   assert.equal(await voice.locator('#playBtn').isEnabled(),true);
   assert((await voice.locator('#audioReadyLabel').textContent()).includes('Voix indisponibles'));
   await voice.locator('#playBtn').click();await voice.waitForFunction(()=>isPlaying&&scheduledVoiceSources.size>0);await voice.locator('#playBtn').click();
@@ -65,7 +65,7 @@ async function seed(page){await page.evaluate(async value=>{await RENAX_STORAGE.
   proof.push({staleTab:'newer raw snapshot preserved after unchanged and dirty pagehide'});await context.close();
 
   // Failure after internal track reload must release the preparation state and fall back.
-  const guide=await fresh();await guide.waitForFunction(()=>allVoiceAudioReady);
+  const guide=await fresh();await guide.evaluate(()=>prepareAllVoiceAudio());await guide.waitForFunction(()=>allVoiceAudioReady);
   await guide.evaluate(value=>{window._plan={sections:value.profiles[0].songs[0].sections,announcements:[],speeches:[],countInMeasures:2,duration:4};RENAX_AMORCE.prepare=async()=>_plan;value.profiles[0].songs[0].amorce=true;RENAX_SONGS.replaceLibrary(value);RENAX_STORAGE.write(value)},fixture());
   await openTracks(guide);await guide.evaluate(()=>RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',song:'s',profile:'p'}));
   const fallback=await guide.evaluate(async()=>{const begin=RENAX_AMORCE.begin;let once=true;RENAX_AMORCE.begin=(...args)=>{if(once){once=false;throw Error('Injected late guide failure')}return begin(...args)};await startMetronome();const result={playing:isPlaying,preparing:RENAX_SONGS.preparing,caption:playBtn.textContent};stopMetronome();RENAX_AMORCE.begin=begin;return result});

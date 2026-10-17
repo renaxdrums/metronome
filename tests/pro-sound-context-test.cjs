@@ -7,7 +7,7 @@ const previous=cp.execFileSync('git',['-C',root,'show','f38d9b3f76acd05a608151c6
  for(const baseline of [true,false]){
   const p=await h.browser.newPage();p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>{window._atobCalls=0;const decode=atob;window.atob=(...a)=>{_atobCalls++;return decode(...a)}});
   if(baseline)await p.route('**/pro-sound-bank.js*',r=>r.fulfill({contentType:'text/javascript',body:previous}));
-  await p.goto(h.url);await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_PRO_SOUNDS);
+  await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_PRO_SOUNDS);
   const result=await p.evaluate(async()=>{
    const startupDecodes=_atobCalls,rows=[];
    for(const key of RENAX_PRO_SOUNDS.keys){
@@ -23,7 +23,7 @@ const previous=cp.execFileSync('git',['-C',root,'show','f38d9b3f76acd05a608151c6
  }
  assert.equal(renders[1].startupDecodes,0);
  for(let i=0;i<renders[0].rows.length;i++){const before=renders[0].rows[i],after=renders[1].rows[i];assert.equal(after.key,before.key);assert.equal(after.hash,before.hash,after.key+' PCM changed');assert.equal(after.tail,before.tail,after.key+' tail changed');assert.equal(after.schedulerDecodes,0,after.key+' decoded in play');}
- const p=await h.browser.newPage(),requests=[];p.on('request',r=>{if(/\/beep-[123]\.wav/.test(r.url()))requests.push(r.url())});await p.goto(h.url);await p.waitForFunction(()=>allVoiceAudioReady);
+ const p=await h.browser.newPage(),requests=[];p.on('request',r=>{if(/\/beep-[123]\.wav/.test(r.url()))requests.push(r.url())});await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady);
  const isolated=await p.evaluate(async()=>{await initAudio();const foreign=audioCtx,target=new OfflineAudioContext(1,48000,48000),bank=SOUND_BANKS.userMetroclic;bank.prepare(target);bank.play(target.destination,.1,2,false);const pcm=(await target.startRendering()).getChannelData(0),buffer=await ensureInstrumentBankReady('beep');return {nonzero:pcm.some(x=>x!==0),globalUnchanged:audioCtx===foreign,shakerPrepared:!!buffer?.getChannelData,shakerAlias:SOUND_BANKS.beep===SOUND_BANKS.proShaker}});
  assert.deepEqual(isolated,{nonzero:true,globalUnchanged:true,shakerPrepared:true,shakerAlias:true});assert.deepEqual(requests,[]);await p.close();
  const source=previous.match(/const samples=(\[[\s\S]*?\]);/)[1],samples=JSON.parse(source),manifest=JSON.parse(fs.readFileSync(path.join(root,'assets/metronome/pro-samples-manifest.json'),'utf8'));

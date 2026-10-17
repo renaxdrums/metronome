@@ -10,11 +10,15 @@ const resources = manifest.resources.map(({ path: name }) => {
   return { path: name, bytes: data.length, gzipBytes: zlib.gzipSync(data, { level: 9 }).length };
 });
 function walk(directory) {
-  return fs.readdirSync(path.join(root, directory), { withFileTypes: true })
-    .flatMap(entry => entry.isDirectory() ? walk(directory + '/' + entry.name) : [directory + '/' + entry.name]);
+  return fs
+    .readdirSync(path.join(root, directory), { withFileTypes: true })
+    .flatMap((entry) =>
+      entry.isDirectory() ? walk(directory + '/' + entry.name) : [directory + '/' + entry.name],
+    );
 }
-const voices = walk('assets/voices').filter(name => name.endsWith('.wav'))
-  .map(name => ({ path: name, bytes: fs.statSync(path.join(root, name)).size }));
+const voices = walk('assets/voices')
+  .filter((name) => name.endsWith('.wav'))
+  .map((name) => ({ path: name, bytes: fs.statSync(path.join(root, name)).size }));
 const report = {
   note: 'Local gzip estimate. Offline inventory is not the same as initial-page transfer. External voice models excluded.',
   shellBytes: resources.reduce((sum, item) => sum + item.bytes, 0),
@@ -23,6 +27,6 @@ const report = {
   resources: resources.sort((a, b) => b.bytes - a.bytes),
   voices,
 };
-const output = process.argv.find(value => value.startsWith('--output='))?.slice(9);
+const output = process.argv.find((value) => value.startsWith('--output='))?.slice(9);
 if (output) fs.writeFileSync(output, JSON.stringify(report, null, 2) + '\n');
 else process.stdout.write(JSON.stringify(report, null, 2) + '\n');

@@ -43,7 +43,7 @@ $('run').onclick=async()=>{
   for(const b of blocks){const speech=await synthesize(b.text,b.language);if(id!==token)return;speeches.push(speech);candidates.push(lastSyllableCandidate(speech.events,b.language));}
   const frame=$('audio-app');
   // Same-origin hidden iframe: separate instance of the unchanged app engine.
-  const adapter=createAudioAdapter(frame);
+  const adapter=await createAudioAdapter(frame);
   const started=performance.now();
   while(!adapter.ready()){if(id!==token)return;if(performance.now()-started>20000)throw new Error('Chargement des samples trop long. Réessayez.');await new Promise(r=>setTimeout(r,100));}
   if(id!==token)return;

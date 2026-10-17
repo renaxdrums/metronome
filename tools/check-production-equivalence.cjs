@@ -1,0 +1,101 @@
+const assert = require('node:assert/strict');
+const { start, save } = require('../tests/audio-harness.cjs');
+(async () => {
+  const releaseURL = process.env.TEST_URL;
+  if (!releaseURL) throw Error('TEST_URL must point to the production release');
+  delete process.env.TEST_URL;
+  const h = await start();
+  process.env.TEST_URL = releaseURL;
+  const rows = [];
+  try {
+    for (const [width, height] of [
+      [1440, 1000],
+      [390, 844],
+    ]) {
+      const pages = [];
+      for (const baseline of [true, false]) {
+        const p = await h.browser.newPage({
+          viewport: { width, height },
+          hasTouch: width < 1100,
+          reducedMotion: 'reduce',
+        });
+        await p.goto(baseline ? h.url : releaseURL);
+        await p.evaluate(() => prepareAllVoiceAudio());
+        await p.waitForFunction(() => allVoiceAudioReady && window.RENAX_SONGS);
+        // Compare the same settled state, after the five-second ready notification.
+        await p.waitForFunction(() =>
+          document.getElementById('audioReadyWrap').classList.contains('fade-out'),
+        );
+        await p.evaluate(() => document.fonts.ready);
+        await p.addStyleTag({
+          content: '*,*::before,*::after{animation:none!important;transition:none!important}',
+        });
+        pages.push(p);
+      }
+      for (const theme of ['dark', 'light', 'ivory'])
+        for (const module of [
+          'Métronome',
+          'Polyrythmie',
+          'Entraînement',
+          'Séquenceur',
+          'Multipiste',
+          'Track',
+        ]) {
+          const snapshots = [];
+          for (const p of pages) {
+            await p.locator('#index2SettingsBtn').click();
+            await p.locator('[data-appearance=' + theme + ']').click();
+            await p.locator('#index2SettingsClose').click();
+            await p.getByRole('tab', { name: module, exact: true }).click();
+            await p.evaluate(
+              () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+            );
+            snapshots.push(
+              await p.evaluate(() =>
+                [...document.body.querySelectorAll('*')]
+                  .filter((e) => {
+                    const b = e.getBoundingClientRect();
+                    return (
+                      b.width > 0 && b.height > 0 && getComputedStyle(e).visibility !== 'hidden'
+                    );
+                  })
+                  .map((e) => {
+                    const b = e.getBoundingClientRect(),
+                      s = getComputedStyle(e);
+                    return {
+                      tag: e.tagName,
+                      class: e.className?.baseVal ?? e.className,
+                      rect: [b.x, b.y, b.width, b.height].map((n) => Math.round(n * 100) / 100),
+                      color: s.color,
+                      background: s.backgroundColor,
+                      font: s.fontFamily,
+                      fontSize: s.fontSize,
+                      border: s.borderRadius,
+                    };
+                  }),
+              ),
+            );
+          }
+          assert.deepEqual(
+            snapshots[1],
+            snapshots[0],
+            JSON.stringify({ width, height, theme, module }),
+          );
+          rows.push({ width, height, theme, module, visibleElements: snapshots[1].length });
+        }
+      for (const p of pages) await p.close();
+    }
+    save('production-equivalence-results.json', {
+      comparisons: rows,
+      method:
+        'Actual browser geometry and computed appearance: readable source versus built release',
+    });
+    console.log('PASS 36 source/production module/theme/viewport layouts identical');
+  } finally {
+    await h.browser.close();
+    h.server?.close();
+  }
+})().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
+});

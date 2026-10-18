@@ -37,6 +37,8 @@ const { start, save } = require('./audio-harness.cjs');
         const result = await p.evaluate(() => ({
           ...__layout,
           reason: document.documentElement.dataset.workspaceReady,
+          loadingAt: performance.getEntriesByName('renax-workspace-loading')[0]?.startTime,
+          visibleAt: performance.getEntriesByName('renax-workspace-visible')[0]?.startTime,
           busy: document.querySelector('.main-grid').hasAttribute('aria-busy'),
           overflow: document.documentElement.scrollWidth > innerWidth,
           visible: getComputedStyle(document.querySelector('.main-grid')).visibility,
@@ -46,8 +48,10 @@ const { start, save } = require('./audio-harness.cjs');
         });
         assert(result.value < 0.1, JSON.stringify({ width, theme, ...result }));
         assert(
-          result.reason === 'ready' && result.revealedAt !== null && result.revealedAt < 3000,
-          'Must reveal through normal initialization, before emergency timeout',
+          result.reason === 'ready' &&
+            result.revealedAt !== null &&
+            result.visibleAt - result.loadingAt < 3000,
+          'Must reveal normally within 3000 ms of entering the loading state; navigation latency is recorded separately',
         );
         assert.equal(result.busy, false);
         assert.equal(result.visible, 'visible');

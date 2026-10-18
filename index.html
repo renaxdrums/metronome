@@ -8,8 +8,8 @@
 </script>
   <style>html[data-workspace-loading] .main-grid{visibility:hidden}</style>
   <script>
-  (()=>{const root=document.documentElement;root.dataset.workspaceLoading='';let released=false;
-    const release=reason=>{if(released)return;released=true;clearTimeout(timer);root.dataset.workspaceReady=reason;delete root.dataset.workspaceLoading;document.querySelector('.main-grid')?.removeAttribute('aria-busy');};
+  (()=>{const root=document.documentElement;root.dataset.workspaceLoading='';window.performance?.mark?.('renax-workspace-loading');let released=false;
+    const release=reason=>{if(released)return;released=true;clearTimeout(timer);window.performance?.mark?.('renax-workspace-visible');root.dataset.workspaceReady=reason;delete root.dataset.workspaceLoading;document.querySelector('.main-grid')?.removeAttribute('aria-busy');};
     window.RENAX_RELEASE_LAYOUT=()=>release('ready');const timer=setTimeout(()=>release('timeout'),3000);
   })();
   </script>
@@ -786,7 +786,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="offline-cache.js?v=f41c06ec6200"></script>
 <script src="interface-translations.js?v=761b1bcdda07"></script>
 <script src="interface-language.js?v=147f6b309b94"></script>
-<script src="workspace-layout.js?v=bb898e22f9de"></script>
+<script src="workspace-layout.js?v=1521274dd416"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=94e73145c59c"></script>
 <script src="console-intro.js?v=c98ebce90fec"></script>

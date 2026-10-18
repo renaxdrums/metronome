@@ -100,12 +100,16 @@
  window.RENAX_WORKSPACE={go,get current(){return page;}};
  const restored=history.state?.renaxNavigation?.screen;
  const initial=restored?.workspace||(restored?.songs?.pane==='songs'?'tracks':'metronome');
- go(buttons.has(initial)?initial:'metronome');
+ // A fresh default view already owns the native model and rendered controls.
+ // Rebuilding that same model adds DOM mutations and layouts before first paint.
+ const freshDefault=!restored&&initial==='metronome'&&appMode==='metronome'&&!window.RENAX_MULTI?.active&&document.getElementById('songsRoot').hidden&&!isPlaying&&!playbackStarting&&!trainBtn.classList.contains('active');
+ if(freshDefault){restoreControls('metronome');resetCustomizationTimer();window.RENAX_EDIT_HISTORY?.enterWorkspace('metronome');if(!desktop.matches)switchTab('visu');sync();}
+ else go(buttons.has(initial)?initial:'metronome');
  // Reveal after controls have moved and the canvas has its final dimensions.
- const reveal=()=>Promise.resolve(document.fonts?.ready).then(()=>requestAnimationFrame(()=>{
+ const reveal=()=>requestAnimationFrame(()=>{
   sync();place();resizeCanvas();updateRingRadius();
-  requestAnimationFrame(()=>window.RENAX_RELEASE_LAYOUT?.());
- }));
+  window.RENAX_RELEASE_LAYOUT?.();
+ });
  reveal();window.addEventListener('load',()=>{sync();place();},{once:true});
 })();
 
@@ -113,23 +117,35 @@
 (()=>{
  const selectors='.numbox-button,#workspaceNav button,#tapBtn,.btn,.multi-add,.training-mode-tabs button';
  const observed=new WeakSet(),original=new WeakMap(),fitted=new WeakMap();let frame=0,generation=0;
- function fit(button){
-  if(!button.isConnected||button.clientWidth===0||button.closest('.console-arrival-replica'))return;
-  const label=button.matches('.numbox-button')?button.querySelector(':scope>span'):button;
-  if(!label)return;
-  const signature=button.clientWidth+'|'+label.textContent+'|'+generation;
-  if(fitted.get(button)===signature)return;
-  if(!original.has(label))original.set(label,{value:label.style.getPropertyValue('font-size'),priority:label.style.getPropertyPriority('font-size')});
-  const saved=original.get(label);label.style.removeProperty('font-size');if(saved.value)label.style.setProperty('font-size',saved.value,saved.priority);
-  const base=parseFloat(getComputedStyle(label).fontSize),available=label.clientWidth;
-  if(!available||!base)return;
-  const overflow=label.scrollWidth;
-  if(overflow>available+1){const size=Math.max(9,Math.min(base,base*available/overflow));label.style.setProperty('font-size',size+'px','important');}
-  if(button.matches('.numbox-button'))button.title=label.textContent.trim();
-  fitted.set(button,button.clientWidth+'|'+label.textContent+'|'+generation);
+ // Restore, measure and apply in separate passes. Interleaving these operations
+ // forces a document layout for every label, especially on slower phones.
+ function scan(){
+  frame=0;const candidates=[];
+  for(const button of document.querySelectorAll(selectors)){
+   if(button.closest('.console-arrival-replica'))continue;
+   if(!observed.has(button)){observed.add(button);resize.observe(button);}
+   if(!button.isConnected||button.clientWidth===0)continue;
+   const label=button.matches('.numbox-button')?button.querySelector(':scope>span'):button;
+   if(!label)continue;
+   const signature=button.clientWidth+'|'+label.textContent+'|'+generation;
+   if(fitted.get(button)===signature)continue;
+   if(!original.has(label))original.set(label,{value:label.style.getPropertyValue('font-size'),priority:label.style.getPropertyPriority('font-size')});
+   candidates.push({button,label,saved:original.get(label)});
+  }
+  for(const {label,saved} of candidates){
+   if(label.style.getPropertyValue('font-size')!==saved.value||label.style.getPropertyPriority('font-size')!==saved.priority){
+    if(saved.value)label.style.setProperty('font-size',saved.value,saved.priority);else label.style.removeProperty('font-size');
+   }
+  }
+  const measurements=candidates.map(item=>({...item,base:parseFloat(getComputedStyle(item.label).fontSize),available:item.label.clientWidth,overflow:item.label.scrollWidth}));
+  for(const {button,label,base,available,overflow} of measurements){
+   if(!available||!base)continue;
+   if(overflow>available+1){const size=Math.max(9,Math.min(base,base*available/overflow));label.style.setProperty('font-size',size+'px','important');}
+   if(button.matches('.numbox-button')&&button.title!==label.textContent.trim())button.title=label.textContent.trim();
+  }
+  for(const {button,label,base,available} of measurements)if(available&&base)fitted.set(button,button.clientWidth+'|'+label.textContent+'|'+generation);
  }
- const resize=new ResizeObserver(entries=>{for(const entry of entries)fit(entry.target);});
- function scan(){frame=0;for(const button of document.querySelectorAll(selectors)){if(button.closest('.console-arrival-replica'))continue;if(!observed.has(button)){observed.add(button);resize.observe(button);}fit(button);}}
+ const resize=new ResizeObserver(()=>queue());
  function queue(){if(!frame)frame=requestAnimationFrame(scan);}
  new MutationObserver(queue).observe(document.body,{childList:true,subtree:true,characterData:true});
  const invalidate=()=>{generation++;queue();};

@@ -20,9 +20,8 @@ const { start, save } = require('./audio-harness.cjs');
           }).observe({ type: 'layout-shift', buffered: true });
           new MutationObserver(() => {
             if (
-              document.documentElement &&
+              document.documentElement?.dataset.workspaceReady &&
               !document.documentElement.hasAttribute('data-workspace-loading') &&
-              window.RENAX_WORKSPACE &&
               __layout.revealedAt === null
             )
               __layout.revealedAt = performance.now();
@@ -37,13 +36,17 @@ const { start, save } = require('./audio-harness.cjs');
         await p.waitForTimeout(1100);
         const result = await p.evaluate(() => ({
           ...__layout,
+          reason: document.documentElement.dataset.workspaceReady,
           busy: document.querySelector('.main-grid').hasAttribute('aria-busy'),
           overflow: document.documentElement.scrollWidth > innerWidth,
           visible: getComputedStyle(document.querySelector('.main-grid')).visibility,
         }));
+        save('startup-layout-progress.json', {
+          runs: [...runs, { width, theme, ...result, errors }],
+        });
         assert(result.value < 0.1, JSON.stringify({ width, theme, ...result }));
         assert(
-          result.revealedAt !== null && result.revealedAt < 3000,
+          result.reason === 'ready' && result.revealedAt !== null && result.revealedAt < 3000,
           'Must reveal through normal initialization, before emergency timeout',
         );
         assert.equal(result.busy, false);
@@ -68,6 +71,10 @@ const { start, save } = require('./audio-harness.cjs');
     await p.goto(h.url);
     await p.waitForFunction(() => !document.documentElement.hasAttribute('data-workspace-loading'));
     assert(await p.locator('.main-grid').isVisible());
+    assert.equal(
+      await p.evaluate(() => document.documentElement.dataset.workspaceReady),
+      'timeout',
+    );
     assert.equal(await p.locator('.main-grid').getAttribute('aria-busy'), null);
     await p.close();
     save('startup-layout-results.json', { runs, failOpen: true });

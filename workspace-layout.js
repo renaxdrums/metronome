@@ -106,7 +106,7 @@
   sync();place();resizeCanvas();updateRingRadius();
   requestAnimationFrame(()=>window.RENAX_RELEASE_LAYOUT?.());
  }));
- if(document.readyState==='complete')reveal();else window.addEventListener('load',reveal,{once:true});
+ reveal();window.addEventListener('load',()=>{sync();place();},{once:true});
 })();
 
 /* Text fitting is presentation only; option names and handlers are preserved. */

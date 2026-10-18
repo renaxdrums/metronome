@@ -102,7 +102,8 @@
  const initial=restored?.workspace||(restored?.songs?.pane==='songs'?'tracks':'metronome');
  // A fresh default view already owns the native model and rendered controls.
  // Rebuilding that same model adds DOM mutations and layouts before first paint.
- const freshDefault=!restored&&initial==='metronome'&&appMode==='metronome'&&!window.RENAX_MULTI?.active&&document.getElementById('songsRoot').hidden&&!isPlaying&&!playbackStarting&&!trainBtn.classList.contains('active');
+ const defaultScreen=!restored||(restored.workspace==='metronome'&&restored.tab==='visu'&&!restored.settings&&restored.songs?.pane==='sequence');
+ const freshDefault=defaultScreen&&initial==='metronome'&&appMode==='metronome'&&!window.RENAX_MULTI?.active&&document.getElementById('songsRoot').hidden&&!isPlaying&&!playbackStarting&&!trainBtn.classList.contains('active');
  if(freshDefault){restoreControls('metronome');resetCustomizationTimer();window.RENAX_EDIT_HISTORY?.enterWorkspace('metronome');if(!desktop.matches)switchTab('visu');sync();}
  else go(buttons.has(initial)?initial:'metronome');
  // Reveal after controls have moved and the canvas has its final dimensions.

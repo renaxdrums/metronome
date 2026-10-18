@@ -25,9 +25,8 @@
  const silent=document.querySelector('.silent-section'),silentHome=document.createComment('silent-controls-home');silent.before(silentHome);
  const silentCollapse=document.createElement('button');silentCollapse.type='button';silentCollapse.className='silent-collapse';silentCollapse.textContent='Mesures vides';silentCollapse.setAttribute('aria-expanded','false');silentCollapse.setAttribute('aria-controls','silentSettings');silent.querySelector('.silent-head').prepend(silentCollapse);
  silentCollapse.onclick=()=>{const expanded=silent.classList.toggle('is-expanded');silentCollapse.setAttribute('aria-expanded',String(expanded));};
- const nav=document.createElement('nav');nav.id='workspaceNav';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Espaces de travail');
- const trainIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2M12 9v4l3 2"/></svg>';
- const items=[['metronome','Métronome',nativeMode.querySelector('[data-mode="metronome"] svg').outerHTML],['polyrhythm','Polyrythmie',nativeMode.querySelector('[data-mode="polyrhythm"] svg').outerHTML],['training','Entraînement',trainIcon],['sequence','Séquenceur',multiTabs.querySelector('button:first-child svg').outerHTML],['multi','Multipiste',multiTabs.querySelector('button:last-child svg').outerHTML],['tracks','Track',document.querySelector('.song-tabs [data-pane="songs"] svg')?.outerHTML||'<svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/></svg>']];
+ const nav=document.getElementById('workspaceNav');nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Espaces de travail');
+ const items=['metronome','polyrhythm','training','sequence','multi','tracks'];
  let page='metronome',changing=false;
  // Each native workspace owns its musical model. The audio scheduler is reused.
  const musicalStates=new Map();
@@ -63,8 +62,7 @@
  const controlOpenByWorkspace=new Map();let shownWorkspace=null,wasDesktop=desktop.matches;
  function rememberControls(){if(!desktop.matches&&shownWorkspace!==null)controlOpenByWorkspace.set(shownWorkspace,controls.open);}
  function restoreControls(workspace){shownWorkspace=workspace;controls.open=desktop.matches||(controlOpenByWorkspace.get(workspace)??false);}
- for(const [id,label,icon] of items){const b=document.createElement('button');b.type='button';b.dataset.workspace=id;b.setAttribute('role','tab');b.setAttribute('aria-controls',id==='training'?'mobileTrainingHost':id==='tracks'?'songsRoot':id==='sequence'||id==='multi'?'sequencePane':'sequencerContainer');b.innerHTML=icon+'<span>'+label+'</span>';b.onclick=()=>go(id);nav.append(b);buttons.set(id,b);}
- document.querySelector('header').after(nav);
+ for(const id of items){const b=nav.querySelector('[data-workspace="'+id+'"]');b.onclick=()=>go(id);buttons.set(id,b);}
  nav.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const list=[...buttons.values()],i=list.indexOf(document.activeElement),next=event.key==='Home'?0:event.key==='End'?list.length-1:(i+(event.key==='ArrowRight'?1:-1)+list.length)%list.length;list[next].click();list[next].focus();});
  const mobileViews=document.createElement('div');mobileViews.id='workspaceMobileViews';mobileViews.setAttribute('role','group');mobileViews.setAttribute('aria-label','Vue de travail');
  mobileViews.innerHTML='<button type="button" data-pane="visu">Visualisation</button><button type="button" data-pane="seq">Mesures</button>';nav.after(mobileViews);
@@ -102,28 +100,56 @@
  window.RENAX_WORKSPACE={go,get current(){return page;}};
  const restored=history.state?.renaxNavigation?.screen;
  const initial=restored?.workspace||(restored?.songs?.pane==='songs'?'tracks':'metronome');
- go(buttons.has(initial)?initial:'metronome');window.addEventListener('load',()=>{sync();place();});
+ // A fresh default view already owns the native model and rendered controls.
+ // Rebuilding that same model adds DOM mutations and layouts before first paint.
+ const defaultScreen=!restored||(restored.workspace==='metronome'&&restored.tab==='visu'&&!restored.settings&&restored.songs?.pane==='sequence');
+ const freshDefault=defaultScreen&&initial==='metronome'&&appMode==='metronome'&&!window.RENAX_MULTI?.active&&document.getElementById('songsRoot').hidden&&!isPlaying&&!playbackStarting&&!trainBtn.classList.contains('active');
+ if(freshDefault){restoreControls('metronome');resetCustomizationTimer();window.RENAX_EDIT_HISTORY?.enterWorkspace('metronome');if(!desktop.matches)switchTab('visu');sync();}
+ else go(buttons.has(initial)?initial:'metronome');
+ // Reveal after controls have moved and the canvas has its final dimensions.
+ const reveal=()=>requestAnimationFrame(()=>{
+  sync();place();resizeCanvas();updateRingRadius();
+  window.RENAX_RELEASE_LAYOUT?.();
+ });
+ reveal();window.addEventListener('load',()=>{sync();place();},{once:true});
 })();
 
 /* Text fitting is presentation only; option names and handlers are preserved. */
 (()=>{
  const selectors='.numbox-button,#workspaceNav button,#tapBtn,.btn,.multi-add,.training-mode-tabs button';
- const observed=new WeakSet(),original=new WeakMap();let frame=0;
- function fit(button){
-  if(!button.isConnected||button.clientWidth===0||button.closest('.console-arrival-replica'))return;
-  const label=button.matches('.numbox-button')?button.querySelector(':scope>span'):button;
-  if(!label)return;
-  if(!original.has(label))original.set(label,{value:label.style.getPropertyValue('font-size'),priority:label.style.getPropertyPriority('font-size')});
-  const saved=original.get(label);label.style.removeProperty('font-size');if(saved.value)label.style.setProperty('font-size',saved.value,saved.priority);
-  const base=parseFloat(getComputedStyle(label).fontSize),available=label.clientWidth;
-  if(!available||!base)return;
-  const overflow=label.scrollWidth;
-  if(overflow>available+1){const size=Math.max(9,Math.min(base,base*available/overflow));label.style.setProperty('font-size',size+'px','important');}
-  if(button.matches('.numbox-button'))button.title=label.textContent.trim();
+ const observed=new WeakSet(),original=new WeakMap(),fitted=new WeakMap();let frame=0,generation=0;
+ // Restore, measure and apply in separate passes. Interleaving these operations
+ // forces a document layout for every label, especially on slower phones.
+ function scan(){
+  frame=0;const candidates=[];
+  for(const button of document.querySelectorAll(selectors)){
+   if(button.closest('.console-arrival-replica'))continue;
+   if(!observed.has(button)){observed.add(button);resize.observe(button);}
+   if(!button.isConnected||button.clientWidth===0)continue;
+   const label=button.matches('.numbox-button')?button.querySelector(':scope>span'):button;
+   if(!label)continue;
+   const signature=button.clientWidth+'|'+label.textContent+'|'+generation;
+   if(fitted.get(button)===signature)continue;
+   if(!original.has(label))original.set(label,{value:label.style.getPropertyValue('font-size'),priority:label.style.getPropertyPriority('font-size')});
+   candidates.push({button,label,saved:original.get(label)});
+  }
+  for(const {label,saved} of candidates){
+   if(label.style.getPropertyValue('font-size')!==saved.value||label.style.getPropertyPriority('font-size')!==saved.priority){
+    if(saved.value)label.style.setProperty('font-size',saved.value,saved.priority);else label.style.removeProperty('font-size');
+   }
+  }
+  const measurements=candidates.map(item=>({...item,base:parseFloat(getComputedStyle(item.label).fontSize),available:item.label.clientWidth,overflow:item.label.scrollWidth}));
+  for(const {button,label,base,available,overflow} of measurements){
+   if(!available||!base)continue;
+   if(overflow>available+1){const size=Math.max(9,Math.min(base,base*available/overflow));label.style.setProperty('font-size',size+'px','important');}
+   if(button.matches('.numbox-button')&&button.title!==label.textContent.trim())button.title=label.textContent.trim();
+  }
+  for(const {button,label,base,available} of measurements)if(available&&base)fitted.set(button,button.clientWidth+'|'+label.textContent+'|'+generation);
  }
- const resize=new ResizeObserver(entries=>{for(const entry of entries)fit(entry.target);});
- function scan(){frame=0;for(const button of document.querySelectorAll(selectors)){if(button.closest('.console-arrival-replica'))continue;if(!observed.has(button)){observed.add(button);resize.observe(button);}fit(button);}}
+ const resize=new ResizeObserver(()=>queue());
  function queue(){if(!frame)frame=requestAnimationFrame(scan);}
  new MutationObserver(queue).observe(document.body,{childList:true,subtree:true,characterData:true});
- window.addEventListener('resize',queue);document.fonts?.ready.then(queue);queue();
+ const invalidate=()=>{generation++;queue();};
+ new MutationObserver(invalidate).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','lang']});
+ window.addEventListener('resize',invalidate);document.fonts?.ready.then(invalidate);queue();
 })();

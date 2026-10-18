@@ -77,3 +77,29 @@
  html#renaxApp[data-theme] body[data-workspace] .panel-visu .score-tools-panel{min-height:26px!important;margin-bottom:4px!important}
  html#renaxApp[data-theme] body[data-workspace] .panel-visu .score-view-switch{flex-direction:row!important}
 }
+
+/* Keep open musical controls in the left column after a phone rotation. */
+@media (orientation: landscape) and (pointer: coarse) and (max-width: 1100px) and (max-height: 600px) {
+  html#renaxApp[data-theme] body[data-workspace] .panel-visu .visu-toolbar {
+    grid-row: 1 !important;
+  }
+  html#renaxApp[data-theme] body[data-workspace] .panel-visu > #workspaceControls {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 0;
+    overflow: auto;
+  }
+}
+@media (orientation: landscape) and (pointer: coarse) and (max-width: 1100px) and (max-height: 600px) {
+  html#renaxApp[data-theme=ivory] body[data-workspace] .panel-visu:not(.score-view) .sequencer-wrapper {
+    gap: 6px !important;
+  }
+  html#renaxApp[data-theme=ivory] body[data-workspace] .panel-visu:not(.score-view) .score-tools-panel {
+    height: 26px !important;
+    max-height: 26px !important;
+    flex-basis: 26px !important;
+  }
+  html#renaxApp[data-theme=ivory] body[data-workspace] .panel-visu:not(.score-view) #sequencerContainer {
+    width: max(0px, min(calc(100cqw - 24px), calc(100cqh - 44px), var(--seq-size))) !important;
+  }
+}

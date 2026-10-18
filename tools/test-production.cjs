@@ -12,6 +12,7 @@ const available = [
   'tests/robustness-boundaries-test.cjs',
   'tests/pro-sound-context-test.cjs',
   'tests/mobile-landscape-test.cjs',
+  'tests/phone-rotation-test.cjs',
   'tests/mp3-output-level-test.cjs',
   'tests/security-text-test.cjs',
   'tests/diagnostics-test.cjs',

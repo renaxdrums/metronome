@@ -59,3 +59,10 @@ Les mesures locales LCP/CLS et les 30 dernières erreurs sont consultables via `
 
 
 Pendant la lecture, un navigateur compatible peut maintenir l’écran allumé ; la demande est libérée à l’arrêt et rétablie au retour sur l’onglet. Préférences propose une compensation visuelle de −100 à +400 ms et une calibration par frappes, enregistrées dans ce navigateur. Seul l’affichage est décalé : les sons, le tempo et l’export audio conservent leur planification. Voir MAINTENANCE.md pour les validations et essais Brave Android/Bluetooth.
+
+
+La langue de l’interface se choisit dans Préférences : français, anglais, espagnol, allemand ou italien. Ces traductions sont incluses dans l’installation hors connexion. Ce choix ne modifie pas les sons, les voix de comptage ni les noms de morceaux et de presets saisis par l’utilisateur.
+
+Maintenance CSS : `pnpm check:styles` contrôle le budget par feuille et les affectations directes de style JavaScript ; les plafonds ne peuvent qu’être réduits.
+
+Les exceptions CSS nécessaires sont documentées dans `CSS-MIGRATION.md` ; `pnpm check:styles` vérifie aussi leurs commentaires et les règles concurrentes. Les grandes feuilles de thème et la migration vers `@layer` restent hors de cette phase.

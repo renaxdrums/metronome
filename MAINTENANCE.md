@@ -91,3 +91,20 @@ Essais physiques à exécuter sur Brave Android avec casque Bluetooth :
 4. Vérifier −100 et +400 ms, annuler une calibration, fermer pendant le chargement, et calibrer pendant une lecture déjà lancée : aucune lecture surprise ni arrêt de celle que l’utilisateur avait lancée.
 
 La précision dépend de la latence annoncée par le navigateur, de l’affichage et des frappes humaines ; les tests simulés ne remplacent pas ces essais physiques. Les workflows de validation acceptent les bases `audit/phase-*` afin de vérifier les PR par phase sans fusionner la phase précédente ni déclencher de déploiement.
+
+
+## Validation de la phase 5
+
+Langues validées dans le périmètre : français, anglais, espagnol, allemand et italien, avec ressources intégrées au cache hors ligne. Tester les six modules, Préférences, le compte et les commandes dynamiques dans chaque langue. Les titres et libellés saisis par les utilisateurs doivent rester littéraux. `multilingual-interface-test.cjs` vérifie la présence des catalogues, les restes français, la persistance et les débordements des boutons sur les trois tailles et trois thèmes, et conserve 45 captures de Préférences. `check-production-offline.cjs` recharge les cinq langues sans réseau en conservant la bibliothèque.
+
+Après modification : `pnpm build`, `pnpm check:assets`, `pnpm check:styles`, `pnpm check:tests`, lint, format et types. Lancer les tests multilingues et `style-budget-test.cjs`, `module-extraction-test.cjs`, puis `quality-invariance-test.cjs` : référence de phase 2 `396287e3a921891b27e608f2e5f363091b5fe1c7`, PCM à 44,1/48 kHz et 54 comparaisons de capture. Terminer par `pnpm build:production` et `pnpm test:production`. Les réglages du casque et les essais physiques de veille/calibration de phase 2 restent à exécuter à part. Les phases 3 et 4 de l’audit ne sont pas comprises dans cette branche.
+
+Le cliquet mesure les feuilles externes, y compris les 98 !important extraits du HTML. Le total initial de 1 895 devient comparable à l’ancien total CSS de 1 797 seulement en ajoutant ces 98 déclarations. Une nouvelle feuille a un plafond nul si elle n’est pas recensée ; un changement de budget ne peut pas augmenter les plafonds de la PR précédente.
+
+Les 36 exceptions conservées, leurs concurrents et les comptes par feuille figurent dans `CSS-MIGRATION.md`. Le cliquet passe de 1 895 à 1 849 priorités CSS et conserve 110 affectations directes JS. Les tests négatifs vérifient qu’une hausse CSS/JS ou un commentaire/concurrent manquant fait échouer le contrôle. Aucune couche `@layer` n’est livrée.
+
+Le test d’invariance exige désormais une différence maximale de canal de 0/255 ; il normalise le thème, les polices, le pointeur et le focus, et masque les canevas animés comme dans la référence. Les sondes `CASCADE_PROBE=remove-important` et `CASCADE_PROBE=layers-only` séparent les deux facteurs à partir des petites feuilles de référence. Les matrices complètes multilingue et d’invariance ont un délai maximal de dix minutes par test ; les assertions restent actives.
+
+Le contrôle multilingue parcourt 360 états dans les cinq langues, vérifie les clés visibles et les catalogues, détecte les restes français et les replis anglais hors anglais, et contrôle les rectangles des glyphes des boutons. Un bouton volontairement trop étroit vérifie la détection de débordement. Les chevrons décoratifs ne sont pas du texte tronqué.
+
+Les résultats de validation de la livraison sont consignés dans `PHASE5-VALIDATION.md` et le compte rendu de la PR ; un résultat en échec ne vaut pas validation. Aucune fusion ni publication ne doit précéder la CI verte.

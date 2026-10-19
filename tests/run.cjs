@@ -98,16 +98,18 @@ function run(file) {
         windowsHide: true,
       },
     ));
-    const limit = file.includes('audio-headroom')
-      ? 1200000
-      : file.includes('rapid-interactions')
-        ? 600000
-        : file.includes('neural') ||
-            file.includes('voice-levels') ||
-            file.includes('amorce-page') ||
-            file.includes('piper-speed')
+    const limit = /(?:multilingual-interface|quality-invariance)/.test(file)
+      ? 600000
+      : file.includes('audio-headroom')
+        ? 1200000
+        : file.includes('rapid-interactions')
           ? 600000
-          : 180000;
+          : file.includes('neural') ||
+              file.includes('voice-levels') ||
+              file.includes('amorce-page') ||
+              file.includes('piper-speed')
+            ? 600000
+            : 180000;
     let timedOut = false;
     const timer = setTimeout(() => {
       timedOut = true;

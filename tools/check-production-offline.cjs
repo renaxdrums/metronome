@@ -53,6 +53,17 @@ const { start, newTrack, openPlaylist, save } = require('../tests/audio-harness.
     await context.setOffline(true);
     await p.reload();
     await p.waitForFunction(() => window.RENAX_SONGS && window.RENAX_OFFLINE?.ready);
+    for (const language of ['fr', 'en', 'es', 'de', 'it']) {
+      await p.evaluate((language) => RENAX_I18N.setLanguage(language), language);
+      await p.reload();
+      await p.waitForFunction(
+        (language) => window.RENAX_I18N?.language === language && window.RENAX_SONGS,
+        language,
+      );
+      assert.equal(await p.evaluate(() => document.documentElement.lang), language);
+      assert.equal(await p.evaluate(() => JSON.stringify(RENAX_SONGS.library)), library);
+    }
+    await p.evaluate(() => RENAX_I18N.setLanguage('fr'));
     await p.locator('#index2SettingsBtn').click();
     await p.getByRole('button', { name: 'Préparer les voix hors connexion', exact: true }).click();
     await p.locator('#index2SettingsClose').click();

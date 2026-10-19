@@ -1,0 +1,46 @@
+/* Extracted from index.html, cascade slot 3. */
+/* Vue mobile centrée sur le métronome : commandes compactes, cercle prioritaire. */
+  #songExportFormat,#mp3ExportLevel { display: block; margin: 0 0 16px; min-height: 40px; }
+  #mp3ExportDialog > p:not(#mp3ExportStatus) { margin: 0 0 16px; color: var(--text-muted); font-size: 11px; line-height: 1.5; }
+  @media (max-width: 1100px) {
+    body { padding: 6px; }
+    header { min-height: 32px; padding: 0 0 4px; margin-bottom: 4px; }
+    #index2SettingsBtn { width: 32px; height: 32px; min-height: 32px; padding: 0; font-size: 14px; }
+    .mobile-tabs { width: 100%; margin-bottom: 4px; padding: 2px; gap: 3px; }
+    .mobile-tabs button { min-height: 32px; padding: 5px 3px; font-size: 9px; border: 1px solid #454552; background: rgba(255,255,255,.025); }
+    .mobile-tabs button.active { border-color: var(--orange); }
+    .main-grid > .panel-visu.mobile-active { padding: 6px 10px; gap: 4px; }
+    .panel-visu .panel-title { font-size: 9px; padding: 0; margin: 0; border: 0; line-height: 14px; }
+    .panel-visu .train-timer { font-size: 10px; }
+    .panel-visu .mode-switch { gap: 5px; }
+    .panel-visu .mode-switch button { min-height: 32px; font-size: 10px; border-radius: 6px; }
+    .panel-visu .visu-toolbar { padding: 0; border: 0; }
+    .panel-visu .visu-measure-info { gap: 8px; }
+    .panel-visu .visu-measure-info .measure-label {
+      font: 700 13px 'JetBrains Mono', monospace;
+      letter-spacing: 0;
+    }
+    .panel-visu .visu-measure-info .sig-group .slash {
+      font: 700 13px 'JetBrains Mono', monospace;
+    }
+    .panel-visu .numbox-custom { width: 40px; flex-basis: 40px; }
+    .panel-visu .numbox-button {
+      width: 40px; height: 30px; padding: 3px 5px;
+      font: 700 13px 'JetBrains Mono', monospace;
+    }
+    .panel-visu .numbox-button::after {
+      width: 5px; height: 5px;
+    }
+    .panel-visu .sequencer-wrapper { padding: 0; }
+    .panel-visu .legend { font-size: 9px; gap: 8px; line-height: 12px; }
+    footer { margin-top: 4px; padding-top: 4px; gap: 0; }
+    .footer-center { width: min(100%, 260px); grid-template-columns: 164px 86px; }
+    .footer-center #playBtn, .footer-center #playBtn[data-song-transport="true"], .footer-center #panicBtn {
+      min-height: 36px; height: 36px; padding: 6px 10px; font-size: 11px;
+    }
+    .footer-right { display: none; }
+  }
+  @media (min-width: 601px) and (max-width: 1100px) and (min-height: 501px) {
+    .main-grid > .panel-visu.mobile-active { row-gap: 4px; column-gap: 12px; }
+    .panel-visu .mode-switch { width: min(100%, 280px); }
+  }

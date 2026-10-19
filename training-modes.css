@@ -1,4 +1,7 @@
 /* Scoped to the training editor in its existing responsive host. */
+/* Intrinsic JS measurements are fallbacks; the component sets the final sizes. */
+.training-section .compact-select{width:var(--training-native-width,100%);}
+.training-section .compact-select .numbox-button{height:var(--training-native-height,32px);}
 .training-section .training-mode-tabs {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:100%;}
 .training-section .training-mode-tabs button,.training-section .training-curve-options button {display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:40px;padding:6px;border:1px solid #363640;border-radius:6px;background:#15151b;color:var(--text);font:600 10px/1.3 var(--font);cursor:pointer;}
 .training-section .training-mode-tabs button[aria-selected=true] {background:rgba(0,229,255,.08);color:var(--text);border-color:rgba(0,229,255,.55);box-shadow:0 0 0 1px rgba(0,229,255,.08) inset;}
@@ -15,11 +18,11 @@
 .training-section .training-fields select {width:90px;max-width:100%;}
 .training-section #trainIntervalUnit + .numbox-button {width:100%;}
 .training-section #trainingRunStatus {margin:0;font-size:11px;line-height:1.5;color:var(--cyan);}
-.training-section [hidden] {display:none !important;}
+
 .training-section button:disabled,.training-section input:disabled {opacity:.6;cursor:default;}
 .training-section button:focus-visible {outline:2px solid var(--cyan);outline-offset:2px;}
-@media(min-width:1101px){.training-section .training-mode-tabs button,.training-section .training-curve-options button{flex-direction:column;font-size:9px;gap:2px;}.training-section .training-fields .training-row{display:flex;gap:5px;}.training-section .training-fields .row-label{flex:0 0 46px;font-size:9px;}.training-section #dirToggle{width:auto;flex:1;gap:4px;}.training-section #dirToggle button{width:auto;flex:1;height:30px;min-width:0;}.training-section .training-fields .compact-select{width:76px !important;}}
-@media(max-width:1100px){.training-section .training-mode-tabs button{min-height:44px;font-size:11px;}.training-section .training-fields .compact-select{width:96px !important;flex:0 0 96px;}.training-section .training-fields .compact-select .numbox-button{width:100%;height:36px !important;font-size:11px;}.training-section .training-fields .training-row input{flex:1;}}
+@media(min-width:1101px){.training-section .training-mode-tabs button,.training-section .training-curve-options button{flex-direction:column;font-size:9px;gap:2px;}.training-section .training-fields .training-row{display:flex;gap:5px;}.training-section .training-fields .row-label{flex:0 0 46px;font-size:9px;}.training-section #dirToggle{width:auto;flex:1;gap:4px;}.training-section #dirToggle button{width:auto;flex:1;height:30px;min-width:0;}.training-section .training-fields .compact-select{width:76px ;}}
+@media(max-width:1100px){.training-section .training-mode-tabs button{min-height:44px;font-size:11px;}.training-section .training-fields .compact-select{width:96px ;flex:0 0 96px;}.training-section .training-fields .compact-select .numbox-button{width:100%;height:36px ;font-size:11px;}.training-section .training-fields .training-row input{flex:1;}}
 @media(orientation:landscape) and (pointer:coarse) and (max-width:1100px) and (max-height:600px){.panel-training .training-section{display:flex;gap:8px;}.panel-training .training-section .training-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px;}.training-section .training-curve-row{grid-column:1 / -1;display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;}.training-section .training-mode-tabs button,.training-section .training-curve-options button{min-height:34px;}.training-section .training-curve-options svg{height:20px;}.training-section .btn-train{margin:0;}}
 @media(orientation:landscape) and (pointer:coarse) and (max-width:1100px) and (max-height:600px){
   .main-grid > .panel-training.mobile-active {gap:6px;padding:6px 12px;}
@@ -43,18 +46,20 @@
 
 /* One shared height for the duration value and its unit selector. */
 .training-section .training-duration-row{--duration-control-height:32px;align-items:center;}
-.training-section .training-duration-row #trainDuration,
-.training-section .training-duration-row #trainDurationUnit,
-.training-section .training-duration-row .numbox-button{box-sizing:border-box;height:var(--duration-control-height)!important;min-height:var(--duration-control-height)!important;max-height:var(--duration-control-height)!important;margin:0;padding-top:0!important;padding-bottom:0!important;border-radius:6px;}
+.training-section #trainingFields .training-duration-row :is(#trainDuration,#trainDurationUnit,.numbox-button){box-sizing:border-box;height:var(--duration-control-height);min-height:var(--duration-control-height);max-height:var(--duration-control-height);margin:0;padding-top:0;padding-bottom:0;}
+.training-section .training-duration-row #trainDuration,.training-section .training-duration-row #trainDurationUnit,.training-section .training-duration-row .numbox-button{border-radius:6px;}
 @media(max-width:1100px){.training-section .training-duration-row{--duration-control-height:44px;}}
 @media(orientation:landscape) and (pointer:coarse) and (max-width:1100px) and (max-height:600px){.training-section .training-duration-row{--duration-control-height:32px;}}
 
 /* Training uses the same translucent cyan transport style as Play. */
-.training-section #trainBtn{display:flex;align-items:center;justify-content:center;gap:9px;min-height:42px!important;padding:10px 12px!important;border-radius:7px!important;border:1px solid rgba(0,229,255,.65)!important;background:rgba(0,229,255,.08)!important;box-shadow:none!important;color:var(--text)!important;font:600 11px/1.35 var(--font)!important;letter-spacing:.3px!important;text-transform:none!important;transition:background .15s,border-color .15s;}
-.training-section #trainBtn::before{content:'';display:block;flex:none;width:0;height:0;border-left:10px solid var(--cyan);border-top:6px solid transparent;border-bottom:6px solid transparent;}
-.training-section #trainBtn:not(:disabled):hover{background:rgba(0,229,255,.14)!important;border-color:var(--cyan)!important;}
-.training-section #trainBtn.active{background:rgba(0,229,255,.18)!important;border-color:var(--cyan)!important;}
+.training-section #trainBtn{display:flex;align-items:center;justify-content:center;gap:9px;/* requis : contre appearance-theme.css:html#renaxApp[data-theme=light] body #playBtn,html#renaxApp[data-theme=light] body .training-section #trainBtn */min-height:42px!important;padding:10px 12px;/* requis : contre console-theme.css:#playBtn,#trainBtn */border-radius:7px!important;/* requis : contre console-theme.css:#playBtn,#trainBtn */border:1px solid rgba(0,229,255,.65)!important;/* requis : contre console-theme.css:#playBtn,#trainBtn */background:rgba(0,229,255,.08)!important;/* requis : contre console-theme.css:#playBtn,#trainBtn */box-shadow:none!important;/* requis : contre console-theme.css:#playBtn,#trainBtn */color:var(--text)!important;/* requis : contre ivory-theme.css:html#renaxApp[data-theme=ivory] :is(#trainBtn,#trainingVisualBtn) */font:600 11px/1.35 var(--font)!important;/* requis : contre appearance-theme.css:html#renaxApp[data-theme=light] body #playBtn,html#renaxApp[data-theme=light] body .training-section #trainBtn */letter-spacing:.3px!important;/* requis : contre ivory-theme.css:html#renaxApp[data-theme=ivory] :is(#trainBtn,#trainingVisualBtn) */text-transform:none!important;transition:background .15s,border-color .15s;}
+.training-section #trainBtn::before{content:"";display:block;flex:none;width:0;height:0;border-left:10px solid var(--cyan);border-top:6px solid transparent;border-bottom:6px solid transparent;}
+.training-section #trainBtn:not(:disabled):hover{/* requis : contre console-theme.css:#playBtn,#trainBtn */background:rgba(0,229,255,.14)!important;/* requis : contre console-theme.css:#playBtn:hover,#trainBtn:hover */border-color:var(--cyan)!important;}
+.training-section #trainBtn.active{/* requis : contre console-theme.css:#playBtn.btn-cyan,#trainBtn.active */background:rgba(0,229,255,.18)!important;/* requis : contre console-theme.css:#playBtn.btn-cyan,#trainBtn.active */border-color:var(--cyan)!important;}
 .training-section #trainBtn.active::before{width:10px;height:10px;border:0;border-radius:1px;background:var(--cyan);}
-.training-section #trainBtn:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(0,229,255,.24)!important;}
+.training-section #trainBtn:focus-visible{outline:none;/* requis : contre console-theme.css:#playBtn,#trainBtn */box-shadow:0 0 0 2px rgba(0,229,255,.24)!important;}
 .training-section #trainBtn:disabled{opacity:.45;cursor:default;}
 @media(prefers-reduced-motion:reduce){.training-section #trainBtn{transition:none;}}
+
+/* Hidden training rows must not compete with their own layout declarations. */
+.training-section [hidden],.training-section .training-fields [hidden]{display:none;}

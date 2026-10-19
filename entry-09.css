@@ -1,0 +1,9 @@
+/* Extracted from index.html, cascade slot 9. */
+.tempo-slider-row{display:flex;align-items:center;gap:6px;width:100%}
+.tempo-slider-row #bpmSlider{display:none!important}.tempo-slider-row #tempoFader{flex:1;min-width:0;width:auto;margin:0}
+.tempo-step-button{display:flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:32px;padding:0;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.025);color:var(--orange);cursor:pointer}
+.tempo-step-button svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tempo-step-button:hover{border-color:var(--orange);background:rgba(255,111,0,.08)}
+.tempo-step-button:disabled{opacity:.35;cursor:default}
+.tempo-step-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+@media(pointer:coarse){.tempo-step-button{flex-basis:40px;width:40px;height:44px}}

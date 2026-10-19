@@ -1,0 +1,74 @@
+/* Extracted from index.html, cascade slot 2. */
+/* Index 2 uniquement : ergonomie visuelle, sans modifier les commandes. */
+    .song-tabs { gap: 8px; margin-bottom: 4px; }
+    .song-tabs button, .index2-header-btn, .song-back,
+    :is(#songsHome, #songPane, #profilePane) .btn,
+    .footer-center .btn {
+      min-height: 40px; border-radius: 7px; padding: 10px 12px;
+      font-family: var(--font); font-size: 11px; font-weight: 700;
+      line-height: 1.35; letter-spacing: .4px;
+    }
+    .song-tabs button { text-transform: uppercase; }
+    .song-tabs button:not([aria-selected="true"]) { background: #1c1c24; border-color: #363641; }
+    .panel-seq { gap: 16px; }
+    #sequencePane { gap: 16px; }
+    .panel-seq .panel-title { font-size: 11px; padding-bottom: 10px; }
+    .seq-count-row { gap: 10px; }
+    .seq-count-row label { flex-basis: 82px; font-size: 10px; }
+    .seq-count-row select { min-height: 36px; font-size: 12px; border-radius: 7px; }
+    .silent-head-label { font-size: 10px; }
+    .silent-toggle { min-height: 32px; min-width: 52px; border-radius: 7px; font-size: 10px; }
+    .measure-card, #songPane .song-section.measure-card { padding: 12px; border-radius: 8px; gap: 10px; }
+    .measure-num { font-size: 11px; line-height: 1.4; }
+    .measure-sig { font-size: 12px; }
+    .measure-tempo-label, .measure-tempo-unit { font-size: 9px; }
+    .measure-tempo-input { min-height: 30px; font-size: 11px !important; border-radius: 6px; }
+    :is(#songPane, #profilePane) { font-size: 12px; }
+    :is(#songPane, #profilePane) label { margin: 12px 0; line-height: 1.4; }
+    :is(#songPane, #profilePane) input[type="text"], #profilePane select {
+      min-height: 40px; padding: 10px; border-radius: 7px; font-size: 12px;
+    }
+    .song-actions { gap: 8px; margin: 12px 0; }
+    #songPane > .song-actions > .btn { flex: 1; border-color: #3a3a45; }
+    #songPane > .song-actions > .btn:last-child,
+    .song-block-body .song-actions .btn { color: #ffaf78; background: #211812; border-color: #654026; }
+    .song-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .song-back::after { content: none; }
+    #songPane > .btn:not(.song-back) {
+      width: 100%; margin-top: 10px; color: var(--cyan);
+      border-color: #28717d; background: #102126; white-space: normal;
+    }
+    .song-entry { margin: 10px 0; border-color: #3a3a45; }
+    .song-note, .song-block-summary, .song-playlist-summary { font-size: 11px; line-height: 1.55; }
+    .song-note { margin: 4px 0; color: #9a9aaa; }
+    #songPane .song-section.measure-card { margin: 12px 0; }
+    .song-block-header { min-height: 32px; align-items: center; }
+    #songPane .song-inline-field { gap: 10px; margin: 8px 0; font-size: 10px; }
+    #songPane .song-inline-field .numbox-custom { margin-left: auto; }
+    #songPane .song-inline-field .numbox-button { min-height: 36px; border-radius:var(--numeric-radius);font-size:var(--numeric-font-size); }
+    #songPane .song-inline-field .measure-tempo-unit { min-width: 26px; }
+    .song-tempo-value { font-size: 11px; }
+    .footer-center { gap: 10px; }
+    .footer-center #playBtn, .footer-center #playBtn[data-song-transport="true"] {
+      width: 174px; min-width: 174px; min-height: 44px; white-space: nowrap;
+    }
+    .footer-center #panicBtn { min-width: 88px; min-height: 44px; }
+    .footer-center .btn-primary { background: var(--orange); border-color: var(--orange); color: #000; }
+    .footer-center .btn-primary:hover { background: #ff8c33; }
+    .footer-center .btn-cyan { background: var(--cyan); border-color: var(--cyan); color: #000; }
+    .footer-center .btn-cyan:hover { background: #55eeff; }
+    :is(.song-tabs button, .index2-header-btn, .panel-seq button, .footer-center .btn):focus-visible {
+      outline: 2px solid var(--cyan); outline-offset: 3px;
+    }
+    :is(#songPane, #profilePane) input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+    @media (min-width: 1101px) {
+      .main-grid { grid-template-columns: 230px minmax(440px, 1fr) 320px; }
+      .footer-center { left: 276px; bottom: 70px; }
+      .panel-visu { padding-bottom: 72px; }
+      .sequencer-container { max-width: min(680px, calc(100vw - 640px)); }
+    }
+    @media (max-width: 600px) {
+      .footer-center #playBtn, .footer-center #playBtn[data-song-transport="true"] { width: 164px; min-width: 164px; }
+      .footer-center #panicBtn { min-width: 76px; }
+      .song-tabs button, :is(#songsHome, #songPane, #profilePane) .btn { min-height: 44px; }
+    }

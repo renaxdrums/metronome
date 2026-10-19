@@ -1,0 +1,36 @@
+/* Extracted from index.html, cascade slot 13. */
+body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!important;width:100%}
+#multiPresetLibrary > .btn{background:rgba(66,207,225,.12)!important;color:var(--cyan)!important;border:1px solid var(--border)!important;min-height:44px;border-radius:7px}
+#multiPresetLibrary .sequence-preview-play{display:grid;place-items:center;width:32px;min-width:32px;height:32px;padding:7px;border:1px solid var(--border);border-radius:6px;background:#343d47;color:var(--orange);cursor:pointer}
+#multiPresetLibrary .sequence-preview-play svg{width:16px;height:16px;fill:currentColor}
+#multiPresetLibrary .multi-preset-open svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#multiPresetLibrary > h3{color:var(--text);margin:0 0 16px}
+#multiPresetLibrary > .btn{margin-bottom:16px}
+#multiPresetLibrary .multi-preset-card{margin-bottom:10px;cursor:pointer}
+#multiPresetLibrary .multi-track-head{display:flex;align-items:center;gap:8px}
+#multiPresetLibrary .multi-track-name{flex:1;min-width:0;overflow-wrap:anywhere}
+#multiPresetLibrary .measure-sig{white-space:nowrap;font-size:12px}
+#multiPresetLibrary button[hidden],#multiPresetLibrary[hidden],#multiControls[hidden],#multiTracks[hidden]{display:none!important}
+/* Retour MultiMétro : rendu aligné sur les autres boutons Retour des playlists. */
+#multiControls > button.song-back{
+  display:inline-flex;align-items:center;justify-content:center;
+  align-self:flex-start;flex:none;box-sizing:border-box;
+  width:36px;min-width:36px;max-width:36px;
+  height:36px;min-height:36px;padding:0!important;margin:0 0 12px;
+  gap:0;background:#343b45!important;border:1px solid #505b69!important;
+  border-radius:6px;color:var(--orange)!important;box-shadow:none!important;
+}
+#multiControls > button.song-back svg{
+  display:block;flex:none;width:18px;height:18px;
+  fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+#multiControls > button.song-back:hover{
+  background:#414a56!important;border-color:#627080!important;
+}
+#multiControls > button.song-back:focus-visible{
+  outline:2px solid #ff6b0099;outline-offset:3px;
+}
+@media(max-width:1100px){
+  #multiControls > button.song-back{height:44px;min-height:44px;}
+}

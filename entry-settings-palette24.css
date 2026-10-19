@@ -1,0 +1,12 @@
+/* Extracted from index.html, cascade slot 15. */
+html#renaxApp[data-theme=dark] #index2SettingsPanel{background:#282f38!important;border-color:#46515e!important;color:#e7edf3!important}
+html#renaxApp[data-theme=dark] #index2SettingsPanel .index2-settings-section{background:#2e3640!important;border:1px solid #46515e!important;box-shadow:none!important}
+html#renaxApp[data-theme=dark] #index2SettingsPanel :is(h3,.index2-setting-row){color:#c3ccd7!important}
+html#renaxApp[data-theme=dark] #index2SettingsPanel h3{font-size:11px;letter-spacing:.09em}
+html#renaxApp[data-theme=dark] #index2SettingsPanel :is(button,select,.numbox-button){background:#353e49!important;border-color:#52606e!important;color:#e7edf3!important;box-shadow:none!important}
+html#renaxApp[data-theme=dark] #index2SettingsPanel button[aria-pressed=true]{background:#29464f!important;border-color:#56818b!important;color:#e3f5f8!important;box-shadow:inset 0 -2px #609aa5!important}
+html#renaxApp[data-theme=dark] #index2SettingsPanel button:hover:not(:disabled){background:#404b58!important}
+html#renaxApp[data-theme=dark] #index2SettingsPanel .index2-settings-note{background:#343e49!important;color:#bac7d3!important;border-left-color:#d68b50!important}
+html#renaxApp[data-theme=dark] #index2SettingsPanel button:disabled{opacity:.55!important}
+html#renaxApp[data-theme=light] #index2SettingsPanel .index2-settings-section{background:#edf1f4!important;border:1px solid #c6d0d9!important;box-shadow:none!important}
+html#renaxApp[data-theme=light] #index2SettingsPanel .appearance-options button[aria-pressed=true]{background:#dcecf0!important;border-color:#76a7b1!important;box-shadow:inset 0 -2px #087c90!important}

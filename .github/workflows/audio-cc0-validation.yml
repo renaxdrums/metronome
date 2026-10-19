@@ -37,6 +37,7 @@ jobs:
           pnpm lint
           pnpm format:check
           pnpm type-check
+          STYLE_BUDGET_BASE=${{ github.event.pull_request.base.sha }} pnpm check:styles
           pnpm test:coverage:core
           node tests/midi-resource-test.cjs
       - name: Install MP3 inspection tools

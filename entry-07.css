@@ -1,0 +1,6 @@
+/* Extracted from index.html, cascade slot 7. */
+.reset-undo-tools{position:absolute;top:0;right:0;display:flex;flex-direction:column;gap:5px;z-index:4;}
+.reset-undo-tools #panicBtn,.reset-undo-tools #undoBtn{display:flex;align-items:center;justify-content:center;width:32px;min-width:32px;height:32px;min-height:32px;padding:6px;margin:0;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.025);color:var(--orange);cursor:pointer;}
+.reset-undo-tools svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.reset-undo-tools #undoBtn:disabled{opacity:.35;cursor:default;}
+.reset-undo-tools button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}

@@ -1,0 +1,8 @@
+/* Extracted from index.html, cascade slot 6. */
+/* Center the main transport independently of the compact reset control. */
+  .visu-bottom{align-self:stretch;width:100%;}
+  .visu-bottom .footer-center{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);width:100%;gap:8px;}
+  .visu-bottom .footer-center #playBtn,
+  .visu-bottom .footer-center #playBtn[data-song-transport="true"]{grid-column:2;justify-self:center;width:auto;min-width:104px;}
+  .visu-bottom .footer-center #panicBtn{grid-column:3;justify-self:end;width:64px;min-width:64px;padding-inline:8px;}
+  @media(max-width:1100px){footer>.visu-bottom{flex:1;}.visu-bottom .footer-center #playBtn{min-width:104px;}}

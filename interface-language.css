@@ -1,0 +1,5 @@
+/* Language selector; localized labels share the available control width. */
+.interface-language-buttons{display:flex;gap:8px}.interface-language-buttons button{display:grid;place-items:center;width:42px;height:40px;padding:0;border:1px solid #35353f;border-radius:8px;background:#19191f;color:#fff;cursor:pointer;font-size:24px;line-height:1;transition:background .15s,border-color .15s}.interface-language-buttons button:hover{background:#25252e;border-color:#626270}.interface-language-buttons button[aria-pressed="true"]{border-color:#00cfe8;background:rgba(0,207,232,.10)}.interface-language-buttons button:focus-visible{outline:2px solid #00cfe8;outline-offset:3px}
+.interface-language-row{grid-template-columns:1fr}
+.interface-language-buttons{flex-wrap:wrap;max-width:100%}
+.interface-language-buttons button{font-size:12px;min-width:42px;flex:0 0 42px}

@@ -3,9 +3,54 @@ const fs = require('node:fs'),
   cp = require('node:child_process'),
   assert = require('node:assert/strict');
 const { start, save } = require('./audio-harness.cjs');
-const baseline = process.env.INVARIANCE_REF || '274eac965132a8f3120c7e097b8a3cb9c90285e4',
+const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f363091b5fe1c7',
   root = path.resolve(__dirname, '..'),
   cache = new Map();
+const cascadeProbe = process.env.CASCADE_PROBE || '';
+assert(['', 'remove-important', 'layers-only', 'layers-without-important'].includes(cascadeProbe));
+const probeLayers = {
+  'app-base.css': 'base',
+  'accessibility.css': 'components',
+  'training-modes.css': 'components',
+  'navigation-index.css': 'layout',
+};
+async function restoreProbe(page) {
+  if (!cascadeProbe) return;
+  await page.evaluate(() => {
+    for (const { link, style } of window.__cascadeProbe || []) {
+      style.remove();
+      link.disabled = false;
+    }
+    window.__cascadeProbe = [];
+  });
+}
+async function applyProbe(page) {
+  if (!cascadeProbe) return;
+  const sources = Object.fromEntries(
+    Object.entries(probeLayers).map(([file, layer]) => {
+      let body = cp.execFileSync('git', ['show', baseline + ':' + file], {
+        cwd: root,
+        encoding: 'utf8',
+      });
+      if (cascadeProbe !== 'layers-only') body = body.replace(/!\s*important\b/gi, '');
+      if (cascadeProbe !== 'remove-important')
+        body = '@layer base, components, layout, themes;\n@layer ' + layer + ' {\n' + body + '\n}';
+      return [file, body];
+    }),
+  );
+  await page.evaluate((sources) => {
+    window.__cascadeProbe = [];
+    for (const link of document.querySelectorAll('link[rel=stylesheet]')) {
+      const body = sources[new URL(link.href).pathname.split('/').pop()];
+      if (body === undefined) continue;
+      const style = document.createElement('style');
+      style.textContent = body;
+      link.before(style);
+      link.disabled = true;
+      window.__cascadeProbe.push({ link, style });
+    }
+  }, sources);
+}
 async function baselineRoute(page, url) {
   await page.route(url + '/**', async (route) => {
     const pathname = new URL(route.request().url()).pathname,
@@ -43,7 +88,9 @@ async function baselineRoute(page, url) {
   });
 }
 (async () => {
-  const h = await start(),
+  const h = await start({
+      launchArgs: ['--disable-gpu', '--disable-lcd-text', '--force-color-profile=srgb'],
+    }),
     pcm = [],
     visuals = [],
     styleDiffs = [];
@@ -67,43 +114,44 @@ async function baselineRoute(page, url) {
       });
       pages.push(p);
     }
-    for (const rate of [44100, 48000]) {
-      const outputs = [];
-      for (const p of pages)
-        outputs.push(
-          await p.evaluate(async (rate) => {
-            const hashes = {};
-            for (const bank of Object.keys(SOUND_BANKS).sort()) {
-              let seed = 42;
-              Math.random = () => {
-                seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-                return seed / 4294967296;
-              };
-              audioCtx = new OfflineAudioContext(1, rate * 4, rate);
-              for (const first of [false, true])
-                for (const state of [1, 2, 3])
-                  SOUND_BANKS[bank].play(
-                    audioCtx.destination,
-                    0.4 + (state - 1) * 0.5 + (first ? 1.5 : 0),
-                    state,
-                    first,
-                    { beatNumber: state, subIndex: 0, beatDurationSec: 0.5 },
-                  );
-              const x = (await audioCtx.startRendering()).getChannelData(0);
-              const digest = await crypto.subtle.digest('SHA-256', x.buffer);
-              hashes[bank] = {
-                sha256: [...new Uint8Array(digest)]
-                  .map((b) => b.toString(16).padStart(2, '0'))
-                  .join(''),
-                samples: x.length,
-              };
-            }
-            return hashes;
-          }, rate),
-        );
-      assert.deepEqual(outputs[1], outputs[0], 'PCM changed at ' + rate);
-      pcm.push({ rate, banks: outputs[1], identical: true });
-    }
+    if (process.env.VISUAL_ONLY !== '1')
+      for (const rate of [44100, 48000]) {
+        const outputs = [];
+        for (const p of pages)
+          outputs.push(
+            await p.evaluate(async (rate) => {
+              const hashes = {};
+              for (const bank of Object.keys(SOUND_BANKS).sort()) {
+                let seed = 42;
+                Math.random = () => {
+                  seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+                  return seed / 4294967296;
+                };
+                audioCtx = new OfflineAudioContext(1, rate * 4, rate);
+                for (const first of [false, true])
+                  for (const state of [1, 2, 3])
+                    SOUND_BANKS[bank].play(
+                      audioCtx.destination,
+                      0.4 + (state - 1) * 0.5 + (first ? 1.5 : 0),
+                      state,
+                      first,
+                      { beatNumber: state, subIndex: 0, beatDurationSec: 0.5 },
+                    );
+                const x = (await audioCtx.startRendering()).getChannelData(0);
+                const digest = await crypto.subtle.digest('SHA-256', x.buffer);
+                hashes[bank] = {
+                  sha256: [...new Uint8Array(digest)]
+                    .map((b) => b.toString(16).padStart(2, '0'))
+                    .join(''),
+                  samples: x.length,
+                };
+              }
+              return hashes;
+            }, rate),
+          );
+        assert.deepEqual(outputs[1], outputs[0], 'PCM changed at ' + rate);
+        pcm.push({ rate, banks: outputs[1], identical: true });
+      }
     for (const p of pages) await p.close();
     if (process.env.PCM_ONLY !== '1')
       for (const [width, height] of [
@@ -119,6 +167,7 @@ async function baselineRoute(page, url) {
             reducedMotion: 'reduce',
           });
           if (before) await baselineRoute(p, h.url);
+
           await p.goto(h.url);
           await p.evaluate(() => prepareAllVoiceAudio());
           await p.waitForFunction(() => allVoiceAudioReady && window.RENAX_SONGS);
@@ -143,10 +192,18 @@ async function baselineRoute(page, url) {
           ]) {
             const shots = [];
             for (const [i, p] of views.entries()) {
+              await p.bringToFront();
+              if (i) await restoreProbe(p);
               await p.locator('#index2SettingsBtn').click();
               await p.locator('[data-appearance=' + theme + ']').click();
               await p.locator('#index2SettingsClose').click();
               await p.getByRole('tab', { name: module, exact: true }).click();
+              if (i) await applyProbe(p);
+              await p.mouse.move(0, 0);
+              await p.evaluate(() => {
+                document.activeElement?.blur();
+              });
+              await p.evaluate(() => document.fonts.ready);
               await p.evaluate(
                 () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
               );
@@ -186,7 +243,7 @@ async function baselineRoute(page, url) {
               },
               shots.map((bytes) => bytes.toString('base64')),
             );
-            const equal = maxChannelDifference <= 2;
+            const equal = maxChannelDifference === 0;
             visuals.push({ width, height, theme, module, identical: equal, maxChannelDifference });
             if (!equal) {
               const maps = [];
@@ -230,6 +287,9 @@ async function baselineRoute(page, url) {
                           'padding-bottom',
                           'opacity',
                           'border-color',
+                          'border-radius',
+                          'border-width',
+                          'box-shadow',
                           'outline-color',
                           'outline-width',
                         ].map((k) => [k, s.getPropertyValue(k)]),
@@ -260,7 +320,7 @@ async function baselineRoute(page, url) {
           }
         for (const p of views) await p.close();
       }
-    save('quality-invariance-results.json', { baseline, pcm, visuals, styleDiffs });
+    save('quality-invariance-results.json', { baseline, cascadeProbe, pcm, visuals, styleDiffs });
     assert(
       visuals.every((v) => v.identical),
       'Screenshots differ; inspect quality-invariance-results.json',
@@ -268,7 +328,7 @@ async function baselineRoute(page, url) {
     console.log(
       'PASS identical PCM at both rates; ' +
         visuals.length +
-        ' baseline screenshot comparisons (maximum channel rounding tolerance: 2/255)',
+        ' baseline screenshot comparisons (maximum channel difference: 0/255)',
     );
   } finally {
     await h.browser.close();

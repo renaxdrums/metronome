@@ -195,11 +195,14 @@ const key = 'renax.multimetro.v1';
     });
     await denied.goto(h.url);
     await denied.waitForFunction(() => window.RENAX_BACKUP && window.RENAX_SONGS);
-    await denied.waitForFunction(() => document.querySelectorAll('#playBtn').length === 1);
     await denied.getByRole('tab', { name: 'Métronome', exact: true }).click();
-    await denied.locator('#playBtn').click();
+    // Denied storage can re-enable the arrival replica. Its inert, aria-hidden
+    // controls keep duplicate IDs; target only the accessible live transport.
+    const transport = denied.locator('#playBtn').and(denied.getByRole('button'));
+    await transport.click();
     await denied.waitForFunction(() => isPlaying);
-    await denied.locator('#playBtn').click();
+    await transport.click();
+    await denied.waitForFunction(() => !isPlaying);
     assert.deepEqual(errors, []);
     proof.push({ id: 'R05', backupInitialized: true, instrumentWorks: true, errors });
     await denied.close();

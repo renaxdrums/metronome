@@ -91,7 +91,15 @@ async function baselineRoute(page, url) {
 }
 (async () => {
   const h = await start({
-      launchArgs: ['--disable-gpu', '--disable-lcd-text', '--force-color-profile=srgb'],
+      // Repaint complete tiles: partial rasterization changes native range-border
+      // antialiasing after workspace/theme changes despite identical styles and geometry.
+      // Keep every pixel, the strict computed-style gate and the existing threshold.
+      launchArgs: [
+        '--disable-gpu',
+        '--disable-lcd-text',
+        '--force-color-profile=srgb',
+        '--disable-partial-raster',
+      ],
     }),
     pcm = [],
     visuals = [],
@@ -372,6 +380,7 @@ async function baselineRoute(page, url) {
       referenceAgainstItself,
       cascadeProbe,
       pixelThreshold,
+      partialRasterization: false,
       pcm,
       visuals,
       styleComparisons,

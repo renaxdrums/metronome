@@ -1,6 +1,13 @@
 /* Offline interface catalogs. Musical voice language and user content are independent. */
 (() => {
-  const rows = `Bluetooth headphones|Auriculares Bluetooth|Bluetooth-Kopfhörer|Cuffie Bluetooth
+  const rows = `Confirm import|Confirmar importación|Import bestätigen|Conferma importazione
+Cancel|Cancelar|Abbrechen|Annulla
+Import|Importar|Importieren|Importa
+Import {count} guest songs into {email}? No existing songs will be replaced.|¿Importar {count} temas sin cuenta en {email}? No se reemplazará ningún tema existente.|{count} Stücke ohne Konto in {email} importieren? Vorhandene Stücke werden nicht ersetzt.|Importare {count} brani senza account in {email}? Nessun brano esistente verrà sostituito.
+“{name}” has an identifier already used by another version. Import as a separate copy without replacing that version?|«{name}» usa un identificador de otra versión. ¿Importar una copia separada sin reemplazar esa versión?|„{name}“ hat eine Kennung einer anderen Version. Als separate Kopie importieren, ohne diese Version zu ersetzen?|«{name}» usa un identificativo di un’altra versione. Importare una copia separata senza sostituire quella versione?
+Import cancelled: no data changed.|Importación cancelada: ningún dato modificado.|Import abgebrochen: keine Daten geändert.|Importazione annullata: nessun dato modificato.
+Import cancelled: the account or library changed. Start the import again.|Importación cancelada: cambió la cuenta o la biblioteca. Reinicia la importación.|Import abgebrochen: Konto oder Bibliothek geändert. Import erneut starten.|Importazione annullata: account o libreria modificati. Riavvia l’importazione.
+Bluetooth headphones|Auriculares Bluetooth|Bluetooth-Kopfhörer|Cuffie Bluetooth
 Adds 200 ms to the visuals. Disable this option for speakers or wired headphones.|Añade 200 ms a la imagen. Desactiva esta opción con altavoces o auriculares con cable.|Verzögert die Anzeige um 200 ms. Für Lautsprecher oder kabelgebundene Kopfhörer deaktivieren.|Ritarda la visualizzazione di 200 ms. Disattiva con altoparlanti o cuffie cablate.
 Identify audio outputs|Identificar salidas de audio|Audioausgänge erkennen|Identifica uscite audio
 One-time microphone access to identify outputs. No recording. Stop playback before continuing.|Acceso puntual al micrófono para identificar las salidas. Sin grabación. Detén la reproducción antes de continuar.|Einmaliger Mikrofonzugriff zur Erkennung der Ausgänge. Keine Aufnahme. Wiedergabe vorher stoppen.|Accesso temporaneo al microfono per identificare le uscite. Nessuna registrazione. Arresta la riproduzione prima di continuare.

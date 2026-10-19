@@ -70,3 +70,5 @@ Les exceptions CSS nécessaires sont documentées dans `CSS-MIGRATION.md` ; `pnp
 En cas de veille pendant la lecture ou de décalage Bluetooth, Préférences permet d’exporter un diagnostic local incluant le Wake Lock et les latences audio annoncées. Aucun diagnostic n’est envoyé automatiquement.
 
 Pour examiner un changement de sortie Bluetooth, arrêter la lecture puis utiliser « Identifier les sorties audio » dans Préférences. Cette action demande un accès ponctuel au microphone pour exposer les informations des périphériques ; le micro est immédiatement libéré, sans enregistrement ni envoi de son. Exporter ensuite le diagnostic. Cette identification ne constitue pas encore un basculement automatique de compensation.
+
+La version publiée n’inclut plus l’ancienne interface ni son script dédié ; leurs sources restent au dépôt. Les anciennes données locales sont récupérées par l’application actuelle. Les confirmations d’import cloud utilisent des dialogues accessibles traduits. Les dépendances vocales externes sont autorisées uniquement depuis les trois chemins jsDelivr versionnés partagés avec le build.

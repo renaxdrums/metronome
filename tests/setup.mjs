@@ -1,8 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+const runtimeOrigins = createRequire(import.meta.url)('../network-origins.js');
 const root = path.resolve('.qa-cache'),
-  revision = '7ab07eba2d966ce45040c88d9be953e1d68640e7',
-  cdn = `https://cdn.jsdelivr.net/gh/echogarden-project/espeak-ng-emscripten@${revision}/`;
+  cdn = runtimeOrigins.espeak;
 async function download(url, file) {
   try {
     if ((await fs.stat(file)).size > 0) return;

@@ -44,5 +44,42 @@
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
   }
   panel.addEventListener('keydown',keydown);trigger.addEventListener('keydown',keydown);
+  // Shared native-dialog focus contract, also used by cloud confirmations.
+  window.RENAX_DIALOG_FOCUS=Object.freeze({show(dialog,initial){
+    const previous=document.activeElement;
+    dialog.addEventListener('keydown',event=>{
+      event.stopPropagation();
+      if(event.key!=='Tab')return;
+      const items=[...dialog.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),a[href],[tabindex="0"]')].filter(element=>element.getClientRects().length);
+      if(event.shiftKey&&document.activeElement===items[0]){event.preventDefault();items.at(-1)?.focus();}
+      else if(!event.shiftKey&&document.activeElement===items.at(-1)){event.preventDefault();items[0]?.focus();}
+    });
+    dialog.addEventListener('close',()=>setTimeout(()=>{
+      const target=previous?.isConnected&&!previous.disabled?previous:document.querySelector('dialog[open] button:not(:disabled)')||trigger;
+      target?.focus();
+    },0),{once:true});
+    dialog.showModal();(initial||dialog.querySelector('button'))?.focus();
+  }});
+  window.RENAX_DIALOGS=Object.freeze({confirm({messageKey,parameters={}}){
+    if(document.getElementById('renaxCloudConfirm'))return Promise.resolve(false);
+    return new Promise(resolve=>{
+      const dialog=document.createElement('dialog');dialog.id='renaxCloudConfirm';dialog.className='song-confirmation';dialog.setAttribute('aria-labelledby','renaxCloudConfirmTitle');dialog.setAttribute('aria-describedby','renaxCloudConfirmMessage');
+      const title=document.createElement('h3');title.id='renaxCloudConfirmTitle';
+      const message=document.createElement('p');message.id='renaxCloudConfirmMessage';message.className='song-confirm-message';message.dataset.noTranslate='';
+      const actions=document.createElement('div');actions.className='song-confirm-actions';
+      const cancel=document.createElement('button'),accept=document.createElement('button');
+      for(const button of [cancel,accept]){button.type='button';button.className='btn';}
+      accept.classList.add('song-confirm-accept');
+      const render=()=>{
+        title.textContent=RENAX_I18N.t('cloud.confirmTitle');cancel.textContent=RENAX_I18N.t('cloud.cancel');accept.textContent=RENAX_I18N.t('cloud.accept');
+        let text=RENAX_I18N.t(messageKey);for(const [key,value]of Object.entries(parameters))text=text.replaceAll('{'+key+'}',String(value));message.textContent=text;
+      };
+      render();window.addEventListener('renax-language-changed',render);
+      cancel.onclick=()=>dialog.close('cancel');accept.onclick=()=>dialog.close('accept');
+      dialog.addEventListener('close',()=>{window.removeEventListener('renax-language-changed',render);const accepted=dialog.returnValue==='accept';dialog.remove();resolve(accepted);},{once:true});
+      actions.append(cancel,accept);dialog.append(title,message,actions);document.body.append(dialog);
+      try{window.RENAX_DIALOG_FOCUS.show(dialog,cancel);}catch(error){dialog.remove();window.removeEventListener('renax-language-changed',render);resolve(false);console.warn('Confirmation unavailable',error);}
+    });
+  }});
   new MutationObserver(sync).observe(panel,{attributes:true,attributeFilter:['class']});sync();
 })();

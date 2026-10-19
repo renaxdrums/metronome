@@ -5,6 +5,8 @@ const path = require('node:path');
 const cp = require('node:child_process');
 const crypto = require('node:crypto');
 const { minify } = require('html-minifier-terser');
+const runtimeOrigins = require('../network-origins.js');
+const cdnSources = Object.values(runtimeOrigins).join(' ');
 const root = path.resolve(__dirname, '..');
 const parent = path.join(root, 'dist');
 const output = path.join(parent, 'site');
@@ -39,7 +41,10 @@ function prepareOutput() {
   });
   const report = [];
   for (const name of fs.readdirSync(root)) {
-    if (!/\.(?:html|css|js|mjs|webmanifest|ico|txt)$/.test(name) || name === 'eslint.config.mjs')
+    if (
+      !/\.(?:html|css|js|mjs|webmanifest|ico|txt)$/.test(name) ||
+      ['eslint.config.mjs', 'index-legacy.html', 'songs.js'].includes(name)
+    )
       continue;
     const source = fs.readFileSync(path.join(root, name), 'utf8');
     let result = source;
@@ -113,14 +118,14 @@ function prepareOutput() {
     "base-uri 'self'",
     "object-src 'none'",
     "form-action 'self'",
-    "script-src 'self' 'wasm-unsafe-eval' https://www.gstatic.com https://cdn.jsdelivr.net https://www.google.com " +
+    `script-src 'self' 'wasm-unsafe-eval' https://www.gstatic.com ${cdnSources} https://www.google.com ` +
       hashes.join(' '),
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     "media-src 'self' blob:",
     "worker-src 'self' blob:",
-    "connect-src 'self' blob: data: https://www.gstatic.com https://cdn.jsdelivr.net https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://huggingface.co https://*.huggingface.co https://*.hf.co",
+    `connect-src 'self' blob: data: https://www.gstatic.com ${cdnSources} https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://huggingface.co https://*.huggingface.co https://*.hf.co`,
     "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://recaptcha.google.com",
   ].join('; ');
   fs.writeFileSync(path.join(parent, 'csp-candidate.txt'), policy + '\n');

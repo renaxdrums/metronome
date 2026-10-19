@@ -1,9 +1,10 @@
+import '../../network-origins.js';
 import {neuralAudio} from './neural-core.mjs?v=20261009-levels';
 const modelId='onnx-community/Kokoro-82M-v1.0-ONNX-timestamped',revision='dd4401a9add81ac692d20e240d22ec9dda82cc29';
 let initialized,model,tokenizer,runtime,backend='wasm',fallbackReason='';const voices=new Map();
 async function initialize(requested){
  self.postMessage({progress:'Chargement du moteur neuronal…'});
- runtime=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/transformers.min.js');
+ runtime=await import(globalThis.RENAX_NETWORK.transformers+'dist/transformers.min.js');
  runtime.env.allowLocalModels=false;runtime.env.backends.onnx.wasm.numThreads=1;
  self.postMessage({progress:'Chargement du modèle Kokoro…'});
  tokenizer=await runtime.AutoTokenizer.from_pretrained(modelId,{revision});

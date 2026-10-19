@@ -20,6 +20,7 @@
     "tests/audio-headroom-test.cjs",
     "tests/audio-linear-mix-test.cjs",
     "tests/block-drag-gesture-test.cjs",
+    "tests/cloud-confirmation-test.cjs",
     "tests/count-in-performance-test.cjs",
     "tests/current-ui-test.cjs",
     "tests/customization-timer-test.cjs",

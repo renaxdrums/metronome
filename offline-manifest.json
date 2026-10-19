@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "cd247f1cbc0b439e",
+  "revision": "0d9bf7a0b889bfc4",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "cloud-backup.js",
-      "sha256": "f9e5598ca18ab436672ed62620721b02c618810808bd8d7e1e51b56d0fd4996f",
+      "sha256": "11c242a0891d5cd6b59ccd55efcce41b0fbf35c5f70d67a7756d8fd3e1d924a2",
       "text": true
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "3ca99e58aac0b4c88ede1988f55e1be5ffb9376844cbaddb7c419365704d45ef",
+      "sha256": "af8a783936b83288c94398b0ec6f315c10d585ca59727ccb7a0ddd1dc7548aa5",
       "text": true
     },
     {
@@ -284,12 +284,12 @@
     },
     {
       "path": "interface-locales.js",
-      "sha256": "cc8a4984a941369823cb4018bc9203e305d369442e74f83952c517e29c2c4403",
+      "sha256": "05159d261d884e3001d9cb56374e8df19bf016fb8c35b07d465deee5a7d10765",
       "text": true
     },
     {
       "path": "interface-translations.js",
-      "sha256": "787caec43d6be68a8f69999ffcf7c429121498705fbedc278b1d968bd763c807",
+      "sha256": "6f6ea6af0d2ffb1693ba15194be11e0ff0cc61ea82a9136783526a1c98463c3b",
       "text": true
     },
     {
@@ -373,6 +373,11 @@
       "text": true
     },
     {
+      "path": "network-origins.js",
+      "sha256": "c5b6cfb6340c97a60bf227524eace8fe3127fe90374125dc437b7337160fd1da",
+      "text": true
+    },
+    {
       "path": "numbox-controls.js",
       "sha256": "ce94a8848171aaf3ddcb4d3961831e004c33c0248ae22ad46a57fdf63de2978f",
       "text": true
@@ -434,7 +439,7 @@
     },
     {
       "path": "settings-accessibility.js",
-      "sha256": "3fb18747a4eb5ffdc52734f2acd478000195c9714d290dab3c2129ffcd05d5bb",
+      "sha256": "90a57e5e6edf26cac946c6146d1abf21027f123bd214d1c039422d406abb1269",
       "text": true
     },
     {

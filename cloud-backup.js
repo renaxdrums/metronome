@@ -137,17 +137,20 @@ function button(text,parent,action,disabled=false){const node=element('button',t
 async function importGuest(){
   const guest=storage.guestLibrary();if(!guest)return;api.validateLibrary(guest);
   // Preview and confirmation are required before copying anonymous data to an account.
-  if(!confirm('Importer les '+guest.profiles.reduce((n,p)=>n+p.songs.length,0)+' morceaux sans compte dans '+account.email+' ? Aucun morceau existant ne sera remplacé.'))return;
+  const importUid=account?.uid,importScope=storage.scope,importToken=storage.rawToken;
+  const assertImportContext=()=>{if(!importUid||account?.uid!==importUid||storage.scope!==importScope||storage.rawToken!==importToken)throw Error(RENAX_I18N.t('cloud.importChanged'));};
+  if(!await RENAX_DIALOGS.confirm({messageKey:'cloud.importGuest',parameters:{count:guest.profiles.reduce((n,p)=>n+p.songs.length,0),email:account.email}}))return;
+  assertImportContext();
   const signature=({id,...song})=>core.canonical({...song,sections:song.sections.map(({id,...section})=>section)});
   const next=core.copy(api.library),known=new Set(next.profiles.flatMap(p=>p.songs.map(signature))),mapping=core.copy(storage.state.importDecisions.guestProfiles||{});
   for(const p of guest.profiles){const songs=p.songs.filter(s=>!known.has(signature(s))).map(core.copy);for(const song of songs){if(next.profiles.some(profile=>profile.songs.some(existing=>existing.id===song.id&&core.canonical(existing)!==core.canonical(song)))){
-      if(!confirm('« '+song.name+' » utilise un identifiant déjà présent avec une autre version. Importer explicitement comme copie séparée, sans remplacer l’autre version ?'))throw Error('Import annulé : aucune donnée modifiée.');song.id=crypto.randomUUID();
+      if(!await RENAX_DIALOGS.confirm({messageKey:'cloud.importDuplicate',parameters:{name:song.name}}))throw Error(RENAX_I18N.t('cloud.importCancelled'));assertImportContext();song.id=crypto.randomUUID();
     }}
     let profile=next.profiles.find(existing=>existing.id===mapping[p.id]);
     if(!profile){profile=core.copy(p);if(next.profiles.some(existing=>existing.id===profile.id))profile.id=crypto.randomUUID();profile.songs=[];next.profiles.push(profile);mapping[p.id]=profile.id;}
     profile.songs.push(...core.copy(songs));songs.forEach(s=>known.add(signature(s)));
   }
-  api.validateLibrary(next);storage.write(next);const receipt=storage.state;receipt.importDecisions.guestProfiles=mapping;storage.update(receipt);storage.reconcile();queue();
+  assertImportContext();api.validateLibrary(next);storage.write(next);const receipt=storage.state;receipt.importDecisions.guestProfiles=mapping;storage.update(receipt);storage.reconcile();queue();
 }
 let backupView='';
 const backupIcons={

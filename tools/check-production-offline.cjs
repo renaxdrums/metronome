@@ -17,6 +17,10 @@ const { start, newTrack, openPlaylist, save } = require('../tests/audio-harness.
     await p.addInitScript(() => {
       window.showSaveFilePicker = undefined;
     });
+    for (const archive of ['index-legacy.html', 'songs.js']) {
+      const response = await p.request.get(h.url + '/' + archive);
+      assert.equal(response.status(), 404, archive + ' must not be published');
+    }
     await p.goto(h.url);
     await p.waitForFunction(
       () => window.RENAX_OFFLINE?.ready && !!navigator.serviceWorker.controller,

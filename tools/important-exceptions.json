@@ -393,6 +393,6 @@
       "selector": "#songsRoot #profilePane .btn",
       "property": "min-height"
     },
-    "condition": ["@media(max-width:1100px)"]
+    "condition": ["@media (max-width:1100px)"]
   }
 ]

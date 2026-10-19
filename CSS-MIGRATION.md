@@ -19,14 +19,12 @@ Les conflits internes résolus sans priorité sont le masquage des lignes d’en
 | `accessibility.css` | `html#renaxApp body :is(button,a,input,select,textarea,summary,[tabindex]):focus-visible` | `outline` | `console-theme.css:#playBtn:focus-visible,#trainBtn:focus-visible` (`outline`) | toutes |
 | `accessibility.css` | `html#renaxApp body :is(button,a,input,select,textarea,summary,[tabindex]):focus-visible` | `outline-offset` | `renax-pulse-ivory.css:html#renaxApp[data-theme=ivory] body :is(button,summary,.numbox-trigger,.numbox-option):focus-visible` (`outline-offset`) | toutes |
 | `accessibility.css` | `html#renaxApp[data-theme=light] body :is(#sequenceAddMeasure,#trainBtn)` | `color` | `console-theme.css:#playBtn,#trainBtn` (`color`) | toutes |
-| `accessibility.css` | `html#renaxApp[data-theme=light] .seq-count-row>label` | `color` | `appearance-theme.css:html#renaxApp[data-theme=light] body .training-section :is(.row-label,.training-row>span,.training-curve-row),
-html#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label)` (`color`) | toutes |
+| `accessibility.css` | `html#renaxApp[data-theme=light] .seq-count-row>label` | `color` | `appearance-theme.css:html#renaxApp[data-theme=light] body .training-section :is(.row-label,.training-row>span,.training-curve-row), html#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label)` (`color`) | toutes |
 | `accessibility.css` | `html#renaxApp[data-theme=ivory] body #workspaceNav button` | `color` | `ivory-theme.css:html#renaxApp[data-theme=ivory] #workspaceNav button` (`color`) | toutes |
 | `accessibility.css` | `html#renaxApp[data-theme=ivory] body #tapBtn` | `color` | `console-theme.css:.tap-tempo-btn` (`color`) | toutes |
 | `accessibility.css` | `html#renaxApp[data-theme=ivory] body :is(#bpmDisplay>span,.measure-sig,.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label)` | `color` | `ivory-theme.css:html#renaxApp[data-theme=ivory] .silent-settings.disabled :is(label,.numbox-button)` (`color`) | toutes |
 | `accessibility.css` | `html#renaxApp[data-theme=ivory] body .silent-settings.disabled label` | `color` | `ivory-theme.css:html#renaxApp[data-theme=ivory] .silent-settings.disabled :is(label,.numbox-button)` (`color`) | toutes |
-| `accessibility.css` | `html#renaxApp[data-theme=light] body .silent-settings.disabled label` | `color` | `appearance-theme.css:html#renaxApp[data-theme=light] body .training-section :is(.row-label,.training-row>span,.training-curve-row),
-html#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label)` (`color`) | toutes |
+| `accessibility.css` | `html#renaxApp[data-theme=light] body .silent-settings.disabled label` | `color` | `appearance-theme.css:html#renaxApp[data-theme=light] body .training-section :is(.row-label,.training-row>span,.training-curve-row), html#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label)` (`color`) | toutes |
 | `accessibility.css` | `html#renaxApp[data-theme=ivory] body .song-tempo-value` | `color` | `console-theme.css:#songsRoot .song-tempo-value` (`color`) | toutes |
 | `accessibility.css` | `html#renaxApp[data-theme=ivory] body :is(.track-create,.track-add-section)` | `color` | `console-theme.css:#sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,#songsRoot .track-create,#songsRoot .track-add-section` (`color`) | toutes |
 | `accessibility.css` | `html#renaxApp[data-theme=ivory] body #mp3ExportDialog :is(.mp3-credit,.mp3-credit a)` | `color` | `ivory-theme.css:html#renaxApp[data-theme=ivory] .mp3-credit` (`color`) | toutes |
@@ -53,7 +51,7 @@ html#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-uni
 | `training-modes.css` | `.training-section #trainBtn:focus-visible` | `box-shadow` | `console-theme.css:#playBtn,#trainBtn` (`box-shadow`) | toutes |
 | `navigation-index.css` | `:is(#songPane,#profilePane,.playlist-heading,#songPane .song-detail-toolbar) > button.song-back` | `width` | `console-theme.css:#songsRoot #profilePane .song-back` (`width`) | toutes |
 | `navigation-index.css` | `#songsRoot .song-back` | `min-height` | `console-theme.css:#songsRoot #profilePane .btn` (`min-height`) | toutes |
-| `navigation-index.css` | `#songsRoot .song-back` | `min-height` | `console-theme.css:#songsRoot #profilePane .btn` (`min-height`) | @media(max-width:1100px) |
+| `navigation-index.css` | `#songsRoot .song-back` | `min-height` | `console-theme.css:#songsRoot #profilePane .btn` (`min-height`) | @media (max-width:1100px) |
 
 ## Comparaisons contrôlées
 

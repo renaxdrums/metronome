@@ -2,7 +2,7 @@ import * as core from './sync-core.js?v=20261008-auto-sync';
 import {firebaseConfig,providers,appCheckSiteKey,emulator} from './firebase-config.js';
 const storage=window.RENAX_STORAGE,api=window.RENAX_SONGS;
 await storage.ready;
-let account=null,remote=null,sdk=null,auth=null,db=null,unsubscribe=null,generation=0,running=false,retry=0,timer=null,deferred=false,message='Sauvegardé dans ce navigateur',failure='',confirmed=false;
+let account=null,sdk=null,auth=null,db=null,unsubscribe=null,generation=0,running=false,retry=0,timer=null,deferred=false,message='Sauvegardé dans ce navigateur',failure='',confirmed=false;
 let pendingLocalChoice=null;
 const rememberKey='renax-index2-remember-auth';
 const guestAutoOwnerKey='renax-index2-guest-auto-owner-v1';
@@ -79,7 +79,7 @@ async function ensureFirebase(){
   if(emulator){if(!['localhost','127.0.0.1'].includes(location.hostname))throw Error('Émulateurs interdits sur le site public.');authModule.connectAuthEmulator(auth,'http://'+emulator.host+':'+emulator.authPort,{disableWarnings:true});firestore.connectFirestoreEmulator(db,emulator.host,emulator.firestorePort);}
   if(appCheckSiteKey&&!emulator){const check=await import(base+'firebase-app-check.js');check.initializeAppCheck(instance,{provider:new check.ReCaptchaEnterpriseProvider(appCheckSiteKey),isTokenAutoRefreshEnabled:true});}
   authModule.onAuthStateChanged(auth,async user=>{
-    const token=++generation;unsubscribe?.();unsubscribe=null;remote=null;confirmed=false;clearTimeout(timer);account=user;
+    const token=++generation;unsubscribe?.();unsubscribe=null;confirmed=false;clearTimeout(timer);account=user;
     try{
       // Preserve the anonymous library before switching to the account scope.
       // A song created before sign-in must follow the user into the account automatically.
@@ -115,7 +115,7 @@ async function ensureFirebase(){
       // catalog over an existing remote library at the first connection.
       unsubscribe=firestore.onSnapshot(firestore.collection(db,'users',uid,'records'),{includeMetadataChanges:true},snapshot=>{
         if(token!==generation||snapshot.metadata.fromCache||snapshot.metadata.hasPendingWrites)return;
-        remote=snapshot;queue();
+        queue();
       },error=>{confirmed=false;say('Modifications locales en attente',friendly(error));});
       queue();renderPanel();
     }catch(error){say('Sauvegarde locale indisponible',friendly(error));}
@@ -137,17 +137,20 @@ function button(text,parent,action,disabled=false){const node=element('button',t
 async function importGuest(){
   const guest=storage.guestLibrary();if(!guest)return;api.validateLibrary(guest);
   // Preview and confirmation are required before copying anonymous data to an account.
-  if(!confirm('Importer les '+guest.profiles.reduce((n,p)=>n+p.songs.length,0)+' morceaux sans compte dans '+account.email+' ? Aucun morceau existant ne sera remplacé.'))return;
+  const importUid=account?.uid,importScope=storage.scope,importToken=storage.rawToken;
+  const assertImportContext=()=>{if(!importUid||account?.uid!==importUid||storage.scope!==importScope||storage.rawToken!==importToken)throw Error(RENAX_I18N.t('cloud.importChanged'));};
+  if(!await RENAX_DIALOGS.confirm({messageKey:'cloud.importGuest',parameters:{count:guest.profiles.reduce((n,p)=>n+p.songs.length,0),email:account.email}}))return;
+  assertImportContext();
   const signature=({id,...song})=>core.canonical({...song,sections:song.sections.map(({id,...section})=>section)});
   const next=core.copy(api.library),known=new Set(next.profiles.flatMap(p=>p.songs.map(signature))),mapping=core.copy(storage.state.importDecisions.guestProfiles||{});
   for(const p of guest.profiles){const songs=p.songs.filter(s=>!known.has(signature(s))).map(core.copy);for(const song of songs){if(next.profiles.some(profile=>profile.songs.some(existing=>existing.id===song.id&&core.canonical(existing)!==core.canonical(song)))){
-      if(!confirm('« '+song.name+' » utilise un identifiant déjà présent avec une autre version. Importer explicitement comme copie séparée, sans remplacer l’autre version ?'))throw Error('Import annulé : aucune donnée modifiée.');song.id=crypto.randomUUID();
+      if(!await RENAX_DIALOGS.confirm({messageKey:'cloud.importDuplicate',parameters:{name:song.name}}))throw Error(RENAX_I18N.t('cloud.importCancelled'));assertImportContext();song.id=crypto.randomUUID();
     }}
     let profile=next.profiles.find(existing=>existing.id===mapping[p.id]);
     if(!profile){profile=core.copy(p);if(next.profiles.some(existing=>existing.id===profile.id))profile.id=crypto.randomUUID();profile.songs=[];next.profiles.push(profile);mapping[p.id]=profile.id;}
     profile.songs.push(...core.copy(songs));songs.forEach(s=>known.add(signature(s)));
   }
-  api.validateLibrary(next);storage.write(next);const receipt=storage.state;receipt.importDecisions.guestProfiles=mapping;storage.update(receipt);storage.reconcile();queue();
+  assertImportContext();api.validateLibrary(next);storage.write(next);const receipt=storage.state;receipt.importDecisions.guestProfiles=mapping;storage.update(receipt);storage.reconcile();queue();
 }
 let backupView='';
 const backupIcons={
@@ -214,7 +217,7 @@ function renderPanel(){
     const options=element('details',undefined,root);options.className='backup-options';options.open=optionsOpen;element('summary','Options du compte',options);
     const optionActions=element('div',undefined,options);optionActions.className='backup-option-actions';
     const syncButton=button(failure?'Réessayer la synchronisation':'Actualiser la synchronisation',optionActions,sync);syncButton.setAttribute('aria-label','Réessayer la synchronisation');
-    const importButton=button('Importer les morceaux locaux',optionActions,importGuest);importButton.setAttribute('aria-label','Importer les morceaux sans compte');
+    const importButton=button('Importer les morceaux locaux',optionActions,importGuest);importButton.id='backupImportGuest';importButton.setAttribute('aria-label','Importer les morceaux sans compte');
     button('Lier Google à ce compte',optionActions,()=>authenticate('google'),!providers.google);
     const signout=button('Se déconnecter',root,async()=>{await sdk.auth.signOut(auth);sessionStorage.removeItem('renax-index2-auth-enabled');localStorage.removeItem(rememberKey);remember=false;});signout.classList.add('backup-signout');signout.style.borderColor='var(--cyan)';backupIcon(signout,'login');signout.querySelector('svg').style.color='var(--orange)';signout.querySelector('svg').style.transform='rotate(180deg)';
     // JSON controls stay in the dedicated local backup view.

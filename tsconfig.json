@@ -6,9 +6,19 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2022", "DOM"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": [],
     "strict": true
   },
-  "files": ["sync-core.js", "song-tempo-ramp.js", "types/library.d.ts"]
+  "files": [
+    "sync-core.js",
+    "song-tempo-ramp.js",
+    "types/library.d.ts",
+    "local-backup.js",
+    "emergency-backup.js",
+    "midi-export.js",
+    "ui-feedback.js",
+    "numbox-controls.js",
+    "types/globals.d.ts"
+  ]
 }

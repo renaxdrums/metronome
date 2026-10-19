@@ -11,7 +11,7 @@
       --yellow: #168a45;
       --grey: #2a2a35;
       --grey-hover: #3a3a45;
-      --font: 'Inter', sans-serif;
+      --font: "Inter", sans-serif;
       --seq-size: 680px;
       --seq-offset: 232px;
     }
@@ -102,12 +102,12 @@
     .panel-title.with-timer { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
     .train-timer {
-      font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+      font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 700;
       color: var(--cyan); letter-spacing: 1px; white-space: nowrap;
       opacity: 0.35; transition: opacity 0.2s, color 0.2s;
     }
     .train-timer.active { opacity: 1; }
-    .train-timer.active::before { content: '● '; color: var(--orange); animation: timerBlink 1.4s infinite; }
+    .train-timer.active::before { content: "● "; color: var(--orange); animation: timerBlink 1.4s infinite; }
     .train-timer.training { color: var(--orange); }
     .train-timer.training.active::before { color: var(--cyan); }
     @keyframes timerBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
@@ -129,7 +129,7 @@
     .volume-row { display: flex; align-items: center; gap: 8px; }
     .volume-row input[type=range] { flex: 1; }
     .volume-value {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+      font-family: "JetBrains Mono", monospace; font-size: 10px; font-weight: 700;
       color: var(--orange); min-width: 34px; text-align: right; letter-spacing: 0.5px;
     }
 
@@ -151,7 +151,7 @@
     .tap-tempo-btn:hover { background: var(--grey-hover); border-color: var(--orange); }
     .tap-tempo-btn.hit { background: var(--orange); color: #000; border-color: var(--orange); box-shadow: 0 0 12px rgba(255, 107, 0, 0.5); }
     .tap-tempo-btn .key-hint {
-      font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
+      font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 600;
       background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 3px; color: var(--text-muted);
     }
     .tap-tempo-btn.hit .key-hint { background: rgba(0, 0, 0, 0.15); color: #000; }
@@ -160,7 +160,7 @@
     .training-section > label { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
     .training-row { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-muted); }
     .training-row .row-label { flex: 0 0 52px; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .training-row input[type=number] { flex: 1; min-width: 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; text-align: center; -moz-appearance: textfield; }
+    .training-row input[type=number] { flex: 1; min-width: 0; font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700; text-align: center; -moz-appearance: textfield; }
     .training-row input[type=number]::-webkit-outer-spin-button,
     .training-row input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .training-row .unit { font-size: 9px; color: var(--text-muted); flex: 0 0 auto; min-width: 24px; }
@@ -188,7 +188,7 @@
     .dir-toggle button,
     .btn-train,
     .footer-center .btn {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: "JetBrains Mono", monospace;
     }
 
     .seq-count-row { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--text-muted); }
@@ -222,12 +222,12 @@
     .measure-card.playing { border-color: var(--cyan); box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.4) inset, 0 0 12px rgba(0, 229, 255, 0.15); }
     .measure-head { display: flex; justify-content: space-between; align-items: baseline; }
     .measure-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .measure-sig { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--orange); }
+    .measure-sig { font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700; color: var(--orange); }
     .measure-tempo-row { display: flex; align-items: center; gap: 5px; width: fit-content; max-width: 100%; }
     .measure-tempo-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
     .measure-tempo-input {
-      width: 60px !important; min-width: 60px; padding: 3px 5px !important; text-align: center;
-      font-family: 'JetBrains Mono', monospace !important; font-size: 9px !important; font-weight: 700; color: var(--orange) !important;
+      width: 60px ; min-width: 60px; padding: 3px 5px ; text-align: center;
+      font-family: "JetBrains Mono", monospace ; font-size: 9px ; font-weight: 700; /* requis : contre appearance-theme.css:html[data-theme=light] :is(input:not([type=range]):not([type=checkbox]),select,textarea,.numbox-button) */color: var(--orange) !important;
       -moz-appearance: textfield;
     }
     .measure-tempo-input::-webkit-outer-spin-button, .measure-tempo-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -286,7 +286,7 @@
     .visu-measure-info .sig-group select {
       width: 58px;
       padding: 5px 8px;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: "JetBrains Mono", monospace;
       font-size: 12px;
       font-weight: 800;
       color: var(--orange);
@@ -567,9 +567,9 @@
     .poly-card-preview .outer-mini { background:var(--orange); }
     .poly-card-preview .inner-mini { background:var(--cyan); }
     .poly-ratio-row { display:flex; align-items:center; gap:5px; }
-    .poly-ratio-row input { width:50px; min-width:50px; padding:3px 4px; text-align:center; font-family:'JetBrains Mono',monospace; font-weight:800; font-size:10px; }
+    .poly-ratio-row input { width:50px; min-width:50px; padding:3px 4px; text-align:center; font-family:"JetBrains Mono",monospace; font-weight:800; font-size:10px; }
     body.poly-mode .silent-section { display:none; }
-    body.poly-mode .beat-controls { display:none !important; }
+    body.poly-mode .beat-controls { display:none ; }
     body.poly-mode .legend { opacity:1; }
     body.poly-mode .legend .legend-item { display:flex; }
     @media (max-width:1100px) {
@@ -592,10 +592,10 @@
        ========================================================= */
 
     /* Les contrôles 5/3 ne doivent exister visuellement qu'en Polyrythmie. */
-    body:not(.poly-mode) #polyControls { display: none !important; }
-    body.poly-mode #polyControls { display: flex !important; }
-    body.poly-mode #metroSigGroup { display: none !important; }
-    body:not(.poly-mode) #metroSigGroup { display: flex !important; }
+    body:not(.poly-mode) #polyControls { display: none ; }
+    body.poly-mode #polyControls { display: flex ; }
+    body.poly-mode #metroSigGroup { display: none ; }
+    body:not(.poly-mode) #metroSigGroup { display: flex ; }
 
     /* Scrollbar du panneau Séquenceur : fond fondu dans le panneau + trait cyan fin. */
     .panel-seq {
@@ -615,8 +615,8 @@
     .author-credit { font-size: 9px; }
 
     @media (min-width: 1101px) {
-      .mobile-training-bpm { display:none !important; }
-      .panel-training { display:none !important; }
+      .mobile-training-bpm { display:none ; }
+      .panel-training { display:none ; }
       /* Titre principal PC. */
       .header-center h2 { font-size: 16px; }
 
@@ -659,7 +659,7 @@
       }
       /* START / RESET : style rectangulaire d'origine, conservé au nouvel emplacement. */
       .footer-center .btn {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: "JetBrains Mono", monospace;
       }
 
       /* Le footer ne réserve plus la hauteur des anciens boutons centraux. */
@@ -683,7 +683,7 @@
         flex-wrap: nowrap;
       }
       body.poly-mode .panel-visu .beat-controls {
-        display: flex !important;
+        display: flex ;
         visibility: hidden;
         pointer-events: none;
       }
@@ -734,20 +734,20 @@
     }
 
     /* ===== Numbox custom : scrollbar fine cyan (pas de grosse scrollbar système) ===== */
-    .numbox-native {
-      position: absolute !important;
-      width: 1px !important;
-      height: 1px !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-      clip: rect(0 0 0 0) !important;
-      clip-path: inset(50%) !important;
+    html#renaxApp .numbox-custom > .numbox-native {
+      position: absolute ;
+      width: 1px ;
+      height: 1px ;
+      /* requis : contre appearance-theme.css:html#renaxApp[data-theme=light] body .silent-settings.disabled :is(select,.numbox-button) */opacity: 0 !important;
+      pointer-events: none ;
+      clip: rect(0 0 0 0) ;
+      clip-path: inset(50%) ;
     }
     .numbox-custom {
       position: relative;
       width: 58px;
       flex: 0 0 58px;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: "JetBrains Mono", monospace;
     }
     .numbox-button {
       width: 58px;
@@ -757,7 +757,7 @@
       border-radius: 5px;
       background: var(--grey);
       color: var(--orange);
-      font: 800 12px 'JetBrains Mono', monospace;
+      font: 800 12px "JetBrains Mono", monospace;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -765,7 +765,7 @@
       cursor: pointer;
     }
     .numbox-button::after {
-      content: '';
+      content: "";
       width: 6px; height: 6px;
       border-right: 2px solid var(--orange);
       border-bottom: 2px solid var(--orange);
@@ -800,7 +800,7 @@
       border: 0;
       background: transparent;
       color: var(--text);
-      font: 800 12px 'JetBrains Mono', monospace;
+      font: 800 12px "JetBrains Mono", monospace;
       text-align: center;
       padding: 6px 4px;
       cursor: pointer;
@@ -808,7 +808,7 @@
     .numbox-option:hover, .numbox-option.active { background: rgba(0,229,255,.12); color: var(--cyan); }
 
     /* ===== Préparation audio : fine ligne cyan + READY temporaire ===== */
-    .audio-ready-wrap[hidden] { display: none !important; }
+    .audio-ready-wrap[hidden] { display: none ; }
     .audio-ready-wrap {
       position: absolute;
       right: 12px;
@@ -855,7 +855,7 @@
 #index2SettingsBtn{font-size:15px;padding:0 10px;color:var(--orange);}
 header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:focus-visible,header #fullscreenBtn:hover,header #fullscreenBtn:focus-visible{color:var(--orange);}
 .index2-badge{
-  font:700 8px 'JetBrains Mono',monospace;color:var(--orange);
+  font:700 8px "JetBrains Mono",monospace;color:var(--orange);
   border:1px solid rgba(255,107,0,.28);border-radius:999px;padding:4px 7px;
   letter-spacing:.6px;white-space:nowrap;
 }
@@ -893,7 +893,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   border-left:2px solid var(--orange);background:rgba(255,107,0,.045);
 }
 .index2-status{
-  font:700 8px 'JetBrains Mono',monospace;text-transform:uppercase;
+  font:700 8px "JetBrains Mono",monospace;text-transform:uppercase;
   letter-spacing:.6px;color:var(--cyan);
 }
 .index2-settings-backdrop{
@@ -932,9 +932,9 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
     position:static;inset:auto;width:auto;height:100%;max-height:none;
     border-radius:6px;box-shadow:none;padding:12px;
   }
-  .index2-settings-panel.mobile-active{display:flex !important;}
-  .index2-settings-panel.open{display:flex !important;}
-  .index2-settings-backdrop{display:none !important;}
+  .index2-settings-panel.mobile-active{display:flex ;}
+  .index2-settings-panel.open{display:flex ;}
+  .index2-settings-backdrop{display:none ;}
 }
 @media (max-width:600px){
   /* Smartphone — START / RESET symétriques autour de l'axe vertical. */
@@ -947,10 +947,10 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 @media (max-width:600px){
   .index2-header-btn span{display:none;}
   .index2-header-btn{width:34px;padding:0;}
-  #index2SongsBtn::before{content:'♫';font-size:14px;}
+  #index2SongsBtn::before{content:"♫";font-size:14px;}
   .index2-setting-row{grid-template-columns:1fr 118px;}
 }
 
       button, [role="button"], .btn { -webkit-user-select: none; user-select: none; }
     :is(button, [role="button"], .btn) :is(input, textarea, [contenteditable="true"]) { -webkit-user-select: text; user-select: text; }
-@media(max-width:1100px){body.training-tab-open #playBtn,body.training-tab-open #panicBtn{display:none!important;}#trainBtn:not(.active)::before{content:"";display:inline-block;width:12px;height:12px;margin-right:7px;vertical-align:-1px;background:currentColor;clip-path:polygon(15% 0,100% 50%,15% 100%);}}
+@media(max-width:1100px){body.training-tab-open #playBtn,body.training-tab-open #panicBtn{/* requis : contre renax-pulse-ivory.css:html#renaxApp[data-theme=ivory] :is(.reset-undo-tools #panicBtn,.reset-undo-tools #undoBtn) */display:none!important;}#trainBtn:not(.active)::before{content:"";display:inline-block;width:12px;height:12px;margin-right:7px;vertical-align:-1px;background:currentColor;clip-path:polygon(15% 0,100% 50%,15% 100%);}}

@@ -1,6 +1,7 @@
+import '../../network-origins.js';
 import {withDurations} from './piper-model.mjs';
 import {normalizeVoice} from './voice-loudness.mjs?v=20261009-levels';
-const runtimeURL='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0-dev.20250409-89f8206ba4/dist/';
+const runtimeURL=globalThis.RENAX_NETWORK.onnx+'dist/';
 const modelURL='https://huggingface.co/rhasspy/piper-voices/resolve/c10ece1aade47bb51c153c893d14e5bf8e5b7117/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx';
 let ready,ort,session,config;
 async function initialize(){

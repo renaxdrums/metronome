@@ -60,7 +60,7 @@ Les trois scripts classiques `metronome-audio.js`, `metronome-core.js` et `metro
 
 L'aperçu du guide utilise le contrat explicite et figé `RENAX_AUDIO_ADAPTER` (`prepare`, `ready`, `configure`, `destination`, `click`, `count`), sans évaluation de chaînes dans la fenêtre enfant. `prepare` est asynchrone et prépare les enregistrements nécessaires avant le rendu. Les 40 voix enregistrées se chargent à la première demande vocale ou à l'action explicite de préparation hors connexion. Les modèles de synthèse naturelle restent distincts.
 
-`types/library.d.ts` décrit bibliothèque, morceaux, sections et opérations de synchronisation. Le contrôle JSDoc de `sync-core.js` et `song-tempo-ramp.js` fonctionne sans émettre de JavaScript. Il est strict sur ces deux modules et progressif pour le reste du projet ; il ne couvre pas encore tout le DOM ni le moteur audio. La validation des imports à l'exécution reste obligatoire.
+`types/library.d.ts` décrit bibliothèque, morceaux, sections et opérations de synchronisation. Le contrôle JSDoc de `sync-core.js` et `song-tempo-ramp.js` fonctionne sans émettre de JavaScript. Il est strict sur sept fichiers : ces deux modules, local-backup.js, emergency-backup.js, midi-export.js, ui-feedback.js et numbox-controls.js. Il ne couvre pas encore tout le DOM ni le moteur audio. La validation des imports à l'exécution reste obligatoire.
 
 `interface-translations.js` contient le dictionnaire FR/EN, indépendant du parcours DOM. Le contrôleur crée sa propre copie pour ses compléments historiques ; les nouveaux messages utilisent des clés. En l'absence du fichier de données, l'interface reste française et conserve la préférence anglaise pour la prochaine ouverture réussie. Les noms des utilisateurs ne sont pas des clés de traduction.
 
@@ -79,3 +79,53 @@ La navigation principale est présente dès le HTML. Seule la grille musicale en
 Ne pas fixer `data-mobile-pane` dans le HTML initial : avant l’installation du gestionnaire de disposition, la restauration de l’historique lit l’onglet natif actif. Un état mobile prématuré peut créer une entrée de détail supplémentaire après rechargement. Le test Retour/Avancer couvre cette régression.
 
 Les marques User Timing `renax-workspace-loading` et `renax-workspace-visible` séparent l’attente réelle de la grille du temps total de navigation ; elles sont optionnelles sur un navigateur sans `performance.mark`. Les mesures de libellés restaurent toutes les tailles, lisent les dimensions, puis appliquent les ajustements en trois passes pour éviter un recalcul de page par libellé. Une première vue native déjà rendue est réutilisée uniquement lorsque l’écran d’historique est absent ou correspond lui aussi au métronome par défaut, et lorsque l’état natif par défaut est intact ; les autres ouvertures passent par la restauration habituelle.
+
+## Contrat des tests et de la CI nocturne
+
+`tests/run.cjs` découvre les tests de premier niveau, plus les scénarios Firebase locaux historiques. Sur Linux il utilise le Chromium installé par Playwright ; `CHROME_PATH` et `RENAX_CHROME` peuvent toujours remplacer ce chemin. Une sélection `--only=` inconnue échoue au lieu de réussir sans exécuter de test.
+
+Avec `RENAX_NIGHTLY=1`, le runner vérifie d’abord le registre `tests/ci-policy.json`, affiche les exclusions motivées et n’exécute que la sélection nocturne explicite. Les scénarios nécessitant les émulateurs restent dans le job Firebase ; les sélecteurs natifs et modèles neuronaux absents ont des exclusions écrites. `tools/check-test-coverage.cjs` vérifie récursivement que chaque fichier `*-test.cjs` ou `*-test.mjs` possède exactement une classification et que les commandes dédiées existent. Le workflow planifié est également exécuté sur les PR qui changent ce contrat, afin de le valider avant fusion. Les artefacts conservent les résultats et journaux par test.
+
+Les références de `tests/timing-test.cjs` sont des temps physiques, convertis avec `AudioBuffer.sampleRate` après décodage. Les 20 scénarios sont rendus à 44,1 et 48 kHz. L’interpolation des échantillons fractionnaires conserve le critère de forme d’onde et le validateur temporel rejette aussi une injection volontaire de 25 ms. Le contrat des scripts classiques et le moteur audio restent inchangés.
+
+
+## Contrat de lecture : veille et synchronisation visuelle
+
+`playback-support.js` reste un script classique, chargé avant `metronome-transport.js`, sans déplacer les scripts existants. `window.RENAX_PLAYBACK` possède le verrou écran des transports métronome/morceau et multipiste : acquisition seulement pendant la lecture visible, libération à l’arrêt, après erreur, au masquage et à `pagehide`, réacquisition au retour. Une demande encore en attente à l’arrêt est libérée dès sa résolution. API absente ou refusée : la lecture reste disponible. Les générations distinctes du transport et du verrou empêchent une ancienne demande ou un ancien rappel visuel de survivre à un arrêt.
+
+`delayMs(context)` retourne `outputLatency` (ou `baseLatency` à défaut) en millisecondes, plus exactement 200 ms si l’option « Casque Bluetooth » est activée, sinon 0 ms de correction supplémentaire. `setBluetoothEnabled(boolean)` conserve le choix dans `renax.bluetoothHeadphones.v1`, sous garde de stockage ; nouveau navigateur désactivé par défaut. Une ancienne compensation non nulle active l’option lors de la migration, avec valeur désormais fixée à 200 ms. `manualMs` vaut 200 et `diagnosticSnapshot().audio.appliedManualMs` précise la correction effectivement appliquée. Le réglage/calibration variable et `setManual` sont retirés à la demande explicite de l’utilisateur. Aucun basculement automatique n’est revendiqué.
+
+Le décalage concerne uniquement les rappels d’affichage, les cues de partition et `RenaxMultiClock.Clock.visualWhen`. Les sons, gains et horizons audio restent inchangés. La roue dentée ouvre et ferme les Préférences ; elle reste accessible avec le dialogue ouvert, avec `aria-expanded`, un piège de focus qui inclut ce déclencheur et un retour du focus à la fermeture. Les autres contrôles restent inertes.
+
+## Phase 5 : présentation et cinq langues hors ligne
+
+Les anciens blocs CSS de `index.html` sont chargés depuis les fichiers `entry-*.css`, au même emplacement relatif parmi les feuilles existantes. Plusieurs fichiers sont nécessaires car les blocs étaient intercalés entre les feuilles ; les réunir en un seul lien déplacerait la cascade. Le style du sélecteur est chargé à sa position tardive par `interface-language.css`. Aucun bloc style ni !important ne demeure dans index.html. Les quatre grandes feuilles de thème restent inchangées.
+
+Les couches `@layer` sont reportées : leur introduction isolée modifie le rendu avec les grandes feuilles hors couche, dont la modification est exclue du périmètre. Les variables de couleur par thème restent hors couche. Les quatre petites feuilles passent de 82 à 36 priorités : chaque priorité conservée nomme sa règle concurrente, avec inventaire dans `CSS-MIGRATION.md` et `tools/important-exceptions.json`. Le contrôle du budget vérifie cet inventaire et les commentaires associés.
+
+Les dimensions intrinsèques des sélecteurs d’entraînement passent par `--training-native-width` et `--training-native-height`, afin que les règles du composant puissent les ajuster sans priorité contre un style inline. Les contrôles natifs masqués utilisent un sélecteur ciblé dans `app-base.css`. Les libellés dynamiques de navigation passent par `RENAX_I18N.t`.
+
+`vendor/i18next-25.6.0.js` est la distribution UMD officielle lisible, accompagnée de sa licence MIT ; elle est servie localement. L’ordre relatif des scripts existants reste inchangé. `RENAX_TRANSLATIONS` fournit les sources français/anglais et clés historiques, `RENAX_LOCALES` les catalogues espagnol, allemand et italien. `interface-language.js` adapte le DOM et utilise une instance i18next avec ressources embarquées ; aucun service de traduction n’est appelé. `RENAX_I18N` conserve `language`, `t`, `setLanguage` et expose `supportedLanguages`. `renax.interfaceLanguage.v1` accepte fr/en/es/de/it ; le refus du stockage ne bloque pas l’interface. Les noms saisis, données musicales et langues audio ne dépendent pas de la langue d’interface.
+
+`tools/style-budget.json` fixe par fichier le plafond de !important CSS et des affectations directes de style JS, comptées par analyse syntaxique. `pnpm check:styles` refuse toute hausse, tout !important ou bloc style dans index.html ; la CI compare aussi le budget au commit de base de la PR. `--update` peut seulement abaisser un budget existant.
+
+`quality-invariance-test.cjs` sépare la comparaison d’image (égalité stricte 0/255 par canal/pixel, sans pourcentage toléré) et l’égalité stricte des styles calculés sur les 54 combinaisons. `INVARIANCE_SELF=1 VISUAL_ONLY=1` mesure le bruit de la référence comparée à elle-même. Les styles des éléments principaux rendus doivent rester identiques même si le plafond d’image est respecté.
+
+`RENAX_PLAYBACK.diagnosticSnapshot(context)` expose une copie bornée des 32 derniers événements Wake Lock (demande, acquisition, libération, catégorie de refus), les capacités/contexte sécurisé/politique effective et les latences audio. Le diagnostic local `RENAX_FEEDBACK.diagnosticReport().playback` inclut ces observations ; aucune donnée musicale, message brut d’exception ou donnée de compte n’y est ajoutée. Ce diagnostic ne modifie pas la planification audio.
+
+`RENAX_PLAYBACK.identifyOutputs()` est une action explicite, bloquée pendant la lecture/préparation audio. Elle sollicite une autorisation microphone, ferme immédiatement toutes les pistes obtenues, puis énumère les seules sorties audio. Aucun MediaRecorder ni graphe de capture n’est créé. `diagnosticSnapshot().outputIdentification` expose le statut, les empreintes SHA-256 des identifiants et groupes, la présence de libellés et les informations de sink disponibles ; aucun libellé ou identifiant brut n’est exporté. La compensation reste inchangée : la présence d’un périphérique ne prouve pas qu’il est la sortie effective.
+
+## Phase 3 — publication et confirmations
+
+`network-origins.js` est une constante UMD gelée, utilisable par les workers ESM existants, Node et le build. Elle définit une seule fois les trois racines jsDelivr versionnées. Les workers et `tests/setup.mjs` les réutilisent ; `tools/build-production.cjs` les utilise pour `script-src` et `connect-src`. Le HTML source reste sans CSP produite ; seule la copie `dist/site` reçoit la politique. Les scripts classiques conservent leur ordre.
+
+L’archive `index-legacy.html` et son seul consommateur `songs.js` restent au dépôt mais sont exclus du site publié. La récupération de la clé historique est effectuée par `local-backup.js` dans l’application actuelle ; aucun fichier de données n’est supprimé.
+
+`RENAX_DIALOG_FOCUS.show(dialog, initial)` centralise focus initial, Tab/Shift+Tab, isolation des raccourcis et retour du focus. `RENAX_DIALOGS.confirm({messageKey, parameters})` renvoie une Promise booléenne via un dialogue natif, avec Annuler initial, Échap et textes à clés dans cinq langues. Les paramètres utilisateur sont exclusivement du texte. Les deux imports cloud attendent ce résultat et vérifient compte, portée et jeton de bibliothèque avant toute écriture. Le confirm interne de secours n’est pas modifié.
+
+
+## Globales des scripts classiques et types
+
+`tools/classic-script-globals.json` est le registre explicite des noms partagés : il liste les 31 scripts classiques applicatifs à la racine de la page dans leur ordre, les déclarations lexicales des trois fichiers historiques du moteur et les API de fenêtre. Les constantes sont déclarées en lecture seule dans ESLint, les variables de transport réassignées sont modifiables. Les noms de fixtures sont réservés aux tests. `tools/check-classic-script-globals.cjs`, lancé par `pnpm lint`, refuse une divergence de déclarations ou d’ordre sans mise à jour du contrat. Aucun script classique n’est converti en module ES.
+
+`types/globals.d.ts` précise les contrats de bibliothèque, stockage atomique, secours IndexedDB, export MIDI, contrôles et diagnostic consommés par les sept fichiers vérifiés. Les autres API sont déclarées `unknown` ; cela ne prétend pas vérifier leurs consommateurs. Le déclaratif voisin de web-vitals évite de typiser son code minifié. Il n’est ni exécuté ni publié. Les annotations et marques d’export n’altèrent pas les calculs audio ; le PCM reste comparé bit à bit aux deux fréquences.

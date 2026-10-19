@@ -1,6 +1,5 @@
 // Local song library. Storage is scoped to this browser origin; exports are portable.
 (() => {
-  const KEY='renax-drums-songs-v1';
   const id=()=>crypto.randomUUID();
   const clone=value=>JSON.parse(JSON.stringify(value));
   const collapsedCountIns=new Set();
@@ -19,7 +18,7 @@
   let persistTimer=null,persistFailed=false,songReloadDepth=0;
   let library,selectedSong=null,loaded=null,endTimer=null,songView='home',openSectionId=null,storageStatus='Enregistrement automatique';
   try { library=JSON.parse(RENAX_STORAGE.read())||defaultLibrary();validateLibrary(library); }
-  catch (error) { RENAX_STORAGE.markCorrupt();library=defaultLibrary();storageStatus='Sauvegarde locale illisible : la source a été conservée. Exportez vos données avant de continuer.'; }
+  catch (_error) { RENAX_STORAGE.markCorrupt();library=defaultLibrary();storageStatus='Sauvegarde locale illisible : la source a été conservée. Exportez vos données avant de continuer.'; }
   if(!library.profiles.some(p=>p.id===library.activeProfile))library.activeProfile=library.profiles[0].id;
   function validateLibrary(data) {
     if(data.version!==1||!Array.isArray(data.profiles)||!data.profiles.length)throw Error('Format de bibliothèque incorrect.');
@@ -216,7 +215,7 @@
     if(!isPlaying&&!loaded&&transportSong())loadSong();
     const result=await originalStart();syncDirectSongPlay();return result;
   };
-  const originalStop=stopMetronome;stopMetronome=function(...args){if(!songReloadDepth){songStartEpoch++;preparingAmorce=false;}window.RENAX_AMORCE?.stop();clearTimeout(endTimer);const result=originalStop(...args);syncSongTransport();return result;};
+  const originalStop=stopMetronome;stopMetronome=function(...args){if(!songReloadDepth&&!args[0]?.startupFailure){songStartEpoch++;preparingAmorce=false;}window.RENAX_AMORCE?.stop();clearTimeout(endTimer);const result=originalStop(...args);syncSongTransport();return result;};
   const originalMode=setAppMode;setAppMode=function(mode){unload();return originalMode(mode);};
   function resetSelectedSongBlock(){
     const current=song();
@@ -261,7 +260,7 @@
     if(!loaded){cards.forEach(card=>card.classList.remove('active','playing'));return;}
     const position=locate(activeMeasureIndex);if(!position)return;
     let playingCard=null;
-    cards.forEach((card,index)=>{const current=(card.dataset.sectionId||card.dataset.countInId)===position.section.id;card.classList.toggle('playing',isPlaying&&current);card.classList.toggle('active',current);if(current)playingCard=card;});
+    cards.forEach((card,_index)=>{const current=(card.dataset.sectionId||card.dataset.countInId)===position.section.id;card.classList.toggle('playing',isPlaying&&current);card.classList.toggle('active',current);if(current)playingCard=card;});
     if(playingCard)followPlayingBlock(playingCard,position.section);
   }
 
@@ -548,7 +547,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         card.addEventListener('click',e=>{if(!e.target.closest('input,select,button,label')){if(openSectionId===section.id)setSectionOpen(null);else choose(false);}});card.addEventListener('keydown',e=>{if(e.target===card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();choose();}});
         const label=field('Libellé',body,section.label,value=>{section.label=value.trim()||'Section '+(i+1);changed();if(s.amorce)RENAX_AMORCE.prepare(s).catch(error=>status(error.message));});label.setAttribute('list','songLabels');
         if(s.amorce){const langs=el('div',undefined,body,'amorce-languages');for(const language of ['fr','en']){const b=button(language.toUpperCase(),langs,()=>{if(i===0){const previous=s.amorceDefaultLanguage||'fr';s.amorceDefaultLanguage=language;s.amorceLanguageChosen=true;for(const block of s.sections){if(block===section||(!block.amorceLanguageOverride&&(!block.amorceLanguage||block.amorceLanguage===previous)))block.amorceLanguage=language;}}else{section.amorceLanguage=language;section.amorceLanguageOverride=true;}changed();RENAX_AMORCE.prepare(s).catch(error=>status(error.message));});b.setAttribute('aria-pressed',String((section.amorceLanguage||'fr')===language));if((section.amorceLanguage||'fr')===language){b.style.color='var(--orange)';b.style.borderColor='var(--orange)';}b.setAttribute('aria-label',language.toUpperCase()+' pour '+section.label);}}label.addEventListener('input',()=>{section.label=label.value.trim()||'Bloc '+(i+1);title.textContent=section.label;schedulePersist();});
-        const fields=el('div',undefined,body,'song-block-controls');const count=songNumbox('Mesures',fields,section.count,(value,input)=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1){input.value=section.count;return;}const total=s.sections.reduce((n,x)=>n+(x===section?0:x.count),0)+n;if(!Number.isSafeInteger(total)){input.value=section.count;return;}section.count=n;changed();},Array.from({length:64},(_,i)=>i+1));
+        const fields=el('div',undefined,body,'song-block-controls');songNumbox('Mesures',fields,section.count,(value,input)=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1){input.value=section.count;return;}const total=s.sections.reduce((n,x)=>n+(x===section?0:x.count),0)+n;if(!Number.isSafeInteger(total)){input.value=section.count;return;}section.count=n;changed();},Array.from({length:64},(_,i)=>i+1));
         const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999||section.tempoRamp?.enabled&&n>=section.tempoRamp.endTempo){input.value=section.measure.tempo;if(section.tempoRamp?.enabled&&n>=section.tempoRamp.endTempo)status('Le tempo de départ doit rester inférieur au tempo d’arrivée.');return;}if(section.measure.tempo===n){input.value=String(n);return;}unload();section.measure.tempo=n;resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';
         const rampControls=el('div',undefined,body,'song-ramp-controls');
         const rampLabel=el('label',undefined,rampControls,'song-ramp-toggle');

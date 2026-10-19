@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict'),
   fs = require('node:fs'),
-  path = require('node:path'),
+  _path = require('node:path'),
   cp = require('node:child_process');
 const { start, newTrack, openPlaylist, save } = require('../tests/audio-harness.cjs');
 (async () => {
@@ -17,6 +17,10 @@ const { start, newTrack, openPlaylist, save } = require('../tests/audio-harness.
     await p.addInitScript(() => {
       window.showSaveFilePicker = undefined;
     });
+    for (const archive of ['index-legacy.html', 'songs.js']) {
+      const response = await p.request.get(h.url + '/' + archive);
+      assert.equal(response.status(), 404, archive + ' must not be published');
+    }
     await p.goto(h.url);
     await p.waitForFunction(
       () => window.RENAX_OFFLINE?.ready && !!navigator.serviceWorker.controller,
@@ -48,11 +52,22 @@ const { start, newTrack, openPlaylist, save } = require('../tests/audio-harness.
     await p.getByRole('tab', { name: 'Métronome', exact: true }).click();
     await p.locator('#playBtn').click();
     await p.waitForFunction(() => isPlaying);
-    const origin = await p.evaluate(() => performance.timeOrigin);
+    await p.evaluate(() => performance.timeOrigin);
     await p.locator('#playBtn').click();
     await context.setOffline(true);
     await p.reload();
     await p.waitForFunction(() => window.RENAX_SONGS && window.RENAX_OFFLINE?.ready);
+    for (const language of ['fr', 'en', 'es', 'de', 'it']) {
+      await p.evaluate((language) => RENAX_I18N.setLanguage(language), language);
+      await p.reload();
+      await p.waitForFunction(
+        (language) => window.RENAX_I18N?.language === language && window.RENAX_SONGS,
+        language,
+      );
+      assert.equal(await p.evaluate(() => document.documentElement.lang), language);
+      assert.equal(await p.evaluate(() => JSON.stringify(RENAX_SONGS.library)), library);
+    }
+    await p.evaluate(() => RENAX_I18N.setLanguage('fr'));
     await p.locator('#index2SettingsBtn').click();
     await p.getByRole('button', { name: 'Préparer les voix hors connexion', exact: true }).click();
     await p.locator('#index2SettingsClose').click();

@@ -14,7 +14,7 @@ const {start,save}=require('./audio-harness.cjs');
  const timing=await p.evaluate(()=>{
   RENAX_SONGS.loadSong();const events=[],originalClick=playClick,originalVisual=scheduleVisualUpdate,originalTimer=window.setTimeout,oldCtx=audioCtx;
   const song=RENAX_SONGS.loaded;audioCtx={currentTime:0};currentBank='clic';isPlaying=true;playingMeasureIndex=0;currentStepInMeasure=0;nextNoteTime=0;scheduledMeasureLayouts=new WeakMap();
-  playClick=(state,t)=>events.push({time:t,index:playingMeasureIndex,tempo:measures[playingMeasureIndex].tempo});scheduleVisualUpdate=()=>{};window.setTimeout=()=>0;
+  playClick=(_state,t)=>events.push({time:t,index:playingMeasureIndex,tempo:measures[playingMeasureIndex].tempo});scheduleVisualUpdate=()=>{};window.setTimeout=()=>0;
   for(let i=0;i<200;i++){audioCtx.currentTime=nextNoteTime; scheduler();if(playingMeasureIndex===0&&currentStepInMeasure===0&&events.length>1)break;}
   window.setTimeout=originalTimer;playClick=originalClick;scheduleVisualUpdate=originalVisual;audioCtx=oldCtx;isPlaying=false;
   const expected=[];let t=0;for(const section of song.song.sections)for(let bar=0;bar<section.count;bar++)for(let beat=0;beat<section.measure.numerator;beat++){expected.push(t);t+=60/section.measure.tempo*4/section.measure.denominator;}

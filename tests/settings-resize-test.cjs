@@ -38,6 +38,30 @@ const { start, save } = require('./audio-harness.cjs');
       () => !document.getElementById('index2SettingsPanel').classList.contains('open'),
     );
     assert.equal(await p.locator('[data-appearance=dark]').isVisible(), false);
+    for (const width of [390, 834, 1440]) {
+      await p.setViewportSize({ width, height: 900 });
+      for (const theme of ['dark', 'light', 'ivory']) {
+        const gear = p.locator('#index2SettingsBtn');
+        await gear.click();
+        await p.locator('[data-appearance=' + theme + ']').click();
+        await gear.click();
+        await p.waitForFunction(
+          () =>
+            document.getElementById('index2SettingsBtn').getAttribute('aria-expanded') === 'false',
+        );
+        assert.equal(await p.evaluate(() => document.activeElement.id), 'index2SettingsBtn');
+        await gear.press('Enter');
+        await p.locator('#index2SettingsClose').waitFor({ state: 'visible' });
+        await p.locator('#index2SettingsClose').focus();
+        await p.keyboard.press('Shift+Tab');
+        assert.equal(await p.evaluate(() => document.activeElement.id), 'index2SettingsBtn');
+        await p.keyboard.press('Enter');
+        await p.waitForFunction(
+          () =>
+            document.getElementById('index2SettingsBtn').getAttribute('aria-expanded') === 'false',
+        );
+      }
+    }
     assert.deepEqual(errors, []);
     save('settings-resize-results.json', { states, closedStaysClosed: true, errors });
     console.log(

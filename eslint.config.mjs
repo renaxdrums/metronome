@@ -1,7 +1,10 @@
 import globals from 'globals';
+import fs from 'node:fs';
+const contract = JSON.parse(
+  fs.readFileSync(new URL('./tools/classic-script-globals.json', import.meta.url), 'utf8'),
+);
 
-// First stage: correctness checks across owned code. Shared classic-script
-// bindings are documented in ARCHITECTURE.md; migrate those before no-undef.
+// Explicit classic-script bindings remain a documented runtime contract.
 export default [
   {
     ignores: [
@@ -16,8 +19,23 @@ export default [
   },
   {
     files: ['*.js', '*.mjs', 'prototypes/**/*.{js,mjs}', 'tools/**/*.cjs', 'tests/**/*.{cjs,mjs}'],
-    languageOptions: { ecmaVersion: 'latest', globals: { ...globals.browser, ...globals.node } },
+    languageOptions: {
+      ecmaVersion: 'latest',
+      globals: { ...globals.browser, ...globals.node, ...contract.globals },
+    },
     rules: {
+      'no-undef': 'error',
+      'no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      'no-empty': ['error', { allowEmptyCatch: true }],
       'constructor-super': 'error',
       'no-async-promise-executor': 'error',
       'no-class-assign': 'error',
@@ -38,4 +56,51 @@ export default [
       'valid-typeof': 'error',
     },
   },
+  {
+    files: [
+      'amorce-song.js',
+      'audio-landscape.js',
+      'compact-controls.js',
+      'console-intro.js',
+      'edit-history.js',
+      'emergency-backup.js',
+      'header-wave.js',
+      'interface-language.js',
+      'interface-locales.js',
+      'interface-translations.js',
+      'local-backup.js',
+      'metronome-audio.js',
+      'metronome-core.js',
+      'metronome-transport.js',
+      'midi-export.js',
+      'mp3-export-worker.js',
+      'mp3-export.js',
+      'multi-clock.js',
+      'multi-metronome.js',
+      'navigation-history.js',
+      'network-origins.js',
+      'numbox-controls.js',
+      'offline-cache.js',
+      'playback-support.js',
+      'pro-sound-bank.js',
+      'rhythm-score.js',
+      'service-worker.js',
+      'settings-accessibility.js',
+      'song-export.js',
+      'song-tempo-ramp.js',
+      'songs-index2.js',
+      'songs.js',
+      'sound-bank-menu.js',
+      'training-modes.js',
+      'training-numbox.js',
+      'ui-feedback.js',
+      'workspace-layout.js',
+    ],
+    languageOptions: { sourceType: 'script' },
+  },
+  {
+    files: ['mp3-export-worker.js'],
+    languageOptions: { globals: { ...globals.worker, lamejs: 'readonly' } },
+  },
+  { files: ['tests/**/*.{cjs,mjs}'], languageOptions: { globals: contract.testGlobals } },
 ];

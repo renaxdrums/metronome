@@ -1,0 +1,398 @@
+[
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp body :is(button,a,input,select,textarea,summary,[tabindex]):focus-visible",
+    "property": "outline",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn:focus-visible,#trainBtn:focus-visible",
+      "property": "outline"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp body :is(button,a,input,select,textarea,summary,[tabindex]):focus-visible",
+    "property": "outline-offset",
+    "competitor": {
+      "file": "renax-pulse-ivory.css",
+      "selector": "html#renaxApp[data-theme=ivory] body :is(button,summary,.numbox-trigger,.numbox-option):focus-visible",
+      "property": "outline-offset"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=light] body :is(#sequenceAddMeasure,#trainBtn)",
+    "property": "color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn,#trainBtn",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=light] .seq-count-row>label",
+    "property": "color",
+    "competitor": {
+      "file": "appearance-theme.css",
+      "selector": "html#renaxApp[data-theme=light] body .training-section :is(.row-label,.training-row>span,.training-curve-row),\nhtml#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label)",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=ivory] body #workspaceNav button",
+    "property": "color",
+    "competitor": {
+      "file": "ivory-theme.css",
+      "selector": "html#renaxApp[data-theme=ivory] #workspaceNav button",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=ivory] body #tapBtn",
+    "property": "color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": ".tap-tempo-btn",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=ivory] body :is(#bpmDisplay>span,.measure-sig,.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label)",
+    "property": "color",
+    "competitor": {
+      "file": "ivory-theme.css",
+      "selector": "html#renaxApp[data-theme=ivory] .silent-settings.disabled :is(label,.numbox-button)",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=ivory] body .silent-settings.disabled label",
+    "property": "color",
+    "competitor": {
+      "file": "ivory-theme.css",
+      "selector": "html#renaxApp[data-theme=ivory] .silent-settings.disabled :is(label,.numbox-button)",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=light] body .silent-settings.disabled label",
+    "property": "color",
+    "competitor": {
+      "file": "appearance-theme.css",
+      "selector": "html#renaxApp[data-theme=light] body .training-section :is(.row-label,.training-row>span,.training-curve-row),\nhtml#renaxApp[data-theme=light] body :is(.measure-tempo-label,.measure-tempo-unit,.silent-head-label,.seq-count-row>label)",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=ivory] body .song-tempo-value",
+    "property": "color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#songsRoot .song-tempo-value",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=ivory] body :is(.track-create,.track-add-section)",
+    "property": "color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,#songsRoot .track-create,#songsRoot .track-add-section",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=ivory] body #mp3ExportDialog :is(.mp3-credit,.mp3-credit a)",
+    "property": "color",
+    "competitor": {
+      "file": "ivory-theme.css",
+      "selector": "html#renaxApp[data-theme=ivory] .mp3-credit",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=light] body :is(.track-create,.track-add-section,#mp3ExportSave)",
+    "property": "color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,#songsRoot .track-create,#songsRoot .track-add-section",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=light] body #trainTimer",
+    "property": "color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#trainTimer",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=light] body #index2SettingsPanel button[data-appearance][aria-pressed=true]",
+    "property": "color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#index2SettingsPanel button,#directAccountDialog .btn",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "accessibility.css",
+    "selector": "html#renaxApp[data-theme=light] body #mp3ExportDialog #mp3ExportSave",
+    "property": "color",
+    "competitor": {
+      "file": "appearance-theme.css",
+      "selector": "html[data-theme=light] body #mp3ExportDialog .mp3-actions #mp3ExportSave,html[data-theme=light] body #mp3ExportDownload:not([hidden])",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "app-base.css",
+    "selector": ".measure-tempo-input",
+    "property": "color",
+    "competitor": {
+      "file": "appearance-theme.css",
+      "selector": "html[data-theme=light] :is(input:not([type=range]):not([type=checkbox]),select,textarea,.numbox-button)",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "app-base.css",
+    "selector": "html#renaxApp .numbox-custom > .numbox-native",
+    "property": "opacity",
+    "competitor": {
+      "file": "appearance-theme.css",
+      "selector": "html#renaxApp[data-theme=light] body .silent-settings.disabled :is(select,.numbox-button)",
+      "property": "opacity"
+    },
+    "condition": []
+  },
+  {
+    "file": "app-base.css",
+    "selector": "body.training-tab-open #playBtn,body.training-tab-open #panicBtn",
+    "property": "display",
+    "competitor": {
+      "file": "renax-pulse-ivory.css",
+      "selector": "html#renaxApp[data-theme=ivory] :is(.reset-undo-tools #panicBtn,.reset-undo-tools #undoBtn)",
+      "property": "display"
+    },
+    "condition": ["@media (max-width:1100px)"]
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "min-height",
+    "competitor": {
+      "file": "appearance-theme.css",
+      "selector": "html#renaxApp[data-theme=light] body #playBtn,html#renaxApp[data-theme=light] body .training-section #trainBtn",
+      "property": "min-height"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "border-radius",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn,#trainBtn",
+      "property": "border-radius"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "border",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn,#trainBtn",
+      "property": "border"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "background",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn,#trainBtn",
+      "property": "background"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "box-shadow",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn,#trainBtn",
+      "property": "box-shadow"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn,#trainBtn",
+      "property": "color"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "font",
+    "competitor": {
+      "file": "ivory-theme.css",
+      "selector": "html#renaxApp[data-theme=ivory] :is(#trainBtn,#trainingVisualBtn)",
+      "property": "font"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "letter-spacing",
+    "competitor": {
+      "file": "appearance-theme.css",
+      "selector": "html#renaxApp[data-theme=light] body #playBtn,html#renaxApp[data-theme=light] body .training-section #trainBtn",
+      "property": "letter-spacing"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn",
+    "property": "text-transform",
+    "competitor": {
+      "file": "ivory-theme.css",
+      "selector": "html#renaxApp[data-theme=ivory] :is(#trainBtn,#trainingVisualBtn)",
+      "property": "text-transform"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn:not(:disabled):hover",
+    "property": "background",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn,#trainBtn",
+      "property": "background"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn:not(:disabled):hover",
+    "property": "border-color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn:hover,#trainBtn:hover",
+      "property": "border-color"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn.active",
+    "property": "background",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn.btn-cyan,#trainBtn.active",
+      "property": "background"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn.active",
+    "property": "border-color",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn.btn-cyan,#trainBtn.active",
+      "property": "border-color"
+    },
+    "condition": []
+  },
+  {
+    "file": "training-modes.css",
+    "selector": ".training-section #trainBtn:focus-visible",
+    "property": "box-shadow",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#playBtn,#trainBtn",
+      "property": "box-shadow"
+    },
+    "condition": []
+  },
+  {
+    "file": "navigation-index.css",
+    "selector": ":is(#songPane,#profilePane,.playlist-heading,#songPane .song-detail-toolbar) > button.song-back",
+    "property": "width",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#songsRoot #profilePane .song-back",
+      "property": "width"
+    },
+    "condition": []
+  },
+  {
+    "file": "navigation-index.css",
+    "selector": "#songsRoot .song-back",
+    "property": "min-height",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#songsRoot #profilePane .btn",
+      "property": "min-height"
+    },
+    "condition": []
+  },
+  {
+    "file": "navigation-index.css",
+    "selector": "#songsRoot .song-back",
+    "property": "min-height",
+    "competitor": {
+      "file": "console-theme.css",
+      "selector": "#songsRoot #profilePane .btn",
+      "property": "min-height"
+    },
+    "condition": ["@media (max-width:1100px)"]
+  }
+]

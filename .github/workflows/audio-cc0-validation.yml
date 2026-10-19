@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, audio/cc0-pro-20261011]
   pull_request:
-    branches: [main]
+    branches: [main, 'audit/phase-*']
   workflow_dispatch:
 
 permissions:
@@ -22,7 +22,9 @@ jobs:
         with:
           node-version: '22'
       - name: Check asset versions
-        run: node tools/stamp-assets.cjs --check
+        run: |
+          node tools/stamp-assets.cjs --check
+          node tools/check-test-coverage.cjs
       - uses: pnpm/action-setup@v4
         with:
           version: '11.25.0'
@@ -35,6 +37,7 @@ jobs:
           pnpm lint
           pnpm format:check
           pnpm type-check
+          STYLE_BUDGET_BASE=${{ github.event.pull_request.base.sha }} pnpm check:styles
           pnpm test:coverage:core
           node tests/midi-resource-test.cjs
       - name: Install MP3 inspection tools
@@ -47,6 +50,16 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/instrument-samples-test.cjs
+      - name: Timing at both device sample rates, with a negative control
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/timing-test.cjs
+          node tests/tooling-guards-test.cjs
+      - name: Phase 2 playback ownership and unchanged PCM
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/playback-support-test.cjs
+          PCM_ONLY=1 node tests/quality-invariance-test.cjs
       - name: MP3 export regression
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"

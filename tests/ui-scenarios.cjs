@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'),fs=require('node:fs');const {start,save,openTracks,openPlaylist,newTrack,showMeasures,openControls}=require('./audio-harness.cjs');
+const assert=require('node:assert/strict'),fs=require('node:fs');const {start,save,openTracks,openPlaylist,newTrack,showMeasures,openControls: _openControls}=require('./audio-harness.cjs');
 const measure=(n=4,d=4,t=120)=>({numerator:n,denominator:d,tempo:t,beatSubdivisions:Array(n).fill(1),beatStates:Array.from({length:n},(_,i)=>[i?1:2])});
 const library=(count=1)=>({version:1,activeProfile:'qa',profiles:[{id:'qa',name:'QA playlist',songs:Array.from({length:count},(_,i)=>({id:'s'+i,name:'QA '+(i+1),sections:[{id:'a'+i,label:'Intro',count:1,measure:measure()}]}))}]});
 async function seed(p,n=1){await p.evaluate(l=>RENAX_SONGS.replaceLibrary(l),library(n));}
@@ -6,7 +6,10 @@ async function detail(p){await openPlaylist(p);await p.locator('.song-playlist-c
 async function run(name){const h=await start(),p=await h.browser.newPage({viewport:{width:1440,height:1000}}),errors=[],observations={};p.on('pageerror',e=>errors.push(e.message));try{await p.goto(h.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>window.RENAX_SONGS&&allVoiceAudioReady);await seed(p,3);
 switch(name){
 case 'account-back-regression':{
- await openTracks(p);await p.locator('#songsHome').getByRole('button',{name:'Playlist',exact:true}).click();await p.waitForFunction(()=>RENAX_SONGS.navigation.view==='playlists');await p.reload();await p.waitForFunction(()=>window.RENAX_SONGS);await openTracks(p);await p.locator('#songPane .song-back').click();await p.waitForFunction(()=>RENAX_SONGS.navigation.view==='home');
+ await openTracks(p);await p.locator('#songsHome').getByRole('button',{name:'Playlist',exact:true}).click();// History is recorded on a timer: wait for its committed snapshot before reloading.
+ await p.waitForFunction(()=>RENAX_SONGS.navigation.view==='playlists'&&history.state?.renaxNavigation?.screen?.songs?.view==='playlists');await p.reload();
+ // Reload already restores the Track pane: wait for its screen before clicking Back.
+ await p.waitForFunction(()=>window.RENAX_SONGS?.navigation.view==='playlists');await p.locator('#songPane .song-back').click();await p.waitForFunction(()=>RENAX_SONGS.navigation.view==='home');
  const before=await p.evaluate(()=>JSON.stringify(RENAX_SONGS.library));await p.locator('#directAccountBtn').click();assert(await p.locator('#backupEmail').isVisible());assert(await p.locator('#backupPassword').isVisible());await p.locator('#directAccountDialog').getByRole('button',{name:'Fermer',exact:true}).click();assert.equal(await p.evaluate(()=>JSON.stringify(RENAX_SONGS.library)),before);break;
 }
 case 'song-back-regression':{

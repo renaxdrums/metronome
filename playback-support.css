@@ -1,0 +1,11 @@
+/* Preferences added by playback-support.js; existing workspaces are unaffected. */
+#latencySettings .index2-setting-row { gap: 12px; align-items: center; }
+#visualLatencyMs { width: 88px; min-height: 44px; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; text-align: right; }
+#latencySettings p { color: var(--text-muted); font-size: 11px; line-height: 1.6; }
+#latencySettings .latency-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+#latencySettings .btn { min-height: 44px; flex: 1 1 100px; white-space: normal; }
+#latencySettings :is(input, button):focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+#latencyStatus { display: block; margin-top: 10px; font-size: 11px; line-height: 1.6; color: var(--text); }
+
+/* Keep only the preferences trigger above the modal backdrop; its siblings remain inert. */
+html.renax-settings-open body > header { z-index: 61; }

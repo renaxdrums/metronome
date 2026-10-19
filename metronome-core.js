@@ -1,3 +1,34 @@
+/* exported
+  getStepDurationMs, NOTE_NAMES, getSubdivLabel, getPulseDescription, isPlaying,
+  playbackStarting, tempo, measures, collapsedSequenceMeasures, metronomeMeasures,
+  polyrhythmMeasures, appMode, polyEventIndex, activeMeasureIndex, playingMeasureIndex,
+  currentStepInMeasure, scheduledMeasureLayouts, totalSteps, stepsData, nextNoteTime,
+  scheduleAheadTime, lookahead, timerID, silentModeEnabled, clickMeasures,
+  silentMeasures, silentCycleMeasure, playhead, workElapsed, workStartTime,
+  training, allowedSubdivisions, normalizeMeasureSubdivisions, createMeasure, measureTotalSteps,
+  getBeatAndSub, getVoiceGroupSize, updateVoiceGroupLabel, getSchedulingMeasure, validatePlayingState,
+  bpmDisplay, bpmSlider, mobileTrainingBpm, updateMobileTrainingBpm, volumeSlider,
+  volumeValue, soundBankSel, playBtn, tapBtn, panicBtn,
+  measureCountSel, silentToggle, silentSettings, clickMeasureCountSel, silentMeasureCountSel,
+  measureListEl, activeMeasureLabel, activeNumeratorSel, activeDenominatorSel, sequencerContainer,
+  beatDisplay, trainTimerEl, trainDurationInput, trainStartInput, trainEndInput,
+  trainBtn, modeSwitch, metroSigGroup, polyControls, polyNumeratorInput,
+  polyDenominatorInput, dirToggle, numboxWidgets, closeAllNumboxes, enhanceNumboxSelect,
+  syncNumbox, getEffectiveTempo, syncTempoUI, refreshTempoFields, resetSilentCycle,
+  isSilentCycleAudible, advanceSilentCycle, setSilentMode, RING_RADIUS, STEP_SIZE,
+  updateRingRadius, TRAIL_SEGMENTS, TRAIL_ANGLE, PROGRESS_RADIUS, PROGRESS_CIRC,
+  OUTER_PROGRESS_RADIUS, OUTER_PROGRESS_CIRC, trailGroup, trailGroupOuter, markPlayheadStep,
+  getCurrentHeadAngle, updateProgressTrail, orbitTrail, clearProgressTrail, canvas,
+  pctx, particles, pulses, STEP_RGB, clearParticleCanvas,
+  resizeCanvas, getStepXY, emitBurst, drawOrbitPlayhead, animate,
+  resetCustomizationTimer, customizationFields, formatTime, getWorkElapsed, startWorkTimer,
+  pauseWorkTimer, resetWorkTimer, updateTimerDisplay, loopedMeasure, draggedSequenceMeasure,
+  sequenceTransportIcon, finishSequenceEdit, duplicateSequenceMeasure, renameSequenceMeasure, removeSequenceMeasure,
+  moveSequenceMeasure, previewSequenceMeasure, suppressSequenceClickUntil, enableSequenceDrag, decorateSequenceCards,
+  blockNumberMenu, renderSequencerList, refreshMeasurePreviews, renderActiveMeasure, beatEditorSelection,
+  beatEditor, beatEditorDrag, positionBeatEditor, finishBeatEditorDrag, keepBeatEditorInView,
+  closeBeatEditor, openBeatEditor, refreshBeatEditor, highlightBeatEditor
+*/
     function getStepDurationMs(bpm, denominator, subdiv) {
       return (60000 / bpm) * (4 / denominator) / subdiv;
     }
@@ -7,7 +38,7 @@
       16: 'Double', 32: 'Triple', 64: 'Quadruple', 128: 'Quintuple', 256: 'Sextuple'
     };
 
-    function getSubdivLabel(denominator, subdiv) {
+    function getSubdivLabel(_denominator, subdiv) {
       return String(subdiv);
     }
 
@@ -609,7 +640,7 @@
           const target=done.target||measures.at(-1);
           if(target===m)return;
           // Insert before the target, or after the last card.
-          const from=measures.indexOf(m),to=measures.indexOf(target);
+          const from=measures.indexOf(m),_to=measures.indexOf(target);
           const selected=measures[activeMeasureIndex];stopMetronome();
           measures.splice(from,1);const index=done.after?measures.length:measures.indexOf(target);measures.splice(index,0,m);finishSequenceEdit(selected);
         }

@@ -1,0 +1,54 @@
+name: Complete nightly test suite
+on:
+  schedule:
+    - cron: '23 1 * * *'
+  pull_request:
+    branches: [main, 'audit/phase-*']
+    paths:
+      - 'tests/**'
+      - 'tools/check-test-coverage.cjs'
+      - '.github/workflows/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nightly-tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  complete-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      RENAX_NIGHTLY: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm exec playwright install chromium --with-deps
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg pulseaudio
+      - name: Start audio device
+        run: |
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=qa_audio
+          pactl set-default-sink qa_audio
+      - run: node tests/setup.mjs --espeak-only
+      - run: pnpm check:tests
+      - name: Short playback regression preflight
+        if: github.event_name == 'pull_request'
+        run: pnpm test --only=amorce-song-integration-test.cjs,rhythm-editor-test.cjs
+      - name: All automatically runnable tests
+        run: pnpm test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nightly-test-results
+          path: tests/results/current

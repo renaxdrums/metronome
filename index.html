@@ -6,7 +6,7 @@
 /* Apply before first paint. A system light preference never overrides the default. */
 (()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory'].includes(saved))theme=saved;}catch{}document.documentElement.dataset.theme=theme;})();
 </script>
-  <style>html[data-workspace-loading] .main-grid{visibility:hidden}</style>
+  <link rel="stylesheet" href="entry-01.css?v=210963e43dd8">
   <script>
   (()=>{const root=document.documentElement;root.dataset.workspaceLoading='';window.performance?.mark?.('renax-workspace-loading');let released=false;
     const release=reason=>{if(released)return;released=true;clearTimeout(timer);window.performance?.mark?.('renax-workspace-visible');root.dataset.workspaceReady=reason;delete root.dataset.workspaceLoading;document.querySelector('.main-grid')?.removeAttribute('aria-busy');};
@@ -37,344 +37,43 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>RENAX DRUMS — Métronome</title>
-  <link rel="stylesheet" href="app-base.css?v=fd55babb2eb4">
+  <link rel="stylesheet" href="app-base.css?v=702768f96632">
   <link rel="stylesheet" href="songs.css?v=4b41ea054fb9">
   <link rel="stylesheet" href="mp3-export.css?v=b0417b014049">
   <link rel="stylesheet" href="backup-index2.css?v=125aa2c15eec">
-  <style>
-    /* Index 2 uniquement : ergonomie visuelle, sans modifier les commandes. */
-    .song-tabs { gap: 8px; margin-bottom: 4px; }
-    .song-tabs button, .index2-header-btn, .song-back,
-    :is(#songsHome, #songPane, #profilePane) .btn,
-    .footer-center .btn {
-      min-height: 40px; border-radius: 7px; padding: 10px 12px;
-      font-family: var(--font); font-size: 11px; font-weight: 700;
-      line-height: 1.35; letter-spacing: .4px;
-    }
-    .song-tabs button { text-transform: uppercase; }
-    .song-tabs button:not([aria-selected="true"]) { background: #1c1c24; border-color: #363641; }
-    .panel-seq { gap: 16px; }
-    #sequencePane { gap: 16px; }
-    .panel-seq .panel-title { font-size: 11px; padding-bottom: 10px; }
-    .seq-count-row { gap: 10px; }
-    .seq-count-row label { flex-basis: 82px; font-size: 10px; }
-    .seq-count-row select { min-height: 36px; font-size: 12px; border-radius: 7px; }
-    .silent-head-label { font-size: 10px; }
-    .silent-toggle { min-height: 32px; min-width: 52px; border-radius: 7px; font-size: 10px; }
-    .measure-card, #songPane .song-section.measure-card { padding: 12px; border-radius: 8px; gap: 10px; }
-    .measure-num { font-size: 11px; line-height: 1.4; }
-    .measure-sig { font-size: 12px; }
-    .measure-tempo-label, .measure-tempo-unit { font-size: 9px; }
-    .measure-tempo-input { min-height: 30px; font-size: 11px !important; border-radius: 6px; }
-    :is(#songPane, #profilePane) { font-size: 12px; }
-    :is(#songPane, #profilePane) label { margin: 12px 0; line-height: 1.4; }
-    :is(#songPane, #profilePane) input[type="text"], #profilePane select {
-      min-height: 40px; padding: 10px; border-radius: 7px; font-size: 12px;
-    }
-    .song-actions { gap: 8px; margin: 12px 0; }
-    #songPane > .song-actions > .btn { flex: 1; border-color: #3a3a45; }
-    #songPane > .song-actions > .btn:last-child,
-    .song-block-body .song-actions .btn { color: #ffaf78; background: #211812; border-color: #654026; }
-    .song-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .song-back::after { content: none; }
-    #songPane > .btn:not(.song-back) {
-      width: 100%; margin-top: 10px; color: var(--cyan);
-      border-color: #28717d; background: #102126; white-space: normal;
-    }
-    .song-entry { margin: 10px 0; border-color: #3a3a45; }
-    .song-note, .song-block-summary, .song-playlist-summary { font-size: 11px; line-height: 1.55; }
-    .song-note { margin: 4px 0; color: #9a9aaa; }
-    #songPane .song-section.measure-card { margin: 12px 0; }
-    .song-block-header { min-height: 32px; align-items: center; }
-    #songPane .song-inline-field { gap: 10px; margin: 8px 0; font-size: 10px; }
-    #songPane .song-inline-field .numbox-custom { margin-left: auto; }
-    #songPane .song-inline-field .numbox-button { min-height: 36px; border-radius:var(--numeric-radius);font-size:var(--numeric-font-size); }
-    #songPane .song-inline-field .measure-tempo-unit { min-width: 26px; }
-    .song-tempo-value { font-size: 11px; }
-    .footer-center { gap: 10px; }
-    .footer-center #playBtn, .footer-center #playBtn[data-song-transport="true"] {
-      width: 174px; min-width: 174px; min-height: 44px; white-space: nowrap;
-    }
-    .footer-center #panicBtn { min-width: 88px; min-height: 44px; }
-    .footer-center .btn-primary { background: var(--orange); border-color: var(--orange); color: #000; }
-    .footer-center .btn-primary:hover { background: #ff8c33; }
-    .footer-center .btn-cyan { background: var(--cyan); border-color: var(--cyan); color: #000; }
-    .footer-center .btn-cyan:hover { background: #55eeff; }
-    :is(.song-tabs button, .index2-header-btn, .panel-seq button, .footer-center .btn):focus-visible {
-      outline: 2px solid var(--cyan); outline-offset: 3px;
-    }
-    :is(#songPane, #profilePane) input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
-    @media (min-width: 1101px) {
-      .main-grid { grid-template-columns: 230px minmax(440px, 1fr) 320px; }
-      .footer-center { left: 276px; bottom: 70px; }
-      .panel-visu { padding-bottom: 72px; }
-      .sequencer-container { max-width: min(680px, calc(100vw - 640px)); }
-    }
-    @media (max-width: 600px) {
-      .footer-center #playBtn, .footer-center #playBtn[data-song-transport="true"] { width: 164px; min-width: 164px; }
-      .footer-center #panicBtn { min-width: 76px; }
-      .song-tabs button, :is(#songsHome, #songPane, #profilePane) .btn { min-height: 44px; }
-    }
-  </style>
+  <link rel="stylesheet" href="entry-02.css?v=dd10aed3e348">
 <!-- Styles mobiles isolés : mêmes éléments et mêmes commandes. -->
 <link rel="stylesheet" href="sequencer-layout.css?v=a6c348058b27">
-<style>
-  /* Vue mobile centrée sur le métronome : commandes compactes, cercle prioritaire. */
-  #songExportFormat,#mp3ExportLevel { display: block; margin: 0 0 16px; min-height: 40px; }
-  #mp3ExportDialog > p:not(#mp3ExportStatus) { margin: 0 0 16px; color: var(--text-muted); font-size: 11px; line-height: 1.5; }
-  @media (max-width: 1100px) {
-    body { padding: 6px; }
-    header { min-height: 32px; padding: 0 0 4px; margin-bottom: 4px; }
-    #index2SettingsBtn { width: 32px; height: 32px; min-height: 32px; padding: 0; font-size: 14px; }
-    .mobile-tabs { width: 100%; margin-bottom: 4px; padding: 2px; gap: 3px; }
-    .mobile-tabs button { min-height: 32px; padding: 5px 3px; font-size: 9px; border: 1px solid #454552; background: rgba(255,255,255,.025); }
-    .mobile-tabs button.active { border-color: var(--orange); }
-    .main-grid > .panel-visu.mobile-active { padding: 6px 10px; gap: 4px; }
-    .panel-visu .panel-title { font-size: 9px; padding: 0; margin: 0; border: 0; line-height: 14px; }
-    .panel-visu .train-timer { font-size: 10px; }
-    .panel-visu .mode-switch { gap: 5px; }
-    .panel-visu .mode-switch button { min-height: 32px; font-size: 10px; border-radius: 6px; }
-    .panel-visu .visu-toolbar { padding: 0; border: 0; }
-    .panel-visu .visu-measure-info { gap: 8px; }
-    .panel-visu .visu-measure-info .measure-label {
-      font: 700 13px 'JetBrains Mono', monospace;
-      letter-spacing: 0;
-    }
-    .panel-visu .visu-measure-info .sig-group .slash {
-      font: 700 13px 'JetBrains Mono', monospace;
-    }
-    .panel-visu .numbox-custom { width: 40px; flex-basis: 40px; }
-    .panel-visu .numbox-button {
-      width: 40px; height: 30px; padding: 3px 5px;
-      font: 700 13px 'JetBrains Mono', monospace;
-    }
-    .panel-visu .numbox-button::after {
-      width: 5px; height: 5px;
-    }
-    .panel-visu .sequencer-wrapper { padding: 0; }
-    .panel-visu .legend { font-size: 9px; gap: 8px; line-height: 12px; }
-    footer { margin-top: 4px; padding-top: 4px; gap: 0; }
-    .footer-center { width: min(100%, 260px); grid-template-columns: 164px 86px; }
-    .footer-center #playBtn, .footer-center #playBtn[data-song-transport="true"], .footer-center #panicBtn {
-      min-height: 36px; height: 36px; padding: 6px 10px; font-size: 11px;
-    }
-    .footer-right { display: none; }
-  }
-  @media (min-width: 601px) and (max-width: 1100px) and (min-height: 501px) {
-    .main-grid > .panel-visu.mobile-active { row-gap: 4px; column-gap: 12px; }
-    .panel-visu .mode-switch { width: min(100%, 280px); }
-  }
-</style>
-<style>
-  /* Présentation du transport uniquement : boutons existants et légende regroupés. */
-  .visu-bottom {display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;min-width:0;}
-  .panel-visu > .visu-bottom {grid-column:1/-1;grid-row:4;padding-top:6px;}
-  .visu-bottom .footer-center {position:static;inset:auto;transform:none;display:flex;justify-content:center;align-items:center;width:auto;margin:0;gap:8px;z-index:auto;}
-  .visu-bottom .footer-center #playBtn,.visu-bottom .footer-center #panicBtn {width:auto;min-width:76px;min-height:36px;height:36px;padding:7px 14px;font-size:11px;border-radius:6px;}
-  .visu-bottom .footer-center #playBtn {min-width:104px;}
-  .visu-bottom .footer-center #playBtn[data-song-transport="true"] {width:auto;min-width:136px;}
-  .visu-bottom .legend {margin:0;gap:12px;font-size:10px;line-height:14px;}
-  @media(min-width:1101px) {
-    .main-grid > .panel-visu {padding-bottom:14px;}
-  }
-  @media(max-width:1100px) {
-    footer > .visu-bottom {gap:6px;padding:0;}
-    .visu-bottom .footer-center {display:grid;grid-template-columns:86px 86px;gap:16px;justify-content:center;}
-    .visu-bottom .footer-center #playBtn,.visu-bottom .footer-center #playBtn[data-song-transport="true"],.visu-bottom .footer-center #panicBtn {width:86px;min-width:86px;min-height:40px;height:40px;padding:6px 10px;}
-    footer > .visu-bottom .legend {display:none;font-size:9px;line-height:12px;}
-    body:has(.panel-visu.mobile-active) footer > .visu-bottom .legend {display:flex;}
-  }
-</style>
+<link rel="stylesheet" href="entry-03.css?v=4e2e647de0a9">
+<link rel="stylesheet" href="entry-04.css?v=034e91594408">
   <link rel="stylesheet" href="song-entry.css?v=74acde869b30">
-  <link rel="stylesheet" href="navigation-index.css?v=e72d6940e586">
-<style>
-.orange-ui-icon { width: 14px; height: 14px; display: inline-block; vertical-align: -2px; margin-right: 6px; fill: none; stroke: var(--orange); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
-    .mobile-tabs button.active .orange-ui-icon { stroke: #000; opacity: 1; visibility: visible; }
-</style>
+  <link rel="stylesheet" href="navigation-index.css?v=25ac1351d39f">
+<link rel="stylesheet" href="entry-05.css?v=659916c270da">
   <link rel="stylesheet" href="mobile-landscape.css?v=7356072925d6">
-  <link rel="stylesheet" href="training-modes.css?v=c54b8f2f7df9">
+  <link rel="stylesheet" href="training-modes.css?v=41282065510c">
   <link rel="stylesheet" href="rhythm-score.css?v=1952315176ed">
 
-<style>
-  /* Center the main transport independently of the compact reset control. */
-  .visu-bottom{align-self:stretch;width:100%;}
-  .visu-bottom .footer-center{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);width:100%;gap:8px;}
-  .visu-bottom .footer-center #playBtn,
-  .visu-bottom .footer-center #playBtn[data-song-transport="true"]{grid-column:2;justify-self:center;width:auto;min-width:104px;}
-  .visu-bottom .footer-center #panicBtn{grid-column:3;justify-self:end;width:64px;min-width:64px;padding-inline:8px;}
-  @media(max-width:1100px){footer>.visu-bottom{flex:1;}.visu-bottom .footer-center #playBtn{min-width:104px;}}
-</style>
+<link rel="stylesheet" href="entry-06.css?v=7ae7e31d68e0">
 
-<style>
-.reset-undo-tools{position:absolute;top:0;right:0;display:flex;flex-direction:column;gap:5px;z-index:4;}
-.reset-undo-tools #panicBtn,.reset-undo-tools #undoBtn{display:flex;align-items:center;justify-content:center;width:32px;min-width:32px;height:32px;min-height:32px;padding:6px;margin:0;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.025);color:var(--orange);cursor:pointer;}
-.reset-undo-tools svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
-.reset-undo-tools #undoBtn:disabled{opacity:.35;cursor:default;}
-.reset-undo-tools button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
-</style>
+<link rel="stylesheet" href="entry-07.css?v=463aca5615bf">
 
-<style id="sequence-edit-transport">
-#measureList .measure-card{position:relative;padding-right:52px;min-height:108px;}
-.sequence-card-tools{position:absolute;right:8px;top:7px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:5px;}
-.sequence-card-tools button,.sequence-more summary{display:grid;place-items:center;width:30px;height:28px;padding:0;background:#191a21;border:1px solid #353641;border-radius:7px;color:var(--orange);cursor:pointer;}
-.sequence-card-tools button:focus-visible,.sequence-more summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
-.sequence-card-tools .sequence-drag{font-size:20px;cursor:grab;color:var(--text-muted);touch-action:none;}
-.sequence-preview-play svg{width:15px;height:15px;fill:currentColor;}
-.sequence-preview-play[aria-pressed="true"]{color:var(--cyan);border-color:var(--cyan);}
-.sequence-card-tools button:disabled{opacity:.4;cursor:default;}
-.sequence-more{position:relative;}
-.measure-head .measure-num[data-no-translate]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.sequence-more summary{list-style:none;font-size:20px;line-height:1;}
-.sequence-more summary::-webkit-details-marker{display:none;}
-.sequence-more-actions{position:absolute;right:35px;bottom:0;padding:5px;border:1px solid #3b3b46;background:#191a21;border-radius:8px;z-index:20;box-shadow:0 8px 24px #0008;}
-.sequence-more-actions{display:flex;flex-direction:column;gap:3px;min-width:132px;}
-.sequence-more-actions button{width:100%;padding:0 12px;text-align:left;font:600 12px var(--font);}
-#measureList .drop-target{border-top:3px solid var(--cyan);}#measureList .measure-card{touch-action:none;}#measureList .dragging{border-color:var(--orange);cursor:grabbing;} .sequence-drag-placeholder{border:1px dashed var(--orange);border-radius:8px;background:#ff6b0010;}
-#playBtn{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:9px;width:auto!important;min-width:116px!important;height:42px!important;min-height:42px!important;padding:10px 18px!important;border-radius:7px!important;background:rgba(0,229,255,.08)!important;border:1px solid rgba(0,229,255,.65)!important;box-shadow:none!important;color:var(--text)!important;font-size:0!important;line-height:1.35;transition:background .15s,border-color .15s;}
-#playBtn::before{content:'';position:static;display:block;flex:none;width:0;height:0;border-left:10px solid var(--cyan);border-top:6px solid transparent;border-bottom:6px solid transparent;}
-#playBtn::after{content:attr(data-transport-label);font:600 11px/1.35 var(--font);letter-spacing:.3px;text-transform:none;}
-#playBtn:hover{background:rgba(0,229,255,.14)!important;border-color:var(--cyan)!important;transform:none;box-shadow:none!important;}
-#playBtn:active{background:rgba(0,229,255,.22)!important;}
-#playBtn:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(0,229,255,.24)!important;}
-#playBtn.btn-cyan{background:rgba(0,229,255,.18)!important;border-color:var(--cyan)!important;}
-#playBtn.btn-cyan::before{width:10px;height:10px;border:0;border-radius:1px;background:var(--cyan);}
-#playBtn:disabled{opacity:.45;}
-@media(prefers-reduced-motion:reduce){#playBtn{transition:none;}}
-</style>
-<style>
-.tempo-slider-row{display:flex;align-items:center;gap:6px;width:100%}
-.tempo-slider-row #bpmSlider{display:none!important}.tempo-slider-row #tempoFader{flex:1;min-width:0;width:auto;margin:0}
-.tempo-step-button{display:flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:32px;padding:0;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.025);color:var(--orange);cursor:pointer}
-.tempo-step-button svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.tempo-step-button:hover{border-color:var(--orange);background:rgba(255,111,0,.08)}
-.tempo-step-button:disabled{opacity:.35;cursor:default}
-.tempo-step-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-@media(pointer:coarse){.tempo-step-button{flex-basis:40px;width:40px;height:44px}}
-</style><style id="circular-view-legend">body:has(.panel-visu:not(.score-view)) .visu-bottom > .legend{display:none!important}</style><style>
-.panel-visu .visu-toolbar #trainTimer{margin-left:auto;flex:0 0 auto;font-size:24px;font-weight:700;line-height:1.2;letter-spacing:.5px;font-variant-numeric:tabular-nums;opacity:1;color:var(--cyan);}
-@media(max-width:600px){.panel-visu .visu-toolbar #trainTimer{font-size:20px;}}
-</style>
-<style>
-#beatEditor{font-family:var(--font);line-height:1.5;}
-#beatEditor .beat-editor-division-label{display:flex;flex-direction:column;gap:10px;font-family:var(--font);font-size:12px;font-weight:500;letter-spacing:0;}
-#beatEditor .beat-editor-division-label>.numbox{width:100%;}
-#beatEditor .beat-editor-division-label select,#beatEditor .beat-editor-division-label .numbox-button{width:100%;min-height:36px;font-family:var(--font);}
-#beatEditor .beat-editor-legend{text-align:center;align-items:center;}
-</style>
+<link id="sequence-edit-transport" rel="stylesheet" href="entry-sequence-edit-transport.css?v=8075137715c1">
+<link rel="stylesheet" href="entry-09.css?v=a66a57940143"><link id="circular-view-legend" rel="stylesheet" href="entry-circular-view-legend.css?v=b7784e722d76"><link rel="stylesheet" href="entry-11.css?v=a9bea4c245c7">
+<link rel="stylesheet" href="entry-12.css?v=5956b2c2f6c4">
 <link rel="stylesheet" href="multi-metronome.css?v=1f1df82d778f">
   <link rel="stylesheet" href="workspace-layout.css?v=e26cf6b2d1ab">
 <link rel="stylesheet" href="pro-interface.css?v=58585adca440">
 <link rel="stylesheet" href="console-theme.css?v=4ab10514ea73">
-<style>
-body.multi-mode #sequencePane #multiPresetLibrary:not([hidden]){display:block!important;width:100%}
-#multiPresetLibrary > .btn{background:rgba(66,207,225,.12)!important;color:var(--cyan)!important;border:1px solid var(--border)!important;min-height:44px;border-radius:7px}
-#multiPresetLibrary .sequence-preview-play{display:grid;place-items:center;width:32px;min-width:32px;height:32px;padding:7px;border:1px solid var(--border);border-radius:6px;background:#343d47;color:var(--orange);cursor:pointer}
-#multiPresetLibrary .sequence-preview-play svg{width:16px;height:16px;fill:currentColor}
-#multiPresetLibrary .multi-preset-open svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#multiPresetLibrary > h3{color:var(--text);margin:0 0 16px}
-#multiPresetLibrary > .btn{margin-bottom:16px}
-#multiPresetLibrary .multi-preset-card{margin-bottom:10px;cursor:pointer}
-#multiPresetLibrary .multi-track-head{display:flex;align-items:center;gap:8px}
-#multiPresetLibrary .multi-track-name{flex:1;min-width:0;overflow-wrap:anywhere}
-#multiPresetLibrary .measure-sig{white-space:nowrap;font-size:12px}
-#multiPresetLibrary button[hidden],#multiPresetLibrary[hidden],#multiControls[hidden],#multiTracks[hidden]{display:none!important}
-/* Retour MultiMétro : rendu aligné sur les autres boutons Retour des playlists. */
-#multiControls > button.song-back{
-  display:inline-flex;align-items:center;justify-content:center;
-  align-self:flex-start;flex:none;box-sizing:border-box;
-  width:36px;min-width:36px;max-width:36px;
-  height:36px;min-height:36px;padding:0!important;margin:0 0 12px;
-  gap:0;background:#343b45!important;border:1px solid #505b69!important;
-  border-radius:6px;color:var(--orange)!important;box-shadow:none!important;
-}
-#multiControls > button.song-back svg{
-  display:block;flex:none;width:18px;height:18px;
-  fill:none;stroke:currentColor;stroke-width:1.7;
-  stroke-linecap:round;stroke-linejoin:round;
-}
-#multiControls > button.song-back:hover{
-  background:#414a56!important;border-color:#627080!important;
-}
-#multiControls > button.song-back:focus-visible{
-  outline:2px solid #ff6b0099;outline-offset:3px;
-}
-@media(max-width:1100px){
-  #multiControls > button.song-back{height:44px;min-height:44px;}
-}
-</style><link id="appearance-theme" rel="stylesheet" href="appearance-theme.css?v=c05ea8675343">
-<style id="light-readability20">html#renaxApp[data-theme=light] .beat-divider{background:#667d8c!important}html#renaxApp[data-theme=light] .poly-ring.outer{border-color:#d88c55!important}html#renaxApp[data-theme=light] .poly-ring.inner{border-color:#61adba!important}html#renaxApp[data-theme=light] .subdivision-dot{min-width:5px;min-height:5px}html#renaxApp[data-theme=light] .legend{color:#52616d!important;font-size:12px!important}html#renaxApp[data-theme=light] button:focus-visible,html#renaxApp[data-theme=light] [role=button]:focus-visible{outline:2px solid #087c90;outline-offset:3px}@media(min-width:1101px){.panel-visu .visu-toolbar{min-height:86px;box-sizing:border-box}.panel-visu .sequencer-wrapper{overflow:clip}}</style>
-<style id="settings-palette24">
-html#renaxApp[data-theme=dark] #index2SettingsPanel{background:#282f38!important;border-color:#46515e!important;color:#e7edf3!important}
-html#renaxApp[data-theme=dark] #index2SettingsPanel .index2-settings-section{background:#2e3640!important;border:1px solid #46515e!important;box-shadow:none!important}
-html#renaxApp[data-theme=dark] #index2SettingsPanel :is(h3,.index2-setting-row){color:#c3ccd7!important}
-html#renaxApp[data-theme=dark] #index2SettingsPanel h3{font-size:11px;letter-spacing:.09em}
-html#renaxApp[data-theme=dark] #index2SettingsPanel :is(button,select,.numbox-button){background:#353e49!important;border-color:#52606e!important;color:#e7edf3!important;box-shadow:none!important}
-html#renaxApp[data-theme=dark] #index2SettingsPanel button[aria-pressed=true]{background:#29464f!important;border-color:#56818b!important;color:#e3f5f8!important;box-shadow:inset 0 -2px #609aa5!important}
-html#renaxApp[data-theme=dark] #index2SettingsPanel button:hover:not(:disabled){background:#404b58!important}
-html#renaxApp[data-theme=dark] #index2SettingsPanel .index2-settings-note{background:#343e49!important;color:#bac7d3!important;border-left-color:#d68b50!important}
-html#renaxApp[data-theme=dark] #index2SettingsPanel button:disabled{opacity:.55!important}
-html#renaxApp[data-theme=light] #index2SettingsPanel .index2-settings-section{background:#edf1f4!important;border:1px solid #c6d0d9!important;box-shadow:none!important}
-html#renaxApp[data-theme=light] #index2SettingsPanel .appearance-options button[aria-pressed=true]{background:#dcecf0!important;border-color:#76a7b1!important;box-shadow:inset 0 -2px #087c90!important}
-</style>
-<style id="intro-startup25">#renaxArrival:not([data-intro-ready=true]) *{animation-play-state:paused!important}</style>
-<style id="opaque-navigation26">
-/* Paint navigation above the header's wave, without changing its palette. */
-#workspaceNav{position:relative;z-index:2;isolation:isolate}
-html#renaxApp[data-theme=light] #workspaceNav button{background:#e4e8eb!important}
-html#renaxApp[data-theme=light] #workspaceNav button:hover{background:#f0f2f4!important}
-html#renaxApp[data-theme=light] #workspaceNav button[aria-selected=true]{background:#fff!important}
-@media(max-width:1100px){html#renaxApp[data-theme=light] #workspaceNav button{background:#edf0f2!important}html#renaxApp[data-theme=light] #workspaceNav button:hover{background:#f0f2f4!important}html#renaxApp[data-theme=light] #workspaceNav button[aria-selected=true]{background:#fff!important}}
-</style>
+<link rel="stylesheet" href="entry-13.css?v=20b69b1b6a58"><link id="appearance-theme" rel="stylesheet" href="appearance-theme.css?v=c05ea8675343">
+<link id="light-readability20" rel="stylesheet" href="entry-light-readability20.css?v=f6b6aafc402d">
+<link id="settings-palette24" rel="stylesheet" href="entry-settings-palette24.css?v=86c3933cfed1">
+<link id="intro-startup25" rel="stylesheet" href="entry-intro-startup25.css?v=5217a211472f">
+<link id="opaque-navigation26" rel="stylesheet" href="entry-opaque-navigation26.css?v=a29d34fc41f6">
 
-<style id="tap-tempo-fit27">
-/* A fixed label scale and reserved grid column keep the same fit at every PC width. */
-@media(min-width:1101px){
- html#renaxApp body .visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(48px,1fr) 125px!important}
- html#renaxApp body .visu-toolbar #tapBtn{box-sizing:border-box;width:125px!important;min-width:125px!important;max-width:125px!important;padding:8px 12px!important;font-size:10px!important;line-height:1.3!important;letter-spacing:1px!important;overflow:visible!important}
-}
-html#renaxApp body #tapBtn>span:first-child{display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;font-size:inherit!important;line-height:inherit!important}
-html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 13px;margin:0}
-@media(max-width:1100px){
- html#renaxApp body .workspace-controls-grid #tapBtn{box-sizing:border-box;width:116px!important;min-width:116px!important;max-width:116px!important;padding:8px 12px!important;font-size:10px!important;line-height:1.3!important;letter-spacing:1px!important;overflow:visible!important}
- html#renaxApp body .workspace-controls-grid .control-group:first-child{padding-right:128px!important}
-}
-</style>
+<link id="tap-tempo-fit27" rel="stylesheet" href="entry-tap-tempo-fit27.css?v=8cb373b8ee99">
 <link rel="stylesheet" href="ivory-theme.css?v=7328d83e9340">
 <link rel="stylesheet" href="renax-pulse-ivory.css?v=b510a8408482">
-<style id="beat-hover45">
-/* Clickable beats: enlarge the box around its anchored centre, never its
-   orbital transform. Preserve measure-start/compound sizing and play pulses. */
-#sequencerContainer .step{
- --beat-hover-factor:1;--beat-hover-color:var(--cyan);cursor:pointer;
- transition:transform .12s ease,background .15s,box-shadow .15s,border-color .15s,width .14s ease,height .14s ease;
-}
-#sequencerContainer .step:is(.compound-strong,.measure-start){--beat-hover-factor:1.3}
-#sequencerContainer .step.compound-weak{--beat-hover-factor:.8}
-#sequencerContainer .step[data-state="0"]{--beat-hover-color:var(--text-muted)}
-#sequencerContainer .step[data-state="2"]{--beat-hover-color:var(--yellow)}
-#sequencerContainer .step[data-state="3"]{--beat-hover-color:var(--orange)}
-#sequencerContainer .step::after{
- content:"";position:absolute;inset:-5px;border-radius:inherit;pointer-events:none;
- border:1px solid color-mix(in srgb,var(--beat-hover-color) 60%,transparent);
- box-shadow:0 0 7px color-mix(in srgb,var(--beat-hover-color) 28%,transparent);
- opacity:0;transition:opacity .14s ease;
-}
-@media(hover:hover) and (pointer:fine){
- #sequencerContainer .step:hover{
-  width:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
-  height:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
- }
- #sequencerContainer .step:hover::after{opacity:1}
-}
-#sequencerContainer .step:focus-visible{
- width:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
- height:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
-}
-#sequencerContainer .step:focus-visible::after{opacity:1}
-@media(prefers-reduced-motion:reduce){
- #sequencerContainer .step,#sequencerContainer .step::after{transition:none!important}
-}
-</style><link rel="stylesheet" href="accessibility.css?v=d4b6b8ceee79">
+<link id="beat-hover45" rel="stylesheet" href="entry-beat-hover45.css?v=b5cd61a9099f"><link rel="stylesheet" href="accessibility.css?v=0d0e695a10ba">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -383,7 +82,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
 <div class="console-arrival-word" aria-label="Métronome"><span style="--n:0">M</span><span style="--n:1">é</span><span style="--n:2">t</span><span style="--n:3">r</span><span style="--n:4">o</span><span style="--n:5">n</span><span style="--n:6">o</span><span style="--n:7">m</span><span style="--n:8">e</span></div>
 <small class="console-arrival-brand">RENAX DRUMS</small><div class="console-arrival-sweep" aria-hidden="true"></div></div>
 </div>
-<noscript><style>#renaxArrival{display:none!important}</style></noscript>
+<noscript><link rel="stylesheet" href="entry-20.css?v=a1cc71906e0f"></noscript>
 
   <header>
     <div class="header-left">
@@ -669,22 +368,24 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
     <div class="footer-right"><span>V3.0.1</span><span class="author-credit">David Arens</span></div>
   </footer>
 
-  <script src="ui-feedback.js?v=a841029440a1"></script>
-<script src="numbox-controls.js?v=ce94a8848171"></script>
-  <script src="metronome-audio.js?v=00b4f3d4c908"></script>
-  <script src="metronome-core.js?v=f71989a09a66"></script>
-  <script src="metronome-transport.js?v=f6ec7404af87"></script>
+  <script src="ui-feedback.js?v=eae7d41e1fb6"></script>
+<script src="numbox-controls.js?v=da106d639f33"></script>
+  <script src="metronome-audio.js?v=d8297fa53c84"></script>
+  <script src="metronome-core.js?v=e7f80ab61877"></script>
+  <link rel="stylesheet" href="playback-support.css?v=be7d47c55905">
+  <script src="playback-support.js?v=906fd4c12e7e"></script>
+  <script src="metronome-transport.js?v=265a71e59c7e"></script>
   <script src="pro-sound-bank.js?v=4380a78e5f34"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
 </script>
 <script src="sound-bank-menu.js?v=ccaf886df669"></script>
-  <script src="emergency-backup.js?v=ffc0a16005b2"></script>
-<script src="local-backup.js?v=f40f0ce49852"></script>
+  <script src="emergency-backup.js?v=9a0db8f8e45e"></script>
+<script src="local-backup.js?v=6fb6848845c2"></script>
   <script src="amorce-song.js?v=9f00d2d74e2c"></script>
   <script src="song-tempo-ramp.js?v=84e7c800f469"></script>
-  <script src="songs-index2.js?v=924dd92eb5b3"></script>
-  <script type="module" src="cloud-backup.js?v=f9e5598ca18a"></script>
+  <script src="songs-index2.js?v=8087d7e387c3"></script>
+  <script type="module" src="cloud-backup.js?v=7da0844d83ca"></script>
   <script>
     // Index 2 : ouvrir les morceaux de la playlist avec les sections repliées.
     (() => {
@@ -703,7 +404,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
       }, true);
     })();
   </script>
-  <script src="midi-export.js?v=20642ff1b5a6"></script>
+  <script src="midi-export.js?v=f3a3106d75bd"></script>
   <script src="song-export.js?v=1ba2f86f345f"></script>
 
   <script>
@@ -733,7 +434,7 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
       const songTab=document.querySelector('.song-tabs button[data-pane="songs"]');
       if(songTab) songTab.click();
     }
-    openBtn?.addEventListener('click',openSettings);
+    openBtn?.addEventListener('click',()=>{if(panel.classList.contains('open')||panel.classList.contains('mobile-active'))closeBtn.click();else openSettings();});
     closeBtn?.addEventListener('click',closeSettings);
     backdrop?.addEventListener('click',closeSettings);
     songsBtn?.addEventListener('click',openSongs);
@@ -754,12 +455,12 @@ html#renaxApp body #tapBtn>span:first-child svg{width:13px;height:13px;flex:0 0 
     arrange();desktop.addEventListener('change',arrange);
   })();
   </script>
-  <script src="settings-accessibility.js?v=4ed7dbc3b618"></script>
+  <script src="settings-accessibility.js?v=0c5ce31d148b"></script>
 <script src="training-modes.js?v=5b004b076af3"></script>
   <script src="training-numbox.js?v=2c35b75c2592"></script>
-  <script src="compact-controls.js?v=b329c4777674"></script>
+  <script src="compact-controls.js?v=8c007ba62521"></script>
   <script src="navigation-history.js?v=0fb4d8833b37"></script>
-  <script src="rhythm-score.js?v=20ddb94d7dae"></script>
+  <script src="rhythm-score.js?v=e058a752abac"></script>
   <script src="edit-history.js?v=0e5a27a29b3b"></script>
 <script>
 (()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);if(/^(start|play)$/i.test(raw)&&raw!==label)playBtn.textContent=label;playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();
@@ -781,15 +482,18 @@ fader.addEventListener('keydown',event=>{const delta={ArrowLeft:-1,ArrowDown:-1,
 bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',sync);
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
-<script src="multi-clock.js?v=e13d4c26ebe6"></script>
-<script src="multi-metronome.js?v=179d438846ee"></script>
+<script src="multi-clock.js?v=200171f7f4fd"></script>
+<script src="multi-metronome.js?v=6f20f7386b95"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
-<script src="interface-translations.js?v=761b1bcdda07"></script>
-<script src="interface-language.js?v=147f6b309b94"></script>
-<script src="workspace-layout.js?v=56ddb404b79e"></script>
+<script src="interface-translations.js?v=6f6ea6af0d2f"></script>
+<script src="vendor/i18next-25.6.0.js?v=6077ce0b0640"></script>
+<script src="interface-locales.js?v=05159d261d88"></script>
+<link rel="stylesheet" href="interface-language.css?v=3995c298df9e">
+<script src="interface-language.js?v=ed716ad49547"></script>
+<script src="workspace-layout.js?v=c6eb3e433097"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=94e73145c59c"></script>
-<script src="console-intro.js?v=c98ebce90fec"></script>
+<script src="console-intro.js?v=4328c1f2f3c7"></script>
 <script>
 /* Premier clic ou toucher : plein écran, une seule tentative par chargement. */
 (() => {

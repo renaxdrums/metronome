@@ -1,18 +1,24 @@
 /* Local error feedback and diagnostics. Nothing is sent to a server. */
 (() => {
   'use strict';
+  /** @type {RenaxFeedbackEntry[]} */
   const entries = [];
+  /** @type {RenaxMeasurements} */
   const measurements = { lcpMs: null, cls: 0, inpMs: null, inpSupported: false };
-  let notice,
-    clsWindowValue = 0,
+  /** @type {HTMLElement | null} */
+  let notice = null;
+  let clsWindowValue = 0,
     clsWindowStart = 0,
     clsLast = 0;
   /** Show a recoverable failure without replacing the application or its data. */
+  /** @param {string} message @param {unknown} [cause] */
   function error(message, cause) {
     entries.push({
       at: new Date().toISOString(),
       message,
-      detail: String(cause?.message || cause || ''),
+      detail: String(
+        /** @type {{message?: unknown} | null | undefined} */ (cause)?.message || cause || '',
+      ),
     });
     if (entries.length > 30) entries.shift();
     if (!notice) {
@@ -26,13 +32,13 @@
       close.type = 'button';
       close.textContent = 'Fermer';
       close.onclick = () => {
-        notice.remove();
+        /** @type {HTMLElement} */ (notice).remove();
         notice = null;
       };
       notice.append(text, close);
       document.body.append(notice);
     }
-    notice.querySelector('p').textContent = message;
+    /** @type {HTMLParagraphElement} */ (notice.querySelector('p')).textContent = message;
   }
   // Keep native console reporting intact: these listeners do not preventDefault().
   window.addEventListener('error', (event) => {
@@ -54,15 +60,18 @@
       new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           if (type === 'largest-contentful-paint') measurements.lcpMs = entry.startTime;
-          else if (!entry.hadRecentInput) {
+          else if (
+            !(/** @type {PerformanceEntry & {hadRecentInput: boolean}} */ (entry).hadRecentInput)
+          ) {
             if (
               !clsWindowStart ||
               entry.startTime - clsLast > 1000 ||
               entry.startTime - clsWindowStart > 5000
             ) {
               clsWindowStart = entry.startTime;
-              clsWindowValue = entry.value;
-            } else clsWindowValue += entry.value;
+              clsWindowValue = /** @type {PerformanceEntry & {value: number}} */ (entry).value;
+            } else
+              clsWindowValue += /** @type {PerformanceEntry & {value: number}} */ (entry).value;
             clsLast = entry.startTime;
             measurements.cls = Math.max(measurements.cls, clsWindowValue);
           }
@@ -90,6 +99,10 @@
       createdAt: new Date().toISOString(),
       browser: navigator.userAgent,
       measurements: { ...measurements },
+      playback:
+        window.RENAX_PLAYBACK?.diagnosticSnapshot(
+          typeof audioCtx === 'undefined' ? null : audioCtx,
+        ) ?? null,
       networkReportedOnline: navigator.onLine,
       primaryStorageHealthy: window.RENAX_STORAGE?.healthy ?? null,
       errors: entries.map((entry) => ({

@@ -132,7 +132,7 @@ module.exports = function versionRelease(directory) {
     let html = normalized(file);
     html = html.replace(
       /(\b(?:src|href)=["'])([^"']+)(["'])/g,
-      (whole, before, value, after) => before + assetURL(value, file) + after,
+      (_whole, before, value, after) => before + assetURL(value, file) + after,
     );
     html = html.replace(
       /(<script\b([^>]*)>)([\s\S]*?)(<\/script>)/gi,

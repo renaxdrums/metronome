@@ -1,3 +1,16 @@
+/* exported
+  mobileTabs, panels, paramsPanel, trainingSection, mobileTrainingHost,
+  trainingPlaceholder, placeTrainingSection, switchTab, openMobileTempoSettings, audioCtx,
+  masterVolume, currentBank, reportAudioFailure, initAudio, oscTone,
+  noiseBurst, FIRST_BEAT_RATIO, FIRST_BEAT_VOL, OTHER_STRONG_BEAT_RATIO, isOtherStrongBeat,
+  VOICE_METRONOME_FILES, VOICE_ATTACK_SECONDS, VOICE_MAX_ATTACK_SECONDS, VOICE_AUDIO_REVISION, scheduledVoiceSources,
+  VOICE_METRONOME_BUFFERS, VOICE_METRONOME_PROMISES, audioReadyWrap, audioReadyLabel, audioReadyBar,
+  allVoiceAudioReady, allVoiceAudioPromise, ensureAudioContextForDecode, setAudioLoadProgress, prepareAllVoiceAudio,
+  ensureVoiceMetronomeReady, playVoiceSubdivisionTick, playVoiceMetronome, renderVoiceCount, voiceLoudnessGain,
+  SOUND_BANKS, INSTRUMENT_SAMPLE_BANKS, INSTRUMENT_SAMPLE_MAX_DURATION, INSTRUMENT_SAMPLE_REVISION, instrumentSamples,
+  instrumentSampleLoads, prepareInstrumentSample, ensureInstrumentBankReady, audioMixers, BANK_GAINS,
+  getAudioMixDestination, voiceMixers, getVoiceMixDestination, playCountIn, playClick
+*/
 
     const mobileTabs = document.getElementById('mobileTabs');
     const panels = document.querySelectorAll('.panel');
@@ -218,7 +231,7 @@
       await prepareAllVoiceAudio();
     }
 
-    function playVoiceSubdivisionTick(dest, time, state, isFirst) {
+    function playVoiceSubdivisionTick(_dest, time, state, isFirst) {
       let freq = state === 3 ? 1450 : state === 2 ? 1100 : 820;
       let vol = state === 3 ? 0.64 : state === 2 ? 0.48 : 0.36;
       if (isFirst) vol *= 1.08;
@@ -249,7 +262,7 @@
     function renderVoiceCount(gender, dest, time, state, isFirst, context, settings) {
       const beatNumber = Number(context.beatNumber) || 0;
       const subIndex = Number(context.subIndex) || 0;
-      const beatDurationSec = Math.max(0.08, Number(context.beatDurationSec) || 0.5);
+      const _beatDurationSec = Math.max(0.08, Number(context.beatDurationSec) || 0.5);
       const buffer = beatNumber > 0 ? VOICE_METRONOME_BUFFERS[gender][String(beatNumber)] : null;
 
       // En mode métronome, la voix compte uniquement le début de chaque temps.

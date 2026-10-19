@@ -134,7 +134,7 @@
   if(isPlaying||cues.length||active.length)frame=requestAnimationFrame(tick);
  }
  function wake(){if(enabled&&!frame)frame=requestAnimationFrame(tick);}
- function enqueue(cue){cues.push(cue);cues.sort((a,b)=>a.time-b.time);if(cues.length>256)cues.splice(0,cues.length-256);wake();}
+ function enqueue(cue){const offset=(window.RENAX_PLAYBACK?.delayMs(audioCtx)||0)/1000;cues.push({...cue,time:cue.time+offset,end:cue.end+offset});cues.sort((a,b)=>a.time-b.time);if(cues.length>256)cues.splice(0,cues.length-256);wake();}
  const render=renderActiveMeasure;renderActiveMeasure=function(...args){const result=render.apply(this,args);syncFreeButton();pencil.hidden=!enabled||appMode!=='metronome';editor.hidden=!enabled||!editing||appMode!=='metronome';pulse.hidden=!enabled||appMode!=='metronome';renderEditor();layout();refresh();return result;};
  const subdivisions=renderSubdivisionDots;renderSubdivisionDots=function(...args){const result=subdivisions.apply(this,args);refresh();return result;};
  const visual=scheduleVisualUpdate;scheduleVisualUpdate=function(mIdx,sIdx,time,position){const result=visual.apply(this,arguments);const m=measures[mIdx],p=position||getBeatAndSub(m,sIdx);enqueue({measure:mIdx,beat:p.beat,key:`${p.beat}:${Math.round(p.subIndex/(p.subdivisions||m.beatSubdivisions[p.beat])*m.beatSubdivisions[p.beat])}`,time,end:time+(p.durationMs||getStepDurationMs(getEffectiveTempo(m),m.denominator,m.beatSubdivisions[p.beat]))/1000,audible:isSilentCycleAudible(),pulse:p.subIndex===0&&(m.denominator>=8?(m.numerator%3===0?p.beat%3===0:m.numerator>=5&&m.numerator%2?p.beat%2===0&&p.beat<m.numerator-2:true):true)});return result;};

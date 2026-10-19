@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const assert=require('node:assert/strict'),_fs=require('node:fs'),path=require('node:path');
 const {start,save}=require('./audio-harness.cjs');
 (async()=>{const h=await start();try{
  const p=await h.browser.newPage({viewport:{width:1280,height:850}}),errors=[];p.on('pageerror',e=>errors.push(e.message));

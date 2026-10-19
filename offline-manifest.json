@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "revision": "587d47df6c9fe912",
+  "revision": "766504fad3db9014",
   "resources": [
     {
       "path": "accessibility.css",
-      "sha256": "d4b6b8ceee79b143a63b59873baf4d2f5624bda080712cd0aef9f493698621c9",
+      "sha256": "0d0e695a10ba96cf75a03f0b684f95747683955de54c50126a9f5f21c7513ca5",
       "text": true
     },
     {
@@ -19,7 +19,7 @@
     },
     {
       "path": "app-base.css",
-      "sha256": "fd55babb2eb4b533f9e670161fa451e09296b831d6cafc15a03b2c1d409c0cb9",
+      "sha256": "702768f96632e5ea3771348b0b6e56f9849d6b0938202dc99e93b21a8a9fff94",
       "text": true
     },
     {
@@ -129,17 +129,17 @@
     },
     {
       "path": "cloud-backup.js",
-      "sha256": "f9e5598ca18ab436672ed62620721b02c618810808bd8d7e1e51b56d0fd4996f",
+      "sha256": "7da0844d83ca9311e854b6194c8fe2395e8c9314506f98a06d1387607be0b7d7",
       "text": true
     },
     {
       "path": "compact-controls.js",
-      "sha256": "b329c4777674972638672b81e2839603e4b67de245cb9e11221cc203f96ce510",
+      "sha256": "8c007ba62521bf926cc7e7d6bdb8cf1b757eb8ef1aa03437476673419796e9a0",
       "text": true
     },
     {
       "path": "console-intro.js",
-      "sha256": "c98ebce90fec67b06b1ce3932daf12b207fb1e583b38acf9113a7babd06e6cdf",
+      "sha256": "4328c1f2f3c7866e40cd2f04415815f83148caf62c4990004b0a6e76a50f3090",
       "text": true
     },
     {
@@ -154,7 +154,107 @@
     },
     {
       "path": "emergency-backup.js",
-      "sha256": "ffc0a16005b2a296d370c480d80492b6f21858bbae1a6da8beb09356bcc1d01e",
+      "sha256": "9a0db8f8e45e0a65f3bdc43de8f6fbc112a24010451a0e54d87422fa04ed1661",
+      "text": true
+    },
+    {
+      "path": "entry-01.css",
+      "sha256": "210963e43dd82997a58cf097dcc36beb883c5ae3ccc392acb10956a2c90cae32",
+      "text": true
+    },
+    {
+      "path": "entry-02.css",
+      "sha256": "dd10aed3e34853c4814f285d3736c2611a0bbcd8404e42fa2b0c2405ac39be60",
+      "text": true
+    },
+    {
+      "path": "entry-03.css",
+      "sha256": "4e2e647de0a9406572736f3df9337f0b4613128e5eec28dd58fe2da926f453de",
+      "text": true
+    },
+    {
+      "path": "entry-04.css",
+      "sha256": "034e91594408e969731a95ce3cdf34fefc56065440fb01570e8cd0ca05776db2",
+      "text": true
+    },
+    {
+      "path": "entry-05.css",
+      "sha256": "659916c270da5e43aeb0cdf0253b93562670a71668f9785fdac7c81f356062ae",
+      "text": true
+    },
+    {
+      "path": "entry-06.css",
+      "sha256": "7ae7e31d68e064b7f5cd540ae9f08ea6b294a64573b80984a9cca4eb6409d21a",
+      "text": true
+    },
+    {
+      "path": "entry-07.css",
+      "sha256": "463aca5615bf9c516c38f69a6edae6531a537df866d85dfa35784041c2ab9f96",
+      "text": true
+    },
+    {
+      "path": "entry-09.css",
+      "sha256": "a66a57940143c7dba00ccd411fe8baf73a0ecf3d1bb386cba10663f2e60ac964",
+      "text": true
+    },
+    {
+      "path": "entry-11.css",
+      "sha256": "a9bea4c245c7d9e6b9d2835081ef79e7b3f2e3ebdcfa9a3381fceeaff3348818",
+      "text": true
+    },
+    {
+      "path": "entry-12.css",
+      "sha256": "5956b2c2f6c4aff6fa54913678dffb7a75bc1005ecd3e5a6744477c6dabae164",
+      "text": true
+    },
+    {
+      "path": "entry-13.css",
+      "sha256": "20b69b1b6a5862c405c2e38a6d0ed5728fe2d80949a4787ff85cb4a8c4be248e",
+      "text": true
+    },
+    {
+      "path": "entry-20.css",
+      "sha256": "a1cc71906e0fcf168a4b3026fbf6127d8ae2b758e8286b4bd1b6c67daacb5789",
+      "text": true
+    },
+    {
+      "path": "entry-beat-hover45.css",
+      "sha256": "b5cd61a9099f10ac079bc9e80747d67a2560d017d0925e01b28d540044cf3daa",
+      "text": true
+    },
+    {
+      "path": "entry-circular-view-legend.css",
+      "sha256": "b7784e722d763775d624b3ab9bad09408fe78df535818e73953b5d3d596c018e",
+      "text": true
+    },
+    {
+      "path": "entry-intro-startup25.css",
+      "sha256": "5217a211472f32c4dae5cdcf0ca19389a444c32cbab8a8287a64d62f85ab094b",
+      "text": true
+    },
+    {
+      "path": "entry-light-readability20.css",
+      "sha256": "f6b6aafc402d3944c573fa6967e41599cf22af7afcf0414081e1d012bcaf000f",
+      "text": true
+    },
+    {
+      "path": "entry-opaque-navigation26.css",
+      "sha256": "a29d34fc41f60770cb575129b201b143e2e36e6563d4430805c0357f58255c47",
+      "text": true
+    },
+    {
+      "path": "entry-sequence-edit-transport.css",
+      "sha256": "8075137715c12a7d3047cd0534da6d1a355dc85f574c254500764ff69cda98a6",
+      "text": true
+    },
+    {
+      "path": "entry-settings-palette24.css",
+      "sha256": "86c3933cfed1362920e609ff4da4f053d4e33c79a9f700319e0263720092736a",
+      "text": true
+    },
+    {
+      "path": "entry-tap-tempo-fit27.css",
+      "sha256": "8cb373b8ee99f6e0d2d0bd5daa8d03ffd23737fc243c5a55664d0fc4d8312263",
       "text": true
     },
     {
@@ -169,17 +269,27 @@
     },
     {
       "path": "index.html",
-      "sha256": "fd8399cbfb56681ee616d3e07cd60289eedb62d9c85119d25c27b85dceaa75d3",
+      "sha256": "ab2facc4567cb5855eaea890ba96ac010755e92df7ce4627d53cc4d5e897ad85",
+      "text": true
+    },
+    {
+      "path": "interface-language.css",
+      "sha256": "3995c298df9e89b6bef73a87fcf37ca8d50b300c5ac2c6f45eef4fd751d6dfa9",
       "text": true
     },
     {
       "path": "interface-language.js",
-      "sha256": "147f6b309b945d9f4e46ff270b4ea849f7c73999a34793136e5a0400cb2fa1d3",
+      "sha256": "ed716ad495471c7deaf6f1e29141c9856708143d880bb85472c8050a2e7c8479",
+      "text": true
+    },
+    {
+      "path": "interface-locales.js",
+      "sha256": "05159d261d884e3001d9cb56374e8df19bf016fb8c35b07d465deee5a7d10765",
       "text": true
     },
     {
       "path": "interface-translations.js",
-      "sha256": "761b1bcdda0741beba193aa27b8d3d89b76edadca88048891b2ea17dfcecf7c8",
+      "sha256": "6f6ea6af0d2ffb1693ba15194be11e0ff0cc61ea82a9136783526a1c98463c3b",
       "text": true
     },
     {
@@ -189,7 +299,7 @@
     },
     {
       "path": "local-backup.js",
-      "sha256": "f40f0ce49852b4a9e20de3636dc4a675ece658f67bad4811e0952ddbb9b48457",
+      "sha256": "6fb6848845c23adc9d717075865cfb95a35d1b0ec0fc08e51d6e5fc0e86967cc",
       "text": true
     },
     {
@@ -199,22 +309,22 @@
     },
     {
       "path": "metronome-audio.js",
-      "sha256": "00b4f3d4c9085dddfc563441477311e7a700cdb08530aa913763afb527f9f791",
+      "sha256": "d8297fa53c8449216c736439070f29a06c9248f5aa75a108ad6d53672905812f",
       "text": true
     },
     {
       "path": "metronome-core.js",
-      "sha256": "f71989a09a664889c9a9aaa2404ce592104585b66fb9a662a814b43f3a419a49",
+      "sha256": "e7f80ab61877831e37f49d83419ae09c83ea89c52863f556555963f6192429cf",
       "text": true
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "f6ec7404af879a9e110f5a3d45402532abdf7bb5ebc8b152cf4f1f2e0bbc3ee4",
+      "sha256": "265a71e59c7eca646011596961325e7fdcabc998608ae991d4e3e4ec72f07234",
       "text": true
     },
     {
       "path": "midi-export.js",
-      "sha256": "20642ff1b5a65ad7de7df6ef37c852d925f0c4ae91f5c9be5f1195a4dfcbd3ab",
+      "sha256": "f3a3106d75bdc475089325bc82da0b6fb6c1ae4db4b9e3f9fee5817859c66d04",
       "text": true
     },
     {
@@ -239,7 +349,7 @@
     },
     {
       "path": "multi-clock.js",
-      "sha256": "e13d4c26ebe608d46b245acb403e41d3c0215b618b6c05c24e0314559e840517",
+      "sha256": "200171f7f4fd86c22bdc9f3e5ef467bd65bd3910de837665987c9a5e17439cc2",
       "text": true
     },
     {
@@ -249,7 +359,7 @@
     },
     {
       "path": "multi-metronome.js",
-      "sha256": "179d438846ee9883ddf88ea75937d49cff7735b08c3f3e19d6d808d6998c7b48",
+      "sha256": "6f20f7386b950e0ce5dcebd6c993d98c6ac61a886653b1a2d270b5051e65e255",
       "text": true
     },
     {
@@ -259,17 +369,32 @@
     },
     {
       "path": "navigation-index.css",
-      "sha256": "e72d6940e586dcb49121658a6e1b6ac7179343e6bbcc06da184d3b3813ef5803",
+      "sha256": "25ac1351d39fd0180f8e20fd7c6349dde88fbcef59a4ba503e2b182520c646c9",
+      "text": true
+    },
+    {
+      "path": "network-origins.js",
+      "sha256": "c5b6cfb6340c97a60bf227524eace8fe3127fe90374125dc437b7337160fd1da",
       "text": true
     },
     {
       "path": "numbox-controls.js",
-      "sha256": "ce94a8848171aaf3ddcb4d3961831e004c33c0248ae22ad46a57fdf63de2978f",
+      "sha256": "da106d639f338bc9c7ea90789f8906c4692f60613988a926efa6ced2672db810",
       "text": true
     },
     {
       "path": "offline-cache.js",
       "sha256": "f41c06ec6200ebc6023c24da74523491eefcfe91b3bb2c000ebd1d8b9cf9ce5c",
+      "text": true
+    },
+    {
+      "path": "playback-support.css",
+      "sha256": "be7d47c55905e193a2be2359e429434ece68a84bb67531129a83e746f3d1f18f",
+      "text": true
+    },
+    {
+      "path": "playback-support.js",
+      "sha256": "906fd4c12e7ea664fd156e99fa92a94653b63a14c87c3d96b04bae9781205e74",
       "text": true
     },
     {
@@ -304,7 +429,7 @@
     },
     {
       "path": "rhythm-score.js",
-      "sha256": "20ddb94d7dae048d749a34fae4321b62ca95a0d2f5459b0ffe8e43e584632084",
+      "sha256": "e058a752abacc54686d99d6c50c308ec350a87f95801f7eee4bbcc5c291ae920",
       "text": true
     },
     {
@@ -314,7 +439,7 @@
     },
     {
       "path": "settings-accessibility.js",
-      "sha256": "4ed7dbc3b618389f4869d47e2256b4b6303fb54066c86127aeb2b8d5ef875516",
+      "sha256": "0c5ce31d148baf434392d512025962e8f4c726c673f2644dc9177a24edc653a2",
       "text": true
     },
     {
@@ -334,7 +459,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "924dd92eb5b3ab47fe7196ff6990dc7fda00f29c13f977b2a18d2360d3d2cb20",
+      "sha256": "8087d7e387c3605b08ed3db7c1e83410b6e9f36de8af33f04cb9c8217db98b8a",
       "text": true
     },
     {
@@ -354,7 +479,7 @@
     },
     {
       "path": "training-modes.css",
-      "sha256": "c54b8f2f7df9508120cd637512bf313470f9d167a74a80049a3c59261e92f112",
+      "sha256": "41282065510c4c0d9a390626b102018855d4626478f7874b26dbeefb48a992af",
       "text": true
     },
     {
@@ -369,7 +494,12 @@
     },
     {
       "path": "ui-feedback.js",
-      "sha256": "a841029440a1fa2e9d9946df5f263317e9875e47850fa6719b3963391df5b7a9",
+      "sha256": "eae7d41e1fb6251997e0f67cc7f3a3b81ea78d5c3bf32c97112da6b2c899573b",
+      "text": true
+    },
+    {
+      "path": "vendor/i18next-25.6.0.js",
+      "sha256": "6077ce0b0640c89b0f163d9e86ed7467ea372b5bedf248b8dfec4c81dce3f5d5",
       "text": true
     },
     {
@@ -394,7 +524,7 @@
     },
     {
       "path": "workspace-layout.js",
-      "sha256": "56ddb404b79ea1cf69eafc7241f671a447700cefc3755a7b13ff99fa8af4cc2b",
+      "sha256": "c6eb3e433097ea397010cafe5450ee3819be3c26e734433a99874e018349d732",
       "text": true
     }
   ]

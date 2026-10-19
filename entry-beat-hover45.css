@@ -1,0 +1,33 @@
+/* Extracted from index.html, cascade slot 19. */
+/* Clickable beats: enlarge the box around its anchored centre, never its
+   orbital transform. Preserve measure-start/compound sizing and play pulses. */
+#sequencerContainer .step{
+ --beat-hover-factor:1;--beat-hover-color:var(--cyan);cursor:pointer;
+ transition:transform .12s ease,background .15s,box-shadow .15s,border-color .15s,width .14s ease,height .14s ease;
+}
+#sequencerContainer .step:is(.compound-strong,.measure-start){--beat-hover-factor:1.3}
+#sequencerContainer .step.compound-weak{--beat-hover-factor:.8}
+#sequencerContainer .step[data-state="0"]{--beat-hover-color:var(--text-muted)}
+#sequencerContainer .step[data-state="2"]{--beat-hover-color:var(--yellow)}
+#sequencerContainer .step[data-state="3"]{--beat-hover-color:var(--orange)}
+#sequencerContainer .step::after{
+ content:"";position:absolute;inset:-5px;border-radius:inherit;pointer-events:none;
+ border:1px solid color-mix(in srgb,var(--beat-hover-color) 60%,transparent);
+ box-shadow:0 0 7px color-mix(in srgb,var(--beat-hover-color) 28%,transparent);
+ opacity:0;transition:opacity .14s ease;
+}
+@media(hover:hover) and (pointer:fine){
+ #sequencerContainer .step:hover{
+  width:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
+  height:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
+ }
+ #sequencerContainer .step:hover::after{opacity:1}
+}
+#sequencerContainer .step:focus-visible{
+ width:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
+ height:calc(var(--step-size,26px) * var(--beat-hover-factor) * 1.08)!important;
+}
+#sequencerContainer .step:focus-visible::after{opacity:1}
+@media(prefers-reduced-motion:reduce){
+ #sequencerContainer .step,#sequencerContainer .step::after{transition:none!important}
+}

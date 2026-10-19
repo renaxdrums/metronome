@@ -9,13 +9,21 @@
   `;document.head.append(style);
   function enhance(select){
     if(select.closest('.console-arrival-replica')||numboxWidgets.has(select))return;
-    const rect=select.getBoundingClientRect(),computed=getComputedStyle(select);
+    const rect=select.getBoundingClientRect();getComputedStyle(select);
     const numeric=/^\d+$/.test(select.options[0]?.textContent.trim()||'');
     enhanceNumboxSelect(select);
     const wrap=select.parentElement,button=wrap.querySelector('.numbox-button');
     if(!numeric||!['activeNumerator','activeDenominator','polyNumerator','polyDenominator'].includes(select.id)){
-      wrap.classList.add('compact-select');wrap.style.width=rect.width?rect.width+'px':'100%';wrap.style.flex='1 1 auto';
-      button.style.height=Math.max(30,rect.height||32)+'px';
+      wrap.classList.add('compact-select');
+      if(select.closest('.training-section')){
+        // Supply intrinsic sizes without overriding the training component CSS.
+        wrap.style.setProperty('--training-native-width',rect.width?rect.width+'px':'100%');
+        button.style.setProperty('--training-native-height',Math.max(30,rect.height||32)+'px');
+      }else{
+        wrap.style.width=rect.width?rect.width+'px':'100%';
+        button.style.height=Math.max(30,rect.height||32)+'px';
+      }
+      wrap.style.flex='1 1 auto';
     }
     const label=select.getAttribute('aria-label')||document.querySelector('label[for="'+select.id+'"]')?.textContent||select.closest('label')?.firstChild?.textContent||select.id;
     if(label&&!select.hasAttribute('aria-label'))select.setAttribute('aria-label',label.trim());numboxWidgets.get(select)?.sync();button.disabled=select.disabled;

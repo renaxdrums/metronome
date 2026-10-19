@@ -1,0 +1,2 @@
+/* Extracted from index.html, cascade slot 10. */
+body:has(.panel-visu:not(.score-view)) .visu-bottom > .legend{display:none!important}

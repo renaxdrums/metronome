@@ -212,14 +212,14 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const head=el('button',undefined,card,'measure-head song-block-header');head.type='button';
         const title=el('span',section.label||'Bloc '+(i+1),head,'measure-num');
         el('span',section.measure.numerator+'/'+section.measure.denominator,head,'measure-sig');
-        const summary=el('div',section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+section.measure.tempo+' BPM',card,'song-block-summary');
+        el('div',section.count+' mesures · '+section.measure.numerator+'/'+section.measure.denominator+' · '+section.measure.tempo+' BPM',card,'song-block-summary');
         const body=el('div',undefined,card,'song-block-body');body.id='song-block-'+section.id;head.setAttribute('aria-controls',body.id);
         const choose=(showVisualizer=true)=>{setSectionOpen(section.id);loadSong();activeMeasureIndex=s.sections.slice(0,i).reduce((n,s)=>n+s.count,0);renderActiveMeasure();if(showVisualizer&&window.innerWidth<=1100)switchTab('visu');};
         head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')e.stopPropagation();});
         head.addEventListener('click',e=>{e.stopPropagation();if(openSectionId===section.id)setSectionOpen(null);else choose(false);});
         card.addEventListener('click',e=>{if(!e.target.closest('input,select,button,label')){if(openSectionId===section.id)setSectionOpen(null);else choose(false);}});card.addEventListener('keydown',e=>{if(e.target===card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();choose();}});
         const label=field('Libellé',body,section.label,value=>{section.label=value.trim()||'Section '+(i+1);changed();});label.setAttribute('list','songLabels');label.addEventListener('input',()=>{title.textContent=label.value.trim()||'Bloc '+(i+1);});
-        const fields=el('div',undefined,body,'song-block-controls');const count=songNumbox('Mesures',fields,section.count,(value,input)=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1){input.value=section.count;return;}const total=s.sections.reduce((n,x)=>n+(x===section?0:x.count),0)+n;if(!Number.isSafeInteger(total)){input.value=section.count;return;}section.count=n;changed();},Array.from({length:64},(_,i)=>i+1));
+        const fields=el('div',undefined,body,'song-block-controls');songNumbox('Mesures',fields,section.count,(value,input)=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1){input.value=section.count;return;}const total=s.sections.reduce((n,x)=>n+(x===section?0:x.count),0)+n;if(!Number.isSafeInteger(total)){input.value=section.count;return;}section.count=n;changed();},Array.from({length:64},(_,i)=>i+1));
         const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999){input.value=section.measure.tempo;return;}section.measure.tempo=n;changed();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';el('span','BPM',bpmRow,'measure-tempo-unit');
         const preview=el('div',undefined,body,'measure-preview');
         for(let b=0;b<section.measure.numerator;b++){const group=el('div',undefined,preview,'preview-beat');for(const state of section.measure.beatStates[b])el('span',undefined,group,'preview-dot').dataset.state=state;}

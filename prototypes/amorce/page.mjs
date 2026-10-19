@@ -20,7 +20,7 @@ async function prepareBlock(i){
  if(!text.trim()){note.textContent='Libellé vide';return;}
  note.textContent='Préparation…';
  try{const speech=await synthesize(text,language);if(note.dataset.key===key&&input.value===text&&languages.get(i)===language)note.textContent=`Prêt · ${speech.backend.toUpperCase()} · calcul ${(speech.inferenceMs/1000).toFixed(2)} s`;}
- catch(error){if(note.dataset.key===key)note.textContent='Préparation échouée — réessayer à la lecture';}
+ catch(_error){if(note.dataset.key===key)note.textContent='Préparation échouée — réessayer à la lecture';}
 }
 function refreshLanguages(){document.querySelectorAll('[data-lang]').forEach(b=>{const selected=languages.get(Number(b.dataset.index))===b.dataset.lang;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',selected);});}
 refreshLanguages();

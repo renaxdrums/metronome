@@ -49,3 +49,7 @@ firebase emulators:exec --only firestore,auth --project demo-renax-backup "node 
 ```
 
 Tests exécutés : migration et source conservée, absence de transmission anonyme, quota local et corruption, reprise hors ligne après rechargement, deux appareils, conflit concurrent, suppression contre édition hors ligne, choix des versions, restauration, séparation invités/comptes, règles anonymes/A/B, immutabilité et atomicité. La matrice 4/4, 3/4, 5/4, 6/4, 3/8, 6/8, 9/8, 12/8, 15/8, 18/8, 6/16, 12/16 et Start/Stop/accents est vérifiée en navigateur. Les exports et le moteur sont contrôlés par absence de modification ; aucune mesure de latence matérielle n'est revendiquée. Tests Google réels, annulation de sa fenêtre et quotas Firebase réels restent à vérifier sur le projet configuré, sans générer volontairement des dépenses ni dépasser ses quotas.
+
+## Archive et production
+
+`index-legacy.html` et `songs.js` sont conservés uniquement comme sources historiques dans le dépôt ; le build de production les exclut. La restauration des anciennes données ne dépend pas de cette page : `local-backup.js` conserve et lit la clé `renax-drums-songs-v1`, puis le validateur actuel contrôle son contenu. La copie historique demeure intacte ; aucune donnée de navigateur ni de compte n’est retirée. `index2.html` conserve sa redirection vers l’interface actuelle.

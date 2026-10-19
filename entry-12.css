@@ -1,0 +1,6 @@
+/* Extracted from index.html, cascade slot 12. */
+#beatEditor{font-family:var(--font);line-height:1.5;}
+#beatEditor .beat-editor-division-label{display:flex;flex-direction:column;gap:10px;font-family:var(--font);font-size:12px;font-weight:500;letter-spacing:0;}
+#beatEditor .beat-editor-division-label>.numbox{width:100%;}
+#beatEditor .beat-editor-division-label select,#beatEditor .beat-editor-division-label .numbox-button{width:100%;min-height:36px;font-family:var(--font);}
+#beatEditor .beat-editor-legend{text-align:center;align-items:center;}

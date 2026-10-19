@@ -1,7 +1,6 @@
 const {start,save}=require('./audio-harness.cjs');
 const fs=require('fs'),path=require('path'),assert=require('assert'),cp=require('child_process');
 const out=process.env.TEST_OUTPUT_DIR||path.join(__dirname,'results');fs.mkdirSync(out,{recursive:true});
-function wav(pcm,rate,file){const b=Buffer.alloc(44+pcm.length*4);b.write('RIFF');b.writeUInt32LE(b.length-8,4);b.write('WAVEfmt ',8);b.writeUInt32LE(16,16);b.writeUInt16LE(3,20);b.writeUInt16LE(1,22);b.writeUInt32LE(rate,24);b.writeUInt32LE(rate*4,28);b.writeUInt16LE(4,32);b.writeUInt16LE(32,34);b.write('data',36);b.writeUInt32LE(pcm.length*4,40);for(let i=0;i<pcm.length;i++)b.writeFloatLE(pcm[i],44+i*4);fs.writeFileSync(file,b);}
 function probe(file){return JSON.parse(cp.execFileSync('ffprobe',['-v','error','-show_entries','format=duration:stream=codec_name,sample_rate,channels,bit_rate','-of','json',file],{encoding:'utf8'}));}
 function decoded(file){const b=cp.execFileSync('ffmpeg',['-v','error','-i',file,'-f','f32le','-ac','1','-ar','48000','pipe:1'],{maxBuffer:128*1024*1024});return new Float32Array(b.buffer.slice(b.byteOffset,b.byteOffset+b.length));}
 function peak8(file){const b=cp.execFileSync('ffmpeg',['-v','error','-i',file,'-af','aresample=384000:filter_size=96:phase_shift=10','-f','f32le','-ac','1','pipe:1'],{maxBuffer:512*1024*1024});let peak=0;for(let i=0;i<b.length;i+=4)peak=Math.max(peak,Math.abs(b.readFloatLE(i)));return 20*Math.log10(peak);}

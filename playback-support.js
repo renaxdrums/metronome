@@ -17,6 +17,70 @@
     wakeEvents.push({ state, reason, at: performance.now(), visibility: document.visibilityState });
     if (wakeEvents.length > 32) wakeEvents.shift();
   }
+  let outputProbe = { status: 'notRequested', outputs: [], sinkHash: null, error: null };
+  let probePending = false;
+  async function identifierHash(value) {
+    if (!value) return null;
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join(
+      '',
+    );
+  }
+  async function readOutputs() {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const outputs = await Promise.all(
+      devices
+        .filter((device) => device.kind === 'audiooutput')
+        .slice(0, 16)
+        .map(async (device) => ({
+          default: device.deviceId === 'default',
+          idHash: await identifierHash(device.deviceId),
+          groupHash: await identifierHash(device.groupId),
+          labelExposed: !!device.label,
+        })),
+    );
+    const context = typeof audioCtx === 'undefined' ? null : audioCtx;
+    const sink = context?.sinkId;
+    outputProbe = {
+      status: 'ready',
+      outputs,
+      sinkHash: typeof sink === 'string' && sink ? await identifierHash(sink) : null,
+      sinkExposed: typeof sink === 'string',
+      usesSystemDefault: typeof sink === 'string' ? sink === '' || sink === 'default' : null,
+      error: null,
+    };
+  }
+  async function identifyOutputs() {
+    if (active || (typeof playbackStarting !== 'undefined' && playbackStarting))
+      return 'stopRequired';
+    if (probePending) return 'pending';
+    if (!navigator.mediaDevices?.getUserMedia || !navigator.mediaDevices?.enumerateDevices) {
+      outputProbe = { status: 'unsupported', outputs: [], sinkHash: null, error: null };
+      return 'unsupported';
+    }
+    probePending = true;
+    outputProbe = { status: 'pending', outputs: [], sinkHash: null, error: null };
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      // Permission is used only to expose device metadata. No recorder or audio graph is created.
+      for (const track of stream.getTracks()) track.stop();
+      await readOutputs();
+      return 'ready';
+    } catch (error) {
+      const name = [
+        'NotAllowedError',
+        'NotFoundError',
+        'NotReadableError',
+        'SecurityError',
+      ].includes(error?.name)
+        ? error.name
+        : 'OtherError';
+      outputProbe = { status: 'failed', outputs: [], sinkHash: null, error: name };
+      return 'failed';
+    } finally {
+      probePending = false;
+    }
+  }
   function diagnosticSnapshot(context) {
     const policy = document.permissionsPolicy || document.featurePolicy;
     let policyAllowed = null;
@@ -25,6 +89,10 @@
     } catch {}
     return {
       active,
+      outputIdentification: {
+        ...outputProbe,
+        outputs: outputProbe.outputs.map((output) => ({ ...output })),
+      },
       secureContext: window.isSecureContext,
       topLevel: window.top === window,
       wakeLockSupported: typeof navigator.wakeLock?.request === 'function',
@@ -152,6 +220,7 @@
     setManual,
     recordBeat,
     diagnosticSnapshot,
+    identifyOutputs,
     get generation() {
       return generation;
     },
@@ -169,7 +238,7 @@
       section.className = 'index2-settings-section';
       section.id = 'latencySettings';
       section.innerHTML =
-        '<h3 data-i18n-key="latency.heading"></h3><label class="index2-setting-row"><span data-i18n-key="latency.manual"></span><input id="visualLatencyMs" type="number" min="-100" max="400" step="1" ></label><p data-i18n-key="latency.help"></p><div class="latency-actions"><button type="button" class="btn" id="latencyCalibrate" data-i18n-key="latency.calibrate"></button><button type="button" class="btn" id="latencyTap" data-i18n-key="latency.tap" disabled></button><button type="button" class="btn" id="latencyApply" data-i18n-key="latency.apply" disabled></button><button type="button" class="btn" id="latencyCancel" data-i18n-key="latency.cancel" hidden></button></div><output id="latencyStatus" role="status" aria-live="polite" data-no-translate></output>';
+        '<h3 data-i18n-key="latency.heading"></h3><label class="index2-setting-row"><span data-i18n-key="latency.manual"></span><input id="visualLatencyMs" type="number" min="-100" max="400" step="1" ></label><p data-i18n-key="latency.help"></p><div class="latency-actions"><button type="button" class="btn" id="latencyCalibrate" data-i18n-key="latency.calibrate"></button><button type="button" class="btn" id="latencyTap" data-i18n-key="latency.tap" disabled></button><button type="button" class="btn" id="latencyApply" data-i18n-key="latency.apply" disabled></button><button type="button" class="btn" id="latencyCancel" data-i18n-key="latency.cancel" hidden></button></div><p data-i18n-key="latency.identifyHelp"></p><button type="button" class="btn" id="latencyIdentifyOutputs" data-i18n-key="latency.identify"></button><output id="latencyStatus" role="status" aria-live="polite" data-no-translate></output>';
       const panel = document.getElementById('index2SettingsPanel');
       if (!panel) return;
       panel.append(section);
@@ -178,7 +247,8 @@
         tap = section.querySelector('#latencyTap'),
         apply = section.querySelector('#latencyApply'),
         cancel = section.querySelector('#latencyCancel'),
-        status = section.querySelector('output');
+        status = section.querySelector('output'),
+        identify = section.querySelector('#latencyIdentifyOutputs');
       let collecting = false,
         preparing = false,
         calibrationEpoch = 0,
@@ -186,6 +256,16 @@
         ownedGeneration = null,
         samples = [];
       const fallback = {
+        'latency.identify': 'Identifier les sorties audio',
+        'latency.identifyHelp':
+          'Autorisation micro ponctuelle pour identifier les sorties. Aucun enregistrement. Arrêtez la lecture avant de continuer.',
+        'latency.identify.ready': 'Identification terminée. Exportez le diagnostic.',
+        'latency.identify.failed':
+          'Identification impossible ou autorisation refusée. Exportez le diagnostic.',
+        'latency.identify.unsupported':
+          'Identification des sorties indisponible dans ce navigateur.',
+        'latency.identify.stopRequired': 'Arrêtez la lecture avant de demander cette autorisation.',
+        'latency.identify.pending': 'Identification en cours…',
         'latency.heading': 'Synchronisation visuelle',
         'latency.manual': 'Compensation manuelle (ms)',
         'latency.help': 'Le décalage automatique de la sortie audio est ajouté à cette valeur.',
@@ -219,9 +299,27 @@
         renderStatus();
       }
       window.addEventListener('renax-language-changed', renderStatus);
+      identify.onclick = async () => {
+        identify.disabled = true;
+        try {
+          const result = await identifyOutputs();
+          setStatus('latency.identify.' + result);
+        } finally {
+          identify.disabled = false;
+        }
+      };
       input.value = String(manual);
       input.addEventListener('change', () => {
         if (!setManual(input.valueAsNumber)) {
+          identify.onclick = async () => {
+            identify.disabled = true;
+            try {
+              const result = await identifyOutputs();
+              setStatus('latency.identify.' + result);
+            } finally {
+              identify.disabled = false;
+            }
+          };
           input.value = String(manual);
           setStatus('latency.saveError');
         } else setStatus('');
@@ -287,6 +385,15 @@
           mid = Math.floor(sorted.length / 2),
           median = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
         if (setManual(Math.round(median))) {
+          identify.onclick = async () => {
+            identify.disabled = true;
+            try {
+              const result = await identifyOutputs();
+              setStatus('latency.identify.' + result);
+            } finally {
+              identify.disabled = false;
+            }
+          };
           input.value = String(manual);
           finish();
           setStatus('latency.saved');

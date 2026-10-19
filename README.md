@@ -68,3 +68,5 @@ Maintenance CSS : `pnpm check:styles` contrôle le budget par feuille et les aff
 Les exceptions CSS nécessaires sont documentées dans `CSS-MIGRATION.md` ; `pnpm check:styles` vérifie aussi leurs commentaires et les règles concurrentes. Les grandes feuilles de thème et la migration vers `@layer` restent hors de cette phase.
 
 En cas de veille pendant la lecture ou de décalage Bluetooth, Préférences permet d’exporter un diagnostic local incluant le Wake Lock et les latences audio annoncées. Aucun diagnostic n’est envoyé automatiquement.
+
+Pour examiner un changement de sortie Bluetooth, arrêter la lecture puis utiliser « Identifier les sorties audio » dans Préférences. Cette action demande un accès ponctuel au microphone pour exposer les informations des périphériques ; le micro est immédiatement libéré, sans enregistrement ni envoi de son. Exporter ensuite le diagnostic. Cette identification ne constitue pas encore un basculement automatique de compensation.

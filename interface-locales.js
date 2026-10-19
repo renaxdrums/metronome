@@ -1,6 +1,13 @@
 /* Offline interface catalogs. Musical voice language and user content are independent. */
 (() => {
-  const rows = `Automatic local backup. Sign in to access your songs on your devices.|Copia local automática. Inicia sesión para acceder a tus temas en tus dispositivos.|Automatische lokale Sicherung. Anmelden, um auf deinen Geräten auf deine Stücke zuzugreifen.|Backup locale automatico. Accedi per ritrovare i brani sui tuoi dispositivi.
+  const rows = `Identify audio outputs|Identificar salidas de audio|Audioausgänge erkennen|Identifica uscite audio
+One-time microphone access to identify outputs. No recording. Stop playback before continuing.|Acceso puntual al micrófono para identificar las salidas. Sin grabación. Detén la reproducción antes de continuar.|Einmaliger Mikrofonzugriff zur Erkennung der Ausgänge. Keine Aufnahme. Wiedergabe vorher stoppen.|Accesso temporaneo al microfono per identificare le uscite. Nessuna registrazione. Arresta la riproduzione prima di continuare.
+Identification complete. Export diagnostics.|Identificación terminada. Exporta el diagnóstico.|Erkennung abgeschlossen. Diagnose exportieren.|Identificazione completata. Esporta la diagnostica.
+Identification unavailable or permission denied. Export diagnostics.|Identificación imposible o permiso denegado. Exporta el diagnóstico.|Erkennung nicht möglich oder Berechtigung verweigert. Diagnose exportieren.|Identificazione impossibile o autorizzazione negata. Esporta la diagnostica.
+Output identification unavailable in this browser.|Identificación de salidas no disponible en este navegador.|Ausgangserkennung in diesem Browser nicht verfügbar.|Identificazione delle uscite non disponibile in questo browser.
+Stop playback before requesting this permission.|Detén la reproducción antes de solicitar este permiso.|Wiedergabe vor der Berechtigungsanfrage stoppen.|Arresta la riproduzione prima di richiedere questa autorizzazione.
+Identifying outputs…|Identificando salidas…|Ausgänge werden erkannt…|Identificazione delle uscite…
+Automatic local backup. Sign in to access your songs on your devices.|Copia local automática. Inicia sesión para acceder a tus temas en tus dispositivos.|Automatische lokale Sicherung. Anmelden, um auf deinen Geräten auf deine Stücke zuzugreifen.|Backup locale automatico. Accedi per ritrovare i brani sui tuoi dispositivi.
 Tracks|Pistas|Spuren|Tracce
 Intro animation|Animación de inicio|Startanimation|Animazione iniziale
 Metronome introduction|Introducción del metrónomo|Metronom-Einführung|Introduzione del metronomo

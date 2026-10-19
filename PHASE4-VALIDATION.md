@@ -22,10 +22,11 @@ La phase précédente est validée par la CI : 93/93 scripts nocturnes, producti
 | Secours IndexedDB | Récupération, CAS, portée, export de secours et API absente réussis |
 | Contrôles et éditeur | Clavier/zoom/dialogues et édition rythmique réussis |
 | Contrôles négatifs lint/types et inventaire | Réussis |
+| Production | Les 14 contrôles passent, dont CSP/guide vocal, hors ligne/MP3/bibliothèque et 36 équivalences source/production |
 | Revue du moteur | AST des trois scripts audio identique, à l’exception des noms de liaisons inutilisées ; calculs et appels inchangés |
 | Revue des thèmes | Quatre fichiers protégés identiques octet par octet |
 
-La sélection initiale de huit scripts a passé sept contrôles ; le huitième, Firebase local, n’a pas pu lancer Chrome dans cet environnement (socket Unix interdit). La relance avec le même Chromium headless utilisé par les autres tests a réussi : corruption, quota, récupération, matrice de métriques, Start/Stop, accents et sauvegarde mobile/bureau validés, sans modifier le test. Le test complet de production et la CI de cette phase restent à confirmer dans la pull request ; les résultats d’une révision précédente ne valent pas validation de cette révision.
+La sélection initiale de huit scripts a passé sept contrôles ; le huitième, Firebase local, n’a pas pu lancer Chrome dans cet environnement (socket Unix interdit). La relance avec le même Chromium headless utilisé par les autres tests a réussi : corruption, quota, récupération, matrice de métriques, Start/Stop, accents et sauvegarde mobile/bureau validés, sans modifier le test. Le test complet de production a passé ses 14 contrôles. La CI de cette phase reste à confirmer dans la pull request ; les résultats d’une révision précédente ne valent pas validation de cette révision.
 
 ## Essais physiques
 

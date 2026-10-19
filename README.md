@@ -66,3 +66,5 @@ La langue de l’interface se choisit dans Préférences : français, anglais, e
 Maintenance CSS : `pnpm check:styles` contrôle le budget par feuille et les affectations directes de style JavaScript ; les plafonds ne peuvent qu’être réduits.
 
 Les exceptions CSS nécessaires sont documentées dans `CSS-MIGRATION.md` ; `pnpm check:styles` vérifie aussi leurs commentaires et les règles concurrentes. Les grandes feuilles de thème et la migration vers `@layer` restent hors de cette phase.
+
+En cas de veille pendant la lecture ou de décalage Bluetooth, Préférences permet d’exporter un diagnostic local incluant le Wake Lock et les latences audio annoncées. Aucun diagnostic n’est envoyé automatiquement.

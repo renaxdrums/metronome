@@ -28,12 +28,25 @@ const { start, save } = require('./audio-harness.cjs');
       RENAX_FEEDBACK.error('PRIVATE_SONG_TITLE', new Error('PRIVATE_ACCOUNT_DETAIL')),
     );
     await p.locator('#index2SettingsBtn').click();
+    for (const [code, label] of [
+      ['es', 'Español'],
+      ['de', 'Deutsch'],
+      ['it', 'Italiano'],
+    ]) {
+      const button = p.locator('[data-language="' + code + '"]');
+      assert.equal(await button.getAttribute('aria-label'), label);
+      assert.equal(await button.locator('svg[aria-hidden="true"]').count(), 1);
+      assert.equal(await button.textContent(), '');
+    }
     const downloading = p.waitForEvent('download');
     await p.getByRole('button', { name: 'Exporter le diagnostic', exact: true }).click();
     const download = await downloading;
     const raw = fs.readFileSync(await download.path(), 'utf8');
     const report = JSON.parse(raw);
     assert.equal(report.format, 1);
+    assert.equal(typeof report.playback.wakeLockSupported, 'boolean');
+    assert.equal(typeof report.playback.audio.manualMs, 'number');
+    assert(Array.isArray(report.playback.wakeEvents));
     assert(report.errors.length > 0);
     assert(!raw.includes('PRIVATE_SONG_TITLE'));
     assert(!raw.includes('PRIVATE_ACCOUNT_DETAIL'));

@@ -90,6 +90,10 @@
       createdAt: new Date().toISOString(),
       browser: navigator.userAgent,
       measurements: { ...measurements },
+      playback:
+        window.RENAX_PLAYBACK?.diagnosticSnapshot(
+          typeof audioCtx === 'undefined' ? null : audioCtx,
+        ) ?? null,
       networkReportedOnline: navigator.onLine,
       primaryStorageHealthy: window.RENAX_STORAGE?.healthy ?? null,
       errors: entries.map((entry) => ({

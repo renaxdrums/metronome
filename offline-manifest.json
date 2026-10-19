@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "43a0885135b7dfd5",
+  "revision": "1eafc86fe8dcf28b",
   "resources": [
     {
       "path": "accessibility.css",
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "cc22dc51594093e8a1a94202c0467f8fc905d78d8d524f549c6fdbf48b568fec",
+      "sha256": "db68bc4a7029349d46e2b0fea455aa44462cda400e0dd06499de7b75a0c6b3ca",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "interface-language.js",
-      "sha256": "4c4b80c82d38df5724c67a67f0cfdcc59eb9846b922b8a18ee93a1b75a409b18",
+      "sha256": "6be76d44545ba1acfffa2f4924d04771f38ed9f58ffc1a202cdbac741c4567ad",
       "text": true
     },
     {
@@ -389,7 +389,7 @@
     },
     {
       "path": "playback-support.js",
-      "sha256": "bc2b127467b138d0b3ec825fe4c12238b010a0eab9db7d5c56dcf0904af0a059",
+      "sha256": "cb81675434e5ef46799cbc8bb63e0b2266f40069a83c4d6f76ef6e063aebc4ea",
       "text": true
     },
     {
@@ -489,7 +489,7 @@
     },
     {
       "path": "ui-feedback.js",
-      "sha256": "a841029440a1fa2e9d9946df5f263317e9875e47850fa6719b3963391df5b7a9",
+      "sha256": "103c9711413b2f46215d268186927fe539e980df538176574697a63becfee419",
       "text": true
     },
     {

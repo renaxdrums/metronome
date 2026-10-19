@@ -12,6 +12,39 @@
     const value = Number(localStorage.getItem(key));
     if (Number.isFinite(value)) manual = Math.max(-100, Math.min(400, value));
   } catch {}
+  const wakeEvents = [];
+  function traceWake(state, reason = null) {
+    wakeEvents.push({ state, reason, at: performance.now(), visibility: document.visibilityState });
+    if (wakeEvents.length > 32) wakeEvents.shift();
+  }
+  function diagnosticSnapshot(context) {
+    const policy = document.permissionsPolicy || document.featurePolicy;
+    let policyAllowed = null;
+    try {
+      if (policy?.allowsFeature) policyAllowed = policy.allowsFeature('screen-wake-lock');
+    } catch {}
+    return {
+      active,
+      secureContext: window.isSecureContext,
+      topLevel: window.top === window,
+      wakeLockSupported: typeof navigator.wakeLock?.request === 'function',
+      policyAllowed,
+      lockHeld: !!sentinel && !sentinel.released,
+      requestPending: !!pending,
+      wakeEvents: wakeEvents.map((event) => ({ ...event })),
+      audio: {
+        state: context?.state ?? null,
+        sampleRate: context?.sampleRate ?? null,
+        outputLatencyMs: Number.isFinite(context?.outputLatency)
+          ? context.outputLatency * 1000
+          : null,
+        baseLatencyMs: Number.isFinite(context?.baseLatency) ? context.baseLatency * 1000 : null,
+        automaticMs: automaticMs(context),
+        manualMs: manual,
+        visualDelayMs: delayMs(context),
+      },
+    };
+  }
   async function release(lock) {
     if (lock && !lock.released)
       try {
@@ -29,6 +62,7 @@
       return;
     const epoch = lockEpoch;
     try {
+      traceWake('requested');
       pending = navigator.wakeLock.request('screen');
       const lock = await pending;
       if (!active || epoch !== lockEpoch || document.visibilityState !== 'visible') {
@@ -36,14 +70,24 @@
         return;
       }
       sentinel = lock;
+      traceWake('acquired');
       lock.addEventListener(
         'release',
         () => {
           if (sentinel === lock) sentinel = null;
+          traceWake('released');
         },
         { once: true },
       );
-    } catch {
+    } catch (error) {
+      traceWake(
+        'rejected',
+        ['NotAllowedError', 'NotSupportedError', 'AbortError', 'SecurityError'].includes(
+          error?.name,
+        )
+          ? error.name
+          : 'OtherError',
+      );
       /* Denial or missing platform permission must never prevent audio. */
     } finally {
       pending = null;
@@ -107,6 +151,7 @@
     automaticMs,
     setManual,
     recordBeat,
+    diagnosticSnapshot,
     get generation() {
       return generation;
     },

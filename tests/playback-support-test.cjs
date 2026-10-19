@@ -190,6 +190,16 @@ const { start, save } = require('./audio-harness.cjs');
       };
       support.start();
       await new Promise((r) => setTimeout(r, 0));
+      const diagnostic = support.diagnosticSnapshot({ outputLatency: 0.2, baseLatency: 0.01 });
+      if (
+        !diagnostic.wakeEvents.some(
+          (event) => event.state === 'rejected' && event.reason === 'NotAllowedError',
+        )
+      )
+        throw Error('Wake denial missing from diagnostic');
+      if (diagnostic.audio.visualDelayMs !== 235) throw Error('Diagnostic latency mismatch');
+      diagnostic.wakeEvents.length = 0;
+      if (!support.diagnosticSnapshot().wakeEvents.length) throw Error('Mutable diagnostic leaked');
       support.stop();
       return { requests: count, held, released: locks.every((l) => l.released) };
     });

@@ -108,3 +108,5 @@ Le test d’invariance impose au maximum 2/255 sur chaque canal de chaque pixel,
 Le contrôle multilingue parcourt 360 états dans les cinq langues, vérifie les clés visibles et les catalogues, détecte les restes français et les replis anglais hors anglais, et contrôle les rectangles des glyphes des boutons. Un bouton volontairement trop étroit vérifie la détection de débordement. Les chevrons décoratifs ne sont pas du texte tronqué.
 
 Les résultats de validation de la livraison sont consignés dans `PHASE5-VALIDATION.md` et le compte rendu de la PR ; un résultat en échec ne vaut pas validation. Aucune fusion ni publication ne doit précéder la CI verte.
+
+Diagnostic S23 : après une extinction automatique pendant la lecture, exporter le diagnostic depuis Préférences avant de recharger la page. La section `playback` distingue absence API, refus, politique `screen-wake-lock`, acquisition et libération ; elle indique les latences annoncées et le réglage manuel. Ne pas conclure à une cause à partir du seul résultat de calibration. Les tests simulés ne remplacent pas une validation sur appareil.

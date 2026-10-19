@@ -6,6 +6,8 @@ const { start, save } = require('./audio-harness.cjs');
 const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f363091b5fe1c7',
   root = path.resolve(__dirname, '..'),
   cache = new Map();
+const referenceAgainstItself = process.env.INVARIANCE_SELF === '1';
+const pixelThreshold = 2; // Maximum over every pixel and RGBA channel; no pixel-count allowance.
 const cascadeProbe = process.env.CASCADE_PROBE || '';
 assert(['', 'remove-important', 'layers-only', 'layers-without-important'].includes(cascadeProbe));
 const probeLayers = {
@@ -93,12 +95,13 @@ async function baselineRoute(page, url) {
     }),
     pcm = [],
     visuals = [],
-    styleDiffs = [];
+    styleDiffs = [],
+    styleComparisons = [];
   try {
     const pages = [];
     for (const before of [true, false]) {
       const p = await h.browser.newPage();
-      if (before) await baselineRoute(p, h.url);
+      if (before || referenceAgainstItself) await baselineRoute(p, h.url);
       await p.addInitScript(() => {
         let seed = 42;
         Math.random = () => {
@@ -163,10 +166,11 @@ async function baselineRoute(page, url) {
         for (const before of [true, false]) {
           const p = await h.browser.newPage({
             viewport: { width, height },
+            deviceScaleFactor: 1,
             hasTouch: width < 1100,
             reducedMotion: 'reduce',
           });
-          if (before) await baselineRoute(p, h.url);
+          if (before || referenceAgainstItself) await baselineRoute(p, h.url);
 
           await p.goto(h.url);
           await p.evaluate(() => prepareAllVoiceAudio());
@@ -243,9 +247,18 @@ async function baselineRoute(page, url) {
               },
               shots.map((bytes) => bytes.toString('base64')),
             );
-            const equal = maxChannelDifference === 0;
-            visuals.push({ width, height, theme, module, identical: equal, maxChannelDifference });
-            if (!equal) {
+            const equal = maxChannelDifference <= pixelThreshold;
+            visuals.push({
+              width,
+              height,
+              theme,
+              module,
+              identical: maxChannelDifference === 0,
+              withinThreshold: equal,
+              maxChannelDifference,
+            });
+            {
+              // Computed-style equality is required even when the pixel gate passes.
               const maps = [];
               for (const p of views)
                 maps.push(
@@ -253,8 +266,16 @@ async function baselineRoute(page, url) {
                     const out = {};
                     for (const e of document.body.querySelectorAll('*')) {
                       const b = e.getBoundingClientRect();
-                      if (!b.width || !b.height || getComputedStyle(e).visibility === 'hidden')
-                        continue;
+                      const s = getComputedStyle(e);
+                      if (!b.width || !b.height || s.visibility !== 'visible') continue;
+                      // Principal rendered UI only: native select/input replicas are clipped and transparent.
+                      let transparent = false;
+                      for (let ancestor = e; ancestor; ancestor = ancestor.parentElement)
+                        if (getComputedStyle(ancestor).opacity === '0') {
+                          transparent = true;
+                          break;
+                        }
+                      if (transparent) continue;
                       let parts = [],
                         current = e;
                       while (current && current !== document.body) {
@@ -269,11 +290,25 @@ async function baselineRoute(page, url) {
                         if (current.id) break;
                         current = current.parentElement;
                       }
-                      const s = getComputedStyle(e);
                       out[parts.join(' > ')] = Object.fromEntries(
                         [
                           'color',
                           'background-color',
+                          'background',
+                          'border',
+                          'border-top',
+                          'border-right',
+                          'border-bottom',
+                          'border-left',
+                          'margin',
+                          'margin-top',
+                          'margin-right',
+                          'margin-bottom',
+                          'margin-left',
+                          'padding',
+                          'padding-left',
+                          'padding-right',
+                          'visibility',
                           'font-size',
                           'font-family',
                           'font-weight',
@@ -298,37 +333,67 @@ async function baselineRoute(page, url) {
                     return out;
                   }),
                 );
-              for (const [selector, values] of Object.entries(maps[0]))
-                if (maps[1][selector]) {
-                  const changed = Object.keys(values).filter(
-                    (k) => values[k] !== maps[1][selector][k],
-                  );
-                  if (changed.length)
-                    styleDiffs.push({
-                      width,
-                      theme,
-                      module,
-                      selector,
-                      changes: changed.map((k) => ({
-                        property: k,
-                        before: values[k],
-                        after: maps[1][selector][k],
-                      })),
-                    });
-                }
+              const beforeDifferences = styleDiffs.length;
+              const selectors = new Set([...Object.keys(maps[0]), ...Object.keys(maps[1])]);
+              for (const selector of selectors) {
+                const values = maps[0][selector],
+                  after = maps[1][selector];
+                const changed =
+                  !values || !after
+                    ? ['element']
+                    : Object.keys(values).filter((k) => values[k] !== after[k]);
+                if (changed.length)
+                  styleDiffs.push({
+                    width,
+                    theme,
+                    module,
+                    selector,
+                    changes: changed.map((k) => ({
+                      property: k,
+                      before: values?.[k] ?? 'absent',
+                      after: after?.[k] ?? 'absent',
+                    })),
+                  });
+              }
+              styleComparisons.push({
+                width,
+                height,
+                theme,
+                module,
+                elements: selectors.size,
+                identical: styleDiffs.length === beforeDifferences,
+              });
             }
           }
         for (const p of views) await p.close();
       }
-    save('quality-invariance-results.json', { baseline, cascadeProbe, pcm, visuals, styleDiffs });
+    save('quality-invariance-results.json', {
+      baseline,
+      referenceAgainstItself,
+      cascadeProbe,
+      pixelThreshold,
+      pcm,
+      visuals,
+      styleComparisons,
+      styleDiffs,
+    });
+    assert.equal(
+      styleDiffs.length,
+      0,
+      'Computed styles differ; inspect quality-invariance-results.json',
+    );
     assert(
-      visuals.every((v) => v.identical),
+      visuals.every((v) => v.withinThreshold),
       'Screenshots differ; inspect quality-invariance-results.json',
     );
     console.log(
-      'PASS identical PCM at both rates; ' +
+      (pcm.length ? 'PASS identical PCM at both rates; ' : 'PASS visual-only validation; ') +
         visuals.length +
-        ' baseline screenshot comparisons (maximum channel difference: 0/255)',
+        ' baseline screenshot and strict computed-style comparisons; maximum channel difference: ' +
+        Math.max(0, ...visuals.map((v) => v.maxChannelDifference)) +
+        '/255 (limit ' +
+        pixelThreshold +
+        '/255, no pixel-count allowance)',
     );
   } finally {
     await h.browser.close();

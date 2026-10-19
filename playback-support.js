@@ -2,16 +2,29 @@
 (() => {
   'use strict';
   const key = 'renax.visualLatencyMs.v1';
+  const bluetoothKey = 'renax.bluetoothHeadphones.v1';
+  let bluetoothEnabled = false;
   let active = false,
     generation = 0,
     lockEpoch = 0,
     sentinel = null,
-    pending = null,
-    manual = 0;
+    pending = null;
+  const manual = 200;
   try {
-    const value = Number(localStorage.getItem(key));
-    if (Number.isFinite(value)) manual = Math.max(-100, Math.min(400, value));
+    const saved = localStorage.getItem(bluetoothKey);
+    const legacy = Number(localStorage.getItem(key));
+    bluetoothEnabled = saved === null ? Number.isFinite(legacy) && legacy !== 0 : saved === 'true';
   } catch {}
+  function setBluetoothEnabled(value) {
+    if (typeof value !== 'boolean') return false;
+    try {
+      localStorage.setItem(bluetoothKey, String(value));
+    } catch {
+      return false;
+    }
+    bluetoothEnabled = value;
+    return true;
+  }
   const wakeEvents = [];
   function traceWake(state, reason = null) {
     wakeEvents.push({ state, reason, at: performance.now(), visibility: document.visibilityState });
@@ -109,6 +122,8 @@
         baseLatencyMs: Number.isFinite(context?.baseLatency) ? context.baseLatency * 1000 : null,
         automaticMs: automaticMs(context),
         manualMs: manual,
+        bluetoothEnabled,
+        appliedManualMs: bluetoothEnabled ? manual : 0,
         visualDelayMs: delayMs(context),
       },
     };
@@ -195,17 +210,7 @@
     return Number.isFinite(value) && value >= 0 ? value * 1000 : 0;
   }
   function delayMs(context) {
-    return automaticMs(context) + manual;
-  }
-  function setManual(value) {
-    if (!Number.isFinite(value) || value < -100 || value > 400) return false;
-    try {
-      localStorage.setItem(key, String(value));
-    } catch {
-      return false;
-    }
-    manual = value;
-    return true;
+    return automaticMs(context) + (bluetoothEnabled ? manual : 0);
   }
   const beats = [];
   function recordBeat(context, time) {
@@ -217,7 +222,10 @@
     stop,
     delayMs,
     automaticMs,
-    setManual,
+    setBluetoothEnabled,
+    get bluetoothEnabled() {
+      return bluetoothEnabled;
+    },
     recordBeat,
     diagnosticSnapshot,
     identifyOutputs,
@@ -234,28 +242,23 @@
   document.addEventListener(
     'DOMContentLoaded',
     () => {
-      const section = document.createElement('section');
-      section.className = 'index2-settings-section';
-      section.id = 'latencySettings';
-      section.innerHTML =
-        '<h3 data-i18n-key="latency.heading"></h3><label class="index2-setting-row"><span data-i18n-key="latency.manual"></span><input id="visualLatencyMs" type="number" min="-100" max="400" step="1" ></label><p data-i18n-key="latency.help"></p><div class="latency-actions"><button type="button" class="btn" id="latencyCalibrate" data-i18n-key="latency.calibrate"></button><button type="button" class="btn" id="latencyTap" data-i18n-key="latency.tap" disabled></button><button type="button" class="btn" id="latencyApply" data-i18n-key="latency.apply" disabled></button><button type="button" class="btn" id="latencyCancel" data-i18n-key="latency.cancel" hidden></button></div><p data-i18n-key="latency.identifyHelp"></p><button type="button" class="btn" id="latencyIdentifyOutputs" data-i18n-key="latency.identify"></button><output id="latencyStatus" role="status" aria-live="polite" data-no-translate></output>';
       const panel = document.getElementById('index2SettingsPanel');
       if (!panel) return;
+      const section = document.createElement('section');
+      section.id = 'latencySettings';
+      section.className = 'index2-settings-section';
+      section.innerHTML =
+        '<h3 data-i18n-key="latency.heading"></h3><label class="index2-setting-row"><span data-i18n-key="latency.bluetooth"></span><input id="bluetoothHeadphones" type="checkbox"></label><p data-i18n-key="latency.bluetoothHelp"></p><p data-i18n-key="latency.identifyHelp"></p><button type="button" class="btn" id="latencyIdentifyOutputs" data-i18n-key="latency.identify"></button><output id="latencyStatus" role="status" aria-live="polite" data-no-translate></output>';
       panel.append(section);
-      const input = section.querySelector('input'),
-        calibrate = section.querySelector('#latencyCalibrate'),
-        tap = section.querySelector('#latencyTap'),
-        apply = section.querySelector('#latencyApply'),
-        cancel = section.querySelector('#latencyCancel'),
-        status = section.querySelector('output'),
-        identify = section.querySelector('#latencyIdentifyOutputs');
-      let collecting = false,
-        preparing = false,
-        calibrationEpoch = 0,
-        ownsPlayback = false,
-        ownedGeneration = null,
-        samples = [];
+      const bluetooth = section.querySelector('#bluetoothHeadphones');
+      const identify = section.querySelector('#latencyIdentifyOutputs');
+      const status = section.querySelector('#latencyStatus');
+      let statusKey = '';
       const fallback = {
+        'latency.heading': 'Synchronisation visuelle',
+        'latency.bluetooth': 'Casque Bluetooth',
+        'latency.bluetoothHelp':
+          'Ajoute 200 ms au visuel. Désactivez cette option sur haut-parleur ou casque filaire.',
         'latency.identify': 'Identifier les sorties audio',
         'latency.identifyHelp':
           'Autorisation micro ponctuelle pour identifier les sorties. Aucun enregistrement. Arrêtez la lecture avant de continuer.',
@@ -266,155 +269,33 @@
           'Identification des sorties indisponible dans ce navigateur.',
         'latency.identify.stopRequired': 'Arrêtez la lecture avant de demander cette autorisation.',
         'latency.identify.pending': 'Identification en cours…',
-        'latency.heading': 'Synchronisation visuelle',
-        'latency.manual': 'Compensation manuelle (ms)',
-        'latency.help': 'Le décalage automatique de la sortie audio est ajouté à cette valeur.',
-        'latency.calibrate': 'Calibrer',
-        'latency.tap': 'Taper en rythme',
-        'latency.apply': 'Appliquer',
-        'latency.cancel': 'Annuler',
-        'latency.instructions': 'Tapez au moins 5 fois avec le clic, puis appliquez la médiane.',
-        'latency.samples': '{count} frappes enregistrées',
-        'latency.saved': 'Calibration enregistrée.',
         'latency.saveError': 'Valeur invalide ou enregistrement local impossible.',
-        'latency.audioError': 'Son indisponible pour la calibration.',
       };
-      const t = (k) => {
-        const value = window.RENAX_I18N?.t(k);
-        return value && value !== k ? value : fallback[k] || k;
+      const t = (key) => {
+        const value = window.RENAX_I18N?.t(key);
+        return value && value !== key ? value : fallback[key] || key;
       };
       for (const element of section.querySelectorAll('[data-i18n-key]'))
         element.textContent = t(element.dataset.i18nKey);
-      let statusKey = '',
-        statusParameters = {};
-      function renderStatus() {
-        let text = statusKey ? t(statusKey) : '';
-        for (const [key, value] of Object.entries(statusParameters))
-          text = text.replaceAll('{' + key + '}', String(value));
-        status.textContent = text;
-      }
-      function setStatus(key, parameters = {}) {
-        statusKey = key;
-        statusParameters = parameters;
-        renderStatus();
-      }
+      const renderStatus = () => {
+        status.textContent = statusKey ? t(statusKey) : '';
+      };
       window.addEventListener('renax-language-changed', renderStatus);
+      bluetooth.checked = bluetoothEnabled;
+      bluetooth.onchange = () => {
+        statusKey = setBluetoothEnabled(bluetooth.checked) ? '' : 'latency.saveError';
+        bluetooth.checked = bluetoothEnabled;
+        renderStatus();
+      };
       identify.onclick = async () => {
         identify.disabled = true;
         try {
-          const result = await identifyOutputs();
-          setStatus('latency.identify.' + result);
+          statusKey = 'latency.identify.' + (await identifyOutputs());
+          renderStatus();
         } finally {
           identify.disabled = false;
         }
       };
-      input.value = String(manual);
-      input.addEventListener('change', () => {
-        if (!setManual(input.valueAsNumber)) {
-          identify.onclick = async () => {
-            identify.disabled = true;
-            try {
-              const result = await identifyOutputs();
-              setStatus('latency.identify.' + result);
-            } finally {
-              identify.disabled = false;
-            }
-          };
-          input.value = String(manual);
-          setStatus('latency.saveError');
-        } else setStatus('');
-      });
-      function finish() {
-        const wasPreparing = preparing;
-        calibrationEpoch++;
-        preparing = false;
-        collecting = false;
-        tap.disabled = true;
-        apply.disabled = true;
-        cancel.hidden = true;
-        calibrate.disabled = false;
-        const shouldStop = ownsPlayback && (wasPreparing || ownedGeneration === generation);
-        ownsPlayback = false;
-        if (shouldStop) stopMetronome();
-      }
-      calibrate.onclick = async () => {
-        if (playbackStarting) return;
-        const request = ++calibrationEpoch;
-        preparing = true;
-        calibrate.disabled = true;
-        cancel.hidden = false;
-        samples = [];
-        beats.length = 0;
-        ownsPlayback = !isPlaying;
-        try {
-          if (ownsPlayback) await startMetronome();
-          if (request !== calibrationEpoch) return;
-          preparing = false;
-          if (!isPlaying) throw Error('Audio unavailable');
-          ownedGeneration = generation;
-          collecting = true;
-          tap.disabled = false;
-          cancel.hidden = false;
-          setStatus('latency.instructions');
-          tap.focus();
-        } catch (error) {
-          if (request !== calibrationEpoch) return;
-          finish();
-          window.RENAX_FEEDBACK?.error(t('latency.audioError'), error);
-        }
-      };
-      tap.onclick = () => {
-        if (!collecting || !isPlaying) return;
-        const candidates = beats.filter((b) => b.context === audioCtx);
-        if (!candidates.length) return;
-        const now = audioCtx.currentTime,
-          auto = automaticMs(audioCtx) / 1000;
-        const nearest = candidates.reduce((best, b) =>
-          Math.abs(now - b.time - auto) < Math.abs(now - best.time - auto) ? b : best,
-        );
-        const delta = (now - nearest.time - auto) * 1000;
-        if (delta < -100 || delta > 400) return;
-        samples.push(delta);
-        if (samples.length > 31) samples.shift();
-        apply.disabled = samples.length < 5;
-        setStatus('latency.samples', { count: samples.length });
-      };
-      apply.onclick = () => {
-        if (samples.length < 5) return;
-        const sorted = samples.slice().sort((a, b) => a - b),
-          mid = Math.floor(sorted.length / 2),
-          median = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-        if (setManual(Math.round(median))) {
-          identify.onclick = async () => {
-            identify.disabled = true;
-            try {
-              const result = await identifyOutputs();
-              setStatus('latency.identify.' + result);
-            } finally {
-              identify.disabled = false;
-            }
-          };
-          input.value = String(manual);
-          finish();
-          setStatus('latency.saved');
-        } else setStatus('latency.saveError');
-      };
-      cancel.onclick = () => {
-        finish();
-        setStatus('');
-      };
-      new MutationObserver(() => {
-        const panel = document.getElementById('index2SettingsPanel');
-        if (
-          (collecting || preparing) &&
-          !panel.classList.contains('open') &&
-          !panel.classList.contains('mobile-active')
-        )
-          finish();
-      }).observe(document.getElementById('index2SettingsPanel'), {
-        attributes: true,
-        attributeFilter: ['class'],
-      });
     },
     { once: true },
   );

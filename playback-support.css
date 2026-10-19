@@ -6,3 +6,6 @@
 #latencySettings .btn { min-height: 44px; flex: 1 1 100px; white-space: normal; }
 #latencySettings :is(input, button):focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 #latencyStatus { display: block; margin-top: 10px; font-size: 11px; line-height: 1.6; color: var(--text); }
+
+/* Keep only the preferences trigger above the modal backdrop; its siblings remain inert. */
+html.renax-settings-open body > header { z-index: 61; }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "b86cf5340544fb1c",
+  "revision": "cd247f1cbc0b439e",
   "resources": [
     {
       "path": "accessibility.css",
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "0336e57b75647f752262b9ebc7e3a4c6a3345e84e06d2717527bb182db9cebb5",
+      "sha256": "3ca99e58aac0b4c88ede1988f55e1be5ffb9376844cbaddb7c419365704d45ef",
       "text": true
     },
     {
@@ -284,12 +284,12 @@
     },
     {
       "path": "interface-locales.js",
-      "sha256": "1d4ec53c34edb48b5a3cb25ce2e838116805d0b0ea4dea452c7b6b72e26bd2f0",
+      "sha256": "cc8a4984a941369823cb4018bc9203e305d369442e74f83952c517e29c2c4403",
       "text": true
     },
     {
       "path": "interface-translations.js",
-      "sha256": "86dd6db15ea2db992fbe1578cbc78052d10606d5a0a5f5ac96a43f068607a881",
+      "sha256": "787caec43d6be68a8f69999ffcf7c429121498705fbedc278b1d968bd763c807",
       "text": true
     },
     {
@@ -384,12 +384,12 @@
     },
     {
       "path": "playback-support.css",
-      "sha256": "5af3e9aed5145ca741b740562569cb5c622043db379dc2a45f80c8d7b655352f",
+      "sha256": "be7d47c55905e193a2be2359e429434ece68a84bb67531129a83e746f3d1f18f",
       "text": true
     },
     {
       "path": "playback-support.js",
-      "sha256": "f588e3b3a7f3dd2a34cb3c8ccb77270f46cfd84cb177d169620e4b878bf720f2",
+      "sha256": "906fd4c12e7ea664fd156e99fa92a94653b63a14c87c3d96b04bae9781205e74",
       "text": true
     },
     {
@@ -434,7 +434,7 @@
     },
     {
       "path": "settings-accessibility.js",
-      "sha256": "4ed7dbc3b618389f4869d47e2256b4b6303fb54066c86127aeb2b8d5ef875516",
+      "sha256": "3fb18747a4eb5ffdc52734f2acd478000195c9714d290dab3c2129ffcd05d5bb",
       "text": true
     },
     {

@@ -1,6 +1,8 @@
 /* Offline interface catalogs. Musical voice language and user content are independent. */
 (() => {
-  const rows = `Identify audio outputs|Identificar salidas de audio|Audioausgänge erkennen|Identifica uscite audio
+  const rows = `Bluetooth headphones|Auriculares Bluetooth|Bluetooth-Kopfhörer|Cuffie Bluetooth
+Adds 200 ms to the visuals. Disable this option for speakers or wired headphones.|Añade 200 ms a la imagen. Desactiva esta opción con altavoces o auriculares con cable.|Verzögert die Anzeige um 200 ms. Für Lautsprecher oder kabelgebundene Kopfhörer deaktivieren.|Ritarda la visualizzazione di 200 ms. Disattiva con altoparlanti o cuffie cablate.
+Identify audio outputs|Identificar salidas de audio|Audioausgänge erkennen|Identifica uscite audio
 One-time microphone access to identify outputs. No recording. Stop playback before continuing.|Acceso puntual al micrófono para identificar las salidas. Sin grabación. Detén la reproducción antes de continuar.|Einmaliger Mikrofonzugriff zur Erkennung der Ausgänge. Keine Aufnahme. Wiedergabe vorher stoppen.|Accesso temporaneo al microfono per identificare le uscite. Nessuna registrazione. Arresta la riproduzione prima di continuare.
 Identification complete. Export diagnostics.|Identificación terminada. Exporta el diagnóstico.|Erkennung abgeschlossen. Diagnose exportieren.|Identificazione completata. Esporta la diagnostica.
 Identification unavailable or permission denied. Export diagnostics.|Identificación imposible o permiso denegado. Exporta el diagnóstico.|Erkennung nicht möglich oder Berechtigung verweigert. Diagnose exportieren.|Identificazione impossibile o autorizzazione negata. Esporta la diagnostica.

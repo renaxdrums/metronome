@@ -108,10 +108,9 @@ const { start, save } = require('./audio-harness.cjs');
     await p.waitForFunction(() => window.__locks.every((l) => l.released));
     const result = await p.evaluate(async () => {
       const support = RENAX_PLAYBACK;
-      for (const value of [-101, 401, NaN, Infinity])
-        if (support.setManual(value)) throw Error('Invalid manual offset accepted');
-      if (!support.setManual(-100) || !support.setManual(400)) throw Error('Valid bound rejected');
-      support.setManual(35);
+      for (const value of [-101, 401, NaN, Infinity, null, 'true'])
+        if (support.setBluetoothEnabled(value)) throw Error('Invalid Bluetooth state accepted');
+      if (!support.setBluetoothEnabled(true)) throw Error('Cannot enable Bluetooth correction');
       const automatic = support.delayMs({ outputLatency: 0.2, baseLatency: 0.01 });
       const fallback = support.delayMs({ baseLatency: 0.02 });
       const previous = audioCtx,
@@ -147,9 +146,15 @@ const { start, save } = require('./audio-harness.cjs');
         locks: window.__locks.length,
       };
     });
-    assert.equal(result.automatic, 235);
-    assert.equal(result.fallback, 55);
-    for (const delay of result.calls) assert(Math.abs(delay - 335) < 1e-6);
+    assert.equal(result.automatic, 400);
+    assert.equal(result.fallback, 220);
+    const disabledOffset = await p.evaluate(() => {
+      RENAX_PLAYBACK.setBluetoothEnabled(false);
+      return RENAX_PLAYBACK.delayMs({ outputLatency: 0.2 });
+    });
+    assert.equal(disabledOffset, 200);
+    await p.evaluate(() => RENAX_PLAYBACK.setBluetoothEnabled(true));
+    for (const delay of result.calls) assert(Math.abs(delay - 500) < 1e-6);
     assert(result.raceReleased);
     const pendingVisibility = await p.evaluate(async () => {
       const support = RENAX_PLAYBACK;
@@ -197,7 +202,7 @@ const { start, save } = require('./audio-harness.cjs');
         )
       )
         throw Error('Wake denial missing from diagnostic');
-      if (diagnostic.audio.visualDelayMs !== 235) throw Error('Diagnostic latency mismatch');
+      if (diagnostic.audio.visualDelayMs !== 400) throw Error('Diagnostic latency mismatch');
       diagnostic.wakeEvents.length = 0;
       if (!support.diagnosticSnapshot().wakeEvents.length) throw Error('Mutable diagnostic leaked');
       support.stop();
@@ -207,7 +212,8 @@ const { start, save } = require('./audio-harness.cjs');
     result.pendingVisibility = pendingVisibility;
     await p.reload();
     await p.waitForFunction(() => window.RENAX_PLAYBACK);
-    assert.equal(await p.evaluate(() => RENAX_PLAYBACK.manualMs), 35);
+    assert.equal(await p.evaluate(() => RENAX_PLAYBACK.manualMs), 200);
+    assert.equal(await p.evaluate(() => RENAX_PLAYBACK.bluetoothEnabled), true);
     await p.evaluate(() => {
       Object.defineProperty(navigator, 'wakeLock', { configurable: true, value: undefined });
     });
@@ -252,64 +258,11 @@ const { start, save } = require('./audio-harness.cjs');
         await shot.locator('[data-appearance=' + theme + ']').click();
         await shot.locator('#latencySettings').scrollIntoViewIfNeeded();
         await shot.screenshot({ path: path.join(captureDir, `latency-${theme}-${width}.png`) });
-        assert(await shot.locator('#visualLatencyMs').isVisible());
-        assert(await shot.locator('#latencyCalibrate').isVisible());
+        assert(await shot.locator('#bluetoothHeadphones').isVisible());
       }
       await shot.close();
     }
-    await p.locator('#latencyCalibrate').click();
-    await p.waitForFunction(() => !document.getElementById('latencyTap').disabled);
-    await p.evaluate(() => {
-      const context = audioCtx;
-      const descriptor = Object.getOwnPropertyDescriptor(context, 'currentTime');
-      Object.defineProperty(context, 'outputLatency', { configurable: true, value: 0.2 });
-      let now = 100.2;
-      Object.defineProperty(context, 'currentTime', { configurable: true, get: () => now });
-      RENAX_PLAYBACK.recordBeat(context, 100);
-      for (const offset of [10, 20, 30, 40, 200]) {
-        now = 100.2 + offset / 1000;
-        document.getElementById('latencyTap').click();
-      }
-      if (descriptor) Object.defineProperty(context, 'currentTime', descriptor);
-      else delete context.currentTime;
-    });
-    await p.locator('#latencyApply').click();
-    assert.equal(await p.evaluate(() => RENAX_PLAYBACK.manualMs), 30);
-    assert.equal(await p.evaluate(() => isPlaying), false);
-    await p.evaluate(() => RENAX_I18N.setLanguage('en'));
-    await p.waitForFunction(
-      () => document.querySelector('#latencySettings h3').textContent === 'Visual synchronization',
-    );
-    assert.equal(await p.locator('#latencyStatus').textContent(), 'Calibration saved.');
-    await p.evaluate(() => RENAX_I18N.setLanguage('fr'));
-    // Calibration must preserve playback that the user already started.
-    await p.evaluate(() => startMetronome());
-    await p.locator('#latencyCalibrate').click();
-    await p.waitForFunction(() => !document.getElementById('latencyTap').disabled);
-    await p.locator('#latencyCancel').click();
-    assert.equal(await p.evaluate(() => isPlaying), true);
-    await p.evaluate(() => stopMetronome());
-    // Closing preferences while an asynchronous start is pending cancels that start.
-    await p.evaluate(() => {
-      const original = ensureVoiceMetronomeReady;
-      window.__restoreEnsure = () => {
-        ensureVoiceMetronomeReady = original;
-      };
-      ensureVoiceMetronomeReady = () =>
-        new Promise((r) => {
-          window.__finishPrepare = r;
-        });
-    });
-    await p.locator('#latencyCalibrate').click();
-    await p.waitForFunction(() => window.__finishPrepare);
     await p.locator('#index2SettingsClose').click();
-    await p.locator('#index2SettingsPanel').waitFor({ state: 'hidden' });
-    await p.evaluate(() => {
-      window.__finishPrepare();
-      window.__restoreEnsure();
-    });
-    await p.waitForFunction(() => !playbackStarting);
-    assert.equal(await p.evaluate(() => isPlaying), false);
     await p.getByRole('tab', { name: 'Métronome', exact: true }).click();
     await p.locator('#scorePartitionBtn').click();
     await p.waitForFunction(() => RENAX_SCORE.enabled && RENAX_SCORE.snapshot.notes > 0);
@@ -323,7 +276,7 @@ const { start, save } = require('./audio-harness.cjs');
         },
         outputLatency: 0.2,
       };
-      RENAX_PLAYBACK.setManual(35);
+      RENAX_PLAYBACK.setBluetoothEnabled(true);
       isPlaying = true;
       window.setTimeout = () => 0;
       const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -335,10 +288,10 @@ const { start, save } = require('./audio-harness.cjs');
         durationMs: 500,
       });
       await frame();
-      clock = 1.334;
+      clock = 1.499;
       await frame();
       const before = RENAX_SCORE.snapshot.active;
-      clock = 1.336;
+      clock = 1.501;
       await frame();
       const after = RENAX_SCORE.snapshot.active;
       window.setTimeout = timeout;
@@ -348,6 +301,22 @@ const { start, save } = require('./audio-harness.cjs');
     });
     assert.equal(scoreLatency.before, 0);
     assert(scoreLatency.after > 0);
+    await p.locator('#index2SettingsBtn').click();
+    const bluetoothSwitch = p.locator('#bluetoothHeadphones');
+    await bluetoothSwitch.uncheck();
+    assert.equal(await p.evaluate(() => RENAX_PLAYBACK.delayMs({ outputLatency: 0.024 })), 24);
+    assert.equal(await p.locator('#visualLatencyMs').count(), 0);
+    assert.equal(await p.locator('#latencyCalibrate').count(), 0);
+    await p.locator('#index2SettingsBtn').click();
+    await p.waitForFunction(() => history.state?.renaxNavigation?.screen?.settings === false);
+    await p.reload();
+    await p.waitForFunction(() => window.RENAX_PLAYBACK);
+    assert.equal(await p.evaluate(() => RENAX_PLAYBACK.bluetoothEnabled), false);
+    assert.equal(await p.evaluate(() => RENAX_PLAYBACK.manualMs), 200);
+    await p.locator('#index2SettingsBtn').click();
+    await p.locator('#bluetoothHeadphones').check();
+    assert.equal(await p.evaluate(() => RENAX_PLAYBACK.delayMs({ outputLatency: 0.024 })), 224);
+    await p.locator('#index2SettingsBtn').click();
     const storage = await h.browser.newPage();
     await storage.addInitScript(() => {
       Storage.prototype.getItem = () => {
@@ -362,9 +331,9 @@ const { start, save } = require('./audio-harness.cjs');
     assert.deepEqual(
       await storage.evaluate(() => ({
         manual: RENAX_PLAYBACK.manualMs,
-        saved: RENAX_PLAYBACK.setManual(15),
+        saved: RENAX_PLAYBACK.setBluetoothEnabled(true),
       })),
-      { manual: 0, saved: false },
+      { manual: 200, saved: false },
     );
     await storage.close();
     await p.getByRole('tab', { name: 'Multipiste', exact: true }).click();
@@ -388,7 +357,7 @@ const { start, save } = require('./audio-harness.cjs');
       }
       Object.defineProperty(ctx, 'currentTime', { configurable: true, get: () => 1 });
       Object.defineProperty(ctx, 'outputLatency', { configurable: true, value: 0.2 });
-      RENAX_PLAYBACK.setManual(35);
+      RENAX_PLAYBACK.setBluetoothEnabled(true);
       window.setTimeout = (fn, delay) => {
         delays.push(delay);
         return 0;
@@ -412,10 +381,10 @@ const { start, save } = require('./audio-harness.cjs');
     });
     assert.equal(multiLatency.times[0], 1.05);
     assert.deepEqual(multiLatency.visuals, multiLatency.times);
-    assert(multiLatency.delays.some((d) => Math.abs(d - 285) < 1e-6));
+    assert(multiLatency.delays.some((d) => Math.abs(d - 450) < 1e-6));
     result.multiLatency = multiLatency;
     result.scoreLatency = scoreLatency;
-    result.calibrationMedianMs = 30;
+    result.fixedBluetoothMs = 200;
     result.startCancellation = true;
     save('playback-support-results.json', result);
     console.log(

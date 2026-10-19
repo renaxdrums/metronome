@@ -161,6 +161,17 @@ async function inspect(p, language, view) {
           await p.evaluate((language) => RENAX_I18N.setLanguage(language), language);
           await frames(p);
           assert.equal(await p.evaluate(() => document.documentElement.lang), language);
+          assert.equal(await p.locator('.brand p').textContent(), 'Métronome');
+          assert.equal(
+            (await p.locator('#tapBtn > span').first().textContent()).trim(),
+            'TAP TEMPO',
+          );
+          for (const selector of ['.brand', '.header-center', '#tapBtn']) {
+            assert.equal(await p.locator(selector).getAttribute('translate'), 'no');
+            assert.notEqual(await p.locator(selector).getAttribute('data-no-translate'), null);
+          }
+          assert.equal(await p.title(), 'RENAX DRUMS — Métronome');
+
           for (const tab of [0, 1, 2, 3, 4, 5]) {
             await p.locator('#workspaceNav [role=tab]').nth(tab).click();
             await frames(p);

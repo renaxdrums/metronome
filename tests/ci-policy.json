@@ -1,0 +1,113 @@
+{
+  "nightly": [
+    "tests/accessibility-test.cjs",
+    "tests/account-back-regression-test.cjs",
+    "tests/amorce-background-ui-test.cjs",
+    "tests/amorce-corpus-test.mjs",
+    "tests/amorce-count-onset-test.cjs",
+    "tests/amorce-engine-test.mjs",
+    "tests/amorce-first-start-test.cjs",
+    "tests/amorce-phonemic-test.mjs",
+    "tests/amorce-planner-test.mjs",
+    "tests/amorce-render-test.cjs",
+    "tests/amorce-sequence-render-test.cjs",
+    "tests/amorce-sequence-test.mjs",
+    "tests/amorce-song-integration-test.cjs",
+    "tests/amorce-stop-test.cjs",
+    "tests/amorce-syllables-test.mjs",
+    "tests/amorce-un-preservation-test.mjs",
+    "tests/audio-activation-test.cjs",
+    "tests/audio-headroom-test.cjs",
+    "tests/audio-linear-mix-test.cjs",
+    "tests/block-drag-gesture-test.cjs",
+    "tests/count-in-performance-test.cjs",
+    "tests/current-ui-test.cjs",
+    "tests/customization-timer-test.cjs",
+    "tests/diagnostics-test.cjs",
+    "tests/direct-auth-ui-test.cjs",
+    "tests/emergency-backup-test.cjs",
+    "tests/export-presentation-test.cjs",
+    "tests/grouped-voice-test.cjs",
+    "tests/independent-voice-timing-test.cjs",
+    "tests/instrument-samples-test.cjs",
+    "tests/intro-lifecycle-test.cjs",
+    "tests/language-fallback-test.cjs",
+    "tests/live-test.cjs",
+    "tests/male-voice-no-click-test.cjs",
+    "tests/midi-resource-test.cjs",
+    "tests/mobile-landscape-test.cjs",
+    "tests/module-extraction-test.cjs",
+    "tests/mp3-export-test.cjs",
+    "tests/mp3-output-level-test.cjs",
+    "tests/mp3-published-test.cjs",
+    "tests/mp3-score-reference-test.cjs",
+    "tests/numbox-accessibility-test.cjs",
+    "tests/offline-cache-test.cjs",
+    "tests/particle-cleanup-test.cjs",
+    "tests/performance-resilience-test.cjs",
+    "tests/phone-rotation-test.cjs",
+    "tests/piper-language-test.mjs",
+    "tests/playlist-card-click-test.cjs",
+    "tests/playlist-drag-test.cjs",
+    "tests/popup-drag-test.cjs",
+    "tests/pro-sound-context-test.cjs",
+    "tests/pulse-popup-live-test.cjs",
+    "tests/pulse-popup-test.cjs",
+    "tests/qa-regressions-test.cjs",
+    "tests/rapid-interactions-test.cjs",
+    "tests/regression-test.cjs",
+    "tests/rename-menu-test.cjs",
+    "tests/resilience-test.cjs",
+    "tests/rhythm-editor-core-test.mjs",
+    "tests/rhythm-editor-test.cjs",
+    "tests/rhythm-score-core-test.mjs",
+    "tests/rhythm-score-test.cjs",
+    "tests/robustness-boundaries-test.cjs",
+    "tests/security-text-test.cjs",
+    "tests/settings-resize-test.cjs",
+    "tests/song-back-regression-test.cjs",
+    "tests/song-block-area-toggle-test.cjs",
+    "tests/song-block-preview-test.cjs",
+    "tests/song-card-style-test.cjs",
+    "tests/song-folded-blocks-test.cjs",
+    "tests/song-navigation-test.cjs",
+    "tests/song-numbox-test.cjs",
+    "tests/song-tempo-ramp-test.cjs",
+    "tests/songs-playback-test.cjs",
+    "tests/songs-test.cjs",
+    "tests/startup-layout-test.cjs",
+    "tests/subdivision-live-test.cjs",
+    "tests/subdivision-mix-test.cjs",
+    "tests/subdivision-test.cjs",
+    "tests/subdivision-visual-test.cjs",
+    "tests/timing-test.cjs",
+    "tests/tooling-guards-test.cjs",
+    "tests/training-modes-test.cjs",
+    "tests/transport-timer-test.cjs",
+    "tests/voice-subdivision-gain-test.cjs"
+  ],
+  "excluded": {
+    "tests/mp3-native-picker-test.cjs": {
+      "reason": "Requires a person operating the native Windows save picker; run pnpm test:native on Windows."
+    },
+    "tests/amorce-neural-test.mjs": {
+      "reason": "Requires pinned speech/model files in .qa-cache, not installed on the nightly runner. Run pnpm test:setup, then this test on the model-validation machine."
+    },
+    "tests/voice-levels-test.mjs": {
+      "reason": "Requires pinned speech/model files in .qa-cache, not installed on the nightly runner. Run pnpm test:setup, then this test on the model-validation machine."
+    },
+    "tests/amorce-page-test.cjs": {
+      "reason": "Requires pinned speech/model files in .qa-cache, not installed on the nightly runner. Run pnpm test:setup, then this test on the model-validation machine."
+    },
+    "tests/piper-speed-test.cjs": {
+      "reason": "Requires pinned speech/model files in .qa-cache, not installed on the nightly runner. Run pnpm test:setup, then this test on the model-validation machine."
+    }
+  },
+  "dedicated": {
+    "tests/account-scope-test.cjs": {
+      "reason": "Requires isolated Firebase Auth and Firestore emulators; executed by the firebase job on push and PR.",
+      "workflow": ".github/workflows/audio-cc0-validation.yml",
+      "command": "node tests/run.cjs --firebase"
+    }
+  }
+}

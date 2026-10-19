@@ -15,6 +15,7 @@ Après un changement des ressources, exécuter `pnpm build`, puis `pnpm check:as
 ## Vérifications
 
 - `pnpm test` : suite complète, avec journaux distincts par scénario. FFmpeg/ffprobe sont requis pour les mesures MP3.
+- `pnpm check:tests` : chaque test doit figurer dans le registre CI ou dans les exclusions motivées de `tests/ci-policy.json`. Voir `tests/CI.md`.
 - `pnpm test:setup` : préparer les dépendances de synthèse vocale utilisées par les tests approfondis. Voir `tests/README.md` pour les modèles et variables de chemins.
 - `pnpm test:accessibility` : axe et parcours clavier. Un résultat automatique ne certifie pas tout WCAG ni les lecteurs d’écran.
 - `pnpm test:resilience` : pannes audio/réseau, quota, secours IndexedDB et vraie réouverture hors ligne.
@@ -25,6 +26,10 @@ Après un changement des ressources, exécuter `pnpm build`, puis `pnpm check:as
 - `pnpm test:compat` : Chrome/Chromium, Firefox et WebKit installés par Playwright, formats PC et mobile. Ce n'est pas une certification Safari/iPhone physique.
 - `pnpm test:long-session` : dix minutes de lecture et navigation répétées dans Chrome, observations mémoire après collecte.
 - `pnpm test:coverage:core` : couverture de `sync-core.js` uniquement ; elle ne représente pas celle de toute l'application.
+
+La suite nocturne tourne chaque jour à 01:23 UTC et sur les PR qui modifient son contrat. Elle utilise `RENAX_NIGHTLY=1 pnpm test`, installe les ressources eSpeak et publie les journaux, résultats et exclusions. Les tests avec modèles neuronaux volumineux restent explicitement exclus ; les comptes sont vérifiés par le job Firebase séparé.
+
+Le test `timing-test.cjs` vérifie les 20 scénarios à 44,1 et 48 kHz ; un décalage volontaire de 25 ms doit échouer au même critère de synchronisation.
 
 Le moteur et les banques ont des tests de rendu audio. Les références Git doivent être disponibles ; un clone superficiel peut empêcher les comparaisons. Le workflow utilise l’historique complet et les dépendances verrouillées.
 

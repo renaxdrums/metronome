@@ -22,7 +22,9 @@ jobs:
         with:
           node-version: '22'
       - name: Check asset versions
-        run: node tools/stamp-assets.cjs --check
+        run: |
+          node tools/stamp-assets.cjs --check
+          node tools/check-test-coverage.cjs
       - uses: pnpm/action-setup@v4
         with:
           version: '11.25.0'
@@ -47,6 +49,11 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/instrument-samples-test.cjs
+      - name: Timing at both device sample rates, with a negative control
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/timing-test.cjs
+          node tests/tooling-guards-test.cjs
       - name: MP3 export regression
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"

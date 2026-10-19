@@ -25,7 +25,7 @@ Installer les dépendances verrouillées avec `pnpm install --frozen-lockfile`. 
 
 1. Exécuter `pnpm build` après une modification des ressources de la page. Les paramètres de cache sont dérivés du contenu, normalisé LF pour les fichiers texte.
 2. Exécuter `pnpm check:assets` ; cette commande vérifie sans réécrire.
-3. Exécuter `node tests/run.cjs` pour la suite automatisée et `node tests/run.cjs --firebase` avec les émulateurs du projet **demo-renax-backup** pour les comptes et les règles.
+3. Exécuter `pnpm check:tests`, puis `node tests/run.cjs` pour la suite automatisée et `node tests/run.cjs --firebase` avec les émulateurs du projet **demo-renax-backup** pour les comptes et les règles.
 4. L’enregistrement natif Windows se vérifie avec une personne choisissant la destination. Une interception de téléchargement ne remplace pas cette validation.
 5. Après publication, contrôler le déploiement et refaire les parcours essentiels sur l’URL publique.
 
@@ -67,3 +67,10 @@ Le lint contrôle les constructions dangereuses dans le code maintenu, les outil
 Avant publication : comparer les dispositions, le PCM, les niveaux des exports, la récupération et le véritable mode hors connexion. Ne pas reconstruire une sortie pendant qu'un navigateur en teste l'installation du cache. Le déploiement GitHub Pages publie l'artefact contrôlé, après réussite des quatre jobs. Le site utilise une CSP meta ; GitHub Pages ne transforme pas un fichier arbitraire en en-tête HTTP.
 
 `pnpm measure:assets` fournit les tailles brutes/gzip, pas le trafic initial exact ou un LCP sur appareil réel. Les voix restent en WAV : aucune conversion avec pertes n'est autorisée par une seule estimation de taille. Les tests qui demandent les voix les préparent explicitement ; les assertions historiques de PCM, dimensions et gains restent applicables.
+## Contrat de la suite nocturne
+
+Le workflow `nightly-tests.yml` lance `RENAX_NIGHTLY=1 pnpm test` à 01:23 UTC, à la demande et sur les PR qui changent les tests ou leur outillage. Avant la suite, `node tests/setup.mjs --espeak-only` prépare les ressources eSpeak épinglées sans télécharger les gros modèles neuronaux. La liste exacte des tests nocturnes, exclusions motivées et tests couverts par un job dédié vit dans `tests/ci-policy.json` ; voir `tests/CI.md` pour les commandes de remplacement.
+
+Tout ajout, déplacement ou retrait d’un fichier `*-test.cjs` ou `*-test.mjs` doit actualiser ce registre. `pnpm check:tests` refuse les oublis, doublons et entrées périmées ; il tourne sur chaque PR et avant la sélection nocturne. Une erreur d’un test classé nocturne fait échouer la suite. Le contrôle négatif de `tooling-guards-test.cjs` vérifie un oubli volontaire dans une copie temporaire isolée.
+
+`timing-test.cjs` force séparément les contextes audio à 44 100 et 48 000 Hz. Les repères annotés sont convertis en secondes puis en trames avec la fréquence du buffer décodé. La corrélation interpole les positions fractionnaires à la fréquence du rendu ; le seuil de forme reste 0,001 et les limites temporelles restent 1,1 ms. Une injection de +25 ms, sur les deux voix et aux deux fréquences, doit être rejetée par le même validateur temporel. Aucun fichier audio ni planificateur n’est modifié.

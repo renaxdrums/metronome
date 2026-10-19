@@ -86,6 +86,7 @@
     "tests/subdivision-test.cjs",
     "tests/subdivision-visual-test.cjs",
     "tests/timing-test.cjs",
+    "tests/tooling-contracts-test.cjs",
     "tests/tooling-guards-test.cjs",
     "tests/training-modes-test.cjs",
     "tests/transport-timer-test.cjs",

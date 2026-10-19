@@ -32,7 +32,10 @@ function prepareOutput() {
 (async () => {
   prepareOutput();
   for (const folder of ['assets', 'vendor'])
-    fs.cpSync(path.join(root, folder), path.join(output, folder), { recursive: true });
+    fs.cpSync(path.join(root, folder), path.join(output, folder), {
+      recursive: true,
+      filter: (file) => !file.endsWith('.d.ts'),
+    });
   // The guide imports these runtime modules dynamically; they are not entry-page links.
   fs.mkdirSync(path.join(output, 'prototypes'), { recursive: true });
   fs.cpSync(path.join(root, 'prototypes/amorce'), path.join(output, 'prototypes/amorce'), {

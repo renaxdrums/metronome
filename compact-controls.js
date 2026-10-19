@@ -9,7 +9,7 @@
   `;document.head.append(style);
   function enhance(select){
     if(select.closest('.console-arrival-replica')||numboxWidgets.has(select))return;
-    const rect=select.getBoundingClientRect(),computed=getComputedStyle(select);
+    const rect=select.getBoundingClientRect();getComputedStyle(select);
     const numeric=/^\d+$/.test(select.options[0]?.textContent.trim()||'');
     enhanceNumboxSelect(select);
     const wrap=select.parentElement,button=wrap.querySelector('.numbox-button');

@@ -2,7 +2,7 @@ import * as core from './sync-core.js?v=20261008-auto-sync';
 import {firebaseConfig,providers,appCheckSiteKey,emulator} from './firebase-config.js';
 const storage=window.RENAX_STORAGE,api=window.RENAX_SONGS;
 await storage.ready;
-let account=null,remote=null,sdk=null,auth=null,db=null,unsubscribe=null,generation=0,running=false,retry=0,timer=null,deferred=false,message='Sauvegardé dans ce navigateur',failure='',confirmed=false;
+let account=null,sdk=null,auth=null,db=null,unsubscribe=null,generation=0,running=false,retry=0,timer=null,deferred=false,message='Sauvegardé dans ce navigateur',failure='',confirmed=false;
 let pendingLocalChoice=null;
 const rememberKey='renax-index2-remember-auth';
 const guestAutoOwnerKey='renax-index2-guest-auto-owner-v1';
@@ -79,7 +79,7 @@ async function ensureFirebase(){
   if(emulator){if(!['localhost','127.0.0.1'].includes(location.hostname))throw Error('Émulateurs interdits sur le site public.');authModule.connectAuthEmulator(auth,'http://'+emulator.host+':'+emulator.authPort,{disableWarnings:true});firestore.connectFirestoreEmulator(db,emulator.host,emulator.firestorePort);}
   if(appCheckSiteKey&&!emulator){const check=await import(base+'firebase-app-check.js');check.initializeAppCheck(instance,{provider:new check.ReCaptchaEnterpriseProvider(appCheckSiteKey),isTokenAutoRefreshEnabled:true});}
   authModule.onAuthStateChanged(auth,async user=>{
-    const token=++generation;unsubscribe?.();unsubscribe=null;remote=null;confirmed=false;clearTimeout(timer);account=user;
+    const token=++generation;unsubscribe?.();unsubscribe=null;confirmed=false;clearTimeout(timer);account=user;
     try{
       // Preserve the anonymous library before switching to the account scope.
       // A song created before sign-in must follow the user into the account automatically.
@@ -115,7 +115,7 @@ async function ensureFirebase(){
       // catalog over an existing remote library at the first connection.
       unsubscribe=firestore.onSnapshot(firestore.collection(db,'users',uid,'records'),{includeMetadataChanges:true},snapshot=>{
         if(token!==generation||snapshot.metadata.fromCache||snapshot.metadata.hasPendingWrites)return;
-        remote=snapshot;queue();
+        queue();
       },error=>{confirmed=false;say('Modifications locales en attente',friendly(error));});
       queue();renderPanel();
     }catch(error){say('Sauvegarde locale indisponible',friendly(error));}

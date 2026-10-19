@@ -1,3 +1,12 @@
+/* exported
+  resizeBeat, renderSubdivisionDots, buildCircularSequencer, schedulerSafely, scheduler,
+  scheduleVisualUpdate, createPolyMeasure, ensurePolyStates, clampPolyValue, getPolyEvents,
+  buildPolyVisualizer, renderPolyrhythmList, renderSequencerListMetronome, renderActiveMeasureMetronome, schedulePolyVisualUpdate,
+  schedulerPolyrhythm, setAppMode, updateActivePolyRatio, startMetronome, stopMetronome,
+  setDirection, startTraining, resetTrainingToStart, restartTraining, trainingTick,
+  endTraining, updateTrainButton, tapTimes, tapFlashTimeout, doTapTempo,
+  isEditingField, voicePreparationSection, voicePreparationHeading, voicePreparationButton, voicePreparationStatus
+*/
     function resizeBeat(m, beatIdx, newSubdiv) {
       if (!allowedSubdivisions(m.denominator).includes(newSubdiv)) return;
       const oldSubdiv = m.beatSubdivisions[beatIdx];
@@ -138,7 +147,7 @@
         const m = measures[mIdx];
         const position = musicalPosition ?? { ...getBeatAndSub(m, sIdx), subdivisions: 1 };
         const beat = position.beat;
-        const visibleSubdivisions = m.beatSubdivisions[beat] || 1;
+        const _visibleSubdivisions = m.beatSubdivisions[beat] || 1;
         const visibleIndex = beat + position.subIndex / position.subdivisions;
         const stepEls = sequencerContainer.querySelectorAll('.step');
         stepEls.forEach(el => el.classList.remove('active'));
@@ -189,7 +198,7 @@
 
     function getPolyEvents(m) {
       const map = new Map();
-      const add = (u, key) => {
+      const add = (u, _key) => {
         const k = Math.round(u * 1000000) / 1000000;
         if (!map.has(k)) map.set(k, { u:k, outer:false, inner:false, outerIndex:-1, innerIndex:-1 });
         return map.get(k);

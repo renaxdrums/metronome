@@ -72,3 +72,10 @@ En cas de veille pendant la lecture ou de décalage Bluetooth, Préférences per
 Pour examiner un changement de sortie Bluetooth, arrêter la lecture puis utiliser « Identifier les sorties audio » dans Préférences. Cette action demande un accès ponctuel au microphone pour exposer les informations des périphériques ; le micro est immédiatement libéré, sans enregistrement ni envoi de son. Exporter ensuite le diagnostic. Cette identification ne constitue pas encore un basculement automatique de compensation.
 
 La version publiée n’inclut plus l’ancienne interface ni son script dédié ; leurs sources restent au dépôt. Les anciennes données locales sont récupérées par l’application actuelle. Les confirmations d’import cloud utilisent des dialogues accessibles traduits. Les dépendances vocales externes sont autorisées uniquement depuis les trois chemins jsDelivr versionnés partagés avec le build.
+
+
+### Vérifications statiques et captures
+
+`pnpm lint` contrôle le registre des globales et l’ordre des scripts classiques, puis ESLint avec `no-undef`, `no-unused-vars` et `no-empty` (catch vides autorisés). `pnpm type-check` vérifie sept fichiers JavaScript en mode strict et sans génération. Les contrats se trouvent dans `tools/classic-script-globals.json` et `types/globals.d.ts`. `node tests/run.cjs --only=tooling-contracts-test.cjs` vérifie aussi les refus attendus du lint et des types.
+
+Les 54 captures d’invariance utilisent le rendu complet de Chromium, avec une tolérance **zéro** sur chaque canal de chaque pixel et sur les styles calculés. La comparaison PCM demeure bit à bit à 44,1 et 48 kHz. Les quatre grandes feuilles de thème restent inchangées.

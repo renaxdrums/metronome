@@ -13,9 +13,9 @@ Référence : `396287e3a921891b27e608f2e5f363091b5fe1c7` (phase 2). PR : https:/
 
 ## Critère visuel explicitement retenu
 
-Maximum de 2/255 sur **chaque canal de chaque pixel**, sans pourcentage ni nombre de pixels supplémentaire toléré. Les styles calculés des éléments principaux rendus doivent être **strictement identiques**, sur les 54 combinaisons : couleurs, arrière-plan, bordures, polices, marges, espacements, dimensions, affichage, visibilité et opacité. Un élément qui apparaît ou disparaît fait échouer le contrôle. Les contrôles natifs transparents/masqués sont exclus, leurs déclencheurs visibles sont inclus.
+Critère actuel : 0/255 sur **chaque canal de chaque pixel**, sans pourcentage ni nombre de pixels supplémentaire toléré. Les styles calculés des éléments principaux rendus doivent être **strictement identiques**, sur les 54 combinaisons : couleurs, arrière-plan, bordures, polices, marges, espacements, dimensions, affichage, visibilité et opacité. Un élément qui apparaît ou disparaît fait échouer le contrôle. Les contrôles natifs transparents/masqués sont exclus, leurs déclencheurs visibles sont inclus.
 
-Animations et transitions désactivées, polices chargées, focus et pointeur normalisés, facteur d’échelle fixé à 1. Les canevas animés (dont l’onde et les particules) sont neutralisés par le masque commun déjà utilisé dans la référence ; leur animation n’est pas certifiée par ces captures. Les sons sont contrôlés séparément par PCM. Si le bruit de rasterisation disparaît, le seuil d’image doit revenir à zéro.
+Animations et transitions désactivées, polices chargées, focus et pointeur normalisés, facteur d’échelle fixé à 1. Les canevas animés (dont l’onde et les particules) sont neutralisés par le masque commun déjà utilisé dans la référence ; leur animation n’est pas certifiée par ces captures. Les sons sont contrôlés séparément par PCM. Le rendu complet a supprimé le bruit ; le seuil est revenu à zéro dans la phase finale d’outillage.
 
 ## Résultats réels
 
@@ -60,3 +60,8 @@ L’utilisateur autorise le 19 octobre une demande ponctuelle de microphone pour
 ## Option manuelle finale et publication demandée
 
 Le 19 octobre, l’utilisateur remplace la détection automatique par « Casque Bluetooth » et précise +200 ms uniquement à son activation. L’option est mémorisée ; désactivation = aucune correction manuelle, latence annoncée par le navigateur conservée. La calibration et la saisie variable sont retirées à sa demande. Les anciens réglages non nuls migrent vers l’option activée à valeur fixe. La roue dentée ouvre/ferme le dialogue ; clavier et isolation du fond sont adaptés pour garder ce seul déclencheur accessible. L’utilisateur autorise désormais la finalisation des cinq phases et la publication après CI verte, via PR. Les résultats antérieurs concernent leurs révisions explicitement citées ; cette nouvelle révision doit repasser la validation.
+
+
+### Correction du rendu des captures et validation du 19 octobre
+
+Le rendu partiel du navigateur provoquait 5/255 sur deux pixels du contour du curseur de tempo après certains changements d’espace, malgré l’égalité de tous ses styles et boîtes internes. `--disable-partial-raster` corrige la capture sans changer l’application, le masque ni les scénarios. La référence contre elle-même et le candidat ont obtenu **54/54 strictement identiques**, maximum **0/255**, aucun écart de style. Le PCM de 25 banques est identique à 44,1 et 48 kHz. Les suites CI de phase 5 et 3 ont passé respectivement **92/92** et **93/93** scripts. La relance WebKit a passé le contrôle après un premier plantage du processus. Le seuil historique de 2/255 décrit dans les résultats précédents est remplacé par zéro pour la livraison finale. Une sonde de retrait de priorités reste rejetée (64 différences de styles et maximum 255/255 sur les douze cas ciblés) : le contrôle n’a pas été assoupli.

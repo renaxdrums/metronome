@@ -16,7 +16,9 @@ const { start, save } = require('./audio-harness.cjs');
       button.textContent = 'Slow interaction fixture';
       button.onclick = () => {
         const end = performance.now() + 120;
-        while (performance.now() < end) {}
+        while (performance.now() < end) {
+          /* Intentional blocking to measure an interaction. */
+        }
       };
       document.body.append(button);
     });

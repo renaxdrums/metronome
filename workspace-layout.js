@@ -1,6 +1,6 @@
 /* Workspace presentation: original musical controls and engines are reused. */
 (()=>{
- const nativeMode=document.getElementById('modeSwitch'),songTabs=document.querySelector('.song-tabs'),multiTabs=document.querySelector('.multi-mode-tabs'),visu=document.querySelector('.panel-visu'),footer=document.querySelector('footer'),params=document.querySelector('.panel-params'),trainPanel=document.querySelector('.panel-training'),trainHost=document.getElementById('mobileTrainingHost'),seqPanel=document.querySelector('.panel-seq');
+ const nativeMode=document.getElementById('modeSwitch'),songTabs=document.querySelector('.song-tabs'),multiTabs=document.querySelector('.multi-mode-tabs'),visu=document.querySelector('.panel-visu'),footer=document.querySelector('footer'),params=document.querySelector('.panel-params'),trainPanel=document.querySelector('.panel-training'),trainHost=document.getElementById('mobileTrainingHost'),_seqPanel=document.querySelector('.panel-seq');
  const desktop=matchMedia('(min-width:1101px)');
  const controls=document.createElement('details');controls.id='workspaceControls';controls.open=desktop.matches;
  controls.innerHTML='<summary>Réglages musicaux</summary><div class="workspace-controls-grid"></div>';

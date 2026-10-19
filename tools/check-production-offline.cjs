@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict'),
   fs = require('node:fs'),
-  path = require('node:path'),
+  _path = require('node:path'),
   cp = require('node:child_process');
 const { start, newTrack, openPlaylist, save } = require('../tests/audio-harness.cjs');
 (async () => {
@@ -52,7 +52,7 @@ const { start, newTrack, openPlaylist, save } = require('../tests/audio-harness.
     await p.getByRole('tab', { name: 'Métronome', exact: true }).click();
     await p.locator('#playBtn').click();
     await p.waitForFunction(() => isPlaying);
-    const origin = await p.evaluate(() => performance.timeOrigin);
+    await p.evaluate(() => performance.timeOrigin);
     await p.locator('#playBtn').click();
     await context.setOffline(true);
     await p.reload();

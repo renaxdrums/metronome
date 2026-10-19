@@ -24,7 +24,7 @@ const { start } = require('./audio-harness.cjs');
     await page.evaluate(() => prepareAllVoiceAudio());
     await page.waitForFunction(() => window.RENAX_SCORE && allVoiceAudioReady);
     await page.locator('#scorePartitionBtn').click();
-    await page.waitForFunction(() => rhythmScore.querySelector('svg'));
+    await page.waitForFunction(() => document.getElementById('rhythmScore').querySelector('svg'));
     await page.evaluate(() => {
       window.pulsePositions = [];
       window.pulseFade = [];
@@ -215,7 +215,7 @@ const { start } = require('./audio-harness.cjs');
     await page.waitForFunction(() => !isPlaying, { timeout: 6000 });
     await page.evaluate(() => RENAX_SONGS.unload());
     await page.locator('#scorePartitionBtn').click();
-    await page.waitForFunction(() => rhythmScore.querySelector('svg'));
+    await page.waitForFunction(() => document.getElementById('rhythmScore').querySelector('svg'));
     await page.locator('#scoreEditBtn').click();
     for (const denominator of [2, 4, 8, 16, 32])
       for (const count of [1, 2, 3, 4, 5, 6, 7, 8]) {
@@ -273,11 +273,15 @@ const { start } = require('./audio-harness.cjs');
         scroll: document.documentElement.scrollWidth,
         width: innerWidth,
         panel: document.querySelector('.panel-visu').getBoundingClientRect().toJSON(),
-        score: rhythmScore.getBoundingClientRect().toJSON(),
+        score: document.getElementById('rhythmScore').getBoundingClientRect().toJSON(),
       }));
       assert(d.scroll <= d.width);
       assert(
-        await page.evaluate(() => rhythmEditor.scrollWidth <= rhythmEditor.clientWidth + 1),
+        await page.evaluate(
+          () =>
+            document.getElementById('rhythmEditor').scrollWidth <=
+            document.getElementById('rhythmEditor').clientWidth + 1,
+        ),
         'toolbar horizontal overflow',
       );
       assert(d.score.bottom <= d.panel.bottom + 1);
@@ -285,10 +289,13 @@ const { start } = require('./audio-harness.cjs');
       assert.equal(staveCount, 1);
       assert(
         await page.evaluate(() => {
-          const s = rhythmScore.querySelector('svg').getBoundingClientRect(),
-            h = rhythmScore.getBoundingClientRect(),
+          const s = document
+              .getElementById('rhythmScore')
+              .querySelector('svg')
+              .getBoundingClientRect(),
+            h = document.getElementById('rhythmScore').getBoundingClientRect(),
             menu = document.querySelector('#rhythmEditor').getBoundingClientRect(),
-            icons = scoreViewSwitch.getBoundingClientRect();
+            icons = document.getElementById('scoreViewSwitch').getBoundingClientRect();
           return (
             s.bottom <= h.bottom + 1 &&
             menu.left >= icons.right &&
@@ -296,7 +303,13 @@ const { start } = require('./audio-harness.cjs');
           );
         }),
       );
-      assert(await page.evaluate(() => rhythmScore.scrollWidth <= rhythmScore.clientWidth + 1));
+      assert(
+        await page.evaluate(
+          () =>
+            document.getElementById('rhythmScore').scrollWidth <=
+            document.getElementById('rhythmScore').clientWidth + 1,
+        ),
+      );
       await page.screenshot({ path: '/tmp/editor-' + viewport.width + '.png' });
     }
     assert.deepEqual(errors, []);

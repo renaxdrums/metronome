@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'),fs=require('node:fs');const {start,save,openTracks,openPlaylist,newTrack,showMeasures,openControls}=require('./audio-harness.cjs');
+const assert=require('node:assert/strict'),fs=require('node:fs');const {start,save,openTracks,openPlaylist,newTrack,showMeasures,openControls: _openControls}=require('./audio-harness.cjs');
 const measure=(n=4,d=4,t=120)=>({numerator:n,denominator:d,tempo:t,beatSubdivisions:Array(n).fill(1),beatStates:Array.from({length:n},(_,i)=>[i?1:2])});
 const library=(count=1)=>({version:1,activeProfile:'qa',profiles:[{id:'qa',name:'QA playlist',songs:Array.from({length:count},(_,i)=>({id:'s'+i,name:'QA '+(i+1),sections:[{id:'a'+i,label:'Intro',count:1,measure:measure()}]}))}]});
 async function seed(p,n=1){await p.evaluate(l=>RENAX_SONGS.replaceLibrary(l),library(n));}

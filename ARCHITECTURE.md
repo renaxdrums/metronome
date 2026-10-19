@@ -60,7 +60,7 @@ Les trois scripts classiques `metronome-audio.js`, `metronome-core.js` et `metro
 
 L'aperçu du guide utilise le contrat explicite et figé `RENAX_AUDIO_ADAPTER` (`prepare`, `ready`, `configure`, `destination`, `click`, `count`), sans évaluation de chaînes dans la fenêtre enfant. `prepare` est asynchrone et prépare les enregistrements nécessaires avant le rendu. Les 40 voix enregistrées se chargent à la première demande vocale ou à l'action explicite de préparation hors connexion. Les modèles de synthèse naturelle restent distincts.
 
-`types/library.d.ts` décrit bibliothèque, morceaux, sections et opérations de synchronisation. Le contrôle JSDoc de `sync-core.js` et `song-tempo-ramp.js` fonctionne sans émettre de JavaScript. Il est strict sur ces deux modules et progressif pour le reste du projet ; il ne couvre pas encore tout le DOM ni le moteur audio. La validation des imports à l'exécution reste obligatoire.
+`types/library.d.ts` décrit bibliothèque, morceaux, sections et opérations de synchronisation. Le contrôle JSDoc de `sync-core.js` et `song-tempo-ramp.js` fonctionne sans émettre de JavaScript. Il est strict sur sept fichiers : ces deux modules, local-backup.js, emergency-backup.js, midi-export.js, ui-feedback.js et numbox-controls.js. Il ne couvre pas encore tout le DOM ni le moteur audio. La validation des imports à l'exécution reste obligatoire.
 
 `interface-translations.js` contient le dictionnaire FR/EN, indépendant du parcours DOM. Le contrôleur crée sa propre copie pour ses compléments historiques ; les nouveaux messages utilisent des clés. En l'absence du fichier de données, l'interface reste française et conserve la préférence anglaise pour la prochaine ouverture réussie. Les noms des utilisateurs ne sont pas des clés de traduction.
 
@@ -109,7 +109,7 @@ Les dimensions intrinsèques des sélecteurs d’entraînement passent par `--tr
 
 `tools/style-budget.json` fixe par fichier le plafond de !important CSS et des affectations directes de style JS, comptées par analyse syntaxique. `pnpm check:styles` refuse toute hausse, tout !important ou bloc style dans index.html ; la CI compare aussi le budget au commit de base de la PR. `--update` peut seulement abaisser un budget existant.
 
-`quality-invariance-test.cjs` sépare la comparaison d’image (plafond absolu 2/255 par canal/pixel, sans pourcentage toléré) et l’égalité stricte des styles calculés sur les 54 combinaisons. `INVARIANCE_SELF=1 VISUAL_ONLY=1` mesure le bruit de la référence comparée à elle-même. Les styles des éléments principaux rendus doivent rester identiques même si le plafond d’image est respecté.
+`quality-invariance-test.cjs` sépare la comparaison d’image (égalité stricte 0/255 par canal/pixel, sans pourcentage toléré) et l’égalité stricte des styles calculés sur les 54 combinaisons. `INVARIANCE_SELF=1 VISUAL_ONLY=1` mesure le bruit de la référence comparée à elle-même. Les styles des éléments principaux rendus doivent rester identiques même si le plafond d’image est respecté.
 
 `RENAX_PLAYBACK.diagnosticSnapshot(context)` expose une copie bornée des 32 derniers événements Wake Lock (demande, acquisition, libération, catégorie de refus), les capacités/contexte sécurisé/politique effective et les latences audio. Le diagnostic local `RENAX_FEEDBACK.diagnosticReport().playback` inclut ces observations ; aucune donnée musicale, message brut d’exception ou donnée de compte n’y est ajoutée. Ce diagnostic ne modifie pas la planification audio.
 
@@ -122,3 +122,10 @@ Les dimensions intrinsèques des sélecteurs d’entraînement passent par `--tr
 L’archive `index-legacy.html` et son seul consommateur `songs.js` restent au dépôt mais sont exclus du site publié. La récupération de la clé historique est effectuée par `local-backup.js` dans l’application actuelle ; aucun fichier de données n’est supprimé.
 
 `RENAX_DIALOG_FOCUS.show(dialog, initial)` centralise focus initial, Tab/Shift+Tab, isolation des raccourcis et retour du focus. `RENAX_DIALOGS.confirm({messageKey, parameters})` renvoie une Promise booléenne via un dialogue natif, avec Annuler initial, Échap et textes à clés dans cinq langues. Les paramètres utilisateur sont exclusivement du texte. Les deux imports cloud attendent ce résultat et vérifient compte, portée et jeton de bibliothèque avant toute écriture. Le confirm interne de secours n’est pas modifié.
+
+
+## Globales des scripts classiques et types
+
+`tools/classic-script-globals.json` est le registre explicite des noms partagés : il liste les 31 scripts classiques applicatifs à la racine de la page dans leur ordre, les déclarations lexicales des trois fichiers historiques du moteur et les API de fenêtre. Les constantes sont déclarées en lecture seule dans ESLint, les variables de transport réassignées sont modifiables. Les noms de fixtures sont réservés aux tests. `tools/check-classic-script-globals.cjs`, lancé par `pnpm lint`, refuse une divergence de déclarations ou d’ordre sans mise à jour du contrat. Aucun script classique n’est converti en module ES.
+
+`types/globals.d.ts` précise les contrats de bibliothèque, stockage atomique, secours IndexedDB, export MIDI, contrôles et diagnostic consommés par les sept fichiers vérifiés. Les autres API sont déclarées `unknown` ; cela ne prétend pas vérifier leurs consommateurs. Le déclaratif voisin de web-vitals évite de typiser son code minifié. Il n’est ni exécuté ni publié. Les annotations et marques d’export n’altèrent pas les calculs audio ; le PCM reste comparé bit à bit aux deux fréquences.

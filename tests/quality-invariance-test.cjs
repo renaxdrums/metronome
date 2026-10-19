@@ -1,5 +1,4 @@
-const fs = require('node:fs'),
-  path = require('node:path'),
+const path = require('node:path'),
   cp = require('node:child_process'),
   assert = require('node:assert/strict');
 const { start, save } = require('./audio-harness.cjs');
@@ -7,7 +6,7 @@ const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f36309
   root = path.resolve(__dirname, '..'),
   cache = new Map();
 const referenceAgainstItself = process.env.INVARIANCE_SELF === '1';
-const pixelThreshold = 2; // Maximum over every pixel and RGBA channel; no pixel-count allowance.
+const pixelThreshold = 0; // Maximum over every pixel and RGBA channel; no pixel-count allowance.
 const cascadeProbe = process.env.CASCADE_PROBE || '';
 assert(['', 'remove-important', 'layers-only', 'layers-without-important'].includes(cascadeProbe));
 const probeLayers = {

@@ -20,7 +20,7 @@ async function initialize(requested){
 }
 let queue=Promise.resolve();
 self.onmessage=({data})=>{queue=queue.then(async()=>{
- const {id,input,language,device}=data;
+ const {id,input,language: _language,device: _device}=data;
  try{
   if(!initialized)initialized=initialize('wasm').catch(e=>{initialized=null;throw e;});
   await initialized;

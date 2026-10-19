@@ -6,8 +6,8 @@
  const timeouts=[],animations=[];
  try{enabled=localStorage.getItem(preference)!=='false';}catch{}
  const word=overlay.querySelector('.console-arrival-word');
- const center=overlay.querySelector('.console-arrival-center');
- const rings=overlay.querySelector('.console-arrival-lines');
+ overlay.querySelector('.console-arrival-center');
+ overlay.querySelector('.console-arrival-lines');
  const logo=overlay.querySelector('.console-arrival-logo');
  const clamp=n=>Math.max(0,Math.min(1,n));
  function label(){

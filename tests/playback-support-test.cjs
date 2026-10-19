@@ -117,7 +117,7 @@ const { start, save } = require('./audio-harness.cjs');
         timeout = window.setTimeout,
         calls = [];
       audioCtx = { currentTime: 1, outputLatency: 0.2 };
-      window.setTimeout = (fn, delay) => {
+      window.setTimeout = (_fn, delay) => {
         calls.push(delay);
         return 0;
       };
@@ -351,18 +351,18 @@ const { start, save } = require('./audio-harness.cjs');
         originals = new Map();
       for (const bank of Object.values(SOUND_BANKS)) {
         originals.set(bank, bank.play);
-        bank.play = (out, time) => {
+        bank.play = (_out, time) => {
           times.push(time);
         };
       }
       Object.defineProperty(ctx, 'currentTime', { configurable: true, get: () => 1 });
       Object.defineProperty(ctx, 'outputLatency', { configurable: true, value: 0.2 });
       RENAX_PLAYBACK.setBluetoothEnabled(true);
-      window.setTimeout = (fn, delay) => {
+      window.setTimeout = (_fn, delay) => {
         delays.push(delay);
         return 0;
       };
-      scheduleVisualUpdate = (m, s, time) => {
+      scheduleVisualUpdate = (_m, _s, time) => {
         visuals.push(time);
       };
       try {

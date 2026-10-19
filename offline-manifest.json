@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "5a855bde5ca16bf5",
+  "revision": "766504fad3db9014",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,17 +129,17 @@
     },
     {
       "path": "cloud-backup.js",
-      "sha256": "ed8af503744e0804644fe063f8e5c17972c8be42abdc527b1dc5e4513b389213",
+      "sha256": "7da0844d83ca9311e854b6194c8fe2395e8c9314506f98a06d1387607be0b7d7",
       "text": true
     },
     {
       "path": "compact-controls.js",
-      "sha256": "f0a298c36503216036f25ba392f9fd592fda50a1ed509ae9c6955862216f70e1",
+      "sha256": "8c007ba62521bf926cc7e7d6bdb8cf1b757eb8ef1aa03437476673419796e9a0",
       "text": true
     },
     {
       "path": "console-intro.js",
-      "sha256": "c98ebce90fec67b06b1ce3932daf12b207fb1e583b38acf9113a7babd06e6cdf",
+      "sha256": "4328c1f2f3c7866e40cd2f04415815f83148caf62c4990004b0a6e76a50f3090",
       "text": true
     },
     {
@@ -154,7 +154,7 @@
     },
     {
       "path": "emergency-backup.js",
-      "sha256": "ffc0a16005b2a296d370c480d80492b6f21858bbae1a6da8beb09356bcc1d01e",
+      "sha256": "9a0db8f8e45e0a65f3bdc43de8f6fbc112a24010451a0e54d87422fa04ed1661",
       "text": true
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "f26d702290a339d4a17abbe733331d3465ea7ec2e5b370ac2572c33e92316e6c",
+      "sha256": "ab2facc4567cb5855eaea890ba96ac010755e92df7ce4627d53cc4d5e897ad85",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "interface-language.js",
-      "sha256": "6be76d44545ba1acfffa2f4924d04771f38ed9f58ffc1a202cdbac741c4567ad",
+      "sha256": "ed716ad495471c7deaf6f1e29141c9856708143d880bb85472c8050a2e7c8479",
       "text": true
     },
     {
@@ -299,7 +299,7 @@
     },
     {
       "path": "local-backup.js",
-      "sha256": "f40f0ce49852b4a9e20de3636dc4a675ece658f67bad4811e0952ddbb9b48457",
+      "sha256": "6fb6848845c23adc9d717075865cfb95a35d1b0ec0fc08e51d6e5fc0e86967cc",
       "text": true
     },
     {
@@ -309,22 +309,22 @@
     },
     {
       "path": "metronome-audio.js",
-      "sha256": "00b4f3d4c9085dddfc563441477311e7a700cdb08530aa913763afb527f9f791",
+      "sha256": "d8297fa53c8449216c736439070f29a06c9248f5aa75a108ad6d53672905812f",
       "text": true
     },
     {
       "path": "metronome-core.js",
-      "sha256": "f71989a09a664889c9a9aaa2404ce592104585b66fb9a662a814b43f3a419a49",
+      "sha256": "e7f80ab61877831e37f49d83419ae09c83ea89c52863f556555963f6192429cf",
       "text": true
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "b545be92c503538ba1f1f10f524bf4f29f028b1a3b48e0a4c839241f371e25d8",
+      "sha256": "265a71e59c7eca646011596961325e7fdcabc998608ae991d4e3e4ec72f07234",
       "text": true
     },
     {
       "path": "midi-export.js",
-      "sha256": "20642ff1b5a65ad7de7df6ef37c852d925f0c4ae91f5c9be5f1195a4dfcbd3ab",
+      "sha256": "f3a3106d75bdc475089325bc82da0b6fb6c1ae4db4b9e3f9fee5817859c66d04",
       "text": true
     },
     {
@@ -379,7 +379,7 @@
     },
     {
       "path": "numbox-controls.js",
-      "sha256": "ce94a8848171aaf3ddcb4d3961831e004c33c0248ae22ad46a57fdf63de2978f",
+      "sha256": "da106d639f338bc9c7ea90789f8906c4692f60613988a926efa6ced2672db810",
       "text": true
     },
     {
@@ -459,7 +459,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "c6d1beafaa6b280be491c7e854bfa48efdd75a9148aba54411d126126f96b098",
+      "sha256": "8087d7e387c3605b08ed3db7c1e83410b6e9f36de8af33f04cb9c8217db98b8a",
       "text": true
     },
     {
@@ -494,7 +494,7 @@
     },
     {
       "path": "ui-feedback.js",
-      "sha256": "103c9711413b2f46215d268186927fe539e980df538176574697a63becfee419",
+      "sha256": "eae7d41e1fb6251997e0f67cc7f3a3b81ea78d5c3bf32c97112da6b2c899573b",
       "text": true
     },
     {
@@ -524,7 +524,7 @@
     },
     {
       "path": "workspace-layout.js",
-      "sha256": "9beb2098de7322383a365c7f5f053b83e3217b55414fc6374dff5d683c16df0f",
+      "sha256": "c6eb3e433097ea397010cafe5450ee3819be3c26e734433a99874e018349d732",
       "text": true
     }
   ]

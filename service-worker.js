@@ -1,6 +1,6 @@
 /* Atomic public application cache. Never cache account requests or library records. */
 'use strict';
-const MANIFEST_REVISION='5a855bde5ca16bf5';
+const MANIFEST_REVISION='766504fad3db9014';
 const base=new URL('./',self.location.href),prefix='renax-offline:'+encodeURIComponent(base.pathname)+':';
 const shellName=prefix+'shell:'+MANIFEST_REVISION,audioName=prefix+'audio';
 let manifestPromise;

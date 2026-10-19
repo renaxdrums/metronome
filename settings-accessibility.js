@@ -46,7 +46,7 @@
   panel.addEventListener('keydown',keydown);trigger.addEventListener('keydown',keydown);
   // Shared native-dialog focus contract, also used by cloud confirmations.
   window.RENAX_DIALOG_FOCUS=Object.freeze({show(dialog,initial){
-    const previous=document.activeElement;
+    const previous=document.activeElement,previousId=previous?.id,previousLabel=previous?.getAttribute('aria-label');
     dialog.addEventListener('keydown',event=>{
       event.stopPropagation();
       if(event.key!=='Tab')return;
@@ -55,7 +55,8 @@
       else if(!event.shiftKey&&document.activeElement===items.at(-1)){event.preventDefault();items[0]?.focus();}
     });
     dialog.addEventListener('close',()=>setTimeout(()=>{
-      const target=previous?.isConnected&&!previous.disabled?previous:document.querySelector('dialog[open] button:not(:disabled)')||trigger;
+      const restored=previous?.isConnected?previous:previousId?document.getElementById(previousId):previousLabel?[...document.querySelectorAll('button[aria-label]')].find(button=>button.getAttribute('aria-label')===previousLabel):null;
+      const target=restored&&!restored.disabled&&restored.getClientRects().length?restored:document.querySelector('dialog[open] button:not(:disabled)')||trigger;
       target?.focus();
     },0),{once:true});
     dialog.showModal();(initial||dialog.querySelector('button'))?.focus();

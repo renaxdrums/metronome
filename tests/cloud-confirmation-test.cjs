@@ -83,6 +83,22 @@ const { start, save } = require('./audio-harness.cjs');
         results.push({ width, language, keyboard: true, focusRestored: true, violations: 0 });
       }
     }
+    await p.evaluate(() => {
+      const original = document.createElement('button');
+      original.id = 'replacementTrigger';
+      original.textContent = 'Fixture';
+      document.body.append(original);
+      original.focus();
+      RENAX_DIALOGS.confirm({
+        messageKey: 'cloud.importDuplicate',
+        parameters: { name: 'Fixture' },
+      });
+      const replacement = original.cloneNode(true);
+      original.replaceWith(replacement);
+    });
+    await p.keyboard.press('Escape');
+    await p.waitForFunction(() => document.activeElement.id === 'replacementTrigger');
+    await p.locator('#replacementTrigger').evaluate((button) => button.remove());
     const source = fs.readFileSync(require.resolve('../cloud-backup.js'), 'utf8');
     assert.equal((source.match(/await RENAX_DIALOGS\.confirm/g) || []).length, 2);
     assert(!/\bconfirm\(/.test(source.replace(/RENAX_DIALOGS\.confirm\(/g, '')));

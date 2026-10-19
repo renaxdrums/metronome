@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0d9bf7a0b889bfc4",
+  "revision": "5a855bde5ca16bf5",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "cloud-backup.js",
-      "sha256": "11c242a0891d5cd6b59ccd55efcce41b0fbf35c5f70d67a7756d8fd3e1d924a2",
+      "sha256": "ed8af503744e0804644fe063f8e5c17972c8be42abdc527b1dc5e4513b389213",
       "text": true
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "af8a783936b83288c94398b0ec6f315c10d585ca59727ccb7a0ddd1dc7548aa5",
+      "sha256": "f26d702290a339d4a17abbe733331d3465ea7ec2e5b370ac2572c33e92316e6c",
       "text": true
     },
     {
@@ -439,7 +439,7 @@
     },
     {
       "path": "settings-accessibility.js",
-      "sha256": "90a57e5e6edf26cac946c6146d1abf21027f123bd214d1c039422d406abb1269",
+      "sha256": "0c5ce31d148baf434392d512025962e8f4c726c673f2644dc9177a24edc653a2",
       "text": true
     },
     {

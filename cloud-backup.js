@@ -217,7 +217,7 @@ function renderPanel(){
     const options=element('details',undefined,root);options.className='backup-options';options.open=optionsOpen;element('summary','Options du compte',options);
     const optionActions=element('div',undefined,options);optionActions.className='backup-option-actions';
     const syncButton=button(failure?'Réessayer la synchronisation':'Actualiser la synchronisation',optionActions,sync);syncButton.setAttribute('aria-label','Réessayer la synchronisation');
-    const importButton=button('Importer les morceaux locaux',optionActions,importGuest);importButton.setAttribute('aria-label','Importer les morceaux sans compte');
+    const importButton=button('Importer les morceaux locaux',optionActions,importGuest);importButton.id='backupImportGuest';importButton.setAttribute('aria-label','Importer les morceaux sans compte');
     button('Lier Google à ce compte',optionActions,()=>authenticate('google'),!providers.google);
     const signout=button('Se déconnecter',root,async()=>{await sdk.auth.signOut(auth);sessionStorage.removeItem('renax-index2-auth-enabled');localStorage.removeItem(rememberKey);remember=false;});signout.classList.add('backup-signout');signout.style.borderColor='var(--cyan)';backupIcon(signout,'login');signout.querySelector('svg').style.color='var(--orange)';signout.querySelector('svg').style.transform='rotate(180deg)';
     // JSON controls stay in the dedicated local backup view.

@@ -56,3 +56,6 @@ Les réponses des comptes Firebase ne sont jamais mises en cache par le Service 
 - `assets/metronome/pro-samples-manifest.json` : métadonnées et empreintes des échantillons supplémentaires.
 
 Les mesures locales LCP/CLS et les 30 dernières erreurs sont consultables via `RENAX_FEEDBACK` dans le navigateur. Elles restent en mémoire et ne sont envoyées à aucun service. L’INP local est également observé avec web-vitals ; il peut rester absent si le navigateur ne fournit pas les événements nécessaires ou si aucune interaction mesurable n’a eu lieu. Un diagnostic sans morceaux ni informations de connexion peut être téléchargé dans les paramètres. Ces observations ne constituent pas une distribution de visites réelles ni une certification sur appareil physique.
+
+
+Pendant la lecture, un navigateur compatible peut maintenir l’écran allumé ; la demande est libérée à l’arrêt et rétablie au retour sur l’onglet. Préférences propose une compensation visuelle de −100 à +400 ms et une calibration par frappes, enregistrées dans ce navigateur. Seul l’affichage est décalé : les sons, le tempo et l’export audio conservent leur planification. Voir MAINTENANCE.md pour les validations et essais Brave Android/Bluetooth.

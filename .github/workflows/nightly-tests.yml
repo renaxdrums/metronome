@@ -3,7 +3,7 @@ on:
   schedule:
     - cron: '23 1 * * *'
   pull_request:
-    branches: [main]
+    branches: [main, 'audit/phase-*']
     paths:
       - 'tests/**'
       - 'tools/check-test-coverage.cjs'

@@ -216,7 +216,7 @@
     if(!isPlaying&&!loaded&&transportSong())loadSong();
     const result=await originalStart();syncDirectSongPlay();return result;
   };
-  const originalStop=stopMetronome;stopMetronome=function(...args){if(!songReloadDepth){songStartEpoch++;preparingAmorce=false;}window.RENAX_AMORCE?.stop();clearTimeout(endTimer);const result=originalStop(...args);syncSongTransport();return result;};
+  const originalStop=stopMetronome;stopMetronome=function(...args){if(!songReloadDepth&&!args[0]?.startupFailure){songStartEpoch++;preparingAmorce=false;}window.RENAX_AMORCE?.stop();clearTimeout(endTimer);const result=originalStop(...args);syncSongTransport();return result;};
   const originalMode=setAppMode;setAppMode=function(mode){unload();return originalMode(mode);};
   function resetSelectedSongBlock(){
     const current=song();

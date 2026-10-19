@@ -71,6 +71,8 @@
     "voices.prepareOffline": "Prepare voices for offline use"
   }
 };
+ Object.assign(messages.fr,{"latency.heading": "Synchronisation visuelle", "latency.manual": "Compensation manuelle (ms)", "latency.help": "Le décalage automatique de la sortie audio est ajouté à cette valeur.", "latency.calibrate": "Calibrer", "latency.tap": "Taper en rythme", "latency.apply": "Appliquer", "latency.cancel": "Annuler", "latency.instructions": "Tapez au moins 5 fois avec le clic, puis appliquez la médiane.", "latency.samples": "{count} frappes enregistrées", "latency.saved": "Calibration enregistrée.", "latency.saveError": "Valeur invalide ou enregistrement local impossible.", "latency.audioError": "Son indisponible pour la calibration."});
+ Object.assign(messages.en,{"latency.heading": "Visual synchronization", "latency.manual": "Manual offset (ms)", "latency.help": "The automatic audio output delay is added to this value.", "latency.calibrate": "Calibrate", "latency.tap": "Tap in time", "latency.apply": "Apply", "latency.cancel": "Cancel", "latency.instructions": "Tap at least 5 times with the click, then apply the median.", "latency.samples": "{count} taps recorded", "latency.saved": "Calibration saved.", "latency.saveError": "Invalid value or local saving unavailable.", "latency.audioError": "Audio unavailable for calibration."});
  Object.freeze(messages.fr);Object.freeze(messages.en);Object.freeze(messages);
  window.RENAX_TRANSLATIONS=Object.freeze({legacy:Object.freeze(Object.assign(Object.create(null),legacy)),messages});
 })();

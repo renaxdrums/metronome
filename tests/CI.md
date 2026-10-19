@@ -18,3 +18,6 @@ La clé `nightly` donne la sélection exécutée ; `dedicated` indique le job co
 Les tests Firebase `*.test.mjs` (noms sans `-test`) sont sélectionnés explicitement par le runner : `core`, `local` et `navigation` dans la suite nocturne ; `core`, `rules`, `browser`, `local` et `navigation` avec `--firebase`. Le contrat anti-oubli porte aussi sur tout futur fichier `*-test` ajouté en sous-répertoire, qui devra disposer d’un chemin d’exécution explicite.
 
 Le test de timing conserve les limites temporelles de 1,1 ms et le seuil de forme d’onde de 0,001. Il doit réussir 20 scénarios par fréquence (44,1 et 48 kHz) et rejeter une injection de 25 ms sur les deux voix à chaque fréquence. Lancer `node tests/run.cjs --only=timing-test.cjs` pour reproduire ces contrôles.
+
+
+Les PR dont la base est `audit/phase-*` exécutent aussi les validations, sans déploiement. La phase 2 ajoute `playback-support-test.cjs` (veille, latence, calibration et Préférences) et `quality-invariance-test.cjs` (PCM SHA-256 aux deux fréquences et captures face à la phase 1 validée). Ces deux tests sont inscrits dans le registre nocturne ; leurs contrôles fonctionnels et PCM passent également dans le job audio. Les différences visuelles sont calculées dans le navigateur, sans dépendance Python supplémentaire.

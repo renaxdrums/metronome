@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "587d47df6c9fe912",
+  "revision": "a6b3314731e2b67e",
   "resources": [
     {
       "path": "accessibility.css",
@@ -169,7 +169,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "fd8399cbfb56681ee616d3e07cd60289eedb62d9c85119d25c27b85dceaa75d3",
+      "sha256": "f897c34029ac03d816917d89213461ff2223a13e773f245a9c1a6565bf55ab6c",
       "text": true
     },
     {
@@ -179,7 +179,7 @@
     },
     {
       "path": "interface-translations.js",
-      "sha256": "761b1bcdda0741beba193aa27b8d3d89b76edadca88048891b2ea17dfcecf7c8",
+      "sha256": "3232c480ab966330f4b257cba5ec20925e85a3884837c29ab63278dd17854b80",
       "text": true
     },
     {
@@ -209,7 +209,7 @@
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "f6ec7404af879a9e110f5a3d45402532abdf7bb5ebc8b152cf4f1f2e0bbc3ee4",
+      "sha256": "b545be92c503538ba1f1f10f524bf4f29f028b1a3b48e0a4c839241f371e25d8",
       "text": true
     },
     {
@@ -239,7 +239,7 @@
     },
     {
       "path": "multi-clock.js",
-      "sha256": "e13d4c26ebe608d46b245acb403e41d3c0215b618b6c05c24e0314559e840517",
+      "sha256": "200171f7f4fd86c22bdc9f3e5ef467bd65bd3910de837665987c9a5e17439cc2",
       "text": true
     },
     {
@@ -249,7 +249,7 @@
     },
     {
       "path": "multi-metronome.js",
-      "sha256": "179d438846ee9883ddf88ea75937d49cff7735b08c3f3e19d6d808d6998c7b48",
+      "sha256": "6f20f7386b950e0ce5dcebd6c993d98c6ac61a886653b1a2d270b5051e65e255",
       "text": true
     },
     {
@@ -270,6 +270,16 @@
     {
       "path": "offline-cache.js",
       "sha256": "f41c06ec6200ebc6023c24da74523491eefcfe91b3bb2c000ebd1d8b9cf9ce5c",
+      "text": true
+    },
+    {
+      "path": "playback-support.css",
+      "sha256": "5af3e9aed5145ca741b740562569cb5c622043db379dc2a45f80c8d7b655352f",
+      "text": true
+    },
+    {
+      "path": "playback-support.js",
+      "sha256": "bc2b127467b138d0b3ec825fe4c12238b010a0eab9db7d5c56dcf0904af0a059",
       "text": true
     },
     {
@@ -304,7 +314,7 @@
     },
     {
       "path": "rhythm-score.js",
-      "sha256": "20ddb94d7dae048d749a34fae4321b62ca95a0d2f5459b0ffe8e43e584632084",
+      "sha256": "e058a752abacc54686d99d6c50c308ec350a87f95801f7eee4bbcc5c291ae920",
       "text": true
     },
     {
@@ -334,7 +344,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "924dd92eb5b3ab47fe7196ff6990dc7fda00f29c13f977b2a18d2360d3d2cb20",
+      "sha256": "c6d1beafaa6b280be491c7e854bfa48efdd75a9148aba54411d126126f96b098",
       "text": true
     },
     {

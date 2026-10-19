@@ -60,6 +60,10 @@
       renderSubdivisionDots(m);
     }
 
+    function schedulerSafely() {
+      try { scheduler(); } catch(error) { reportAudioFailure(error); }
+    }
+
     function scheduler() {
       if (appMode === 'polyrhythm') { schedulerPolyrhythm(); return; }
       const voiceLead = SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active ? Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds || 0) : 0;
@@ -68,7 +72,7 @@
         const mIdx = playingMeasureIndex;
         const sIdx = currentStepInMeasure;
         const model = measures[mIdx];
-        if (!model) { timerID = setTimeout(scheduler, lookahead); return; }
+        if (!model) { timerID = setTimeout(schedulerSafely, lookahead); return; }
         const m = getSchedulingMeasure(model);
 
         if (sIdx >= measureTotalSteps(m)) {
@@ -99,6 +103,7 @@
         }
         const subdiv = m.beatSubdivisions[beat] || 1;
         const stepSeconds = rampStep?.seconds ?? getStepDurationMs(effectiveTempo, m.denominator, subdiv) / 1000;
+        if(subIndex===0)window.RENAX_PLAYBACK?.recordBeat(audioCtx,nextNoteTime);
         scheduleVisualUpdate(mIdx, sIdx, nextNoteTime, { beat, subIndex, voiceGroupSize, subdivisions: m.beatSubdivisions[beat], durationMs: stepSeconds * 1000 });
 
         nextNoteTime += stepSeconds;
@@ -112,14 +117,15 @@
           if(!loopedMeasure && typeof songAtEnd==='function' && songAtEnd())return;
         }
       }
-      timerID = setTimeout(scheduler, lookahead);
+      timerID = setTimeout(schedulerSafely, lookahead);
     }
 
     function scheduleVisualUpdate(mIdx, sIdx, time, musicalPosition = null) {
       const visualModel=measures[mIdx],multiGeneration=window.RENAX_MULTI?.active?window.RENAX_MULTI.generation:null;
-      const drawTime = (time - audioCtx.currentTime) * 1000;
+      const visualEpoch=window.RENAX_PLAYBACK?.generation;
+      const drawTime = (time - audioCtx.currentTime) * 1000 + (window.RENAX_PLAYBACK?.delayMs(audioCtx)||0);
       setTimeout(() => {
-        if (!isPlaying) return;
+        if (!isPlaying || visualEpoch!==window.RENAX_PLAYBACK?.generation) return;
         if(multiGeneration!==null&&(!window.RENAX_MULTI?.active||window.RENAX_MULTI.generation!==multiGeneration||measures[activeMeasureIndex]!==visualModel))return;
         if (activeMeasureIndex !== mIdx) {
           activeMeasureIndex = mIdx;
@@ -291,9 +297,10 @@
     };
 
     function schedulePolyVisualUpdate(mIdx, event, time) {
-      const drawTime=(time-audioCtx.currentTime)*1000;
+      const visualEpoch=window.RENAX_PLAYBACK?.generation;
+      const drawTime=(time-audioCtx.currentTime)*1000+(window.RENAX_PLAYBACK?.delayMs(audioCtx)||0);
       setTimeout(()=>{
-        if(!isPlaying || appMode!=='polyrhythm') return;
+        if(!isPlaying || appMode!=='polyrhythm' || visualEpoch!==window.RENAX_PLAYBACK?.generation) return;
         if(activeMeasureIndex!==mIdx){ activeMeasureIndex=mIdx; renderActiveMeasure(); renderSequencerList(); }
         sequencerContainer.querySelectorAll('.poly-dot').forEach(el=>el.classList.remove('active'));
         if(event.outer){ const el=sequencerContainer.querySelector(`[data-poly-outer="${event.outerIndex}"]`); if(el) el.classList.add('active'); }
@@ -306,7 +313,7 @@
       while(nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
         if(playingMeasureIndex>=measures.length){playingMeasureIndex=0; polyEventIndex=0;}
         const mIdx=playingMeasureIndex, m=measures[mIdx];
-        if(!m){timerID=setTimeout(scheduler,lookahead);return;}
+        if(!m){timerID=setTimeout(schedulerSafely,lookahead);return;}
         const events=getPolyEvents(m);
         if(polyEventIndex>=events.length) polyEventIndex=0;
         const e=events[polyEventIndex];
@@ -319,6 +326,7 @@
           const s = m.innerStates[e.innerIndex] ?? 1;
           if (s > 0) playClick(s,nextNoteTime,e.u===0);
         }
+        if(e.outer)window.RENAX_PLAYBACK?.recordBeat(audioCtx,nextNoteTime);
         schedulePolyVisualUpdate(mIdx,e,nextNoteTime);
         // Le numérateur est la pulsation de référence : sa vitesse reste fixée par le BPM.
         // Le dénominateur se répartit dans la même durée sans accélérer/ralentir le numérateur.
@@ -328,7 +336,7 @@
         polyEventIndex++;
         if(polyEventIndex>=events.length){ polyEventIndex=0; playingMeasureIndex=loopedMeasure&&measures.includes(loopedMeasure)?measures.indexOf(loopedMeasure):(playingMeasureIndex+1)%measures.length; }
       }
-      timerID=setTimeout(scheduler,lookahead);
+      timerID=setTimeout(schedulerSafely,lookahead);
     }
 
     function setAppMode(mode) {
@@ -366,6 +374,7 @@
     async function startMetronome() {
       if(window.RENAX_MULTI?.active)return window.RENAX_MULTI.start();
       if (isPlaying || playbackStarting) return;
+      const startEpoch=window.RENAX_PLAYBACK?.generation;
       playbackStarting = true;
       updateTrainButton();
       try {
@@ -381,8 +390,9 @@
         console.warn('Voice metronome preload unavailable:', err);
         return;
       }
-      if (isPlaying) return;
+      if (isPlaying || startEpoch!==window.RENAX_PLAYBACK?.generation) return;
       isPlaying = true;
+      window.RENAX_PLAYBACK?.start();
       playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : 0;
       currentStepInMeasure = 0;
       polyEventIndex = 0;
@@ -407,10 +417,11 @@
       playhead.startTime = performance.now();
       clearProgressTrail();
       scheduler();
-      } finally { playbackStarting = false; updateTrainButton(); renderSequencerList(); }
+      } catch(error) { stopMetronome({startupFailure:true}); throw error; } finally { playbackStarting = false; updateTrainButton(); renderSequencerList(); }
     }
 
     function stopMetronome({ keepTrainingMode = false } = {}) {
+      window.RENAX_PLAYBACK?.stop();
       if(window.RENAX_MULTI?.active)return window.RENAX_MULTI.stop();
       loopedMeasure = null;
       if (!isPlaying) return;

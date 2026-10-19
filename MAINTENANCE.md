@@ -76,3 +76,18 @@ Tout ajout, déplacement ou retrait d’un fichier `*-test.cjs` ou `*-test.mjs` 
 `timing-test.cjs` force séparément les contextes audio à 44 100 et 48 000 Hz. Les repères annotés sont convertis en secondes puis en trames avec la fréquence du buffer décodé. La corrélation interpole les positions fractionnaires à la fréquence du rendu ; le seuil de forme reste 0,001 et les limites temporelles restent 1,1 ms. Une injection de +25 ms, sur les deux voix et aux deux fréquences, doit être rejetée par le même validateur temporel. Aucun fichier audio ni planificateur n’est modifié.
 
 La première exécution complète en CI a exposé des attentes murales fragiles : l’éditeur rythmique attend désormais quatre événements avant de comparer leur ordre et leur position ; le guide vocal attend la fin musicale sur `audioCtx.currentTime`, avec 200 ms de marge audio et une limite murale de secours. Un test dont l’arrêt est désactivé doit encore échouer. Les rapports du guide sont écrits avant les assertions pour conserver les diagnostics d’échec. Le test de refus du stockage vise le transport accessible plutôt que les IDs dupliqués dans la réplique d’accueil inerte. Ces ajustements ne changent aucun script de l’application.
+
+
+## Validation de la phase 2
+
+Après modification des ressources : `pnpm build`, puis `pnpm check:assets`. Lancer `node tests/run.cjs --only=playback-support-test.cjs,quality-invariance-test.cjs,timing-test.cjs`, les contrôles lint/format/types, puis `pnpm build:production` et `pnpm test:production`. `quality-invariance-test.cjs` compare les rendus PCM SHA-256 de toutes les banques à 44,1/48 kHz au commit de phase 1 validé `274eac965132a8f3120c7e097b8a3cb9c90285e4`, puis capture les six modules, trois thèmes et trois tailles. `PCM_ONLY=1` permet de sélectionner uniquement la comparaison PCM.
+
+`playback-support-test.cjs` simule les verrous et la latence, vérifie les trois transports, les erreurs audio, les acquisitions tardives, le retour visible pendant une acquisition, les bornes/persistance du réglage, le refus du stockage, la calibration et ses annulations. Il vérifie aussi les clés FR/EN, l’accessibilité Axe de la nouvelle section et conserve neuf captures de Préférences.
+
+Essais physiques à exécuter sur Brave Android avec casque Bluetooth :
+1. Pour métronome, multipiste et morceau, laisser jouer au-delà du délai de veille puis arrêter : vérifier écran maintenu pendant la lecture et comportement normal après arrêt.
+2. Quitter l’onglet pendant la lecture, revenir, vérifier reprise de la protection écran sans lecture doublée. Tester aussi sans autorisation de verrou si le navigateur propose ce réglage.
+3. Dans Préférences, calibrer par au moins cinq frappes avec le clic, appliquer, fermer et recharger : vérifier valeur conservée et synchronisation visuelle au casque. Comparer aussi la sortie sans Bluetooth.
+4. Vérifier −100 et +400 ms, annuler une calibration, fermer pendant le chargement, et calibrer pendant une lecture déjà lancée : aucune lecture surprise ni arrêt de celle que l’utilisateur avait lancée.
+
+La précision dépend de la latence annoncée par le navigateur, de l’affichage et des frappes humaines ; les tests simulés ne remplacent pas ces essais physiques. Les workflows de validation acceptent les bases `audit/phase-*` afin de vérifier les PR par phase sans fusionner la phase précédente ni déclencher de déploiement.

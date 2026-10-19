@@ -89,7 +89,19 @@ const { start } = require('./audio-harness.cjs');
       await startMetronome();
       const start = nextNoteTime,
         enabled = RENAX_AMORCE.active;
-      await new Promise((r) => setTimeout(r, (plan.duration + 0.6) * 1000));
+      // A virtual audio device can begin advancing after resume() resolves.
+      // Check the musical end on that clock, not a fixed wall-clock sleep.
+      // The audio limit rejects an extra loop; the wall limit rejects a frozen clock.
+      const waitStarted = performance.now(),
+        wallDeadline = waitStarted + (plan.duration + 5) * 1000;
+      while (
+        isPlaying &&
+        audioCtx.currentTime < start + plan.duration + 0.2 &&
+        performance.now() < wallDeadline
+      )
+        await new Promise((resolve) => setTimeout(resolve, 25));
+      const waitElapsedMs = performance.now() - waitStarted,
+        audioElapsedSeconds = audioCtx.currentTime - start;
       const stopped = !isPlaying,
         unchanged = JSON.stringify(RENAX_SONGS.library) === JSON.stringify(library);
       const rendered = await RENAX_MP3_EXPORT.isolatedRender(song, 'claves', 0.8);
@@ -107,6 +119,9 @@ const { start } = require('./audio-harness.cjs');
         countIn: plan.countInMeasures,
         enabled,
         stopped,
+        waitElapsedMs,
+        audioElapsedSeconds,
+        expectedDurationSeconds: plan.duration,
         unchanged,
         midiEqual: midiA.length === midiB.length && midiA.every((v, i) => v === midiB[i]),
         trace,
@@ -137,10 +152,6 @@ const { start } = require('./audio-harness.cjs');
     assert(result.trace.some((e) => e.bank === 'claves'));
     assert(result.mp3PcmPeak > 0 && result.mp3PcmPeak < 1);
     assert.deepEqual(errors, []);
-    fs.writeFileSync(
-      'tests/amorce-song-integration-results.json',
-      JSON.stringify({ ...result, errors }, null, 2),
-    );
     console.log({ ...result, trace: result.trace.length });
   } finally {
     await h.browser.close();

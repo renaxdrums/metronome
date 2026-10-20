@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "8b0d4ced6660f318",
+  "revision": "69a3e0c030e2b536",
   "resources": [
     {
       "path": "accessibility.css",
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "b61a7b9368a6f9edb158bd1807c3f94b986bce9b94e75d1983fdf571b9bc5349",
+      "sha256": "3736c3fe91839052cd266ae7eb7f15bd40f1f07725954bc489a6fbeb1085be86",
       "text": true
     },
     {
@@ -409,7 +409,7 @@
     },
     {
       "path": "renax-pulse-ivory.css",
-      "sha256": "322e8c7c2e0d9b24197782e621b843b1248ce2815b9f9d5278c99607fc1b1baa",
+      "sha256": "ee765501da9fbe6c54646a00e57d7b455a8db8df51d39392de0436c88c5a06f0",
       "text": true
     },
     {

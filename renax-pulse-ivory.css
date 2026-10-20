@@ -44,7 +44,7 @@ html#renaxApp[data-theme=ivory] .panel-visu{
  border-color:#d1d7c5!important;
 }
 html#renaxApp[data-theme=ivory] .panel-visu .sequencer-wrapper{background:transparent!important}
-html#renaxApp[data-theme=ivory] .panel-visu :is(.visu-toolbar,#workspaceControls){
+html#renaxApp[data-theme=ivory] :is(.panel-visu,.panel-training) :is(.visu-toolbar,#workspaceControls){
  background:#eeeadd!important;border:1px solid #d7dbcf!important;border-radius:13px!important;
  box-shadow:none!important;color:#173e37!important;
 }

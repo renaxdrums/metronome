@@ -137,3 +137,7 @@ Modifier les racines CDN uniquement dans `network-origins.js`, puis lancer build
 Les six grandes feuilles sont migrées par lots sur une branche dédiée. La référence du lot 1 est main `361d5fd7450216831203e4651f14db75e3e91db9`. Consulter `CSS-MIGRATION.md` et l’inventaire `tools/theme-cascade-lot1.json`. Le budget ne peut que baisser. Les captures doivent rester à 0/255, avec styles calculés strictement identiques ; un écart bloque le lot. `@layer` est reporté après la migration. Le PCM reste comparé aux deux fréquences par le test d’invariance.
 
 Sur chaque PR, le job `sampled-audio` conserve sa comparaison PCM à la référence audio historique et ajoute la comparaison visuelle contre le SHA de base de la PR (`INVARIANCE_REF`, `VISUAL_ONLY=1`). Le seuil reste 0/255, sans tolérance par nombre de pixels. Les résultats du test détaillent aussi les styles calculés. Cette base n’est jamais régénérée à partir du résultat modifié.
+
+### Surface ivoire des réglages d’entraînement sur mobile
+
+`#workspaceControls` est le même élément déplacé de `.panel-visu` vers `.panel-training` lorsque l’onglet Paramètres d’Entraînement est actif sur écran tactile. Sa règle de surface ivoire doit cibler les deux parents. Le test `phone-rotation-test.cjs` vérifie désormais le fond, la bordure et la couleur du texte avant/après déplacement, ouvert et fermé, dans les trois thèmes et les deux orientations. Le nouveau contrôle reproduit le fond sombre incorrect sur la version précédant le correctif.

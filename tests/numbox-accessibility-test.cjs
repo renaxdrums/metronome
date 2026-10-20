@@ -40,13 +40,14 @@ const assert=require('node:assert/strict');const {start,save,openTracks,openCont
  }
  await p.locator('#index2SettingsBtn').click();const names=await p.locator('.song-open .measure-num').allTextContents();await p.locator('[data-language=en]').click();assert.equal(await p.locator('html').getAttribute('lang'),'en');assert.deepEqual(await p.locator('.song-open .measure-num').allTextContents(),names);await p.locator('[data-language=fr]').click();assert.equal(await p.locator('html').getAttribute('lang'),'fr');await p.keyboard.press('Escape');
  await checkSoundMenuForeground(h,proof,errors);
+ await checkMultiSoundMenus(h,proof,errors);
  proof.push({appearance:'dark default; all three theme choices reachable on portrait, landscape and desktop; mobile preferences update retained'});
  proof.push({dialogs:'copy, move, mobile rename and user labels retained'});assert.deepEqual(errors,[]);save('numbox-accessibility-results.json',{proof,errors});console.log('PASS accessible/lazy numeric controls, zoom, tap keyboard and fullscreen-compatible dialogs');
 }finally{await h.browser.close();h.server?.close()}})().catch(e=>{console.error(e);process.exitCode=1});
 
 // An opaque menu can still be occluded by a navigation stacking context.
-async function soundMenuProbe(page) {
- return page.locator('.sound-bank-cards.open .numbox-menu').evaluate(menu=>{
+async function soundMenuProbe(page,selector='.sound-bank-cards.open .numbox-menu') {
+ return page.locator(selector).evaluate(menu=>{
   const bounds=menu.getBoundingClientRect(),blocked=[];
   for(const fraction of [.15,.5,.85]){
    const x=bounds.left+bounds.width*fraction;
@@ -127,4 +128,86 @@ async function checkSoundMenuForeground(h,proof,errors) {
  save('sound-menu-foreground-results.json',{baseline:'b7f4f131e94bef652730e8c0b072590c7e43ca6f',negativeControl:'Navigation overlaps the old menu',results,errors});
  proof.push({soundMenu:'36 desktop, tablet and phone states: three themes, three workspaces, phone rotation, opaque foreground, final sound selectable and Escape restores focus'});
  console.log('PASS sound menu: old navigation overlap reproduced; 36 foreground/opacity/selection/keyboard states');
+}
+
+async function menuAppearance(menu) {
+ return menu.evaluate(element=>{
+  const pick=(node,keys)=>{const style=getComputedStyle(node);return Object.fromEntries(keys.map(key=>[key,style[key]]));};
+  const itemKeys=['backgroundColor','borderColor','borderWidth','borderRadius','color','fontFamily','fontSize','fontWeight','lineHeight','padding','marginBottom','minHeight','display','alignItems','gap','textAlign'];
+  return {
+   menu:pick(element,['backgroundColor','borderColor','borderWidth','borderRadius','padding','boxShadow','scrollbarColor']),
+   options:[...element.querySelectorAll('.numbox-option')].slice(0,8).map(item=>({
+    value:item.dataset.value,selected:item.getAttribute('aria-selected'),style:pick(item,itemKeys),
+    icon:item.querySelector('svg')?.innerHTML,
+    iconStyle:item.querySelector('svg')?pick(item.querySelector('svg'),['width','height','stroke','strokeWidth']):null
+   }))
+  };
+ });
+}
+async function checkMultiSoundMenus(h,proof,errors) {
+ const results=[];
+ for(const viewport of [{width:390,height:844},{width:834,height:1112},{width:1440,height:900},{width:844,height:390}]){
+  for(const theme of ['dark','light','ivory']){
+   const page=await h.browser.newPage({viewport,hasTouch:viewport.width<=1100,reducedMotion:'reduce'});
+   page.on('pageerror',error=>errors.push(error.message));
+   try{
+    await page.goto(h.url);
+    await page.waitForFunction(()=>document.documentElement.dataset.workspaceReady&&document.querySelector('#soundBank.numbox-native'));
+    await page.locator('#workspaceNav [data-workspace=metronome]').click();
+    await page.waitForFunction(()=>!document.fullscreenEnabled||!!document.fullscreenElement);
+    await page.evaluate(()=>document.fonts.ready);
+    await page.evaluate(value=>{document.documentElement.dataset.theme=value;},theme);
+    await openControls(page);
+    const referenceTrigger=page.locator('#soundBank').locator('..').locator('.numbox-button');
+    await referenceTrigger.click();
+    await page.mouse.move(0,0);
+    const reference=await menuAppearance(page.locator('#soundBank').locator('..').locator('.numbox-menu'));
+    await referenceTrigger.click();
+    await page.evaluate(()=>RENAX_WORKSPACE.go('multi'));
+    await page.locator('#multiPresetLibrary').getByRole('button',{name:'Nouveau preset',exact:true}).click();
+    await page.locator('.multi-add').filter({hasText:'Nouvelle piste'}).click();
+    await page.waitForFunction(()=>document.querySelectorAll('#multiTracks .multi-sound-bank').length===2);
+    const triggerWidths=await page.locator('#multiTracks .numbox-button').evaluateAll(elements=>elements.map(element=>element.getBoundingClientRect().width));
+    for(let index=0;index<2;index++){
+     const track=page.locator('#multiTracks .multi-track').nth(index),trigger=track.locator('.numbox-button');
+     await trigger.click();
+     const selector='#multiTracks .multi-sound-bank.open .numbox-menu';
+     const menu=page.locator(selector);
+     await page.waitForFunction(selector=>document.querySelector(selector)?.classList.contains('compact-floating'),selector);
+     await page.mouse.move(0,0);
+     const context=JSON.stringify({viewport,theme,index});
+     assert.deepEqual(await menuAppearance(menu),reference,'Same sound cards as the metronome: '+context);
+     const probe=await soundMenuProbe(page,selector);
+     assert.deepEqual(probe.blocked,[],JSON.stringify({viewport,theme,index,...probe}));
+     assert(probe.opaque,context);
+     assert(probe.bounds.top>=0&&probe.bounds.left>=0&&probe.bounds.bottom<=viewport.height&&probe.bounds.right<=viewport.width,context);
+     assert.equal(Math.round(probe.bounds.width),Math.round(Math.min(viewport.width-16,Math.max(triggerWidths[index],140)))) ;
+     assert(probe.bounds.height<=220.1,context);
+     const output=require('node:path').join(process.env.TEST_OUTPUT_DIR||require('node:path').join(__dirname,'results'),['sound-menu-multi',viewport.width,viewport.height,theme,index+1].join('-')+'.png');
+     await page.screenshot({path:output});
+     await trigger.focus();await page.keyboard.press('ArrowDown');await page.keyboard.press('Escape');
+     assert.equal(await trigger.getAttribute('aria-expanded'),'false');
+     assert.equal(await trigger.evaluate(element=>element===document.activeElement),true);
+     await trigger.click();
+     const before=await page.locator('#multiTracks .multi-bank-row select').evaluateAll(elements=>elements.map(element=>element.value));
+     const last=page.locator(selector).locator('.numbox-option').last(),value=await last.getAttribute('data-value');
+     await last.scrollIntoViewIfNeeded();
+     assert.deepEqual((await soundMenuProbe(page,selector)).blocked,[],context);
+     await last.click();
+     await page.waitForFunction(({index,value})=>document.querySelectorAll('#multiTracks .multi-bank-row select')[index]?.value===value,{index,value});
+     const after=await page.locator('#multiTracks .multi-bank-row select').evaluateAll(elements=>elements.map(element=>element.value));
+     assert.equal(after[1-index],before[1-index],'Changing one track preserves the other sound');
+     assert.equal(await page.locator('#multiTracks .numbox-custom.open').count(),0);
+     // Restore the original sound through the UI, so both tracks compare the same selected card.
+     const restored=page.locator('#multiTracks .multi-track').nth(index).locator('.numbox-button');
+     await restored.click();
+     await page.locator(selector).locator('[data-value="userMetroclic"]').click();
+     results.push({viewport,theme,track:index+1,identicalStylesAndIcons:true,compactDimensions:true,foreground:true,independentSelection:true,keyboard:true});
+    }
+   }finally{await page.close();}
+  }
+ }
+ save('sound-menu-multi-results.json',{results,errors});
+ proof.push({multiSoundMenus:'24 menus: same colors, borders, typography and icons as metronome; compact dimensions, foreground, final sound selection and keyboard'});
+ console.log('PASS two multitrack sound menus across desktop, tablet, phone portrait/landscape and all themes');
 }

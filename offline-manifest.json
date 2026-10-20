@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "089876838b505325",
+  "revision": "9f0f9b1b59e528a1",
   "resources": [
     {
       "path": "accessibility.css",
@@ -134,7 +134,7 @@
     },
     {
       "path": "compact-controls.js",
-      "sha256": "8c007ba62521bf926cc7e7d6bdb8cf1b757eb8ef1aa03437476673419796e9a0",
+      "sha256": "17aa5903d1c763c46cf3d12283efcccb19b604cef13f7194093538fff4e6e5e4",
       "text": true
     },
     {
@@ -239,7 +239,7 @@
     },
     {
       "path": "entry-opaque-navigation26.css",
-      "sha256": "e3dfe1b53d0460497476b07b208e75750f04c7432496d5590f15895db12ec034",
+      "sha256": "e838ab7644ae3f4dc20d2f2ae26e0fda7efe8bf6ce1a0503ae520d7371ff65f7",
       "text": true
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "604ebdcc94a2a073028cb914790756d2a4562f6edf1246f2982e812a81360805",
+      "sha256": "957d839366a3545cd767315733ac697c2f941aaed49f000b999df9e639e8be6f",
       "text": true
     },
     {
@@ -469,7 +469,7 @@
     },
     {
       "path": "sound-bank-menu.js",
-      "sha256": "ccaf886df669f67b0e9523f2ad64a2c7472f9fed0d51b6d56f9a0aafc2e82bea",
+      "sha256": "743d19a77c104609cf8191273977f78cb955c0984d064e9989261fda8ab4adf3",
       "text": true
     },
     {

@@ -1,0 +1,290 @@
+{
+  "baseline": "361d5fd7450216831203e4651f14db75e3e91db9",
+  "reason": "Earlier important declarations overridden by an identical selector/property under identical conditions later in the same stylesheet. No layer or specificity changes.",
+  "removed": [
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel",
+      "context": [],
+      "property": "margin",
+      "value": "0 0 2px",
+      "start": 18403,
+      "end": 18428,
+      "line": 201,
+      "winnerLine": 509,
+      "winnerValue": "0",
+      "file": "renax-pulse-ivory.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel",
+      "context": [],
+      "property": "flex",
+      "value": "0 0 44px",
+      "start": 18335,
+      "end": 18359,
+      "line": 200,
+      "winnerLine": 509,
+      "winnerValue": "0 0 44px",
+      "file": "renax-pulse-ivory.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel",
+      "context": [],
+      "property": "max-height",
+      "value": "44px",
+      "start": 18309,
+      "end": 18335,
+      "line": 200,
+      "winnerLine": 508,
+      "winnerValue": "44px",
+      "file": "renax-pulse-ivory.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel",
+      "context": [],
+      "property": "height",
+      "value": "44px",
+      "start": 18287,
+      "end": 18309,
+      "line": 200,
+      "winnerLine": 508,
+      "winnerValue": "44px",
+      "file": "renax-pulse-ivory.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel",
+      "context": [],
+      "property": "min-height",
+      "value": "44px",
+      "start": 18259,
+      "end": 18285,
+      "line": 199,
+      "winnerLine": 508,
+      "winnerValue": "44px",
+      "file": "renax-pulse-ivory.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=light] body #multiControls",
+      "context": [
+        "@media(min-width:1101px)"
+      ],
+      "property": "gap",
+      "value": "10px",
+      "start": 26519,
+      "end": 26537,
+      "line": 191,
+      "winnerLine": 208,
+      "winnerValue": "10px",
+      "file": "appearance-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)",
+      "context": [],
+      "property": "color",
+      "value": "#13363b",
+      "start": 26314,
+      "end": 26337,
+      "line": 263,
+      "winnerLine": 274,
+      "winnerValue": "#13363b",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)",
+      "context": [],
+      "property": "border-color",
+      "value": "#d9ef62",
+      "start": 26283,
+      "end": 26314,
+      "line": 263,
+      "winnerLine": 274,
+      "winnerValue": "#70d5df",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)",
+      "context": [],
+      "property": "background",
+      "value": "#d9ef62",
+      "start": 26254,
+      "end": 26283,
+      "line": 263,
+      "winnerLine": 274,
+      "winnerValue": "#70d5df",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg",
+      "context": [
+        "@media(max-width:1100px)"
+      ],
+      "property": "stroke",
+      "value": "#596a16",
+      "start": 25614,
+      "end": 25638,
+      "line": 256,
+      "winnerLine": 268,
+      "winnerValue": "var(--ivory-lime)",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)",
+      "context": [],
+      "property": "color",
+      "value": "#13363b",
+      "start": 24677,
+      "end": 24700,
+      "line": 246,
+      "winnerLine": 274,
+      "winnerValue": "#13363b",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)",
+      "context": [],
+      "property": "border-color",
+      "value": "var(--ivory-lime)",
+      "start": 24636,
+      "end": 24677,
+      "line": 246,
+      "winnerLine": 274,
+      "winnerValue": "#70d5df",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)",
+      "context": [],
+      "property": "background",
+      "value": "var(--ivory-lime)",
+      "start": 24597,
+      "end": 24636,
+      "line": 246,
+      "winnerLine": 274,
+      "winnerValue": "#70d5df",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] #workspaceNav button",
+      "context": [
+        "@media(min-width:1101px)"
+      ],
+      "property": "padding",
+      "value": "12px",
+      "start": 20165,
+      "end": 20188,
+      "line": 203,
+      "winnerLine": 249,
+      "winnerValue": "12px 8px",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]",
+      "context": [],
+      "property": "box-shadow",
+      "value": "inset 0 -3px #d9ef62",
+      "start": 19639,
+      "end": 19681,
+      "line": 198,
+      "winnerLine": 244,
+      "winnerValue": "inset 0 -3px var(--ivory-lime)",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]",
+      "context": [],
+      "property": "border-color",
+      "value": "#bfd77a",
+      "start": 19584,
+      "end": 19615,
+      "line": 198,
+      "winnerLine": 244,
+      "winnerValue": "#b8d477",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] #workspaceNav button",
+      "context": [
+        "@media(min-width:1101px)"
+      ],
+      "property": "padding",
+      "value": "12px 14px 12px 22px",
+      "start": 12324,
+      "end": 12362,
+      "line": 130,
+      "winnerLine": 249,
+      "winnerValue": "12px 8px",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] :is(#playBtn:hover,#trainBtn:hover,#trainingVisualBtn:hover)",
+      "context": [],
+      "property": "background",
+      "value": "#8ae1e7",
+      "start": 6775,
+      "end": 6803,
+      "line": 76,
+      "winnerLine": 262,
+      "winnerValue": "#e5f587",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .poly-ring.outer",
+      "context": [],
+      "property": "border-color",
+      "value": "#d9ef6280",
+      "start": 5846,
+      "end": 5878,
+      "line": 65,
+      "winnerLine": 218,
+      "winnerValue": "#e6d8b780",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] .step[data-state=\"3\"]",
+      "context": [],
+      "property": "background",
+      "value": "#d6d9a5",
+      "start": 5506,
+      "end": 5534,
+      "line": 61,
+      "winnerLine": 188,
+      "winnerValue": "#e6d8b7",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg",
+      "context": [],
+      "property": "stroke",
+      "value": "var(--ivory-green)",
+      "start": 2086,
+      "end": 2121,
+      "line": 24,
+      "winnerLine": 265,
+      "winnerValue": "var(--ivory-lime)",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": "html#renaxApp[data-theme=ivory] #workspaceNav button svg",
+      "context": [],
+      "property": "stroke",
+      "value": "var(--ivory-green)",
+      "start": 1721,
+      "end": 1757,
+      "line": 21,
+      "winnerLine": 264,
+      "winnerValue": "var(--ivory-lime)",
+      "file": "ivory-theme.css"
+    },
+    {
+      "selector": ".measure-card,.song-section,.song-card,.playlist-choice,.song-block",
+      "context": [],
+      "property": "border-color",
+      "value": "#30343c",
+      "start": 3182,
+      "end": 3213,
+      "line": 35,
+      "winnerLine": 159,
+      "winnerValue": "#48525e",
+      "file": "console-theme.css"
+    }
+  ]
+}

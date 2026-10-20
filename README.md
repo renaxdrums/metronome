@@ -79,3 +79,5 @@ La version publiée n’inclut plus l’ancienne interface ni son script dédié
 `pnpm lint` contrôle le registre des globales et l’ordre des scripts classiques, puis ESLint avec `no-undef`, `no-unused-vars` et `no-empty` (catch vides autorisés). `pnpm type-check` vérifie sept fichiers JavaScript en mode strict et sans génération. Les contrats se trouvent dans `tools/classic-script-globals.json` et `types/globals.d.ts`. `node tests/run.cjs --only=tooling-contracts-test.cjs` vérifie aussi les refus attendus du lint et des types.
 
 Les 54 captures d’invariance utilisent le rendu complet de Chromium, avec une tolérance **zéro** sur chaque canal de chaque pixel et sur les styles calculés. La comparaison PCM demeure bit à bit à 44,1 et 48 kHz. Les quatre grandes feuilles de thème restent inchangées.
+
+La migration ultérieure des six grandes feuilles est suivie par lots dans `CSS-MIGRATION.md` : captures exactes à 0/255, styles calculés et comparaison PCM aux deux fréquences. Aucun `@layer` ne sera introduit avant cette migration.

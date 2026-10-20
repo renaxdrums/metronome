@@ -60,6 +60,14 @@ jobs:
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/playback-support-test.cjs
           PCM_ONLY=1 node tests/quality-invariance-test.cjs
+      - name: Exact theme screenshots and computed styles against the PR base
+        if: github.event_name == 'pull_request'
+        env:
+          INVARIANCE_REF: ${{ github.event.pull_request.base.sha }}
+          VISUAL_ONLY: '1'
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/quality-invariance-test.cjs
       - name: MP3 export regression
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"

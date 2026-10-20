@@ -196,9 +196,8 @@ html#renaxApp[data-theme=ivory] body[data-workspace=metronome]:not(.poly-mode) .
 }
 html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel{
  display:flex!important;align-self:stretch!important;align-items:center!important;
- justify-content:space-between!important;min-height:44px!important;
- height:44px!important;max-height:44px!important;flex:0 0 44px!important;
- padding:0 1px!important;gap:8px!important;margin:0 0 2px!important;
+ justify-content:space-between!important;
+ padding:0 1px!important;gap:8px!important;
 }
 html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel::before{
  content:'◷  VISUALISATION';font:800 10px/1.2 var(--font);

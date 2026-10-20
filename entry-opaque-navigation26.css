@@ -5,3 +5,6 @@ html#renaxApp[data-theme=light] #workspaceNav button{background:#e4e8eb!importan
 html#renaxApp[data-theme=light] #workspaceNav button:hover{background:#f0f2f4!important}
 html#renaxApp[data-theme=light] #workspaceNav button[aria-selected=true]{background:#fff!important}
 @media(max-width:1100px){html#renaxApp[data-theme=light] #workspaceNav button{background:#edf0f2!important}html#renaxApp[data-theme=light] #workspaceNav button:hover{background:#f0f2f4!important}html#renaxApp[data-theme=light] #workspaceNav button[aria-selected=true]{background:#fff!important}}
+
+/* Lift the sound menu's panel above navigation stacking contexts only while open. */
+.main-grid>.panel:has(.sound-bank-cards.open){position:relative;z-index:3;}

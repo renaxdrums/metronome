@@ -98,6 +98,12 @@ jobs:
           node tests/startup-layout-test.cjs
           node tests/phone-rotation-test.cjs
 
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sound-menu-foreground
+          path: tests/results/sound-menu-*
+
   firebase:
     runs-on: ubuntu-latest
     timeout-minutes: 15

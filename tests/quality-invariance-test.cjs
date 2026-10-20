@@ -7,6 +7,15 @@ const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f36309
   cache = new Map();
 const referenceAgainstItself = process.env.INVARIANCE_SELF === '1';
 const pixelThreshold = 0; // Maximum over every pixel and RGBA channel; no pixel-count allowance.
+// Approved bug fix: historical references have a dark training disclosure in ivory.
+// Correct only its parent selector in the reference; never mask pixels, raise the
+// threshold, or copy a modified stylesheet wholesale. The phone-rotation test
+// independently checks the original ivory surface and fails on the old bug.
+const ivoryControlsBefore =
+  'html#renaxApp[data-theme=ivory] .panel-visu :is(.visu-toolbar,#workspaceControls){';
+const ivoryControlsAfter =
+  'html#renaxApp[data-theme=ivory] :is(.panel-visu,.panel-training) :is(.visu-toolbar,#workspaceControls){';
+const correctedReferenceFiles = new Set();
 const cascadeProbe = process.env.CASCADE_PROBE || '';
 assert(['', 'remove-important', 'layers-only', 'layers-without-important'].includes(cascadeProbe));
 const probeLayers = {
@@ -70,8 +79,14 @@ async function baselineRoute(page, url) {
         cache.set(file, null);
       }
     }
-    const body = cache.get(file);
+    let body = cache.get(file);
     if (!body) return route.fulfill({ status: 404, body: 'Not found' });
+    if (file === 'renax-pulse-ivory.css' && body.toString().includes(ivoryControlsBefore)) {
+      const original = body.toString();
+      assert.equal(original.split(ivoryControlsBefore).length, 2);
+      body = Buffer.from(original.replace(ivoryControlsBefore, ivoryControlsAfter));
+      correctedReferenceFiles.add(file);
+    }
     const contentType = /\.html$/.test(file)
       ? 'text/html'
       : /\.(js|mjs)$/.test(file)
@@ -377,6 +392,13 @@ async function baselineRoute(page, url) {
     save('quality-invariance-results.json', {
       baseline,
       referenceAgainstItself,
+      approvedReferenceCorrection: {
+        issue:
+          'Ivory musical controls retain their themed surface after moving into training parameters',
+        files: [...correctedReferenceFiles],
+        before: ivoryControlsBefore,
+        after: ivoryControlsAfter,
+      },
       cascadeProbe,
       pixelThreshold,
       partialRasterization: false,

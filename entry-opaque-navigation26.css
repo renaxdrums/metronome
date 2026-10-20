@@ -8,3 +8,6 @@ html#renaxApp[data-theme=light] #workspaceNav button[aria-selected=true]{backgro
 
 /* Lift the sound menu's panel above navigation stacking contexts only while open. */
 .main-grid>.panel:has(.sound-bank-cards.open){position:relative;z-index:3;}
+
+/* A track card is its own stacking context; lift only the open sound picker. */
+.multi-track:has(.multi-sound-bank.open){z-index:4;}

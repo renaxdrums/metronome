@@ -74,6 +74,7 @@
     .training-curve-menu button[aria-pressed="true"]{border-color:var(--orange);background:var(--grey-hover)}
     .training-curve-select summary:focus-visible,.training-curve-menu button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
     .training-curve-select[aria-disabled="true"]>summary{opacity:.45;cursor:default}
+    @media(max-width:600px),(max-width:1100px) and (max-height:600px) and (pointer:coarse){.training-curve-menu{top:auto;bottom:calc(100% + 4px)}}
   `;document.head.append(curveStyle);
   const selector=document.createElement('details');selector.className='training-curve-select';
   const summary=document.createElement('summary');summary.title='Choisir la courbe du tempo';

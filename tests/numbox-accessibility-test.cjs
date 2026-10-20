@@ -41,6 +41,7 @@ const assert=require('node:assert/strict');const {start,save,openTracks,openCont
  await p.locator('#index2SettingsBtn').click();const names=await p.locator('.song-open .measure-num').allTextContents();await p.locator('[data-language=en]').click();assert.equal(await p.locator('html').getAttribute('lang'),'en');assert.deepEqual(await p.locator('.song-open .measure-num').allTextContents(),names);await p.locator('[data-language=fr]').click();assert.equal(await p.locator('html').getAttribute('lang'),'fr');await p.keyboard.press('Escape');
  await checkSoundMenuForeground(h,proof,errors);
  await checkMultiSoundMenus(h,proof,errors);
+ await checkPhoneDropdownDirection(h,proof,errors);
  proof.push({appearance:'dark default; all three theme choices reachable on portrait, landscape and desktop; mobile preferences update retained'});
  proof.push({dialogs:'copy, move, mobile rename and user labels retained'});assert.deepEqual(errors,[]);save('numbox-accessibility-results.json',{proof,errors});console.log('PASS accessible/lazy numeric controls, zoom, tap keyboard and fullscreen-compatible dialogs');
 }finally{await h.browser.close();h.server?.close()}})().catch(e=>{console.error(e);process.exitCode=1});
@@ -183,6 +184,7 @@ async function checkMultiSoundMenus(h,proof,errors) {
      assert(probe.bounds.top>=0&&probe.bounds.left>=0&&probe.bounds.bottom<=viewport.height&&probe.bounds.right<=viewport.width,context);
      assert.equal(Math.round(probe.bounds.width),Math.round(Math.min(viewport.width-16,Math.max(triggerWidths[index],140)))) ;
      assert(probe.bounds.height<=220.1,context);
+     if(viewport.width<=600||viewport.height<=600){const anchor=await trigger.boundingBox();assert(probe.bounds.bottom<=anchor.y+1,'Phone sound list opens above its trigger: '+context);}
      const output=require('node:path').join(process.env.TEST_OUTPUT_DIR||require('node:path').join(__dirname,'results'),['sound-menu-multi',viewport.width,viewport.height,theme,index+1].join('-')+'.png');
      await page.screenshot({path:output});
      await trigger.focus();await page.keyboard.press('ArrowDown');await page.keyboard.press('Escape');
@@ -210,4 +212,56 @@ async function checkMultiSoundMenus(h,proof,errors) {
  save('sound-menu-multi-results.json',{results,errors});
  proof.push({multiSoundMenus:'24 menus: same colors, borders, typography and icons as metronome; compact dimensions, foreground, final sound selection and keyboard'});
  console.log('PASS two multitrack sound menus across desktop, tablet, phone portrait/landscape and all themes');
+}
+
+
+async function checkPhoneDropdownDirection(h,proof,errors) {
+ const results=[];
+ for(const viewport of [{width:390,height:844},{width:844,height:390}]){
+  const page=await h.browser.newPage({viewport,hasTouch:true,reducedMotion:'reduce'});
+  page.on('pageerror',error=>errors.push(error.message));
+  try {
+   await page.goto(h.url);await page.waitForFunction(()=>document.documentElement.dataset.workspaceReady);
+   await page.locator('#workspaceNav [data-workspace=metronome]').click();
+   await page.waitForFunction(()=>!document.fullscreenEnabled||!!document.fullscreenElement);
+   for(const workspace of ['metronome','polyrhythm','training','sequence','multi','tracks']){
+    await page.evaluate(value=>RENAX_WORKSPACE.go(value),workspace);
+    if(workspace==='multi')await page.locator('#multiPresetLibrary').getByRole('button',{name:'Nouveau preset',exact:true}).click();
+    if(workspace==='tracks'){
+     await require('./audio-harness.cjs').openPlaylist(page);
+     await page.getByRole('button',{name:'Nouveau track',exact:true}).click();
+     await page.locator('[data-section-id] .song-block-header').first().click();
+    }
+    await openControls(page);
+    // Capture the currently rendered controls; later menus can contain virtual options.
+    const candidates=await page.locator('.numbox-custom:not(.console-arrival-replica *) > .numbox-button').all();
+    let checked=0;
+    for(const trigger of candidates){
+     if(!await trigger.isVisible()||!await trigger.isEnabled())continue;
+     await trigger.click();
+     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+     const placement=await trigger.evaluate(button=>{
+      const menu=button.parentElement.querySelector('.numbox-menu'),a=button.getBoundingClientRect(),b=menu.getBoundingClientRect();
+      return {label:button.getAttribute('aria-label'),anchor:a.toJSON(),menu:b.toJSON(),open:button.parentElement.classList.contains('open')};
+     });
+     assert(placement.open&&placement.menu.height>0,JSON.stringify({viewport,workspace,...placement}));
+     assert(placement.menu.bottom<=placement.anchor.top+1,JSON.stringify({viewport,workspace,...placement}));
+     assert(placement.menu.top>=0&&placement.menu.left>=0&&placement.menu.right<=viewport.width,JSON.stringify({viewport,workspace,...placement}));
+     await trigger.click();checked++;
+    }
+    if(workspace==='training'){
+     const curve=page.locator('.training-curve-select');
+     await curve.locator('summary').click();
+     const placement=await curve.evaluate(element=>({anchor:element.querySelector('summary').getBoundingClientRect().toJSON(),menu:element.querySelector('.training-curve-menu').getBoundingClientRect().toJSON()}));
+     assert(placement.menu.bottom<=placement.anchor.top+1,JSON.stringify({viewport,workspace,curve:placement}));
+     await curve.locator('summary').click();checked++;
+    }
+    assert(checked>0,JSON.stringify({viewport,workspace,checked}));
+    results.push({viewport,workspace,checked,opensUp:true});
+   }
+  }finally{await page.close();}
+ }
+ save('sound-menu-phone-direction-results.json',{results,errors});
+ proof.push({phoneDropdowns:'Upward selection lists in all six workspaces, including numeric training and curves, portrait and landscape'});
+ console.log('PASS upward dropdowns in all six phone workspaces and both orientations');
 }

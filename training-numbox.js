@@ -66,7 +66,8 @@
       const r = button.getBoundingClientRect();
       const below = window.innerHeight - r.bottom - 8;
       const above = r.top - 8;
-      const down = below >= Math.min(190, above);
+      const upward = matchMedia('(max-width:600px), (max-width:1100px) and (max-height:600px) and (pointer:coarse)').matches;
+      const down = !upward && below >= Math.min(190, above);
       const height = Math.max(40, Math.min(245, down ? below : above));
       const width = Math.min(window.innerWidth - 16, Math.max(90, r.width));
       const left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8));

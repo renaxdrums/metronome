@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "9f0f9b1b59e528a1",
+  "revision": "b6660d76ad09be5a",
   "resources": [
     {
       "path": "accessibility.css",
@@ -134,12 +134,12 @@
     },
     {
       "path": "compact-controls.js",
-      "sha256": "17aa5903d1c763c46cf3d12283efcccb19b604cef13f7194093538fff4e6e5e4",
+      "sha256": "0f75e8172c4f920b2ffd5ab746cc538a3c0f215d34e63c9430ce2ac45c1e058b",
       "text": true
     },
     {
       "path": "console-intro.js",
-      "sha256": "4328c1f2f3c7866e40cd2f04415815f83148caf62c4990004b0a6e76a50f3090",
+      "sha256": "e7fc189d5cb1633be836896a5c07566fdee6c17015e462cd414fa97ab1cbf037",
       "text": true
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "957d839366a3545cd767315733ac697c2f941aaed49f000b999df9e639e8be6f",
+      "sha256": "9b3a4938af3a758fe362e47123b2523b747f09fa2ccc110005a154f82c063663",
       "text": true
     },
     {
@@ -484,12 +484,12 @@
     },
     {
       "path": "training-modes.js",
-      "sha256": "5b004b076af38616dc5faea2d1ac8845c6f44e1e8c5545c15940240c1324b73b",
+      "sha256": "91fe5f5a56158e34a77885e556d9d3807b7810dc59787262aaeab4b795162e37",
       "text": true
     },
     {
       "path": "training-numbox.js",
-      "sha256": "2c35b75c25929201660b33a952f07f3ade176fd37f9da00f80ab22e18f2eeac4",
+      "sha256": "5464fb23be6c18ac2fa9e93d7a4133ebb8d7e1a94159dba4013bb255e96e038a",
       "text": true
     },
     {

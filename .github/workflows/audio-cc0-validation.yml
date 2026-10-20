@@ -40,6 +40,12 @@ jobs:
           STYLE_BUDGET_BASE=${{ github.event.pull_request.base.sha }} pnpm check:styles
           pnpm test:coverage:core
           node tests/midi-resource-test.cjs
+      - name: Library resilience and accessible controls
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/resilience-test.cjs
+          node tests/numbox-accessibility-test.cjs
+          node tests/pro-sound-context-test.cjs
       - name: Install MP3 inspection tools
         run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
       - name: Five confirmed robustness regressions
@@ -76,12 +82,6 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/mp3-output-level-test.cjs
-      - name: Library resilience and accessible controls
-        run: |
-          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
-          node tests/resilience-test.cjs
-          node tests/numbox-accessibility-test.cjs
-          node tests/pro-sound-context-test.cjs
       - name: Accessibility, emergency backup, offline mode and module boundaries
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"

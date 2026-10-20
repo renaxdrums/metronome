@@ -60,7 +60,12 @@
    // instead of letting a different grid appear during the final reveal.
    for(const [original,mirror] of [[source,copy],...[...source.children].map((node,i)=>[node,copy.children[i]])]){
     const rendered=getComputedStyle(original);
-    for(const property of rendered)mirror.style.setProperty(property,rendered.getPropertyValue(property),'important');
+    // Resolved currentColor must not become an inherited white text fill.
+    // Keep these defaults tied to each descendant's own live color.
+    for(const property of rendered){
+     if(property==='-webkit-text-fill-color'||property==='-webkit-text-stroke-color')continue;
+     mirror.style.setProperty(property,rendered.getPropertyValue(property),'important');
+    }
    }
    copy.style.setProperty('position','absolute','important');
    copy.style.setProperty('display',computed.display,'important');

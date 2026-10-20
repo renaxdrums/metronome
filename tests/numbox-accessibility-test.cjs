@@ -79,30 +79,23 @@ async function checkSoundMenuForeground(h,proof,errors) {
   for(const theme of ['dark','light','ivory']){
    const page=await h.browser.newPage({viewport,hasTouch:viewport.width<=1100,reducedMotion:'reduce'});
    page.on('pageerror',e=>errors.push(e.message));
-   page.on('console',message=>{if(message.text().startsWith('SOUND_MENU'))console.log(message.text());});
-   await page.addInitScript(()=>{
-    const remove=DOMTokenList.prototype.remove;
-    DOMTokenList.prototype.remove=function(...tokens){
-     if(tokens.includes('open')&&this===document.querySelector('.sound-bank-cards')?.classList&&this.contains('open'))console.log('SOUND_MENU closed '+new Error().stack);
-     return remove.apply(this,tokens);
-    };
-    window.addEventListener('resize',()=>console.log('SOUND_MENU viewport resize '+innerWidth+'x'+innerHeight));
-   });
    try {
     await page.goto(h.url);
     await page.waitForFunction(()=>document.documentElement.dataset.workspaceReady&&document.querySelector('.sound-bank-cards'));
+    // Consume the existing first-gesture fullscreen transition before opening a menu.
+    await page.locator('#workspaceNav [data-workspace=metronome]').click();
+    await page.waitForFunction(()=>!document.fullscreenEnabled||!!document.fullscreenElement);
+    await page.evaluate(()=>document.fonts.ready);
     await page.evaluate(value=>{document.documentElement.dataset.theme=value;},theme);
     for(const workspace of ['metronome','polyrhythm','training']){
      await page.evaluate(value=>RENAX_WORKSPACE.go(value),workspace);
      await openControls(page);
-     await page.evaluate(()=>document.fonts.ready);
      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
      console.log('SOUND_MENU scenario',JSON.stringify({viewport,theme,workspace}));
      const trigger=page.locator('.sound-bank-cards .numbox-button');
      await trigger.click();
      await page.waitForFunction(()=>document.querySelector('.sound-bank-cards.open .numbox-menu')?.style.top);
      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-     console.log('SOUND_MENU state',await trigger.getAttribute('aria-expanded'));
      const probe=await soundMenuProbe(page),context=JSON.stringify({viewport,theme,workspace,...probe});
      assert.deepEqual(probe.blocked,[],context);
      assert(probe.opaque,context);

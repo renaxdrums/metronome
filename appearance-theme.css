@@ -188,7 +188,6 @@ html#renaxApp[data-theme=light] body :is(.index2-settings-note,.song-note,.song-
  html#renaxApp[data-theme=light] body .multi-track-head{margin-bottom:8px!important}
  html#renaxApp[data-theme=light] body .multi-bank-row{margin:0 0 5px!important}
  html#renaxApp[data-theme=light] body .multi-track-body .numbox-button{min-height:32px!important;height:32px!important}
- html#renaxApp[data-theme=light] body #multiControls{gap:10px!important}
  html#renaxApp[data-theme=light] body .panel-visu>.visu-bottom{padding:12px 0 8px!important}
  html#renaxApp[data-theme=light] body .visu-toolbar :is(.measure-label,.control-group>label,.workspace-timer-label){font-size:11px!important;color:#52616d!important}
 }

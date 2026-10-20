@@ -58,7 +58,7 @@ Le script principal extrait conserve les mêmes fonctions audio. Les deux tests 
 
 La branche main exige une pull request, les contrôles sampled-audio et firebase réussis et une branche à jour. Suppression, envois forcés et contournement administrateur sont interdits. Le workflow couvre toutes les PR vers main ; les jobs de production et de compatibilité complètent les contrôles existants. La publication dépend de leur réussite à tous.
 
-Le lint contrôle les constructions dangereuses dans le code maintenu, les outils et les tests. Le contrôle des variables non définies et inutilisées n'est pas généralisé aux contrats historiques entre scripts classiques. Le formatage porte progressivement sur les nouveaux fichiers entretenus, sans réécriture générale des sources historiques.
+Le lint contrôle les constructions dangereuses dans le code maintenu, les outils et les tests. Les règles `no-undef` et `no-unused-vars` couvrent les scripts classiques ; leurs globales partagées sont contrôlées par `tools/classic-script-globals.json`. Le formatage porte progressivement sur les nouveaux fichiers entretenus, sans réécriture générale des sources historiques.
 
 ## Production distincte
 
@@ -87,7 +87,7 @@ Après modification des ressources : `pnpm build`, puis `pnpm check:assets`. Lan
 Essais physiques à exécuter sur Brave Android avec casque Bluetooth :
 1. Pour métronome, multipiste et morceau, laisser jouer au-delà du délai de veille puis arrêter : vérifier écran maintenu pendant la lecture et comportement normal après arrêt.
 2. Quitter l’onglet pendant la lecture, revenir, vérifier reprise de la protection écran sans lecture doublée. Tester aussi sans autorisation de verrou si le navigateur propose ce réglage.
-3. Dans Préférences, calibrer par au moins cinq frappes avec le clic, appliquer, fermer et recharger : vérifier valeur conservée et synchronisation visuelle au casque. Comparer aussi la sortie sans Bluetooth.
+3. Dans Préférences, activer « Casque Bluetooth » (+200 ms), fermer et recharger : vérifier que le choix est conservé et que le visuel reste synchronisé au casque. Désactiver l’option pour comparer la sortie sans Bluetooth. La calibration par frappes a été retirée.
 4. Activer « Casque Bluetooth » : +200 ms de correction supplémentaire. Désactiver : +0 ms. Recharger pour vérifier la persistance. Ouvrir et fermer les Préférences par la roue dentée, au clavier et au toucher.
 
 La précision dépend de la latence annoncée par le navigateur, de l’affichage ; les tests simulés ne remplacent pas ces essais physiques. Les workflows de validation acceptent les bases `audit/phase-*` afin de vérifier les PR par phase sans fusionner la phase précédente ni déclencher de déploiement.
@@ -131,3 +131,9 @@ Modifier les racines CDN uniquement dans `network-origins.js`, puis lancer build
 `pnpm type-check` vérifie exactement sept fichiers JavaScript en mode strict, sans émission : sync-core.js, song-tempo-ramp.js, local-backup.js, emergency-backup.js, midi-export.js, ui-feedback.js et numbox-controls.js. `types/globals.d.ts` décrit leurs frontières `window.RENAX_*` et l’import historique versionné ; les autres API restent `unknown` jusqu’à leur couverture. `vendor/web-vitals-6.2.3.d.ts` décrit uniquement l’API consommée, sans analyser ni modifier la distribution tierce. Les déclarations ne sont pas publiées dans dist/site. La validation des JSON importés reste obligatoire.
 
 `tests/tooling-contracts-test.cjs` doit rejeter un nom inconnu, une variable inutilisée, un bloc vide et un objet de bibliothèque invalide transmis au stockage ; il accepte un catch vide et une globale exposée volontairement. Le registre CI inclut ce test. Après une modification : lint, format, types, build/empreintes, budget CSS/JS, inventaire, tests concernés, PCM et 54 captures strictes, build et tests de production.
+
+## Migration des grandes feuilles de thème
+
+Les six grandes feuilles sont migrées par lots sur une branche dédiée. La référence du lot 1 est main `361d5fd7450216831203e4651f14db75e3e91db9`. Consulter `CSS-MIGRATION.md` et l’inventaire `tools/theme-cascade-lot1.json`. Le budget ne peut que baisser. Les captures doivent rester à 0/255, avec styles calculés strictement identiques ; un écart bloque le lot. `@layer` est reporté après la migration. Le PCM reste comparé aux deux fréquences par le test d’invariance.
+
+Sur chaque PR, le job `sampled-audio` conserve sa comparaison PCM à la référence audio historique et ajoute la comparaison visuelle contre le SHA de base de la PR (`INVARIANCE_REF`, `VISUAL_ONLY=1`). Le seuil reste 0/255, sans tolérance par nombre de pixels. Les résultats du test détaillent aussi les styles calculés. Cette base n’est jamais régénérée à partir du résultat modifié.

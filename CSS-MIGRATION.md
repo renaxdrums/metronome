@@ -67,3 +67,49 @@ La première sonde reproduit les 16 cas historiques et deux cas supplémentaires
 Dernier passage livré après précision du critère utilisateur : 54/54 captures respectent un maximum absolu de 2/255 sur chaque canal de chaque pixel, sans quota de pixels différent. 50/54 sont strictement identiques ; les quatre autres restent à 1 ou 2/255. La référence contre elle-même présente sept captures non identiques sur 54, avec le même maximum de 2/255 : le bruit n’a donc pas disparu. Le seuil historique 2/255 est conservé, conformément au choix explicite de l’utilisateur.
 
 Les styles calculés des éléments principaux rendus sont strictement identiques sur les 54 combinaisons : 7 551 éléments, zéro différence. Animations et transitions désactivées, canevas animés neutralisés par le masque commun, facteur d’échelle fixé à 1. Les champs natifs transparents et masqués sont exclus ; les déclencheurs visibles sont inclus. PCM : 25 banques strictement identiques aux deux fréquences. Voir `PHASE5-VALIDATION.md` pour la CI et les limites.
+
+## Migration des grandes feuilles — lot 1 (20 octobre 2026)
+
+Référence de ce lot : `361d5fd7450216831203e4651f14db75e3e91db9` (main après PR 14). Le gel des grandes feuilles concernait la phase 5 précédente ; leur migration est maintenant autorisée, par lots. Aucun `@layer` n’est introduit.
+
+Ce premier lot retire uniquement des déclarations importantes antérieures, déjà remplacées par une déclaration importante du **même sélecteur, de la même propriété et dans les mêmes conditions**, plus loin dans le même fichier. Les valeurs gagnantes, les sélecteurs, leur spécificité et l’ordre de chargement sont conservés. Les valeurs gagnantes sont des couleurs, dimensions et propriétés déjà utilisées dans la version de référence ; aucun nouveau mécanisme CSS n’est requis.
+
+| Feuille | Avant | Retirés | Après |
+| --- | ---: | ---: | ---: |
+| renax-pulse-ivory.css | 580 | 5 | 575 |
+| appearance-theme.css | 356 | 1 | 355 |
+| ivory-theme.css | 303 | 16 | 287 |
+| console-theme.css | 265 | 1 | 264 |
+| workspace-layout.css | 127 | 0 | 127 |
+| mobile-landscape.css | 60 | 0 | 60 |
+| **Six feuilles** | **1 691** | **23** | **1 668** |
+
+Total du projet : 1 849 → 1 826 ; les 110 affectations directes de styles JS ne changent pas. `tools/theme-cascade-lot1.json` conserve les positions et valeurs de référence pour revue. Les numéros de ligne ci-dessous concernent la référence, avant retrait.
+
+| Fichier | Ligne retirée | Sélecteur | Propriété | Valeur retirée | Règle gagnante (ligne de référence) |
+| --- | ---: | --- | --- | --- | --- |
+| renax-pulse-ivory.css | 201 | `html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel` | margin | `0 0 2px` | 509 : `0` |
+| renax-pulse-ivory.css | 200 | `html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel` | flex | `0 0 44px` | 509 : `0 0 44px` |
+| renax-pulse-ivory.css | 200 | `html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel` | max-height | `44px` | 508 : `44px` |
+| renax-pulse-ivory.css | 200 | `html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel` | height | `44px` | 508 : `44px` |
+| renax-pulse-ivory.css | 199 | `html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel` | min-height | `44px` | 508 : `44px` |
+| appearance-theme.css | 191 | `html#renaxApp[data-theme=light] body #multiControls` | gap | `10px` | 208 : `10px` |
+| ivory-theme.css | 263 | `html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)` | color | `#13363b` | 274 : `#13363b` |
+| ivory-theme.css | 263 | `html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)` | border-color | `#d9ef62` | 274 : `#70d5df` |
+| ivory-theme.css | 263 | `html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)` | background | `#d9ef62` | 274 : `#70d5df` |
+| ivory-theme.css | 256 | `html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg` | stroke | `#596a16` | 268 : `var(--ivory-lime)` |
+| ivory-theme.css | 246 | `html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)` | color | `#13363b` | 274 : `#13363b` |
+| ivory-theme.css | 246 | `html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)` | border-color | `var(--ivory-lime)` | 274 : `#70d5df` |
+| ivory-theme.css | 246 | `html#renaxApp[data-theme=ivory] :is(#playBtn.btn-cyan,#trainBtn.active,#trainingVisualBtn.active)` | background | `var(--ivory-lime)` | 274 : `#70d5df` |
+| ivory-theme.css | 203 | `html#renaxApp[data-theme=ivory] #workspaceNav button` | padding | `12px` | 249 : `12px 8px` |
+| ivory-theme.css | 198 | `html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]` | box-shadow | `inset 0 -3px #d9ef62` | 244 : `inset 0 -3px var(--ivory-lime)` |
+| ivory-theme.css | 198 | `html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]` | border-color | `#bfd77a` | 244 : `#b8d477` |
+| ivory-theme.css | 130 | `html#renaxApp[data-theme=ivory] #workspaceNav button` | padding | `12px 14px 12px 22px` | 249 : `12px 8px` |
+| ivory-theme.css | 76 | `html#renaxApp[data-theme=ivory] :is(#playBtn:hover,#trainBtn:hover,#trainingVisualBtn:hover)` | background | `#8ae1e7` | 262 : `#e5f587` |
+| ivory-theme.css | 65 | `html#renaxApp[data-theme=ivory] .poly-ring.outer` | border-color | `#d9ef6280` | 218 : `#e6d8b780` |
+| ivory-theme.css | 61 | `html#renaxApp[data-theme=ivory] .step[data-state="3"]` | background | `#d6d9a5` | 188 : `#e6d8b7` |
+| ivory-theme.css | 24 | `html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true] svg` | stroke | `var(--ivory-green)` | 265 : `var(--ivory-lime)` |
+| ivory-theme.css | 21 | `html#renaxApp[data-theme=ivory] #workspaceNav button svg` | stroke | `var(--ivory-green)` | 264 : `var(--ivory-lime)` |
+| console-theme.css | 35 | `.measure-card,.song-section,.song-card,.playlist-choice,.song-block` | border-color | `#30343c` | 159 : `#48525e` |
+
+Validation locale du lot : 54/54 captures à 0/255 contre main, aucun écart de styles calculés ; PCM identique pour les 25 banques à 44,1 et 48 kHz. Une nouvelle passe visuelle après suppression des règles devenues vides confirme 54/54 captures à 0/255. Le test d’extraction confirme ses 36 dispositions et le contrôle négatif du cliquet échoue bien sur une augmentation. Lint, types, formatage, inventaire des 97 tests et budget passent. La CI reste une validation distincte ; une réussite locale ne préjuge pas de son résultat.

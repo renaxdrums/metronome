@@ -74,6 +74,62 @@ const { start, save, openControls } = require('./audio-harness.cjs');
         await p.close();
       }
     }
+    // Controls are reparented into training parameters on touch screens.
+    // Their theme must travel with them, in both disclosure states.
+    for (const theme of ['dark', 'light', 'ivory']) {
+      for (const viewport of [
+        { width: 390, height: 844 },
+        { width: 844, height: 390 },
+      ]) {
+        const p = await h.browser.newPage({ viewport, hasTouch: true, reducedMotion: 'reduce' });
+        await p.goto(h.url);
+        await p.waitForFunction(() => document.documentElement.dataset.workspaceReady);
+        await p.evaluate((value) => {
+          document.documentElement.dataset.theme = value;
+        }, theme);
+        await openControls(p);
+        const surface = () =>
+          p.locator('#workspaceControls').evaluate((element) => {
+            const style = getComputedStyle(element);
+            return {
+              background: style.backgroundColor,
+              border: style.borderTopColor,
+              color: style.color,
+            };
+          });
+        const expected = await surface();
+        await p.getByRole('tab', { name: 'Entraînement', exact: true }).click();
+        await p.locator('#workspaceMobileViews [data-pane=training]').click();
+        assert.equal(
+          await p
+            .locator('#workspaceControls')
+            .evaluate((e) => e.parentElement.classList.contains('panel-training')),
+          true,
+        );
+        for (const open of [false, true]) {
+          await p.locator('#workspaceControls').evaluate((e, value) => {
+            e.open = value;
+          }, open);
+          const actual = await surface();
+          assert.deepEqual(
+            actual,
+            expected,
+            `Training controls theme lost: ${theme}, ${viewport.width}, open=${open}`,
+          );
+          const dir = process.env.TEST_OUTPUT_DIR || path.join(__dirname, 'results');
+          fs.mkdirSync(dir, { recursive: true });
+          await p
+            .locator('#workspaceControls')
+            .screenshot({
+              path: path.join(dir, `training-controls-${theme}-${viewport.width}-${open}.png`),
+            });
+        }
+        await p.close();
+      }
+    }
+    console.log(
+      'PASS 12 training disclosure/theme/orientation states retain their original themed surface',
+    );
     console.log(
       '12 rotations pendant la lecture : cadran entier, réglages accessibles, retour portrait OK',
     );

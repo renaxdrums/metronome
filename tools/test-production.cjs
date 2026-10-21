@@ -20,6 +20,7 @@ const available = [
   'tests/language-fallback-test.cjs',
   'tests/settings-resize-test.cjs',
   'tests/startup-layout-test.cjs',
+  'tests/intro-lifecycle-test.cjs',
   'tools/check-production-csp.cjs',
   'tools/check-production-equivalence.cjs',
   'tools/check-production-offline.cjs',

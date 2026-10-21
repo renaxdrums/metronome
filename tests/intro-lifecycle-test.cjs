@@ -8,6 +8,14 @@ const { start, save } = require('./audio-harness.cjs');
       const page = await h.browser.newPage({ viewport: { width, height }, hasTouch: width < 1100 });
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
+      await page.addInitScript(() => {
+        window.qaIntroText = {};
+        const draw = CanvasRenderingContext2D.prototype.fillText;
+        CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
+          if (this.canvas.classList.contains('kern-intro-scene')) window.qaIntroText[text] = this.fillStyle;
+          return draw.call(this, text, ...args);
+        };
+      });
       await page.goto(h.url);
       await page.waitForFunction(() => document.getElementById('renaxArrival').dataset.introReady === 'true');
       assert.equal(await page.locator('#renaxArrival').getAttribute('data-intro-variant'), 'kern');
@@ -30,6 +38,10 @@ const { start, save } = require('./audio-harness.cjs');
       assert.equal(black.overlay, 1);
       assert.equal(black.scene, 0);
       assert.equal(black.background, 'rgb(0, 0, 0)');
+      const typography = await page.evaluate(() => window.qaIntroText);
+      assert.equal(typography['R E N A X  D R U M S'], '#ffffff');
+      assert.equal(typography['MÉTRO'], '#ffffff');
+      assert.equal(typography.NOME, '#ff7900');
       await page.waitForFunction(() => {
         const node = document.getElementById('renaxArrival');
         const opacity = Number(getComputedStyle(node).opacity);

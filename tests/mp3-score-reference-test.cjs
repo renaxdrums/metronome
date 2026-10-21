@@ -1,6 +1,9 @@
 // Compare export PCM to events produced by the untouched live scheduler.
 const {start,save}=require('./audio-harness.cjs');const assert=require('assert');
 (async()=>{const r=await start(),p=await r.browser.newPage();try{
+ // Compare identical decoding rates: the export renderer uses 48 kHz, while
+ // the host audio device may default to 44.1 kHz and resample sampled banks.
+ await p.addInitScript(()=>{const Context=window.AudioContext;window.AudioContext=class extends Context{constructor(options){super({...options,sampleRate:48000});}};});
  await p.goto(r.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_MP3_EXPORT);
  const results=await p.evaluate(async()=>{
   const song={id:'reference',name:'Grid reference',sections:[]};

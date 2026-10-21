@@ -87,3 +87,38 @@ body .song-playlist-summary {color:#c6c6d0;}
 #songPane .song-section[data-section-id] .song-block-header-actions{position:absolute!important;right:12px!important;top:12px!important;margin:0!important;float:none!important;gap:6px!important}
 #songPane .song-section[data-section-id].collapsed .song-block-summary{display:none}
 #songPane .song-section[data-section-id] .song-block-summary{margin-top:8px}
+
+/* Tracks: explicit, temporary playlist chaining. Match each approved theme. */
+#songPane .playlist-heading{position:relative;}
+#songPane .playlist-heading > .song-chain-toggle{
+  grid-column:3;justify-self:end;align-self:center;
+  display:grid;place-items:center;width:36px;min-width:36px;height:36px;
+  padding:0;border:1px solid var(--border);border-radius:6px;
+  background:var(--grey);color:var(--text-muted);cursor:pointer;
+}
+#songPane .playlist-heading > .song-chain-toggle svg{width:19px;height:19px;pointer-events:none;}
+#songPane .playlist-heading > .song-chain-toggle:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+#songPane .playlist-heading > .song-chain-toggle[aria-pressed="true"]{
+  border-color:var(--orange);color:var(--orange);background:rgba(255,107,0,.08);
+  box-shadow:inset 0 -2px var(--orange);
+}
+html[data-theme="light"] #songPane .playlist-heading > .song-chain-toggle{
+  background:#d5dee7;border-color:#b8c5d1;color:#526170;
+}
+html[data-theme="light"] #songPane .playlist-heading > .song-chain-toggle[aria-pressed="true"]{
+  background:#deedf1;border-color:#087c90;color:#087c90;box-shadow:inset 0 -2px #087c90;
+}
+html[data-theme="ivory"] #songPane .playlist-heading > .song-chain-toggle{
+  background:#f0f2e7;border-color:#d0d8c8;color:#345f51;
+}
+html[data-theme="ivory"] #songPane .playlist-heading > .song-chain-toggle[aria-pressed="true"]{
+  background:#e6efd1;border-color:#98b48d;color:#173e37;box-shadow:inset 0 -2px #d7ed56;
+}
+#songPane .playlist-heading > .song-chain-hint{
+  position:absolute;right:0;top:calc(100% + 4px);z-index:15;
+  max-width:min(240px,80vw);padding:7px 10px;box-sizing:border-box;
+  border:1px solid var(--border);border-radius:6px;
+  background:var(--panel);color:var(--text);box-shadow:0 5px 14px rgba(0,0,0,.16);
+  font:600 11px/1.3 var(--font);pointer-events:none;
+}
+#songPane .playlist-heading > .song-chain-hint[hidden]{display:none;}

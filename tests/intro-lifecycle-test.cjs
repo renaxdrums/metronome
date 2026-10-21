@@ -29,12 +29,18 @@ const { start, save } = require('./audio-harness.cjs');
       await page.waitForFunction(() => isPlaying);
       await page.evaluate(() => { window.qaIntroAudio = audioCtx; });
       await page.setViewportSize({ width: height, height: width });
-      await page.waitForFunction(() => document.getElementById('renaxArrival').dataset.introPhase === 'black', null, { polling: 20, timeout: 15000 });
-      const black = await page.locator('#renaxArrival').evaluate(node => ({
-        overlay: Number(getComputedStyle(node).opacity),
-        scene: Number(getComputedStyle(node.querySelector('.kern-intro-presentation')).opacity),
-        background: getComputedStyle(node).backgroundColor,
-      }));
+      // Capture the black hold in one frame, before the fade-in can begin.
+      const blackFrame = await page.waitForFunction(() => {
+        const node = document.getElementById('renaxArrival');
+        const state = {
+          overlay: Number(getComputedStyle(node).opacity),
+          scene: Number(getComputedStyle(node.querySelector('.kern-intro-presentation')).opacity),
+          background: getComputedStyle(node).backgroundColor,
+        };
+        return node.dataset.introPhase === 'black' && state.overlay === 1 && state.scene === 0 && state;
+      }, null, { polling: 20, timeout: 15000 });
+      const black = await blackFrame.jsonValue();
+      await blackFrame.dispose();
       assert.equal(black.overlay, 1);
       assert.equal(black.scene, 0);
       assert.equal(black.background, 'rgb(0, 0, 0)');

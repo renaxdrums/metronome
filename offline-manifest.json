@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "1dd86eda74898b26",
+  "revision": "8f6ed50e5c7a9f31",
   "resources": [
     {
       "path": "accessibility.css",
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "da07d2a760a3237b273f0dc832063ddd64a8bdd9a63cf502bd5a350dd62d0748",
+      "sha256": "bfc273e1e3cde223b4e8090ff7bcd115c9abcba2e4982b5ecc7958263a57d2d0",
       "text": true
     },
     {
@@ -299,7 +299,7 @@
     },
     {
       "path": "kern-intro-scene.js",
-      "sha256": "15b7b6c1e55d181bf9388730422807a08f22778bfc5732cc327208082b9fb498",
+      "sha256": "741a360ed0d4f556d282d31c0149f9811c364fc544a06ae47caeeaa98554ef47",
       "text": true
     },
     {

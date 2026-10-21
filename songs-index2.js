@@ -199,8 +199,8 @@
     endTimer=setTimeout(async()=>{
       if(!isPlaying||loaded?.song.id!==finishedId)return;
       stopMetronome();
-      if(next&&owner.songs.includes(next)&&chainedPlaylists.has(owner.id)&&!songsRoot.hidden&&songView==='playlist'&&library.activeProfile===owner.id){
-        unload();selectedSong=next.id;lastTrackSelection={playlistId:owner.id,songId:next.id};openSectionId=null;
+      if(next&&owner.songs.includes(next)&&chainedPlaylists.has(owner.id)&&!songsRoot.hidden&&library.activeProfile===owner.id){
+        unload();selectedSong=next.id;lastTrackSelection={playlistId:owner.id,songId:next.id};openSectionId=null;songView='playlist';
         render();
         try{await startMetronome();}catch(error){status('Lecture impossible : '+error.message);}
       }else status(preview?'Bloc terminé.':'Morceau terminé.');

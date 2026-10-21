@@ -46,10 +46,11 @@
   document.addEventListener('click',event=>{
     const back=event.target.closest('.song-back,#index2SettingsClose,#index2SettingsBackdrop');
     const entry=history.state?.[key];
-    const parentView={detail:'playlist',playlist:'playlists',playlists:'home',profile:'home'}[current.songs.view];
+    const visible=capture();
+    const parentView={detail:'playlist',playlist:'playlists',playlists:'home',profile:'home'}[visible.songs.view];
     const songBack=back?.matches('.song-back');
     const parentMatches=entry?.parent?.songs?.pane==='songs'&&entry.parent.songs.view===parentView&&
-      entry.parent.tab===current.tab&&entry.parent.songs.profile===current.songs.profile;
+      entry.parent.tab===visible.tab&&entry.parent.songs.profile===visible.songs.profile;
     // Interface Retour has a fixed destination, even after a reload or an old history entry.
     // Use browser Back only when its preceding entry is that destination.
     if(songBack&&!parentMatches)semanticBack=true;

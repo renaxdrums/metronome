@@ -289,6 +289,8 @@ async function checkMetricMenuForeground(h,proof,errors) {
   await before.goto(h.url);await before.waitForFunction(()=>document.documentElement.dataset.workspaceReady);
   await before.locator('#workspaceNav [data-workspace=metronome]').click();
   await before.waitForFunction(()=>!document.fullscreenEnabled||!!document.fullscreenElement);
+  await before.evaluate(()=>document.fonts.ready);
+  await before.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   const initial=await metricOpeningProbe(before,'activeNumerator');
   assert(initial.menu.top>=initial.anchor.bottom,'The old metric menu must initially open below its trigger');
   const selector='.numbox-custom.open:has(>#activeNumerator) .numbox-menu';
@@ -308,6 +310,7 @@ async function checkMetricMenuForeground(h,proof,errors) {
     await page.locator('#workspaceNav [data-workspace=metronome]').click();
     await page.waitForFunction(()=>!document.fullscreenEnabled||!!document.fullscreenElement);
     await page.evaluate(()=>document.fonts.ready);
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     for(const settingsOpen of viewport.width<=1100?[false,true]:[true]){
      await page.evaluate(open=>{document.getElementById('workspaceControls').open=open;},settingsOpen);
      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));

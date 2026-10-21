@@ -129,7 +129,7 @@
  .visu-toolbar .numbox-button{height:38px!important;min-height:38px!important;font-size:11px;padding:5px 9px;border-radius:6px}
  .visu-toolbar .workspace-tempo-group{display:grid;grid-template-columns:auto minmax(54px,1fr) 98px;grid-template-rows:13px 38px;column-gap:8px!important;row-gap:7px!important;align-items:center;flex:none}
  .visu-toolbar .workspace-tempo-group>label{grid-column:1/-1;grid-row:1}
- .visu-toolbar .tempo-display{grid-row:2;grid-column:1;display:flex;align-items:baseline;gap:4px;font-size:24px;line-height:38px;white-space:nowrap}
+ .visu-toolbar .tempo-display{grid-row:2;grid-column:1;display:grid;grid-template-columns:3ch auto;align-items:baseline;gap:4px;font-size:24px;line-height:38px;white-space:nowrap}
  .visu-toolbar .tempo-display span{font-size:8px;color:var(--text-muted)}
  .visu-toolbar .tempo-slider-row{grid-column:2;grid-row:2;width:100%;min-width:0;max-width:none;gap:4px}
  .visu-toolbar .tempo-step-button{width:24px!important;min-width:24px!important;flex:0 0 24px;height:32px!important;min-height:32px!important;padding:3px!important;border-radius:5px}

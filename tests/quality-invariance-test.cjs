@@ -237,6 +237,16 @@ async function baselineRoute(page, url) {
               await p.locator('[data-appearance=' + theme + ']').click();
               await p.locator('#index2SettingsClose').click();
               await p.getByRole('tab', { name: module, exact: true }).click();
+              if (!i && module === 'Track') {
+                // Approved Track-only transport fix: the main Play button is now
+                // the song control even before a track has been opened.
+                // Normalize exactly this button on the reference page;
+                // keep strict pixel and computed-style checks everywhere else.
+                await p.evaluate(() => {
+                  playBtn.dataset.songTransport = 'true';
+                  playBtn.textContent = 'Lire le morceau';
+                });
+              }
               if (i) await applyProbe(p);
               await p.mouse.move(0, 0);
               await p.evaluate(() => {

@@ -85,6 +85,7 @@
     "tests/subdivision-mix-test.cjs",
     "tests/subdivision-test.cjs",
     "tests/subdivision-visual-test.cjs",
+    "tests/tempo-fader-test.cjs",
     "tests/timing-test.cjs",
     "tests/tooling-contracts-test.cjs",
     "tests/tooling-guards-test.cjs",

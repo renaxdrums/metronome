@@ -16,6 +16,13 @@ const ivoryControlsBefore =
 const ivoryControlsAfter =
   'html#renaxApp[data-theme=ivory] :is(.panel-visu,.panel-training) :is(.visu-toolbar,#workspaceControls){';
 const correctedReferenceFiles = new Set();
+// Approved tempo stability fix: reserve three digits so the native range never
+// moves under the pointer at 99/100 BPM. Normalize only this exact reference
+// declaration; tempo-fader-test independently exercises the original failure.
+const tempoDisplayBefore =
+  '.visu-toolbar .tempo-display{grid-row:2;grid-column:1;display:flex;align-items:baseline;';
+const tempoDisplayAfter =
+  '.visu-toolbar .tempo-display{grid-row:2;grid-column:1;display:grid;grid-template-columns:3ch auto;align-items:baseline;';
 const cascadeProbe = process.env.CASCADE_PROBE || '';
 assert(['', 'remove-important', 'layers-only', 'layers-without-important'].includes(cascadeProbe));
 const probeLayers = {
@@ -81,6 +88,12 @@ async function baselineRoute(page, url) {
     }
     let body = cache.get(file);
     if (!body) return route.fulfill({ status: 404, body: 'Not found' });
+    if (file === 'workspace-layout.css' && body.toString().includes(tempoDisplayBefore)) {
+      const original = body.toString();
+      assert.equal(original.split(tempoDisplayBefore).length, 2);
+      body = Buffer.from(original.replace(tempoDisplayBefore, tempoDisplayAfter));
+      correctedReferenceFiles.add(file);
+    }
     if (file === 'renax-pulse-ivory.css' && body.toString().includes(ivoryControlsBefore)) {
       const original = body.toString();
       assert.equal(original.split(ivoryControlsBefore).length, 2);
@@ -394,10 +407,12 @@ async function baselineRoute(page, url) {
       referenceAgainstItself,
       approvedReferenceCorrection: {
         issue:
-          'Ivory musical controls retain their themed surface after moving into training parameters',
+          'Ivory training controls retain their themed surface; tempo digits reserve a stable native fader origin',
         files: [...correctedReferenceFiles],
         before: ivoryControlsBefore,
         after: ivoryControlsAfter,
+        tempoBefore: tempoDisplayBefore,
+        tempoAfter: tempoDisplayAfter,
       },
       cascadeProbe,
       pixelThreshold,

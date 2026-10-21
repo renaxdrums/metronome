@@ -61,7 +61,7 @@
 <link rel="stylesheet" href="entry-09.css?v=a66a57940143"><link id="circular-view-legend" rel="stylesheet" href="entry-circular-view-legend.css?v=b7784e722d76"><link rel="stylesheet" href="entry-11.css?v=a9bea4c245c7">
 <link rel="stylesheet" href="entry-12.css?v=5956b2c2f6c4">
 <link rel="stylesheet" href="multi-metronome.css?v=1f1df82d778f">
-  <link rel="stylesheet" href="workspace-layout.css?v=e26cf6b2d1ab">
+  <link rel="stylesheet" href="workspace-layout.css?v=00451cfffa88">
 <link rel="stylesheet" href="pro-interface.css?v=58585adca440">
 <link rel="stylesheet" href="console-theme.css?v=60331a02e90f">
 <link rel="stylesheet" href="entry-13.css?v=20b69b1b6a58"><link id="appearance-theme" rel="stylesheet" href="appearance-theme.css?v=412b5e252b90">
@@ -474,11 +474,16 @@ decrease.addEventListener('click',()=>adjust(-1));increase.addEventListener('cli
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});new MutationObserver(sync).observe(trainBtn,{attributes:true,attributeFilter:['aria-pressed','class']});sync();
 })();</script><script>(()=>{
 const fader=document.getElementById('tempoFader');
+let activePointer=null;
 function positionToTempo(position){const p=Math.max(0,Math.min(10000,Number(position)));return Math.round(p<=2000?2+p/2000*38:p<=8000?40+(p-2000)/6000*200:240+(p-8000)/2000*759);}
 function tempoToPosition(bpm){const t=Math.max(2,Math.min(999,Number(bpm)));return Math.round(t<=40?(t-2)/38*2000:t<=240?2000+(t-40)/200*6000:8000+(t-240)/759*2000);}
-function sync(){const bpm=Number(bpmSlider.value);fader.value=String(tempoToPosition(bpm));fader.disabled=training.engaged||bpmSlider.disabled;fader.setAttribute('aria-valuetext',bpm+' BPM');fader.title=bpm+' BPM';}
+function sync(){const bpm=Number(bpmSlider.value),locked=training.engaged||bpmSlider.disabled;if(locked)activePointer=null;if(activePointer===null)fader.value=String(tempoToPosition(bpm));fader.disabled=locked;fader.setAttribute('aria-valuetext',bpm+' BPM');fader.title=bpm+' BPM';}
 function setTempo(bpm){if(training.engaged||bpmSlider.disabled){sync();return;}const next=Math.max(2,Math.min(999,Math.round(bpm)));if(next!==Number(bpmSlider.value)){bpmSlider.value=String(next);bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));}sync();}
 fader.addEventListener('input',()=>setTempo(positionToTempo(fader.value)));
+// Keep the native thumb under the pointer; round BPM without moving the drag origin.
+fader.addEventListener('pointerdown',event=>{if(event.isPrimary&&event.button===0&&!fader.disabled)activePointer=event.pointerId;});
+function finishDrag(event){if(activePointer!==null&&(!event||event.pointerId===activePointer)){activePointer=null;sync();}}
+window.addEventListener('pointerup',finishDrag);window.addEventListener('pointercancel',finishDrag);window.addEventListener('blur',()=>finishDrag());
 fader.addEventListener('keydown',event=>{const delta={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1,PageDown:-10,PageUp:10}[event.key];if(delta!==undefined||event.key==='Home'||event.key==='End'){event.preventDefault();setTempo(event.key==='Home'?2:event.key==='End'?999:Number(bpmSlider.value)+delta);}});
 bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',sync);
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();

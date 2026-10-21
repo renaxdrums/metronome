@@ -1,0 +1,2 @@
+GSAP 3.15.0 — https://gsap.com — Standard license: https://gsap.com/standard-license/
+Original distribution header preserved in gsap-3.15.0.min.js.

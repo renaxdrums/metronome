@@ -30,6 +30,7 @@
     "interface-language.js",
     "workspace-layout.js",
     "header-wave.js",
+    "kern-intro-scene.js",
     "console-intro.js"
   ],
   "bindings": {
@@ -272,7 +273,8 @@
       "voicePreparationHeading",
       "voicePreparationButton",
       "voicePreparationStatus"
-    ]
+    ],
+    "kern-intro-scene.js": []
   },
   "globals": {
     "mobileTabs": "readonly",

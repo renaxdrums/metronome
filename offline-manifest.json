@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "290ccd77ba0f7d44",
+  "revision": "1dd86eda74898b26",
   "resources": [
     {
       "path": "accessibility.css",
@@ -139,7 +139,7 @@
     },
     {
       "path": "console-intro.js",
-      "sha256": "e7fc189d5cb1633be836896a5c07566fdee6c17015e462cd414fa97ab1cbf037",
+      "sha256": "6ef28e33380e1f19821388ccf70c27f6cabaac05eec460c43a44f3add9540961",
       "text": true
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "180149287374329ceb45c900079842f6b9b69e090050fc32b7d2cbbd717a4e46",
+      "sha256": "da07d2a760a3237b273f0dc832063ddd64a8bdd9a63cf502bd5a350dd62d0748",
       "text": true
     },
     {
@@ -295,6 +295,16 @@
     {
       "path": "ivory-theme.css",
       "sha256": "456166e9a80a29cd936b19554b4757563604f0262b7c37d6cae7e5e81d7d59b2",
+      "text": true
+    },
+    {
+      "path": "kern-intro-scene.js",
+      "sha256": "15b7b6c1e55d181bf9388730422807a08f22778bfc5732cc327208082b9fb498",
+      "text": true
+    },
+    {
+      "path": "kern-intro.css",
+      "sha256": "5e2e8530cd7c1720350e6a137747e91405edf47be80794b403b9074b8fc1534a",
       "text": true
     },
     {
@@ -495,6 +505,11 @@
     {
       "path": "ui-feedback.js",
       "sha256": "eae7d41e1fb6251997e0f67cc7f3a3b81ea78d5c3bf32c97112da6b2c899573b",
+      "text": true
+    },
+    {
+      "path": "vendor/gsap-3.15.0.min.js",
+      "sha256": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
       "text": true
     },
     {

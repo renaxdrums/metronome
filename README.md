@@ -81,3 +81,5 @@ La version publiée n’inclut plus l’ancienne interface ni son script dédié
 Les 54 captures d’invariance utilisent le rendu complet de Chromium, avec une tolérance **zéro** sur chaque canal de chaque pixel et sur les styles calculés. La comparaison PCM demeure bit à bit à 44,1 et 48 kHz. Les quatre grandes feuilles de thème restent inchangées.
 
 La migration ultérieure des six grandes feuilles est suivie par lots dans `CSS-MIGRATION.md` : captures exactes à 0/255, styles calculés et comparaison PCM aux deux fréquences. Aucun `@layer` ne sera introduit avant cette migration.
+
+L’accueil utilise la présentation KERN : logo approuvé, ondes, titre MÉTRO blanc / NOME orange et RENAX DRUMS blanc, puis fondu au noir et apparition progressive de l’interface. L’animation se désactive dans les Préférences, avec Échap ou via le réglage système de mouvement réduit. Elle ne démarre aucun son et ne modifie pas la lecture.

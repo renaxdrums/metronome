@@ -39,7 +39,8 @@
     "song-entry.css": 0,
     "songs.css": 6,
     "training-modes.css": 14,
-    "workspace-layout.css": 127
+    "workspace-layout.css": 127,
+    "kern-intro.css": 0
   },
   "javascript": {
     "amorce-plan.mjs": 0,
@@ -47,7 +48,7 @@
     "audio-landscape.js": 2,
     "cloud-backup.js": 14,
     "compact-controls.js": 8,
-    "console-intro.js": 5,
+    "console-intro.js": 2,
     "edit-history.js": 0,
     "emergency-backup.js": 0,
     "eslint.config.mjs": 0,
@@ -104,6 +105,7 @@
     "training-modes.js": 0,
     "training-numbox.js": 7,
     "ui-feedback.js": 0,
-    "workspace-layout.js": 0
+    "workspace-layout.js": 0,
+    "kern-intro-scene.js": 0
   }
 }

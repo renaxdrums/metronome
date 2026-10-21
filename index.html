@@ -74,6 +74,7 @@
 <link rel="stylesheet" href="ivory-theme.css?v=456166e9a80a">
 <link rel="stylesheet" href="renax-pulse-ivory.css?v=ee765501da9f">
 <link id="beat-hover45" rel="stylesheet" href="entry-beat-hover45.css?v=b5cd61a9099f"><link rel="stylesheet" href="accessibility.css?v=0d0e695a10ba">
+<link rel="stylesheet" href="kern-intro.css?v=5e2e8530cd7c">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -493,7 +494,9 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="workspace-layout.js?v=c6eb3e433097"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=94e73145c59c"></script>
-<script src="console-intro.js?v=e7fc189d5cb1"></script>
+<script src="vendor/gsap-3.15.0.min.js?v=92bb9a96476f"></script>
+<script src="kern-intro-scene.js?v=15b7b6c1e55d"></script>
+<script src="console-intro.js?v=6ef28e33380e"></script>
 <script>
 /* Premier clic ou toucher : plein écran, une seule tentative par chargement. */
 (() => {

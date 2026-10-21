@@ -1,0 +1,8 @@
+/* KERN replaces only the opening overlay. Application layout and themes are untouched. */
+html#renaxApp #renaxArrival{display:block;animation:none;background:#000;pointer-events:none}
+html#renaxApp #renaxArrival>.console-arrival-lines,html#renaxApp #renaxArrival>.console-arrival-center{display:none}
+#renaxArrival .kern-intro-presentation{position:absolute;inset:0;background:#101316;pointer-events:none}
+#renaxArrival .kern-intro-presentation canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#renaxArrival .kern-intro-wave{z-index:0}
+#renaxArrival .kern-intro-scene{z-index:1}
+#renaxArrival .kern-intro-wave[hidden]{display:none}

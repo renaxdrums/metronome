@@ -133,3 +133,7 @@ L’archive `index-legacy.html` et son seul consommateur `songs.js` restent au d
 ### Migration des grandes feuilles après la phase 5
 
 La migration autorisée couvre `renax-pulse-ivory.css`, `appearance-theme.css`, `ivory-theme.css`, `console-theme.css`, `workspace-layout.css` et `mobile-landscape.css`. Elle conserve l’ordre des feuilles et la spécificité des règles, par lots comparés à une référence Git explicite ; `@layer` vient après. Le premier lot supprime uniquement des déclarations importantes déjà remplacées par une règle de sélecteur, propriété et conditions identiques plus loin dans la même feuille. Son inventaire est `tools/theme-cascade-lot1.json`. Les contrats audio et les globales classiques sont inchangés.
+
+### Introduction KERN
+
+`vendor/gsap-3.15.0.min.js`, puis `kern-intro-scene.js` sont chargés avant `console-intro.js`, sans modifier l’ordre relatif des scripts existants. Le seul contrat ajouté est `window.RENAX_KERN` (état, dessin Canvas, chronologie GSAP et fond WebGL facultatif). Aucun appel audio. Le fond dispose d’un repli Canvas. La scène dure 9,5 s, disparaît en 0,8 s, garde le noir 0,2 s, puis révèle directement l’interface réelle en 1 s. Aucun clone de l’interface. `kern-intro.css` reste après les thèmes pour neutraliser l’ancienne animation de l’overlay.

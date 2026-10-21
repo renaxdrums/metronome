@@ -42,6 +42,7 @@ const assert=require('node:assert/strict');const {start,save,openTracks,openCont
  await checkSoundMenuForeground(h,proof,errors);
  await checkMultiSoundMenus(h,proof,errors);
  await checkPhoneDropdownDirection(h,proof,errors);
+ await checkMetricMenuForeground(h,proof,errors);
  proof.push({appearance:'dark default; all three theme choices reachable on portrait, landscape and desktop; mobile preferences update retained'});
  proof.push({dialogs:'copy, move, mobile rename and user labels retained'});assert.deepEqual(errors,[]);save('numbox-accessibility-results.json',{proof,errors});console.log('PASS accessible/lazy numeric controls, zoom, tap keyboard and fullscreen-compatible dialogs');
 }finally{await h.browser.close();h.server?.close()}})().catch(e=>{console.error(e);process.exitCode=1});
@@ -264,4 +265,82 @@ async function checkPhoneDropdownDirection(h,proof,errors) {
  save('sound-menu-phone-direction-results.json',{results,errors});
  proof.push({phoneDropdowns:'Upward selection lists in all six workspaces, including numeric training and curves, portrait and landscape'});
  console.log('PASS upward dropdowns in all six phone workspaces and both orientations');
+}
+
+
+async function metricOpeningProbe(page,id) {
+ return page.evaluate(async id=>{
+  const select=document.getElementById(id),wrap=select.parentElement,button=wrap.querySelector('.numbox-button');
+  button.click();
+  // Inspect the opening microtask before the next timer or animation frame.
+  await Promise.resolve();
+  const menu=wrap.querySelector('.numbox-menu');
+  return {anchor:button.getBoundingClientRect().toJSON(),menu:menu.getBoundingClientRect().toJSON(),position:getComputedStyle(menu).position};
+ },id);
+}
+async function checkMetricMenuForeground(h,proof,errors) {
+ const baseline='558207096e1ae3b6d9f005452588eed925eca7e0';
+ const before=await h.browser.newPage({viewport:{width:390,height:844},hasTouch:true,reducedMotion:'reduce'});
+ try {
+  for(const file of ['compact-controls.js','entry-opaque-navigation26.css']){
+   const body=require('node:child_process').execFileSync('git',['show',baseline+':'+file],{encoding:'utf8'});
+   await before.route('**/'+file+'*',route=>route.fulfill({contentType:file.endsWith('.css')?'text/css':'text/javascript',body}));
+  }
+  await before.goto(h.url);await before.waitForFunction(()=>document.documentElement.dataset.workspaceReady);
+  await before.locator('#workspaceNav [data-workspace=metronome]').click();
+  await before.waitForFunction(()=>!document.fullscreenEnabled||!!document.fullscreenElement);
+  await before.evaluate(()=>document.fonts.ready);
+  await before.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  const initial=await metricOpeningProbe(before,'activeNumerator');
+  assert(initial.menu.top>=initial.anchor.bottom,'The old metric menu must initially open below its trigger');
+  const selector='.numbox-custom.open:has(>#activeNumerator) .numbox-menu';
+  await before.waitForFunction(selector=>document.querySelector(selector)?.classList.contains('compact-floating'),selector);
+  const foreground=await soundMenuProbe(before,selector);
+  assert(foreground.blocked.length>0,'The old metric menu must be covered by navigation');
+  save('sound-menu-metric-negative-control.json',{baseline,initial,foreground});
+ }finally{await before.close();}
+ const results=[];
+ for(const viewport of [{width:390,height:844},{width:709,height:1024},{width:834,height:1112},{width:844,height:390},{width:1440,height:900}]){
+  for(const theme of ['dark','light','ivory']){
+   const page=await h.browser.newPage({viewport,hasTouch:viewport.width<=1100,reducedMotion:'reduce'});
+   page.on('pageerror',error=>errors.push(error.message));
+   try {
+    await page.addInitScript(value=>localStorage.setItem('renax-appearance',value),theme);
+    await page.goto(h.url);await page.waitForFunction(()=>document.documentElement.dataset.workspaceReady);
+    await page.locator('#workspaceNav [data-workspace=metronome]').click();
+    await page.waitForFunction(()=>!document.fullscreenEnabled||!!document.fullscreenElement);
+    await page.evaluate(()=>document.fonts.ready);
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    for(const settingsOpen of viewport.width<=1100?[false,true]:[true]){
+     await page.evaluate(open=>{document.getElementById('workspaceControls').open=open;},settingsOpen);
+     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+     for(const id of ['activeNumerator','activeDenominator']){
+      const select=page.locator('#'+id),trigger=select.locator('..').locator('.numbox-button');
+      const early=await metricOpeningProbe(page,id),context=JSON.stringify({viewport,theme,settingsOpen,id});
+      assert.equal(early.position,'fixed','Metric placement precedes the first paint: '+context);
+      if(viewport.width<=1100)assert(early.menu.bottom<=early.anchor.top+1,'Metric opens upward immediately: '+JSON.stringify({context,early}));
+      const selector='.numbox-custom.open:has(>#'+id+') .numbox-menu';
+      const probe=await soundMenuProbe(page,selector);
+      assert.deepEqual(probe.blocked,[],JSON.stringify({context,...probe}));assert(probe.opaque,context);
+      assert(probe.bounds.top>=0&&probe.bounds.left>=0&&probe.bounds.bottom<=viewport.height&&probe.bounds.right<=viewport.width,context);
+      const path=require('node:path').join(process.env.TEST_OUTPUT_DIR||require('node:path').join(__dirname,'results'),['sound-menu-metric',viewport.width,viewport.height,theme,settingsOpen?'expanded':'folded',id].join('-')+'.png');
+      await page.screenshot({path});
+      const value=id==='activeNumerator'?'7':'8';
+      await page.locator(selector).locator('[data-value="'+value+'"]').scrollIntoViewIfNeeded();
+      assert.deepEqual((await soundMenuProbe(page,selector)).blocked,[],context);
+      await page.locator(selector).locator('[data-value="'+value+'"]').click();
+      assert.equal(await select.inputValue(),value);assert.equal(await trigger.getAttribute('aria-expanded'),'false');
+      await trigger.press('ArrowDown');await page.keyboard.press('Escape');
+      assert.equal(await trigger.getAttribute('aria-expanded'),'false');assert(await trigger.evaluate(element=>element===document.activeElement));
+      await trigger.click();await page.locator(selector).locator('[data-value="4"]').click();
+      assert.equal(await page.locator('.main-grid>.panel:has(#'+id+')').evaluate(panel=>getComputedStyle(panel).zIndex),'auto');
+      results.push({viewport,theme,settingsOpen,id,immediatePlacement:true,upward:viewport.width<=1100,foreground:true,selection:true,keyboard:true});
+     }
+    }
+   }finally{await page.close();}
+  }
+ }
+ save('sound-menu-metric-foreground-results.json',{baseline,results,errors});
+ proof.push({metricMenus:'Both metric lists: first opening, foreground, compact and wide mobile viewports, all themes, folded/expanded settings, selection and Escape'});
+ console.log('PASS 54 metric foreground/placement/selection states and old downward/occluded negative control');
 }

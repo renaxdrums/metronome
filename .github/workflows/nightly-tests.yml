@@ -44,7 +44,7 @@ jobs:
       - run: pnpm check:tests
       - name: Short playback regression preflight
         if: github.event_name == 'pull_request'
-        run: pnpm test --only=amorce-song-integration-test.cjs,rhythm-editor-test.cjs
+        run: pnpm test --only=amorce-song-integration-test.cjs,rhythm-editor-test.cjs,live-test.cjs
       - name: All automatically runnable tests
         run: pnpm test
       - uses: actions/upload-artifact@v4

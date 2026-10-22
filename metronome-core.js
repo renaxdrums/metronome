@@ -456,6 +456,12 @@
     }
 
     function animate() {
+      // The opaque introduction covers these visuals; audio has its own scheduler.
+      const arrival = document.getElementById('renaxArrival');
+      if (arrival && !arrival.hidden && arrival.dataset.introPhase !== 'fade-in') {
+        requestAnimationFrame(animate);
+        return;
+      }
       updateTimerDisplay();
       const w = sequencerContainer.clientWidth;
       const h = sequencerContainer.clientHeight;
@@ -520,20 +526,23 @@
     function resetWorkTimer() { workElapsed = 0; workStartTime = 0; }
 
     function updateTimerDisplay() {
+      let text;
       if (training.engaged) {
         const remaining = training.active ? Math.max(0, training.duration - (performance.now() - training.startTime)) : training.duration;
-        trainTimerEl.textContent = training.run?.mode === 'steps'
+        text = training.run?.mode === 'steps'
           ? formatTime(Math.floor((training.active ? performance.now() - training.startTime : 0) / 1000))
           : formatTime(Math.ceil(remaining / 1000));
         trainTimerEl.classList.add('active', 'training');
       } else if (isPlaying || workElapsed > 0 || workStartTime > 0) {
-        trainTimerEl.textContent = formatTime(Math.floor(getWorkElapsed() / 1000));
+        text = formatTime(Math.floor(getWorkElapsed() / 1000));
         trainTimerEl.classList.toggle('active', isPlaying);
         trainTimerEl.classList.remove('training');
       } else {
-        trainTimerEl.textContent = '0:00';
+        text = '0:00';
         trainTimerEl.classList.remove('active', 'training');
       }
+      // Replacing the same text each frame wakes DOM observers and forces layout.
+      if (trainTimerEl.textContent !== text) trainTimerEl.textContent = text;
     }
 
 

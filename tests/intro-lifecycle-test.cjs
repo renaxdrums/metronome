@@ -18,6 +18,17 @@ const { start, save } = require('./audio-harness.cjs');
       });
       await page.goto(h.url);
       await page.waitForFunction(() => document.getElementById('renaxArrival').dataset.introReady === 'true');
+      // An opaque opening must not keep redrawing the covered application.
+      await page.evaluate(() => {
+        window.qaCoveredDraws = { particleCanvas: 0, renaxHeaderWave: 0 };
+        const clear = CanvasRenderingContext2D.prototype.clearRect;
+        CanvasRenderingContext2D.prototype.clearRect = function (...args) {
+          if (Object.hasOwn(window.qaCoveredDraws, this.canvas.id)) window.qaCoveredDraws[this.canvas.id]++;
+          return clear.apply(this, args);
+        };
+      });
+      await page.waitForTimeout(350);
+      assert.deepEqual(await page.evaluate(() => window.qaCoveredDraws), { particleCanvas: 0, renaxHeaderWave: 0 });
       assert.equal(await page.locator('#renaxArrival').getAttribute('data-intro-variant'), 'kern');
       assert.equal(await page.locator('.console-arrival-replica').count(), 0);
       assert.equal(await page.locator('.kern-intro-presentation canvas').count(), 2);
@@ -55,6 +66,15 @@ const { start, save } = require('./audio-harness.cjs');
       }, null, { polling: 20 });
       assert.equal(await page.locator('.kern-intro-presentation').evaluate(node => Number(getComputedStyle(node).opacity)), 0);
       await page.waitForFunction(() => document.getElementById('renaxArrival').hidden);
+      await page.waitForTimeout(100);
+      assert(await page.evaluate(() => window.qaCoveredDraws.particleCanvas > 0 && window.qaCoveredDraws.renaxHeaderWave > 0), 'Covered visuals resume after the intro');
+      const timerChanges = await page.evaluate(() => new Promise(resolve => {
+        let changes = 0;
+        const observer = new MutationObserver(records => { changes += records.length; });
+        observer.observe(trainTimerEl, { childList: true });
+        setTimeout(() => { observer.disconnect(); resolve(changes); }, 200);
+      }));
+      assert(timerChanges <= 1, 'The seconds display must not replace identical text every frame');
       assert.equal(await page.locator('.kern-intro-presentation').count(), 0);
       assert.equal(await page.locator('#playBtn').count(), 1);
       assert(await page.evaluate(() => isPlaying && audioCtx === window.qaIntroAudio));

@@ -41,6 +41,10 @@
  }
  function tick(now){
   frame=0;if(stopped||reduce.matches||document.hidden){last=0;return;}
+  const arrival=document.getElementById('renaxArrival');
+  if(arrival&&!arrival.hidden&&arrival.dataset.introPhase!=='fade-in'){
+   last=0;frame=requestAnimationFrame(tick);return;
+  }
   if(last)elapsed+=Math.min(100,now-last);last=now;
   if(now-paintedAt>=33){paintedAt=now;draw();}
   frame=requestAnimationFrame(tick);

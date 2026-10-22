@@ -31,7 +31,8 @@
     if(finished||!scene||!context)return;
     presentation.style.opacity=String(scene.fade.scene);
     overlay.style.opacity=String(1-scene.fade.app);
-    const t=scene.time;overlay.dataset.introPhase=t>=renderer.FADE_IN?'fade-in':t>=renderer.BLACK?'black':t>=renderer.TRANSITION?'fade-out':'presentation';
+    const t=scene.time,phase=t>=renderer.FADE_IN?'fade-in':t>=renderer.BLACK?'black':t>=renderer.TRANSITION?'fade-out':'presentation';
+    if(overlay.dataset.introPhase!==phase)overlay.dataset.introPhase=phase;
     if(scene.fade.scene>0){
       if(waves){waves.render(scene.time,scene.light);renderer.draw(context,sceneCanvas.width,sceneCanvas.height,0,scene,logo,{skipWaves:true,transparent:true});}
       else renderer.draw(context,sceneCanvas.width,sceneCanvas.height,0,scene,logo);
@@ -46,6 +47,13 @@
     presentation.append(waveCanvas,sceneCanvas);overlay.append(presentation);context=sceneCanvas.getContext('2d');if(!context){finish();return;}
     try{waves=new renderer.RenaxWaves(waveCanvas);}catch{waveCanvas.hidden=true;}
     scene=renderer.state();timeline=renderer.timeline(g,scene,0);timeline.eventCallback('onUpdate',paint);timeline.eventCallback('onComplete',finish);resize();
+    // Let initial canvas upload and layout finish before starting the motion clock.
+    await new Promise(resolve=>{
+      if('requestIdleCallback' in window)requestIdleCallback(resolve,{timeout:500});
+      else setTimeout(resolve,0);
+    });
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    if(finished)return;
     overlay.dataset.introReady='true';timeline.play();fallbackTimer=setTimeout(finish,16000);
   }
   launch().catch(error=>{console.warn('[RENAX intro] Opening unavailable:',error);finish();});

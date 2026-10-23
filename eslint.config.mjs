@@ -15,6 +15,8 @@ export default [
       'tests/results/**',
       'outputs/**',
       'dist/**',
+      'android/build/**',
+      'android/app/src/main/assets/**',
     ],
   },
   {

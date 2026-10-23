@@ -2,6 +2,32 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function budgetPath(uid) { return /databases/$(database)/documents/users/$(uid)/limits/writes; }
+    function allowedWrite(uid, recordId) {
+      let next = getAfter(budgetPath(uid)).data;
+      return next.recordId == recordId
+        && next.operationId == request.resource.data.operationId
+        && next.updatedAt == request.time
+        && (!exists(budgetPath(uid))
+          || next.count != get(budgetPath(uid)).data.count
+          || next.windowStart != get(budgetPath(uid)).data.windowStart);
+    }
+    function validBudget(uid, data) {
+      return data.keys().hasOnly(['windowStart','count','recordId','operationId','updatedAt'])
+        && data.keys().hasAll(['windowStart','count','recordId','operationId','updatedAt'])
+        && data.windowStart is timestamp && data.count is int && data.count > 0 && data.count <= 120
+        && data.recordId is string && data.recordId.size() > 0 && data.recordId.size() <= 1500
+        && data.operationId is string && data.operationId.size() == 36
+        && data.updatedAt == request.time
+        && ((!exists(budgetPath(uid)) && data.windowStart == request.time && data.count == 1)
+          || (exists(budgetPath(uid)) && (
+            (request.time < resource.data.windowStart + duration.value(60, 's')
+              && data.windowStart == resource.data.windowStart && data.count == resource.data.count + 1)
+            || (request.time >= resource.data.windowStart + duration.value(60, 's')
+              && data.windowStart == request.time && data.count == 1))))
+        && getAfter(/databases/$(database)/documents/users/$(uid)/records/$(data.recordId)).data.operationId == data.operationId
+        && getAfter(/databases/$(database)/documents/users/$(uid)/records/$(data.recordId)).data.updatedAt == request.time;
+    }
     function valid(data) {
       return data.keys().hasOnly(['schema','revision','payload','deleted','operationId','device','updatedAt'])
         && data.keys().hasAll(['schema','revision','payload','deleted','operationId','device','updatedAt'])
@@ -15,19 +41,27 @@ service cloud.firestore {
     match /users/{uid}/records/{recordId} {
       allow read: if owner(uid);
       allow create: if owner(uid) && valid(request.resource.data)
+        && allowedWrite(uid, recordId)
         && request.resource.data.revision == 1
         && getAfter(/databases/$(database)/documents/users/$(uid)/records/$(recordId)/history/1).data == request.resource.data;
       allow update: if owner(uid) && valid(request.resource.data)
+        && allowedWrite(uid, recordId)
         && request.resource.data.revision == resource.data.revision + 1
         && getAfter(/databases/$(database)/documents/users/$(uid)/records/$(recordId)/history/$(string(request.resource.data.revision))).data == request.resource.data;
       allow delete: if false;
       match /history/{revision} {
         allow read: if owner(uid);
         allow create: if owner(uid) && valid(request.resource.data)
+          && allowedWrite(uid, recordId)
           && revision == string(request.resource.data.revision)
           && getAfter(/databases/$(database)/documents/users/$(uid)/records/$(recordId)).data == request.resource.data;
         allow update, delete: if false;
       }
+    }
+    match /users/{uid}/limits/writes {
+      allow read: if owner(uid);
+      allow create, update: if owner(uid) && validBudget(uid, request.resource.data);
+      allow delete: if false;
     }
     match /{document=**} { allow read, write: if false; }
   }

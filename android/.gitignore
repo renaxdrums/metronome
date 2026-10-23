@@ -1,0 +1,4 @@
+build/
+signing/
+app/src/main/assets/
+local.properties

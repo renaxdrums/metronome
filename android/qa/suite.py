@@ -1,6 +1,6 @@
 """Functional checks inside the real Android release WebView, with native gestures/SAF."""
 from pathlib import Path
-import json, socket, subprocess, time, traceback, sys
+import json, socket, subprocess, time, traceback, sys, re
 
 root=Path(__file__).resolve().parents[2]; out=root/'android/build/native-qa/output'
 results=[]; process=None; log=None
@@ -37,7 +37,10 @@ def check(name,fn):
   detail=fn();status='unsupported' if isinstance(detail,dict) and detail.get('unsupported') else 'passed';results.append({'name':name,'status':status,'details':detail,'seconds':round(time.monotonic()-started,2)});print(status.upper()+' '+name,flush=True)
  except Exception as e:
   item={'name':name,'status':'failed','error':str(e),'seconds':round(time.monotonic()-started,2)}
-  try:item['web_state']=js('({workspace:document.body.dataset.workspace,text:document.body.innerText.slice(0,1800),url:location.href})')
+  try:
+   item['native_nodes']=nodes();(out/(name+'.png')).write_bytes(adb('exec-out','screencap','-p',check=False).stdout)
+  except Exception:pass
+  try:item['web_state']=js('({workspace:document.body.dataset.workspace,text:document.body.innerText.slice(0,1800),url:location.href,bridge:!!window.__renaxNativeSave,bridgePort:!!window.__renaxNativeSave?.port})')
   except Exception as nested:item['diagnostic_error']=str(nested)
   results.append(item);print('FAIL '+name+': '+str(e),flush=True)
   try:js('(()=>{document.querySelectorAll("dialog[open]").forEach(d=>d.close());if(typeof stopMetronome==="function")stopMetronome();return true})()')
@@ -180,6 +183,7 @@ def export_json():
  wait('!!document.querySelector("#backup-local .song-actions button")')
  control=js('!!document.querySelector("#backupAccount [aria-controls=backup-local]")')
  if control:click('#backupAccount [aria-controls=backup-local]')
+ request('refreshPort');request('refreshPort');time.sleep(.3)
  expected=js('RENAX_SONGS.library');click('#backup-local .song-actions button')
  data=save_picker('renax-morceaux.json');require(json.loads(data)==expected,'JSON content changed through native export');return {'bytes':len(data),'native_picker':True}
 def import_json():
@@ -193,7 +197,7 @@ def import_json():
   time.sleep(.3)
  else:raise AssertionError('Native Android import picker did not open')
  wait_native_file('renax-morceaux.json')
- try:native_click_text(['renax-morceaux.json'])
+ try:require(request('nativeFile',filename='renax-morceaux.json'),'Native file selection failed')
  except AssertionError:
   native_click_text(['Show roots','Open navigation drawer']);native_click_text(['Downloads','Téléchargements']);native_click_text(['renax-morceaux.json'])
  wait('!!document.querySelector("dialog.song-confirmation[open] .song-confirm-accept")')
@@ -222,9 +226,15 @@ def persistence():
  js('(()=>{localStorage.setItem("renax-native-qa-marker","persisted");return true})()');request('relaunch');ready();require(js('localStorage.getItem("renax-native-qa-marker")')=='persisted','Local data lost on activity recreation');return True
 
 def offline():
- adb('shell','cmd','connectivity','airplane-mode','enable');adb('shell','svc','wifi','disable');adb('shell','svc','data','disable')
- adb('shell','ip','link','set','eth0','down',check=False)
- wait('navigator.onLine',lambda x:x is False,timeout=20);request('relaunch');state=ready();nav('metronome');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying');return {'cold_activity_start_without_network':True,'play_stop':True,'url':state['url']}
+ uid=re.search(r'uid:(\d+)',adb('shell','cmd','package','list','packages','-U',TARGET).stdout.decode()).group(1)
+ for tool in ['iptables','ip6tables']:
+  adb('shell',tool,'-I','OUTPUT','-m','owner','--uid-owner',uid,'-j','REJECT')
+  adb('shell',tool,'-I','OUTPUT','-m','owner','--uid-owner',uid,'-d','127.0.0.0/8' if tool=='iptables' else '::1/128','-j','RETURN')
+ request('relaunch');state=ready()
+ js("(()=>{window.__qaNetworkProbe='pending';fetch('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/package.json?qa='+Date.now(),{cache:'no-store'}).then(()=>window.__qaNetworkProbe='reachable',()=>window.__qaNetworkProbe='blocked');return true})()")
+ wait('window.__qaNetworkProbe',lambda x:x=='blocked',timeout=25)
+ nav('metronome');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying')
+ return {'cold_activity_start_with_per_app_outbound_network_blocked':True,'external_fetch_failed':True,'play_stop':True,'url':state['url']}
 
 try:
  adb('root',check=False);adb('wait-for-device')

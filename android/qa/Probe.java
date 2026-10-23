@@ -88,8 +88,24 @@ public final class Probe extends Instrumentation {
     }
     for(int i=0;i<node.getChildCount();i++){AccessibilityNodeInfo child=node.getChild(i);try{nodes(child,list,depth+1);}finally{if(child!=null)child.recycle();}}
   }
+  private boolean nativeFile(AccessibilityNodeInfo n,String filename) {
+    if(n==null)return false;
+    String text=String.valueOf(n.getText()),desc=String.valueOf(n.getContentDescription());
+    if(text.equals(filename)||desc.equals("Preview the file "+filename)) {
+      AccessibilityNodeInfo target=n;
+      if(desc.equals("Preview the file "+filename)&&n.getParent()!=null)target=n.getParent();
+      for(int i=0;i<6&&target!=null;i++) {
+        if(target.isClickable())return target.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        target=target.getParent();
+      }
+    }
+    for(int i=0;i<n.getChildCount();i++)if(nativeFile(n.getChild(i),filename))return true;
+    return false;
+  }
   private Object command(JSONObject q) throws Exception {
     String action=q.getString("action");
+    if(action.equals("refreshPort")){runOnMainSync(()->{try{java.lang.reflect.Method m=activity.getClass().getDeclaredMethod("installPort");m.setAccessible(true);m.invoke(activity);}catch(Exception e){throw new RuntimeException(e);}});return true;}
+    if(action.equals("nativeFile"))return nativeFile(getUiAutomation().getRootInActiveWindow(),q.getString("filename"));
     if(action.equals("eval"))return evaluate(q.getString("script"));
     if(action.equals("tap")){pointer(q.getInt("x"),q.getInt("y"));return true;}
     if(action.equals("tapCss")) {

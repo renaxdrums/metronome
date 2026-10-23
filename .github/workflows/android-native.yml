@@ -57,4 +57,5 @@ jobs:
             android/build/native-qa/output/app.apk
             android/build/native-qa/output/*.json
             android/build/native-qa/output/*.txt
+            android/build/native-qa/output/*.png
           retention-days: 7

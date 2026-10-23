@@ -38,7 +38,7 @@
     "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",
     "playwright": "1.56.0",
     "prettier": "3.9.10",
-    "typescript": "5.9.3",
+    "typescript": "7.0.2",
     "web-vitals": "6.2.3"
   },
   "packageManager": "pnpm@11.25.0"

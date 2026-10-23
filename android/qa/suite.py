@@ -108,6 +108,13 @@ def save_picker(filename):
 def play_stop():
  nav('metronome');tap('#playBtn');wait('typeof isPlaying!=="undefined"&&isPlaying');state=wait('typeof audioCtx!=="undefined"&&audioCtx?audioCtx.state:null',lambda s:s=='running')
  tap('#playBtn');wait('!isPlaying');return {'audio_context':state,'stopped':True}
+def mode_play_stop(mode):
+ nav(mode)
+ if mode=='training':
+  selector=js('(()=>{for(const id of ["trainBtn","trainingVisualBtn"]){const e=document.getElementById(id);if(e&&e.getBoundingClientRect().height>0)return "#"+id}throw Error("Training transport hidden")})()')
+ else:selector='#playBtn'
+ tap(selector);wait('isPlaying');tap(selector);wait('!isPlaying');return {'mode':mode,'start_stop':True}
+
 def tempo_and_metric():
  nav('metronome')
  if not js('document.querySelector("#workspaceControls").open'):tap('#workspaceControls summary')
@@ -217,6 +224,8 @@ try:
  check('tempo_and_7_8_metric',tempo_and_metric)
  check('eight_sound_bank_selections',banks)
  check('native_touch_play_stop_audio_context',play_stop)
+ for mode in ['polyrhythm','training','sequence','multi']:
+  check('native_play_stop_'+mode,lambda mode=mode:mode_play_stop(mode))
  check('three_themes_five_languages',preferences)
  check('sequence_add_remove_measure',add_sequence)
  check('multitrack_add_track',add_multitrack)

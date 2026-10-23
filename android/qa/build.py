@@ -26,7 +26,7 @@ key=build/'test-only.jks';envpass='android-test-only'
 if not key.exists():run('keytool','-genkeypair','-keystore',key,'-alias','qa','-storepass',envpass,'-keypass',envpass,'-keyalg','RSA','-validity','7','-dname','CN=Ephemeral Android QA','-storetype','JKS')
 def compile_apk(name,source,manifest,resources=None):
  classes=build/(name+'-classes');dex=build/(name+'-dex');classes.mkdir(exist_ok=True);dex.mkdir(exist_ok=True)
- run('javac','-source','8','-target','8','-encoding','UTF-8','-bootclasspath',platform,'-d',classes,source)
+ run('javac','-source','8','-target','8','-encoding','UTF-8','-bootclasspath',os.pathsep.join([str(tools/'core-lambda-stubs.jar'),str(platform)]),'-d',classes,source)
  run(tools/'d8','--lib',platform,'--min-api','26','--output',dex,*sorted(classes.rglob('*.class')))
  unsigned=build/(name+'-unsigned.apk')
  args=[tools/'aapt2','link','-I',platform,'--manifest',manifest,'--min-sdk-version','26','--target-sdk-version','35','-o',unsigned]

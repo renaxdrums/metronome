@@ -6,7 +6,7 @@ root=Path(__file__).resolve().parents[2]; out=root/'android/build/native-qa/outp
 results=[]; process=None; log=None
 TARGET='com.renaxdrums.metronome'
 def adb(*args,check=True):
- return subprocess.run(['adb',*map(str,args)],capture_output=True,check=check)
+ return subprocess.run(['adb',*map(str,args)],capture_output=True,check=check,timeout=60)
 def request(action,**values):
  with socket.create_connection(('127.0.0.1',18765),timeout=35) as s:
   s.settimeout(40);s.sendall((json.dumps({'action':action,**values})+'\n').encode())
@@ -42,7 +42,9 @@ def check(name,fn):
   results.append(item);print('FAIL '+name+': '+str(e),flush=True)
   try:js('(()=>{document.querySelectorAll("dialog[open]").forEach(d=>d.close());if(typeof stopMetronome==="function")stopMetronome();return true})()')
   except Exception:pass
-  adb('shell','input','keyevent','BACK',check=False)
+  for _ in range(4):
+   if not any('documentsui' in n.get('package','') for n in nodes()):break
+   adb('shell','input','keyevent','BACK',check=False);time.sleep(.3)
 def require(value,message):
  if not value:raise AssertionError(message)
  return value
@@ -76,9 +78,15 @@ def stop_probe():
 def nodes():return request('nodes')
 def native_click_text(texts):
  choices=nodes(); wanted={x.casefold() for x in texts}
- found=[n for n in choices if n['text'].strip().casefold() in wanted or n['desc'].strip().casefold() in wanted]
+ found=[n for n in choices if n['text'].strip().casefold() in wanted or n['desc'].strip().casefold() in wanted or any(n['desc'].strip().casefold()=='preview the file '+w for w in wanted)]
  if not found:raise AssertionError('Native control missing: '+str(texts)+'; available='+str([(n['text'],n['desc']) for n in choices])[:1600])
  n=next((n for n in found if n['clickable']),found[-1]);request('tap',x=n['x'],y=n['y'])
+def wait_native_file(filename):
+ deadline=time.monotonic()+10
+ while time.monotonic()<deadline:
+  if any(filename.casefold() in (n['text']+' '+n['desc']).casefold() for n in nodes()):return
+  time.sleep(.3)
+ raise AssertionError('Native file is not visible: '+filename)
 def save_picker(filename):
  deadline=time.monotonic()+15;current=[]
  while time.monotonic()<deadline:
@@ -184,6 +192,7 @@ def import_json():
   if any('documentsui' in n.get('package','') for n in current):break
   time.sleep(.3)
  else:raise AssertionError('Native Android import picker did not open')
+ wait_native_file('renax-morceaux.json')
  try:native_click_text(['renax-morceaux.json'])
  except AssertionError:
   native_click_text(['Show roots','Open navigation drawer']);native_click_text(['Downloads','Téléchargements']);native_click_text(['renax-morceaux.json'])
@@ -200,7 +209,7 @@ def export_midi():
  if any('documentsui' in n.get('package','') for n in nodes()):
   data=save_picker(name);require(data.startswith(b'MThd'),'Invalid MIDI header');click('#mp3ExportDialog .mp3-actions button:last-child');return {'native_picker':True,'bytes':len(data)}
  click('#mp3ExportDialog .mp3-actions button:last-child')
- return {'unsupported':True,'reason':'MIDI is generated, but audio/midi is absent from the native message-port MIME allow-list; Android save picker does not open.'}
+ raise AssertionError('Native MIDI save picker did not open')
 
 def export_mp3():
  nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"playlist",profile:RENAX_SONGS.library.activeProfile,song:null})')
@@ -214,10 +223,11 @@ def persistence():
 
 def offline():
  adb('shell','cmd','connectivity','airplane-mode','enable');adb('shell','svc','wifi','disable');adb('shell','svc','data','disable')
- adb('root',check=False);adb('wait-for-device');adb('shell','ip','link','set','eth0','down',check=False)
+ adb('shell','ip','link','set','eth0','down',check=False)
  wait('navigator.onLine',lambda x:x is False,timeout=20);request('relaunch');state=ready();nav('metronome');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying');return {'cold_activity_start_without_network':True,'play_stop':True,'url':state['url']}
 
 try:
+ adb('root',check=False);adb('wait-for-device')
  adb('install','--no-incremental','-r',out/'app.apk');adb('install','--no-incremental','-r',out/'probe.apk')
  adb('logcat','-c');start_probe('first')
  check('startup_local_https',ready)

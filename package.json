@@ -32,7 +32,7 @@
     "eslint": "10.13.0",
     "espree": "11.2.0",
     "firebase": "12.16.0",
-    "firebase-tools": "15.15.0",
+    "firebase-tools": "15.34.0",
     "globals": "17.13.0",
     "html-minifier-terser": "7.2.0",
     "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",

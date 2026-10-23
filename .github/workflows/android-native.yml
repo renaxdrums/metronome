@@ -1,0 +1,53 @@
+name: Android native application
+on:
+  pull_request:
+    paths: ['android/**', '.github/workflows/android-native.yml']
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/android-native.yml']
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [34, 35]
+    env:
+      NODE_PATH: ${{ runner.temp }}/renax-native-deps/node_modules
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install isolated build dependencies
+        run: npm install --prefix "$RUNNER_TEMP/renax-native-deps" --no-audit --no-fund esbuild@0.28.2 espree@11.2.0 html-minifier-terser@7.2.0
+      - name: Prepare Android compiler and KVM
+        run: |
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+          sudo chmod a+rw /dev/kvm
+      - name: Build release activity and separate test probe
+        run: python3 android/qa/build.py
+      - name: Test on Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: default
+          arch: x86_64
+          ram-size: 4096M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340
+          disable-animations: true
+          script: python3 android/qa/suite.py
+      - name: Preserve test results and tested application
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-android-${{ matrix.api }}
+          path: |
+            android/build/native-qa/output/app.apk
+            android/build/native-qa/output/*.json
+            android/build/native-qa/output/*.txt
+          retention-days: 7

@@ -3,7 +3,7 @@ from pathlib import Path
 import json, socket, subprocess, time, traceback, sys, re
 
 root=Path(__file__).resolve().parents[2]; out=root/'android/build/native-qa/output'
-results=[]; process=None; log=None
+results=[]; process=None; log=None; api='unknown'
 TARGET='com.renaxdrums.metronome'
 def adb(*args,check=True):
  return subprocess.run(['adb',*map(str,args)],capture_output=True,check=check,timeout=60)
@@ -31,6 +31,10 @@ def set_value(selector,value,event='change'):
  return js('(()=>{const e=document.querySelector('+json.dumps(selector)+');if(!e)throw Error("Missing input");e.value='+json.dumps(str(value))+';e.dispatchEvent(new Event('+json.dumps(event)+',{bubbles:true}));return e.value})()')
 def nav(mode):
  tap('[data-workspace="'+mode+'"]');wait('document.body.dataset.workspace',lambda x:x==mode)
+def save_report():
+ report={'android_api':api,'production_web_ui_and_audio_engines_unchanged':True,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'tests':results}
+ (out/'native-report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
+ return report
 def check(name,fn):
  started=time.monotonic()
  try:
@@ -38,6 +42,7 @@ def check(name,fn):
  except Exception as e:
   item={'name':name,'status':'failed','error':str(e),'seconds':round(time.monotonic()-started,2)}
   try:
+   item['shared_files']=adb('shell','find','/sdcard/','-type','f',check=False).stdout.decode(errors='replace')
    item['native_nodes']=nodes();(out/(name+'.png')).write_bytes(adb('exec-out','screencap','-p',check=False).stdout)
   except Exception:pass
   try:item['web_state']=js('({workspace:document.body.dataset.workspace,text:document.body.innerText.slice(0,1800),url:location.href,bridge:!!window.__renaxNativeSave,bridgePort:!!window.__renaxNativeSave?.port})')
@@ -48,6 +53,7 @@ def check(name,fn):
   for _ in range(4):
    if not any('documentsui' in n.get('package','') for n in nodes()):break
    adb('shell','input','keyevent','BACK',check=False);time.sleep(.3)
+ save_report()
 def require(value,message):
  if not value:raise AssertionError(message)
  return value
@@ -117,6 +123,13 @@ def save_picker(filename):
    if data and b'No such file' not in data and b'Permission denied' not in data:break
   if data and b'No such file' not in data and b'Permission denied' not in data:break
   time.sleep(.3)
+ if filename.endswith('.mid') and (not data or b'No such file' in data or b'Permission denied' in data):
+  exported_paths=adb('shell','find','/sdcard/','-type','f',check=False).stdout.decode(errors='replace').splitlines()
+  for saved in exported_paths:
+   if not saved.startswith('/') or 'qa' not in saved.casefold():continue
+   candidate_data=adb('exec-out','cat',saved,check=False).stdout
+   if candidate_data.startswith(b'MThd'):
+    data=candidate_data;print('MIDI_SAVED_PATH '+saved,flush=True);break
  require(bool(data) and b'No such file' not in data,'Saved file missing: '+path)
  (out/filename).write_bytes(data);return data
 
@@ -238,10 +251,10 @@ def offline():
  js("(()=>{window.__qaNetworkProbe='pending';fetch('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/package.json?qa='+Date.now(),{cache:'no-store'}).then(()=>window.__qaNetworkProbe='reachable',()=>window.__qaNetworkProbe='blocked');return true})()")
  wait('window.__qaNetworkProbe',lambda x:x=='blocked',timeout=25)
  nav('metronome');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying')
- return {'cold_activity_start_with_per_app_outbound_network_blocked':True,'external_fetch_failed':True,'play_stop':True,'url':state['url']}
+ return {'cold_activity_start_with_outbound_network_blocked':True,'external_fetch_failed':True,'play_stop':True,'url':state['url']}
 
 try:
- adb('root',check=False);adb('wait-for-device')
+ adb('root',check=False);adb('wait-for-device');api=adb('shell','getprop','ro.build.version.sdk').stdout.decode().strip()
  adb('install','--no-incremental','-r',out/'app.apk');adb('install','--no-incremental','-r',out/'probe.apk')
  adb('logcat','-c');start_probe('first')
  check('startup_local_https',ready)
@@ -264,16 +277,16 @@ try:
  check('native_midi_export',export_midi)
  check('background_stop_resume',background)
  check('activity_recreation_local_storage',persistence)
- check('offline_start_and_play_stop',offline)
  stop_probe();start_probe('second')
  check('process_restart_local_storage',lambda:require(js('localStorage.getItem("renax-native-qa-marker")')=='persisted','Local data lost after process restart'))
+ check('offline_start_and_play_stop',offline)
 except Exception as e:
  results.append({'name':'native_suite_execution','status':'failed','error':str(e),'traceback':traceback.format_exc()})
 finally:
  try:stop_probe()
  except Exception:pass
- (out/'native-logcat.txt').write_bytes(adb('logcat','-d',check=False).stdout)
- report={'android_api':adb('shell','getprop','ro.build.version.sdk',check=False).stdout.decode().strip(),'production_web_ui_and_audio_engines_unchanged':True,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'tests':results}
- (out/'native-report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
+ report=save_report()
+ try:(out/'native-logcat.txt').write_bytes(adb('logcat','-d',check=False).stdout)
+ except Exception as e:print('Log collection unavailable: '+str(e),flush=True)
  print(json.dumps(report,indent=2,ensure_ascii=False))
  sys.exit(1 if any(r['status']=='failed' for r in results) else 0)

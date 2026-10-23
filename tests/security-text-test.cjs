@@ -8,6 +8,47 @@ const { start, openPlaylist, save } = require('./audio-harness.cjs');
     const p = await h.browser.newPage();
     await p.goto(h.url);
     await p.waitForFunction(() => window.RENAX_SONGS && window.RENAX_I18N);
+    const boundaries = await p.evaluate(() => {
+      const original = JSON.stringify(RENAX_SONGS.library);
+      const sample = () => JSON.parse(original);
+      const bad = [null];
+      const deep = sample();
+      let cursor = deep;
+      for (let i = 0; i < 34; i++) {
+        cursor.extra = {};
+        cursor = cursor.extra;
+      }
+      bad.push(deep);
+      const polluted = sample();
+      Object.defineProperty(polluted, '__proto__', { value: {}, enumerable: true });
+      bad.push(polluted);
+      const long = sample();
+      long.profiles[0].name = 'x'.repeat(257);
+      bad.push(long);
+      const crowded = sample();
+      crowded.profiles = Array.from({ length: 129 }, (_, i) => ({
+        id: 'p' + i,
+        name: 'p',
+        songs: [],
+      }));
+      bad.push(crowded);
+      const huge = sample();
+      huge.extra = Array(200001).fill(0);
+      bad.push(huge);
+      const refused = bad.map((value) => {
+        try {
+          RENAX_SONGS.validateLibrary(value);
+          return false;
+        } catch {
+          return true;
+        }
+      });
+      return { refused, unchanged: JSON.stringify(RENAX_SONGS.library) === original };
+    });
+    assert.deepEqual(boundaries, {
+      refused: [true, true, true, true, true, true],
+      unchanged: true,
+    });
     for (const name of [
       '<img src=x onerror="window.__xss=1">',
       '<svg onload="window.__xss=2">',

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "485a8d6ce857e31b",
+  "revision": "4254fda37d8ec96b",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "cloud-backup.js",
-      "sha256": "7da0844d83ca9311e854b6194c8fe2395e8c9314506f98a06d1387607be0b7d7",
+      "sha256": "de176ef959867ccbec369b07b63ddfae2414d4582772d6095983fafab8b35d69",
       "text": true
     },
     {
@@ -259,7 +259,7 @@
     },
     {
       "path": "firebase-config.js",
-      "sha256": "475b45ed8b77650ce3e789e8ba190b2e4d36ae2918ed6dc64792a59c9ab46b12",
+      "sha256": "6ffd5167b85cf5643b767bad571439701201e907415855a4be04f6dce70c47ec",
       "text": true
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "43df0b49bd1b78261f5ee77eb9459d840dae1ed19f94b4e57ba7b10b52a629cf",
+      "sha256": "c112193c84b7327de7e16459e96c318ed17d833aa4aa3a39178d6126504861c1",
       "text": true
     },
     {
@@ -469,7 +469,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "f5a44f223960e180c7b15f36b2976c4355f0140e9ab3f80fc16b2049160ab34a",
+      "sha256": "64b0759d885d84a4bf6e3a5c577f832c3f8868eabaea1cf11b091f9d0c146513",
       "text": true
     },
     {

@@ -1,5 +1,7 @@
 import * as core from './sync-core.js?v=20261008-auto-sync';
-import {firebaseConfig,providers,appCheckSiteKey,emulator} from './firebase-config.js';
+import * as configuration from './firebase-config.js';
+const {firebaseConfig,providers,appCheckSiteKey,emulator}=configuration;
+const writeBudgetEnabled=configuration.cloudWriteBudgetEnabled===true||Boolean(emulator);
 const storage=window.RENAX_STORAGE,api=window.RENAX_SONGS;
 await storage.ready;
 let account=null,sdk=null,auth=null,db=null,unsubscribe=null,generation=0,running=false,retry=0,timer=null,deferred=false,message='Sauvegardé dans ce navigateur',failure='',confirmed=false;
@@ -25,6 +27,26 @@ async function writeAtomic(uid,id,pending){
     const ref=recordRef(uid,id),snapshot=await transaction.get(ref),current=snapshot.exists()?decode(snapshot):null;
     if(current?.operationId===pending.operationId)return {record:current};
     if((current?.revision??0)!==pending.expected)return {conflict:current??{revision:0,payload:null,deleted:true,operationId:'',device:'',updatedAt:null}};
+    if(writeBudgetEnabled){
+      const limitRef=sdk.firestore.doc(db,'users',uid,'limits','writes');
+      let limitSnapshot;
+      try{limitSnapshot=await transaction.get(limitRef);}catch(error){
+        // Older deployed rules do not expose the permit document. They still
+        // authorize every record write themselves. Once the new rules are live,
+        // this read succeeds and a permit is mandatory on the server.
+        if(!String(error.code).includes('permission-denied'))throw error;
+      }
+      if(limitSnapshot){
+      const limit=limitSnapshot.exists()?limitSnapshot.data():null;
+      const windowStart=limit?.windowStart?.toMillis?.()||0;
+      const reset=!limit||Date.now()>=windowStart+60000;
+      if(!reset&&limit.count>=120){
+        const error=new Error('Trop de sauvegardes rapprochées. Les modifications restent conservées localement.');
+        error.code='backup/rate-limit';error.retryAfter=Math.max(1000,windowStart+60000-Date.now());throw error;
+      }
+      transaction.set(limitRef,{windowStart:reset?sdk.firestore.serverTimestamp():limit.windowStart,count:reset?1:limit.count+1,recordId:id,operationId:pending.operationId,updatedAt:sdk.firestore.serverTimestamp()});
+      }
+    }
     const revision=(current?.revision??0)+1;
     const data={schema:1,revision,payload:pending.payload??'',deleted:pending.deleted,operationId:pending.operationId,device,updatedAt:sdk.firestore.serverTimestamp()};
     transaction.set(ref,data);
@@ -63,7 +85,7 @@ async function sync(){
     if(Object.keys(storage.state.conflicts).length)say('Conflit à résoudre');
     else if(Object.keys(storage.state.pending).length)queue();
     else say('Synchronisé');
-  }catch(error){if(token!==generation)return;confirmed=false;say(navigator.onLine?'Modifications locales en attente':'Hors connexion',friendly(error));clearTimeout(timer);timer=setTimeout(sync,Math.min(60000,1500*2**Math.min(retry++,6)));}
+  }catch(error){if(token!==generation)return;confirmed=false;say(navigator.onLine?'Modifications locales en attente':'Hors connexion',friendly(error));clearTimeout(timer);timer=setTimeout(sync,error.retryAfter?Math.min(60000,error.retryAfter):Math.min(60000,1500*2**Math.min(retry++,6)));}
   finally{running=false;}
 }
 function friendly(error){const code=error.code||'';if(code.includes('popup-closed')||code.includes('cancelled-popup'))return 'Connexion annulée. Les morceaux locaux sont conservés.';if(code.includes('account-exists-with-different-credential'))return 'Cette adresse utilise déjà une autre méthode. Connectez-vous avec cette méthode, puis utilisez « Lier une méthode ».';if(code.includes('credential-already-in-use'))return 'Cette méthode est liée à un autre compte. Aucune fusion automatique effectuée.';if(code.includes('resource-exhausted'))return 'Quota Firebase atteint. Données locales conservées ; réessayez plus tard.';if(code.includes('permission-denied'))return 'Accès refusé par les règles Firebase. Données locales conservées.';if(code.includes('network')||code.includes('unavailable'))return 'Service indisponible. Le travail local reste disponible.';if(code.includes('requires-recent-login'))return 'Reconnectez-vous avant de lier cette méthode.';if(code.includes('operation-not-allowed'))return 'Cette méthode de connexion n’est pas activée dans Firebase.';return error.message||'Opération impossible.';}

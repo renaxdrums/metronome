@@ -1,6 +1,7 @@
 param([Parameter(Mandatory=$true)][string]$AndroidToolsRoot,[Parameter(Mandatory=$true)][string]$JavaHome,[Parameter(Mandatory=$true)][string]$CompilerJar,[Parameter(Mandatory=$true)][string]$OutputApk)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'apk-assets.ps1')
+. (Join-Path $PSScriptRoot 'prepare-web-assets.ps1')
 $projectRoot=Split-Path $PSScriptRoot -Parent
 $build=Join-Path $PSScriptRoot 'build'
 foreach($name in @('classes','dex','res/drawable','res/values','assets/site','signing')){New-Item -ItemType Directory -Force -Path (Join-Path $build $name) | Out-Null}
@@ -29,6 +30,7 @@ export const appCheckSiteKey=null;
 export const emulator=null;
 export const cloudWriteBudgetEnabled=false;
 '@ | Set-Content (Join-Path $build 'assets/site/firebase-config.js') -Encoding utf8NoBOM
+Prepare-AndroidWorker (Join-Path $build 'assets/site')
 $source=Join-Path $PSScriptRoot 'app/src/main/java/com/renaxdrums/metronome/MainActivity.java'
 Run $java @('-jar',$CompilerJar,'-source','1.8','-target','1.8','-proc:none','-warn:none','-bootclasspath',$platform,'-d',(Join-Path $build 'classes'),$source)
 $classes=@(Get-ChildItem (Join-Path $build 'classes') -Filter '*.class' -Recurse | ForEach-Object FullName)

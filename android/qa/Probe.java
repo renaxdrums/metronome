@@ -94,7 +94,8 @@ public final class Probe extends Instrumentation {
     if(action.equals("tap")){pointer(q.getInt("x"),q.getInt("y"));return true;}
     if(action.equals("tapCss")) {
       String selector=JSONObject.quote(q.getString("selector"));
-      String expression="JSON.stringify((()=>{const e=document.querySelector("+selector+");if(!e)throw Error('Missing touch target');e.scrollIntoView({block:'center',inline:'nearest'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2,w:innerWidth,h:r.height}})())";
+      String expression="JSON.stringify((()=>{const e=document.querySelector("+selector+");if(!e)throw Error('Missing touch target');e.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2,w:innerWidth,h:r.height}})())";
+      evaluate(expression);waitForIdleSync();SystemClock.sleep(150);
       Object encoded=evaluate(expression);
       if(!(encoded instanceof String))throw new IllegalStateException("Touch target unavailable");
       JSONObject r=new JSONObject((String)encoded);if(r.getDouble("h")<=0)throw new IllegalStateException("Touch target is hidden");

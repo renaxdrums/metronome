@@ -1,4 +1,4 @@
-"""Build the unchanged release activity plus a separately signed instrumentation APK."""
+"""Build the release activity plus a separately signed instrumentation APK."""
 from pathlib import Path
 import os, re, shutil, subprocess, sys, zipfile, json, hashlib
 
@@ -14,6 +14,7 @@ html=re.sub(r'<script[^>]+src="offline-cache\.js[^" ]*"[^>]*></script>','',html)
 index.write_text(html.replace('</body>','<script src="android-mode.js"></script></body>'))
 shutil.copyfile(root/'android/app/src/main/web/local-mode.js',assets/'site/android-mode.js')
 (assets/'site/firebase-config.js').write_text('export const firebaseConfig=null;\nexport const providers={email:false,google:false};\nexport const appCheckSiteKey=null;\nexport const emulator=null;\nexport const cloudWriteBudgetEnabled=false;\n')
+run('pwsh','-NoProfile','-Command',". './android/prepare-web-assets.ps1'; Prepare-AndroidWorker '"+str(assets/'site')+"'")
 reference=json.loads((root/'android/qa/reference-audio.json').read_text())
 for relative,expected in reference.items():
  p=assets/'site'/relative

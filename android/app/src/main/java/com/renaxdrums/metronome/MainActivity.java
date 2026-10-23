@@ -108,7 +108,7 @@ public final class MainActivity extends Activity {
         if(!(ORIGIN+"/app/index.html").equals(web.getUrl())||pendingExport!=null)return;
         String raw=message.getData();if(raw==null||raw.length()>MAX_EXPORT*4/3+4096)return;
         JSONObject data=new JSONObject(raw);String mime=data.optString("mime"),name=data.optString("name");
-        if(!Arrays.asList("application/json","audio/mpeg","audio/wav","audio/mp3").contains(mime))return;
+        if(!Arrays.asList("application/json","audio/mpeg","audio/wav","audio/mp3","audio/midi").contains(mime))return;
         byte[] bytes=Base64.decode(data.getString("data"),Base64.DEFAULT);if(bytes.length>MAX_EXPORT)return;
         pendingExport=bytes;name=name.replaceAll("[\\\\/\\p{Cntrl}]","_");if(name.length()>120)name=name.substring(0,120);
         Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT);save.addCategory(Intent.CATEGORY_OPENABLE);save.setType(mime);save.putExtra(Intent.EXTRA_TITLE,name);

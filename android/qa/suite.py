@@ -113,7 +113,9 @@ def mode_play_stop(mode):
  if mode=='training':
   selector=js('(()=>{for(const id of ["trainBtn","trainingVisualBtn"]){const e=document.getElementById(id);if(e&&e.getBoundingClientRect().height>0)return "#"+id}throw Error("Training transport hidden")})()')
  else:selector='#playBtn'
- tap(selector);wait('isPlaying');tap(selector);wait('!isPlaying');return {'mode':mode,'start_stop':True}
+ tap(selector);wait('isPlaying')
+ if mode=='training':selector=js('(()=>{for(const id of ["trainBtn","trainingVisualBtn"]){const e=document.getElementById(id);if(e&&e.getBoundingClientRect().height>0)return "#"+id}throw Error("Training stop hidden")})()')
+ tap(selector);wait('!isPlaying');return {'mode':mode,'start_stop':True}
 
 def tempo_and_metric():
  nav('metronome')
@@ -150,7 +152,7 @@ def add_sequence():
  nav('sequence');before=js('Number(document.querySelector("#measureCount").value)');tap('#sequenceAddMeasure');wait('Number(document.querySelector("#measureCount").value)',lambda x:x==before+1)
  set_value('#measureCount',before);return {'before':before,'after_add':before+1,'restored':before}
 def add_multitrack():
- nav('multi');before=js('document.querySelector("#multiTracks").children.length');tap('#multiControls .multi-add');after=wait('document.querySelector("#multiTracks").children.length',lambda x:x>before)
+ nav('multi');tap('#multiPresetLibrary > button');before=js('document.querySelector("#multiTracks").children.length');tap('#multiControls .multi-add');after=wait('document.querySelector("#multiTracks").children.length',lambda x:x>before)
  return {'before':before,'after':after,'mode_active':js('RENAX_MULTI.active')}
 def create_track():
  nav('tracks');profile=js('RENAX_SONGS.library.activeProfile')
@@ -175,7 +177,7 @@ def export_json():
 def import_json():
  before=js('RENAX_SONGS.library.profiles.length')
  exported=json.loads((out/'renax-morceaux.json').read_text())
- click('#backup-local .song-actions button:nth-child(2)')
+ tap('#backup-local .song-actions button:nth-child(2)')
  deadline=time.monotonic()+15
  while time.monotonic()<deadline:
   current=nodes()
@@ -212,7 +214,8 @@ def persistence():
 
 def offline():
  adb('shell','cmd','connectivity','airplane-mode','enable');adb('shell','svc','wifi','disable');adb('shell','svc','data','disable')
- wait('navigator.onLine',lambda x:x is False,timeout=15);request('relaunch');state=ready();nav('metronome');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying');return {'cold_activity_start_without_network':True,'play_stop':True,'url':state['url']}
+ adb('root',check=False);adb('wait-for-device');adb('shell','ip','link','set','eth0','down',check=False)
+ wait('navigator.onLine',lambda x:x is False,timeout=20);request('relaunch');state=ready();nav('metronome');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying');return {'cold_activity_start_without_network':True,'play_stop':True,'url':state['url']}
 
 try:
  adb('install','--no-incremental','-r',out/'app.apk');adb('install','--no-incremental','-r',out/'probe.apk')
@@ -246,7 +249,7 @@ finally:
  try:stop_probe()
  except Exception:pass
  (out/'native-logcat.txt').write_bytes(adb('logcat','-d',check=False).stdout)
- report={'android_api':adb('shell','getprop','ro.build.version.sdk',check=False).stdout.decode().strip(),'release_activity_unchanged':True,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'midi_native_export':'not supported by current native MIME allow-list; not marked passed','tests':results}
+ report={'android_api':adb('shell','getprop','ro.build.version.sdk',check=False).stdout.decode().strip(),'production_web_ui_and_audio_engines_unchanged':True,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'tests':results}
  (out/'native-report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
  print(json.dumps(report,indent=2,ensure_ascii=False))
  sys.exit(1 if any(r['status']=='failed' for r in results) else 0)

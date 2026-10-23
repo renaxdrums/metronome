@@ -18,6 +18,13 @@ platform 35, Java 21 et Eclipse ECJ 3.42.0. Il prépare une version CSP du site,
 compile le lanceur, crée le DEX, aligne puis signe l’APK. Il vérifie les signatures
 APK v2/v3 et l’alignement avant de livrer le fichier.
 
+Les fichiers embarqués sont ajoutés avec des chemins ZIP utilisant `/`, y compris
+sous Windows. La compilation refuse tout chemin contenant `\`, toute ressource
+absente ou supplémentaire et toute différence SHA-256 avec les fichiers préparés.
+Ces contrôles sont exécutés avant signature puis sur l’APK signé. Le test de
+régression `pwsh -File android/test-apk-assets.ps1` s’exécute sous Windows et Linux
+dans le workflow `android-packaging.yml`. Il ne remplace pas le test sur Android.
+
 Fournir les paramètres `-AndroidToolsRoot`, `-JavaHome`, `-CompilerJar` et
 `-OutputApk`. Les outils sont vérifiés contre leurs métadonnées de téléchargement.
 

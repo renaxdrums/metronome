@@ -1,0 +1,19 @@
+name: Android asset packaging
+on:
+  pull_request:
+    paths: ['android/**', '.github/workflows/android-packaging.yml']
+  push:
+    paths: ['android/**', '.github/workflows/android-packaging.yml']
+permissions:
+  contents: read
+jobs:
+  assets:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify APK archive paths and asset bytes
+        shell: pwsh
+        run: ./android/test-apk-assets.ps1

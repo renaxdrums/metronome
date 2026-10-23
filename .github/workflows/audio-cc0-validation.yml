@@ -25,7 +25,7 @@ jobs:
         run: |
           node tools/stamp-assets.cjs --check
           node tools/check-test-coverage.cjs
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: '11.25.0'
       - name: Install locked test dependencies and Chromium
@@ -118,7 +118,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: '11.25.0'
       - run: pnpm install --frozen-lockfile --ignore-scripts
@@ -139,7 +139,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: '11.25.0'
       - run: pnpm install --frozen-lockfile --ignore-scripts
@@ -168,7 +168,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: '11.25.0'
       - run: pnpm install --frozen-lockfile --ignore-scripts

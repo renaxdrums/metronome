@@ -20,8 +20,8 @@ import org.json.*;
 
 /** Separate test APK. Never included in the application distributed to users. */
 public final class Probe extends Instrumentation {
-  private Activity activity;
-  private WebView web;
+  private volatile Activity activity;
+  private volatile WebView web;
   private boolean done;
   @Override public void onCreate(Bundle args) { super.onCreate(args); start(); }
   private WebView find(View view) {
@@ -34,16 +34,41 @@ public final class Probe extends Instrumentation {
   private Intent intent() {
     return new Intent().setClassName("com.renaxdrums.metronome","com.renaxdrums.metronome.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
   }
+  private void bind(Activity current) {
+    if(current.getClass().getName().equals("com.renaxdrums.metronome.MainActivity")) {
+      activity=current;web=find(current.getWindow().getDecorView());
+    }
+  }
+  @Override public void callActivityOnCreate(Activity current,Bundle state) {
+    super.callActivityOnCreate(current,state);bind(current);
+  }
+  @Override public void callActivityOnResume(Activity current) {
+    super.callActivityOnResume(current);bind(current);
+  }
+  @Override public void callActivityOnDestroy(Activity current) {
+    if(current==activity)web=null;
+    super.callActivityOnDestroy(current);
+  }
   private void launch() {
-    activity=startActivitySync(intent());
-    runOnMainSync(()->web=find(activity.getWindow().getDecorView()));
+    startActivitySync(intent());
     if(web==null)throw new IllegalStateException("Target activity has no WebView");
   }
   private Object evaluate(String script) throws Exception {
-    final String[] value=new String[1]; final CountDownLatch latch=new CountDownLatch(1);
-    runOnMainSync(()->web.evaluateJavascript(script,result->{value[0]=result;latch.countDown();}));
-    if(!latch.await(25,TimeUnit.SECONDS))throw new TimeoutException("WebView JavaScript callback timed out");
-    return value[0]==null?JSONObject.NULL:new JSONTokener(value[0]).nextValue();
+    long deadline=SystemClock.uptimeMillis()+25000;
+    while(SystemClock.uptimeMillis()<deadline) {
+      final WebView target=web;
+      if(target==null){SystemClock.sleep(50);continue;}
+      final String[] value=new String[1];final CountDownLatch latch=new CountDownLatch(1);
+      runOnMainSync(()->{
+        if(target!=web||activity.isDestroyed()){latch.countDown();return;}
+        target.evaluateJavascript(script,result->{value[0]=result;latch.countDown();});
+      });
+      while(SystemClock.uptimeMillis()<deadline&&target==web&&!latch.await(100,TimeUnit.MILLISECONDS)){}
+      if(target!=web)continue;
+      if(latch.getCount()!=0)break;
+      return value[0]==null?JSONObject.NULL:new JSONTokener(value[0]).nextValue();
+    }
+    throw new TimeoutException("WebView JavaScript callback timed out");
   }
   private void pointer(int x,int y) {
     long t=SystemClock.uptimeMillis();

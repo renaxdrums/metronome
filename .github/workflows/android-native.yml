@@ -7,6 +7,9 @@ on:
     paths: ['android/**', '.github/workflows/android-native.yml']
 permissions:
   contents: read
+concurrency:
+  group: native-android-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   native:
     runs-on: ubuntu-latest

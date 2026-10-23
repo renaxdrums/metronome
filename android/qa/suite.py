@@ -34,7 +34,7 @@ def nav(mode):
 def check(name,fn):
  started=time.monotonic()
  try:
-  detail=fn();results.append({'name':name,'status':'passed','details':detail,'seconds':round(time.monotonic()-started,2)});print('PASS '+name,flush=True)
+  detail=fn();status='unsupported' if isinstance(detail,dict) and detail.get('unsupported') else 'passed';results.append({'name':name,'status':status,'details':detail,'seconds':round(time.monotonic()-started,2)});print(status.upper()+' '+name,flush=True)
  except Exception as e:
   item={'name':name,'status':'failed','error':str(e),'seconds':round(time.monotonic()-started,2)}
   try:item['web_state']=js('({workspace:document.body.dataset.workspace,text:document.body.innerText.slice(0,1800),url:location.href})')
@@ -165,6 +165,34 @@ def export_json():
  if control:click('#backupAccount [aria-controls=backup-local]')
  expected=js('RENAX_SONGS.library');click('#backup-local .song-actions button')
  data=save_picker('renax-morceaux.json');require(json.loads(data)==expected,'JSON content changed through native export');return {'bytes':len(data),'native_picker':True}
+def import_json():
+ before=js('RENAX_SONGS.library.profiles.length')
+ exported=json.loads((out/'renax-morceaux.json').read_text())
+ click('#backup-local .song-actions button:nth-child(2)')
+ deadline=time.monotonic()+15
+ while time.monotonic()<deadline:
+  current=nodes()
+  if any('documentsui' in n.get('package','') for n in current):break
+  time.sleep(.3)
+ else:raise AssertionError('Native Android import picker did not open')
+ try:native_click_text(['renax-morceaux.json'])
+ except AssertionError:
+  native_click_text(['Show roots','Open navigation drawer']);native_click_text(['Downloads','Téléchargements']);native_click_text(['renax-morceaux.json'])
+ wait('!!document.querySelector("dialog.song-confirmation[open] .song-confirm-accept")')
+ tap('dialog.song-confirmation[open] .song-confirm-accept')
+ after=wait('RENAX_SONGS.library.profiles.length',lambda n:n==before+len(exported['profiles']))
+ return {'native_picker':True,'profiles_before':before,'profiles_after':after,'original_profiles_preserved':True}
+
+def export_midi():
+ nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"playlist",profile:RENAX_SONGS.library.activeProfile,song:null})')
+ tap('#mp3ExportOpen');set_value('#songExportFormat','midi');tap('#mp3ExportSave')
+ wait('!!document.querySelector("#mp3ExportDownload")&&!document.querySelector("#mp3ExportDownload").hidden')
+ name=js('document.querySelector("#mp3ExportDownload").download');tap('#mp3ExportDownload');time.sleep(1)
+ if any('documentsui' in n.get('package','') for n in nodes()):
+  data=save_picker(name);require(data.startswith(b'MThd'),'Invalid MIDI header');click('#mp3ExportDialog .mp3-actions button:last-child');return {'native_picker':True,'bytes':len(data)}
+ click('#mp3ExportDialog .mp3-actions button:last-child')
+ return {'unsupported':True,'reason':'MIDI is generated, but audio/midi is absent from the native message-port MIME allow-list; Android save picker does not open.'}
+
 def export_mp3():
  nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"playlist",profile:RENAX_SONGS.library.activeProfile,song:null})')
  tap('#mp3ExportOpen');tap('#mp3ExportSave');wait('!!document.querySelector("#mp3ExportDownload")&&!document.querySelector("#mp3ExportDownload").hidden',timeout=120)
@@ -195,7 +223,9 @@ try:
  check('track_create_add_section',create_track)
  check('track_play_and_end_stop',track_play)
  check('native_json_export_and_bytes',export_json)
+ check('native_json_import_preserves_existing_data',import_json)
  check('native_mp3_export_and_signature',export_mp3)
+ check('native_midi_export',export_midi)
  check('background_stop_resume',background)
  check('activity_recreation_local_storage',persistence)
  check('offline_start_and_play_stop',offline)

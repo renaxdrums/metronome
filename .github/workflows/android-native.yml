@@ -15,8 +15,6 @@ jobs:
       fail-fast: false
       matrix:
         api: [34, 35]
-    env:
-      NODE_PATH: ${{ runner.temp }}/renax-native-deps/node_modules
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -30,6 +28,8 @@ jobs:
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
           sudo chmod a+rw /dev/kvm
       - name: Build release activity and separate test probe
+        env:
+          NODE_PATH: ${{ runner.temp }}/renax-native-deps/node_modules
         run: python3 android/qa/build.py
       - name: Test on Android
         uses: reactivecircus/android-emulator-runner@v2

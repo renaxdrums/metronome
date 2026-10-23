@@ -23,6 +23,7 @@ jobs:
           java-version: '21'
       - name: Install isolated build dependencies
         run: npm install --prefix "$RUNNER_TEMP/renax-native-deps" --no-audit --no-fund esbuild@0.28.2 espree@11.2.0 html-minifier-terser@7.2.0
+      - uses: android-actions/setup-android@v3
       - name: Prepare Android compiler and KVM
         run: |
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0'

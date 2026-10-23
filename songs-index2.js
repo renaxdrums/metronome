@@ -25,11 +25,14 @@
   if(!library.profiles.some(p=>p.id===library.activeProfile))library.activeProfile=library.profiles[0].id;
   function validateLibrary(data) {
     // Bound untrusted imports before cloning, rendering or walking musical data.
-    const pending=[{value:data,depth:0}];let nodes=0;
+    const pending=[{value:data,depth:0}];let nodes=0,scheduled=1;
     while(pending.length){
       const {value,depth}=pending.pop();
       if(++nodes>200000||depth>32)throw Error('Bibliothèque trop complexe.');
-      if(value&&typeof value==='object')for(const key of Object.keys(value)){
+      if(Array.isArray(value)&&value.length>200000)throw Error('Bibliothèque trop complexe.');
+      if(value&&typeof value==='object')for(const key in value){
+        if(!Object.prototype.hasOwnProperty.call(value,key))continue;
+        if(++scheduled>200000)throw Error('Bibliothèque trop complexe.');
         if(['__proto__','constructor','prototype'].includes(key))throw Error('Propriété de bibliothèque interdite.');
         pending.push({value:value[key],depth:depth+1});
       }

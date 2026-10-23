@@ -110,7 +110,11 @@ def save_picker(filename):
   native_click_text(['Show roots','Open navigation drawer']);native_click_text(['Downloads','Téléchargements']);native_click_text(['Save','Enregistrer']);time.sleep(.5)
  path='/sdcard/Download/'+filename; deadline=time.monotonic()+10;data=b''
  while time.monotonic()<deadline:
-  data=adb('exec-out','cat',path,check=False).stdout
+  candidates=[filename]
+  if filename.endswith('.mid'):candidates.extend([filename+'.midi',str(Path(filename).with_suffix('.midi'))])
+  for candidate in candidates:
+   data=adb('exec-out','cat','/sdcard/Download/'+candidate,check=False).stdout
+   if data and b'No such file' not in data and b'Permission denied' not in data:break
   if data and b'No such file' not in data and b'Permission denied' not in data:break
   time.sleep(.3)
  require(bool(data) and b'No such file' not in data,'Saved file missing: '+path)
@@ -228,8 +232,8 @@ def persistence():
 def offline():
  uid=re.search(r'uid:(\d+)',adb('shell','cmd','package','list','packages','-U',TARGET).stdout.decode()).group(1)
  for tool in ['iptables','ip6tables']:
-  adb('shell',tool,'-I','OUTPUT','-m','owner','--uid-owner',uid,'-j','REJECT')
-  adb('shell',tool,'-I','OUTPUT','-m','owner','--uid-owner',uid,'-d','127.0.0.0/8' if tool=='iptables' else '::1/128','-j','RETURN')
+  adb('shell',tool,'-I','OUTPUT','-j','REJECT')
+  adb('shell',tool,'-I','OUTPUT','-d','127.0.0.0/8' if tool=='iptables' else '::1/128','-j','RETURN')
  request('relaunch');state=ready()
  js("(()=>{window.__qaNetworkProbe='pending';fetch('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/package.json?qa='+Date.now(),{cache:'no-store'}).then(()=>window.__qaNetworkProbe='reachable',()=>window.__qaNetworkProbe='blocked');return true})()")
  wait('window.__qaNetworkProbe',lambda x:x=='blocked',timeout=25)

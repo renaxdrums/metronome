@@ -11,4 +11,6 @@ function Prepare-AndroidWorker([string]$Site) {
   $match=$matches[0]
   $combined=$worker.Substring(0,$match.Index)+$encoder+";`n"+$worker.Substring($match.Index+$match.Length)
   [IO.File]::WriteAllText($workerPath,$combined,[Text.UTF8Encoding]::new($false))
+  & node (Join-Path $PSScriptRoot 'prepare-workers.cjs') $Site
+  if ($LASTEXITCODE -ne 0) { throw 'Android guide worker preparation failed' }
 }

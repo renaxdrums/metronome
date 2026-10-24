@@ -92,6 +92,7 @@
     "tests/track-playlist-chain-test.cjs",
     "tests/training-modes-test.cjs",
     "tests/transport-timer-test.cjs",
+    "tests/voice-bank-switch-test.cjs",
     "tests/voice-subdivision-gain-test.cjs"
   ],
   "excluded": {

@@ -111,7 +111,9 @@ public final class MainActivity extends Activity {
         if(!Arrays.asList("application/json","audio/mpeg","audio/wav","audio/mp3","audio/midi").contains(mime))return;
         byte[] bytes=Base64.decode(data.getString("data"),Base64.DEFAULT);if(bytes.length>MAX_EXPORT)return;
         pendingExport=bytes;name=name.replaceAll("[\\\\/\\p{Cntrl}]","_");if(name.length()>120)name=name.substring(0,120);
-        Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT);save.addCategory(Intent.CATEGORY_OPENABLE);save.setType(mime);save.putExtra(Intent.EXTRA_TITLE,name);
+        // Android 15 maps audio/midi to .rtx. Preserve the supplied .mid name;
+        // the validated SMF bytes and their MIME type remain unchanged.
+        Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT);save.addCategory(Intent.CATEGORY_OPENABLE);save.setType("audio/midi".equals(mime)?"application/octet-stream":mime);save.putExtra(Intent.EXTRA_TITLE,name);
         startActivityForResult(save,SAVE_FILE);
       }catch(Exception error){pendingExport=null;Toast.makeText(MainActivity.this,"Export impossible",Toast.LENGTH_SHORT).show();}
     }});

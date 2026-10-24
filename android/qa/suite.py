@@ -33,7 +33,7 @@ def set_value(selector,value,event='change'):
 def nav(mode):
  tap('[data-workspace="'+mode+'"]');wait('document.body.dataset.workspace',lambda x:x==mode)
 def save_report():
- report={'android_api':api,'production_web_ui_and_audio_engines_unchanged':True,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'tests':results}
+ report={'android_api':api,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'tests':results}
  (out/'native-report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
  return report
 def check(name,fn):
@@ -118,19 +118,11 @@ def save_picker(filename):
  path='/sdcard/Download/'+filename; deadline=time.monotonic()+10;data=b''
  while time.monotonic()<deadline:
   candidates=[filename]
-  if filename.endswith('.mid'):candidates.extend([filename+'.midi',str(Path(filename).with_suffix('.midi'))])
   for candidate in candidates:
    data=adb('exec-out','cat','/sdcard/Download/'+candidate,check=False).stdout
    if data and b'No such file' not in data and b'Permission denied' not in data:break
   if data and b'No such file' not in data and b'Permission denied' not in data:break
   time.sleep(.3)
- if filename.endswith('.mid') and (not data or b'No such file' in data or b'Permission denied' in data):
-  exported_paths=adb('shell','find','/sdcard/','-type','f',check=False).stdout.decode(errors='replace').splitlines()
-  for saved in exported_paths:
-   if not saved.startswith('/') or 'qa' not in saved.casefold():continue
-   candidate_data=adb('exec-out','cat',saved,check=False).stdout
-   if candidate_data.startswith(b'MThd'):
-    data=candidate_data;print('MIDI_SAVED_PATH '+saved,flush=True);break
  require(bool(data) and b'No such file' not in data,'Saved file missing: '+path)
  (out/filename).write_bytes(data);return data
 
@@ -158,9 +150,20 @@ def tempo_and_metric():
  return {'tempo_steps':'137 → 138 → 137','metric':'7/8 → 4/4'}
 def banks():
  nav('metronome'); choices=js('Array.from(document.querySelector("#soundBank").options).map(o=>({value:o.value,text:o.textContent}))'); tested=[]
- for option in choices[:8]:
-  set_value('#soundBank',option['value']);wait('String(currentBank)',lambda x:x==option['value']);tested.append(option)
- set_value('#soundBank',choices[0]['value']);return tested
+ tap('#playBtn');wait('isPlaying')
+ js('(()=>{window.__qaBankAnalyser=audioCtx.createAnalyser();__qaBankAnalyser.fftSize=4096;getAudioMixDestination(audioCtx).connect(__qaBankAnalyser);window.__qaBankCalls=[];window.__qaOriginalPlayClick=playClick;playClick=function(...args){__qaBankCalls.push(currentBank);return __qaOriginalPlayClick(...args)};return true})()')
+ try:
+  for option in choices:
+   set_value('#soundBank',option['value']);wait('String(currentBank)',lambda x:x==option['value'])
+   js('(()=>{window.__qaBankCalls=[];window.__qaBankSignal={pending:true};const samples=new Float32Array(__qaBankAnalyser.fftSize),start=performance.now();let peak=0;const timer=setInterval(()=>{__qaBankAnalyser.getFloatTimeDomainData(samples);if(performance.now()-start>350)for(const x of samples)peak=Math.max(peak,Math.abs(x));if(performance.now()-start>1400){clearInterval(timer);window.__qaBankSignal={peak,calls:__qaBankCalls.slice()}}},20);return true})()')
+   signal=wait('window.__qaBankSignal',lambda x:not x.get('pending'))
+   require(signal['peak']>1e-6 and option['value'] in signal['calls'],'No scheduled audible signal for '+option['value'])
+   tested.append(dict(option,output_peak=signal['peak'],scheduled_events=len(signal['calls'])))
+ finally:
+  js('(()=>{playClick=__qaOriginalPlayClick;getAudioMixDestination(audioCtx).disconnect(__qaBankAnalyser);return true})()')
+  if js('isPlaying'):tap('#playBtn')
+  set_value('#soundBank',choices[0]['value'])
+ return tested
 
 def modes(landscape):
  request('rotate',landscape=landscape)
@@ -237,22 +240,33 @@ def export_mp3():
  nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"playlist",profile:RENAX_SONGS.library.activeProfile,song:null})')
  tap('#mp3ExportOpen');tap('#mp3ExportSave');wait('!!document.querySelector("#mp3ExportDownload")&&!document.querySelector("#mp3ExportDownload").hidden',timeout=120)
  name=js('document.querySelector("#mp3ExportDownload").download');tap('#mp3ExportDownload');data=save_picker(name)
- require(len(data)>100 and (data.startswith(b'ID3') or data[0]==255),'Invalid MP3 output');click('#mp3ExportDialog .mp3-actions button:last-child');return {'file':name,'bytes':len(data),'native_picker':True}
+ require(len(data)>100 and (data.startswith(b'ID3') or data[0]==255),'Invalid MP3 output')
+ decoded=subprocess.run(['ffmpeg','-v','error','-i',str(out/name),'-f','f32le','-ac','1','-ar','48000','-'],capture_output=True,check=True,timeout=30).stdout
+ import array,math
+ samples=array.array('f');samples.frombytes(decoded)
+ require(len(samples)>48000 and all(math.isfinite(x) for x in samples),'MP3 cannot be decoded as finite audio')
+ peak=max(abs(x) for x in samples);require(peak>1e-5,'Silent MP3')
+ click('#mp3ExportDialog .mp3-actions button:last-child');return {'file':name,'bytes':len(data),'native_picker':True,'decoded_samples':len(samples),'peak':peak}
 def background():
  nav('metronome');tap('#playBtn');wait('isPlaying');request('home');wait('!isPlaying');request('resume');wait('document.hasFocus()');return {'playback_stops_on_background':True,'resume':True}
 def persistence():
  js('(()=>{localStorage.setItem("renax-native-qa-marker","persisted");return true})()');request('relaunch');ready();require(js('localStorage.getItem("renax-native-qa-marker")')=='persisted','Local data lost on activity recreation');return True
 
 def offline():
- uid=re.search(r'uid:(\d+)',adb('shell','cmd','package','list','packages','-U',TARGET).stdout.decode()).group(1)
- for tool in ['iptables','ip6tables']:
-  adb('shell',tool,'-I','OUTPUT','-j','REJECT')
-  adb('shell',tool,'-I','OUTPUT','-d','127.0.0.0/8' if tool=='iptables' else '::1/128','-j','RETURN')
- request('relaunch');state=ready()
- js("(()=>{window.__qaNetworkProbe='pending';fetch('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/package.json?qa='+Date.now(),{cache:'no-store'}).then(()=>window.__qaNetworkProbe='reachable',()=>window.__qaNetworkProbe='blocked');return true})()")
- wait('window.__qaNetworkProbe',lambda x:x=='blocked',timeout=25)
- nav('metronome');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying')
- return {'cold_activity_start_with_outbound_network_blocked':True,'external_fetch_failed':True,'play_stop':True,'url':state['url']}
+ installed=[]
+ try:
+  for tool,address in [('iptables','127.0.0.0/8'),('ip6tables','::1/128')]:
+   for rule in [('-j','REJECT'),('-d',address,'-j','RETURN')]:
+    adb('shell',tool,'-I','OUTPUT',*rule);installed.append((tool,rule))
+  request('relaunch');state=ready()
+  js("(()=>{window.__qaNetworkProbe='pending';fetch('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/package.json?qa='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(5000)}).then(()=>window.__qaNetworkProbe='reachable',()=>window.__qaNetworkProbe='blocked');return true})()")
+  wait('window.__qaNetworkProbe',lambda x:x=='blocked',timeout=15)
+  js('(()=>{window.__qaOfflineVoices="pending";prepareAllVoiceAudio().then(()=>__qaOfflineVoices="ready",e=>__qaOfflineVoices=String(e));return true})()')
+  wait('window.__qaOfflineVoices',lambda x:x=='ready',timeout=25)
+  nav('metronome');set_value('#soundBank','voiceMale');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying')
+  return {'cold_activity_start_with_outbound_network_blocked':True,'external_fetch_failed_or_timed_out':True,'all_recorded_voices_loaded_offline':True,'play_stop':True,'url':state['url']}
+ finally:
+  for tool,rule in reversed(installed):adb('shell',tool,'-D','OUTPUT',*rule,check=False)
 
 try:
  adb('root',check=False);adb('wait-for-device');api=adb('shell','getprop','ro.build.version.sdk').stdout.decode().strip()
@@ -265,7 +279,7 @@ try:
  check('tempo_and_7_8_metric',tempo_and_metric)
  voice_api=(js,wait,tap,nav,set_value,check,require)
  run_voice_checks(voice_api)
- check('eight_sound_bank_selections',banks)
+ check('every_sound_bank_scheduled_and_output_signal',banks)
  check('native_touch_play_stop_audio_context',play_stop)
  for mode in ['polyrhythm','training','sequence','multi']:
   check('native_play_stop_'+mode,lambda mode=mode:mode_play_stop(mode))

@@ -52,6 +52,10 @@ def check_guide(language, api):
     # Only the emulator's disposable QA library is changed.
     js('''(()=>{
       window.__qaGuideErrors=[];
+      if(!window.__qaOriginalWorker)window.__qaOriginalWorker=window.Worker;
+      window.Worker=class extends window.__qaOriginalWorker {
+        constructor(...args){super(...args);this.addEventListener('error',e=>__qaGuideErrors.push({worker:String(args[0]),message:e.message,file:e.filename,line:e.lineno}));}
+      };
       window.addEventListener('securitypolicyviolation',e=>__qaGuideErrors.push({directive:e.violatedDirective,url:e.blockedURI}));
       window.addEventListener('unhandledrejection',e=>__qaGuideErrors.push({error:String(e.reason)}));
       const l=JSON.parse(JSON.stringify(RENAX_SONGS.library));

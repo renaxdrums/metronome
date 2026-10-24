@@ -1,6 +1,7 @@
 """Functional checks inside the real Android release WebView, with native gestures/SAF."""
 from pathlib import Path
 import json, socket, subprocess, time, traceback, sys, re
+from voice_checks import run_voice_checks, check_guide
 
 root=Path(__file__).resolve().parents[2]; out=root/'android/build/native-qa/output'
 results=[]; process=None; log=None; api='unknown'
@@ -262,6 +263,8 @@ try:
  check('landscape_six_workspaces',lambda:modes(True))
  request('rotate',landscape=False);wait('innerWidth<innerHeight')
  check('tempo_and_7_8_metric',tempo_and_metric)
+ voice_api=(js,wait,tap,nav,set_value,check,require)
+ run_voice_checks(voice_api)
  check('eight_sound_bank_selections',banks)
  check('native_touch_play_stop_audio_context',play_stop)
  for mode in ['polyrhythm','training','sequence','multi']:
@@ -271,6 +274,8 @@ try:
  check('multitrack_add_track',add_multitrack)
  check('track_create_add_section',create_track)
  check('track_play_and_end_stop',track_play)
+ for language in ['fr','en']:
+  check('real_neural_guide_'+language,lambda language=language:check_guide(language,voice_api))
  check('native_json_export_and_bytes',export_json)
  check('native_json_import_preserves_existing_data',import_json)
  check('native_mp3_export_and_signature',export_mp3)

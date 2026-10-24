@@ -5,8 +5,8 @@ import json
 def run_voice_checks(api):
     js, wait, tap, nav, set_value, check, require = api
 
-    def live_switch(bank):
-        nav('metronome')
+    def live_switch(bank, mode='metronome'):
+        nav(mode)
         set_value('#volumeSlider',80,'input')
         set_value('#soundBank', 'clic')
         tap('#playBtn')
@@ -46,6 +46,7 @@ def run_voice_checks(api):
     check('cold_switch_to_male_voice_during_playback', lambda: live_switch('voiceMale'))
     check('switch_to_female_voice_during_playback', lambda: live_switch('voiceFemale'))
     check('forty_original_voice_samples_decoded_and_rendered', every_sample)
+    check('multitrack_male_and_female_live_switches', lambda: {'male': live_switch('voiceMale', 'multi'), 'female': live_switch('voiceFemale', 'multi')})
 
 
 def check_guide(language, api):

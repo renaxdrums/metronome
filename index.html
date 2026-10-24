@@ -375,7 +375,7 @@
   <script src="metronome-core.js?v=a607bf8e2622"></script>
   <link rel="stylesheet" href="playback-support.css?v=be7d47c55905">
   <script src="playback-support.js?v=906fd4c12e7e"></script>
-  <script src="metronome-transport.js?v=1ed1aa7e51a0"></script>
+  <script src="metronome-transport.js?v=3d3a45b2a38d"></script>
   <script src="pro-sound-bank.js?v=4380a78e5f34"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
@@ -489,7 +489,7 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
 <script src="multi-clock.js?v=200171f7f4fd"></script>
-<script src="multi-metronome.js?v=6f20f7386b95"></script>
+<script src="multi-metronome.js?v=ec9e737bfa57"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
 <script src="interface-translations.js?v=6f6ea6af0d2f"></script>
 <script src="vendor/i18next-25.6.0.js?v=6077ce0b0640"></script>

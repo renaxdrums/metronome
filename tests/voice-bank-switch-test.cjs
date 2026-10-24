@@ -50,7 +50,33 @@ const { start } = require('./audio-harness.cjs');
     await p.waitForFunction(() => allVoiceAudioReady);
     assert.equal(await p.evaluate(() => currentBank), 'claves');
     await p.locator('#playBtn').click();
-    console.log('PASS cold male/female live switches schedule original voices; obsolete choice ignored');
+    // Multi uses a bank per track: it must receive the completed async choice.
+    await p.locator('#workspaceNav [data-workspace="multi"]').click();
+    await p.selectOption('#soundBank', 'clic');
+    await p.locator('#playBtn').click();
+    await p.waitForFunction(() => isPlaying && RENAX_MULTI.active);
+    await p.evaluate(() => {
+      window.multiVoices = [];
+      const create = audioCtx.createBufferSource.bind(audioCtx);
+      audioCtx.createBufferSource = () => {
+        const source = create(), start = source.start;
+        source.start = function (...args) {
+          for (const [gender, buffers] of Object.entries(VOICE_METRONOME_BUFFERS))
+            if (Object.values(buffers).includes(source.buffer)) window.multiVoices.push(gender);
+          return start.apply(this, args);
+        };
+        return source;
+      };
+    });
+    for (const bank of ['voiceMale', 'voiceFemale']) {
+      await p.selectOption('#soundBank', bank);
+      await p.waitForFunction((expected) => measures[activeMeasureIndex].bank === expected, bank);
+      await p.waitForFunction((gender) => window.multiVoices.includes(gender), bank === 'voiceMale' ? 'male' : 'female');
+      assert.equal(await p.evaluate(() => isPlaying), true);
+    }
+    await p.locator('#playBtn').click();
+    assert.deepEqual(errors, []);
+    console.log('PASS cold male/female live switches; obsolete choice ignored; active multi track follows completed selection');
   } finally {
     await h.browser.close();
     h.server.close();

@@ -673,6 +673,7 @@
       }
       currentBank = requestedBank;
       updateVoiceGroupLabel();
+      document.dispatchEvent(new CustomEvent('renax:sound-bank-ready', { detail: { bank: requestedBank } }));
 
       // Stop pressed while decoding must not trigger the stopped-state preview.
       if (wasPlaying && !isPlaying) return;

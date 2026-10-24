@@ -251,7 +251,35 @@ def export_mp3():
  peak=max(abs(x) for x in samples);require(peak>1e-5,'Silent MP3')
  click('#mp3ExportDialog .mp3-actions button:last-child');return {'file':name,'bytes':len(data),'native_picker':True,'decoded_samples':len(samples),'peak':peak}
 def background():
- nav('metronome');tap('#playBtn');wait('isPlaying');request('home');wait('!isPlaying');request('resume');wait('document.hasFocus()');return {'playback_stops_on_background':True,'resume':True}
+ nav('metronome');set_value('#bpmSlider',120,'input');tap('#playBtn');wait('isPlaying')
+ js('(()=>{window.__qaBackgroundTimes=[];window.__qaBackgroundClick=playClick;playClick=function(...args){__qaBackgroundTimes.push(args[1]);return __qaBackgroundClick(...args)};return true})()')
+ try:
+  request('home')
+  for _ in range(3):time.sleep(10)
+  request('resume');wait('document.hasFocus()')
+  state=js('({playing:isPlaying,audio:audioCtx.state,times:__qaBackgroundTimes})')
+  require(state['playing'] and state['audio']=='running','Playback stopped in background')
+  require(len(state['times'])>=55,'Insufficient scheduled beats during 30-second background test')
+  intervals=[b-a for a,b in zip(state['times'],state['times'][1:])]
+  error=max(abs(x-.5) for x in intervals)
+  require(error<1e-5,'Background beat grid changed')
+  return {'continuous_seconds':30,'scheduled_beats':len(state['times']),'max_grid_error_seconds':error,'resume':True}
+ finally:
+  request('resume');js('(()=>{playClick=__qaBackgroundClick;return true})()')
+  if js('isPlaying'):tap('#playBtn')
+
+def screen_policy():
+ nav('metronome')
+ deadline=time.monotonic()+5
+ while request('keepScreenOn') and time.monotonic()<deadline:time.sleep(.2)
+ require(not request('keepScreenOn'),'Screen held awake while stopped')
+ tap('#playBtn');wait('isPlaying');deadline=time.monotonic()+5
+ while not request('keepScreenOn') and time.monotonic()<deadline:time.sleep(.2)
+ require(request('keepScreenOn'),'Screen can sleep during playback')
+ tap('#playBtn');wait('!isPlaying');deadline=time.monotonic()+5
+ while request('keepScreenOn') and time.monotonic()<deadline:time.sleep(.2)
+ require(not request('keepScreenOn'),'Stop did not release screen flag')
+ return {'awake_during_playback':True,'released_after_stop':True}
 def persistence():
  js('(()=>{localStorage.setItem("renax-native-qa-marker","persisted");return true})()');request('relaunch');ready();require(js('localStorage.getItem("renax-native-qa-marker")')=='persisted','Local data lost on activity recreation');return True
 
@@ -301,7 +329,8 @@ try:
  check('native_json_import_preserves_existing_data',import_json)
  check('native_mp3_export_and_signature',export_mp3)
  check('native_midi_export',export_midi)
- check('background_stop_resume',background)
+ check('screen_awake_only_during_playback',screen_policy)
+ check('background_continuous_playback_30_seconds',background)
  check('activity_recreation_local_storage',persistence)
  stop_probe();start_probe('second')
  check('process_restart_local_storage',lambda:require(js('localStorage.getItem("renax-native-qa-marker")')=='persisted','Local data lost after process restart'))

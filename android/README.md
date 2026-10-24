@@ -9,7 +9,10 @@ externes ont besoin d’Internet. Le compte et la synchronisation cloud s’ouvr
 sur le site officiel dans le navigateur ; les données de l’APK ne sont pas
 automatiquement transférées au navigateur. L’import/export JSON permet leur
 transfert volontaire. Les exports JSON/MP3/WAV utilisent le sélecteur Android.
-La lecture s’arrête en arrière-plan ; aucun service audio permanent n’est installé.
+Le lanceur ne force plus l’arrêt quand l’application passe en arrière-plan.
+Aucun service audio permanent n’est installé : la continuité lors des restrictions
+de batterie ou de la fermeture du processus reste à vérifier sur téléphone.
+Le maintien de l’écran allumé suit la lecture et se libère après Stop.
 Le pont d’export actuel est limité à 20 Mo. Ces différences avec le site restent
 des limites de l’APK, pas des fonctions validées comme équivalentes au site.
 
@@ -19,7 +22,7 @@ distants restent identiques à ceux du site. Le changement de banque vocale pend
 la lecture attend le décodage des enregistrements avant d’activer la voix.
 Le sélecteur Android conserve le nom `.mid` sans lui ajouter `.rtx`.
 
-La QA native utilise Android 14 et 15 à 360 pixels CSS (1080 pixels physiques,
+La QA native utilise Android 14, 15 et 16 à 360 pixels CSS (1080 pixels physiques,
 densité 480), vérifie toutes les banques et les 40 voix, génère les vrais guides
 FR/EN et décode le MP3 effectivement enregistré. Les résultats détaillés font foi :
 ces contrôles automatisés ne constituent pas une écoute sur téléphone physique.

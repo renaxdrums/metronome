@@ -104,17 +104,21 @@ public final class Probe extends Instrumentation {
   }
   private Object command(JSONObject q) throws Exception {
     String action=q.getString("action");
+    if(action.equals("keepScreenOn")){final boolean[] keep=new boolean[1];runOnMainSync(()->keep[0]=(activity.getWindow().getAttributes().flags&android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)!=0);return keep[0];}
     if(action.equals("refreshPort")){runOnMainSync(()->{try{java.lang.reflect.Method m=activity.getClass().getDeclaredMethod("installPort");m.setAccessible(true);m.invoke(activity);}catch(Exception e){throw new RuntimeException(e);}});return true;}
     if(action.equals("nativeFile"))return nativeFile(getUiAutomation().getRootInActiveWindow(),q.getString("filename"));
     if(action.equals("eval"))return evaluate(q.getString("script"));
     if(action.equals("tap")){pointer(q.getInt("x"),q.getInt("y"));return true;}
     if(action.equals("tapCss")) {
       String selector=JSONObject.quote(q.getString("selector"));
-      String expression="JSON.stringify((()=>{const e=document.querySelector("+selector+");if(!e)throw Error('Missing touch target');e.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2,w:innerWidth,h:r.height}})())";
-      evaluate(expression);SystemClock.sleep(150);
+      evaluate("(()=>{const e=document.querySelector("+selector+");if(e)e.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return true})()");SystemClock.sleep(150);
+      String expression="JSON.stringify((()=>{const e=document.querySelector("+selector+");if(!e)return {h:0,hit:false};const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);return {x,y,w:innerWidth,h:r.height,hit:!!hit&&(e===hit||e.contains(hit)),visible:getComputedStyle(e).visibility!=='hidden',obstruction:hit?hit.outerHTML.slice(0,160):'outside viewport'}})())";
       Object encoded=evaluate(expression);
       if(!(encoded instanceof String))throw new IllegalStateException("Touch target unavailable");
-      JSONObject r=new JSONObject((String)encoded);if(r.getDouble("h")<=0)throw new IllegalStateException("Touch target is hidden");
+      JSONObject r=new JSONObject((String)encoded);long deadline=SystemClock.uptimeMillis()+2500;
+      while(r.optDouble("h")>0&&(!r.optBoolean("hit")||!r.optBoolean("visible"))&&SystemClock.uptimeMillis()<deadline){SystemClock.sleep(100);Object next=evaluate(expression);if(!(next instanceof String))break;r=new JSONObject((String)next);}
+      if(r.optDouble("h")<=0||!r.optBoolean("visible"))throw new IllegalStateException("Touch target is hidden: "+q.getString("selector"));
+      if(!r.optBoolean("hit"))throw new IllegalStateException("Touch target is covered: "+q.getString("selector")+" by "+r.optString("obstruction"));
       int[] location=new int[2];runOnMainSync(()->web.getLocationOnScreen(location));
       double scale=web.getWidth()/r.getDouble("w");
       pointer(location[0]+(int)Math.round(r.getDouble("x")*scale),location[1]+(int)Math.round(r.getDouble("y")*scale));

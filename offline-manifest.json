@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "c69e663a10d8233d",
+  "revision": "ab86c4a996d079bb",
   "resources": [
     {
       "path": "accessibility.css",
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "cc1ed6aa5185fd0930b43077caddd946b0612753c7af12974ce61cf4c387c0bc",
+      "sha256": "b1fedc360dc422471defd9c6f4f139a9b9fade564a62571a63547a9480a9514e",
       "text": true
     },
     {
@@ -329,7 +329,7 @@
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "265a71e59c7eca646011596961325e7fdcabc998608ae991d4e3e4ec72f07234",
+      "sha256": "3d3a45b2a38d85b3ff8792088ea63ba557524b694fbaa1171fde8f0a4b55e8ce",
       "text": true
     },
     {
@@ -369,7 +369,7 @@
     },
     {
       "path": "multi-metronome.js",
-      "sha256": "6f20f7386b950e0ce5dcebd6c993d98c6ac61a886653b1a2d270b5051e65e255",
+      "sha256": "ec9e737bfa57b6d4a6fc8e04ec147ff9e249cb3a53b9f17d83fe7d022f2cab17",
       "text": true
     },
     {

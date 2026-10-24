@@ -655,8 +655,28 @@
     });
 
     soundBankSel.addEventListener('change', async (e) => {
-      currentBank = e.target.value;
+      const requestedBank = e.target.value;
+      const wasPlaying = isPlaying;
+      // A live switch is an explicit vocal action too. Keep the current bank
+      // until recordings are decoded, rather than substituting subdivision ticks.
+      if (wasPlaying && SOUND_BANKS[requestedBank]?.isVoice) {
+        try {
+          await ensureVoiceMetronomeReady(requestedBank);
+        } catch (error) {
+          if (soundBankSel.value === requestedBank) {
+            soundBankSel.value = currentBank;
+            window.RENAX_FEEDBACK?.error('Voix indisponibles. Réessayez le chargement.', error);
+          }
+          return;
+        }
+        if (soundBankSel.value !== requestedBank) return;
+      }
+      currentBank = requestedBank;
       updateVoiceGroupLabel();
+      document.dispatchEvent(new CustomEvent('renax:sound-bank-ready', { detail: { bank: requestedBank } }));
+
+      // Stop pressed while decoding must not trigger the stopped-state preview.
+      if (wasPlaying && !isPlaying) return;
 
       // En lecture : changer la banque uniquement, sans jouer l'aperçu.
       if (isPlaying) {

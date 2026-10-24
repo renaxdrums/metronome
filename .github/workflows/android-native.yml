@@ -1,0 +1,80 @@
+name: Android native application
+on:
+  pull_request:
+    paths: ['android/**', '.github/workflows/android-native.yml']
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/android-native.yml']
+permissions:
+  contents: read
+concurrency:
+  group: native-android-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api: 34
+            target: google_apis
+          - api: 35
+            target: default
+          - api: 36
+            target: default
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install isolated build dependencies
+        run: npm install --prefix "$RUNNER_TEMP/renax-native-deps" --no-audit --no-fund esbuild@0.28.2 espree@11.2.0 html-minifier-terser@7.2.0
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Prepare Android compiler and KVM
+        run: |
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          sudo chmod a+rw /dev/kvm
+      - name: Build release activity and separate test probe
+        env:
+          NODE_PATH: ${{ runner.temp }}/renax-native-deps/node_modules
+        run: python3 android/qa/build.py
+      - name: Test on Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          ram-size: 4096M
+          emulator-options: -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340
+          disable-animations: true
+          script: python3 android/qa/suite.py
+      - name: Preserve host diagnostics after native testing
+        if: always()
+        run: |
+          mkdir -p android/build/native-qa/output
+          {
+            free -h
+            df -h
+            sudo dmesg --ctime | tail -100
+          } > android/build/native-qa/output/native-host-diagnostics.txt 2>&1
+      - name: Preserve test results and tested application
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-android-${{ matrix.api }}
+          path: |
+            android/build/native-qa/output/app.apk
+            android/build/native-qa/output/*.json
+            android/build/native-qa/output/*.txt
+            android/build/native-qa/output/*.png
+            android/build/native-qa/output/*.mp3
+            android/build/native-qa/output/*.mid
+          retention-days: 7

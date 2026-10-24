@@ -7,6 +7,7 @@ def run_voice_checks(api):
 
     def live_switch(bank):
         nav('metronome')
+        set_value('#volumeSlider',80,'input')
         set_value('#soundBank', 'clic')
         tap('#playBtn')
         wait('isPlaying')
@@ -35,6 +36,7 @@ def run_voice_checks(api):
                 tap('#playBtn')
 
     def every_sample():
+        set_value('#volumeSlider',80,'input')
         js('(()=>{window.__qaSamples={pending:true};prepareAllVoiceAudio().then(async()=>{const original=audioCtx,bank=currentBank;const rows=[];try{for(const [gender,key] of [["male","voiceMale"],["female","voiceFemale"]])for(let n=1;n<=20;n++){const buffer=VOICE_METRONOME_BUFFERS[gender][String(n)];if(!buffer)throw Error("Missing "+gender+" "+n);const ctx=new OfflineAudioContext(1,Math.ceil((buffer.duration+1)*48000),48000);audioCtx=ctx;currentBank=key;const out=ctx.createGain();out.connect(ctx.destination);let oscillators=0;const create=ctx.createOscillator.bind(ctx);ctx.createOscillator=(...args)=>{oscillators++;return create(...args)};playClick(1,.4,false,{beatNumber:n,subIndex:0,beatDurationSec:.5});const rendered=await ctx.startRendering();let energy=0,peak=0;for(const x of rendered.getChannelData(0)){energy+=x*x;peak=Math.max(peak,Math.abs(x))}if(!(energy>0&&peak>0)||oscillators)throw Error("Silent or substituted voice "+gender+" "+n);rows.push({gender,number:n,samples:buffer.length,peak,energy,oscillators})}window.__qaSamples={rows}}finally{audioCtx=original;currentBank=bank}}).catch(e=>window.__qaSamples={error:String(e.stack)});return true})()')
         state = wait('window.__qaSamples', lambda x: not x.get('pending'), timeout=75)
         require(not state.get('error'), state.get('error'))

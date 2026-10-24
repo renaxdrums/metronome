@@ -80,6 +80,12 @@ public final class Probe extends Instrumentation {
       if(!getUiAutomation().injectInputEvent(up,true))throw new IllegalStateException("Pointer up rejected");
     } finally { down.recycle();up.recycle(); }
   }
+  private void visualReady() throws Exception {
+    final WebView target=web;final CountDownLatch latch=new CountDownLatch(1);
+    runOnMainSync(()->target.postVisualStateCallback(0,new WebView.VisualStateCallback(){@Override public void onComplete(long id){target.invalidate();latch.countDown();}}));
+    if(!latch.await(5,TimeUnit.SECONDS))throw new TimeoutException("WebView visual state timed out");
+    SystemClock.sleep(100);
+  }
   private void nodes(AccessibilityNodeInfo node,JSONArray list,int depth) throws Exception {
     if(node==null||depth>40||list.length()>2000)return;
     if(node.isVisibleToUser()) {
@@ -111,7 +117,7 @@ public final class Probe extends Instrumentation {
     if(action.equals("tap")){pointer(q.getInt("x"),q.getInt("y"));return true;}
     if(action.equals("tapCss")) {
       String selector=JSONObject.quote(q.getString("selector"));
-      evaluate("(()=>{const e=document.querySelector("+selector+");if(e)e.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return true})()");SystemClock.sleep(150);
+      evaluate("(()=>{const e=document.querySelector("+selector+");if(e)e.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return true})()");visualReady();
       String expression="JSON.stringify((()=>{const e=document.querySelector("+selector+");if(!e)return {h:0,hit:false};const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);return {x,y,w:innerWidth,h:r.height,hit:!!hit&&(e===hit||e.contains(hit)),visible:getComputedStyle(e).visibility!=='hidden',obstruction:hit?hit.outerHTML.slice(0,160):'outside viewport'}})())";
       Object encoded=evaluate(expression);
       if(!(encoded instanceof String))throw new IllegalStateException("Touch target unavailable");
@@ -119,9 +125,12 @@ public final class Probe extends Instrumentation {
       while(r.optDouble("h")>0&&(!r.optBoolean("hit")||!r.optBoolean("visible"))&&SystemClock.uptimeMillis()<deadline){SystemClock.sleep(100);Object next=evaluate(expression);if(!(next instanceof String))break;r=new JSONObject((String)next);}
       if(r.optDouble("h")<=0||!r.optBoolean("visible"))throw new IllegalStateException("Touch target is hidden: "+q.getString("selector"));
       if(!r.optBoolean("hit"))throw new IllegalStateException("Touch target is covered: "+q.getString("selector")+" by "+r.optString("obstruction"));
+      // Require a settled hit box, as a real tap must not land on the old pane.
+      for(int i=0;i<10;i++){SystemClock.sleep(100);JSONObject next=new JSONObject((String)evaluate(expression));boolean stable=Math.abs(next.optDouble("x")-r.optDouble("x"))<.5&&Math.abs(next.optDouble("y")-r.optDouble("y"))<.5&&next.optBoolean("hit");r=next;if(stable)break;if(i==9)throw new IllegalStateException("Touch target is moving: "+q.getString("selector"));}
       int[] location=new int[2];runOnMainSync(()->web.getLocationOnScreen(location));
       double scale=web.getWidth()/r.getDouble("w");
       pointer(location[0]+(int)Math.round(r.getDouble("x")*scale),location[1]+(int)Math.round(r.getDouble("y")*scale));
+      visualReady();
       return true;
     }
     if(action.equals("nodes")){JSONArray list=new JSONArray();nodes(getUiAutomation().getRootInActiveWindow(),list,0);return list;}

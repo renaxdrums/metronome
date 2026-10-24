@@ -33,6 +33,8 @@ def click(selector):return js('(()=>{const e=document.querySelector('+json.dumps
 def set_value(selector,value,event='change'):
  return js('(()=>{const e=document.querySelector('+json.dumps(selector)+');if(!e)throw Error("Missing input");e.value='+json.dumps(str(value))+';e.dispatchEvent(new Event('+json.dumps(event)+',{bubbles:true}));return e.value})()')
 def nav(mode):
+ if js('document.querySelector("#beatEditor")?.hidden===false'):
+  tap('#beatEditor [aria-label="Fermer"]');wait('document.querySelector("#beatEditor").hidden')
  tap('[data-workspace="'+mode+'"]');wait('document.body.dataset.workspace',lambda x:x==mode)
 def save_report():
  report={'android_api':api,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'tests':results}
@@ -48,7 +50,7 @@ def check(name,fn):
    item['shared_files']=adb('shell','find','/sdcard/','-type','f',check=False).stdout.decode(errors='replace')
    item['native_nodes']=nodes();(out/(name+'.png')).write_bytes(adb('exec-out','screencap','-p',check=False).stdout)
   except Exception:pass
-  try:item['web_state']=js('({workspace:document.body.dataset.workspace,text:document.body.innerText.slice(0,1800),url:location.href,bridge:!!window.__renaxNativeSave,bridgePort:!!window.__renaxNativeSave?.port})')
+  try:item['web_state']=js('({workspace:document.body.dataset.workspace,pane:document.body.dataset.mobilePane,bank:currentBank,volume:masterVolume,audio:audioCtx?.state,text:document.body.innerText.slice(0,1800),url:location.href,bridge:!!window.__renaxNativeSave,bridgePort:!!window.__renaxNativeSave?.port})')
   except Exception as nested:item['diagnostic_error']=str(nested)
   results.append(item);print('FAIL '+name+': '+str(e),flush=True)
   try:js('(()=>{document.querySelectorAll("dialog[open]").forEach(d=>d.close());if(typeof stopMetronome==="function")stopMetronome();return true})()')
@@ -152,6 +154,7 @@ def tempo_and_metric():
  return {'tempo_steps':'137 → 138 → 137','metric':'7/8 → 4/4'}
 def banks():
  nav('metronome'); choices=js('Array.from(document.querySelector("#soundBank").options).map(o=>({value:o.value,text:o.textContent}))'); tested=[]
+ set_value('#volumeSlider',80,'input')
  tap('#playBtn');wait('isPlaying')
  js('(()=>{window.__qaBankAnalyser=audioCtx.createAnalyser();__qaBankAnalyser.fftSize=4096;getAudioMixDestination(audioCtx).connect(__qaBankAnalyser);window.__qaBankCalls=[];window.__qaOriginalPlayClick=playClick;playClick=function(...args){__qaBankCalls.push(currentBank);return __qaOriginalPlayClick(...args)};return true})()')
  try:
@@ -241,6 +244,7 @@ def export_midi():
 
 def export_mp3():
  nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"playlist",profile:RENAX_SONGS.library.activeProfile,song:null})')
+ set_value('#volumeSlider',80,'input')
  tap('#mp3ExportOpen');tap('#mp3ExportSave');wait('!!document.querySelector("#mp3ExportDownload")&&!document.querySelector("#mp3ExportDownload").hidden',timeout=120)
  name=js('document.querySelector("#mp3ExportDownload").download');tap('#mp3ExportDownload');data=save_picker(name)
  require(len(data)>100 and (data.startswith(b'ID3') or data[0]==255),'Invalid MP3 output')

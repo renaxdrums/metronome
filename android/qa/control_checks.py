@@ -82,7 +82,7 @@ def run_control_checks(api):
 
     def training_curves():
         nav('training')
-        if js('document.querySelector("#workspaceMobileViews [data-pane=training]")?.getBoundingClientRect().height>0'):tap('#workspaceMobileViews [data-pane=training]')
+        if js('document.body.dataset.mobilePane!=="training"&&document.querySelector("#workspaceMobileViews [data-pane=training]")?.getBoundingClientRect().height>0'):tap('#workspaceMobileViews [data-pane=training]')
         curves=js('Array.from(document.querySelectorAll("[data-curve]")).map(e=>e.dataset.curve)')
         set_value('#trainStart',80);set_value('#trainEnd',140);set_value('#trainDuration',2);set_value('#trainDurationUnit','seconds')
         rows=[]
@@ -103,7 +103,7 @@ def run_control_checks(api):
         rows=[]
         for direction,target in [('up',84),('down',76)]:
             nav('training')
-            if js('document.querySelector("#workspaceMobileViews [data-pane=training]")?.getBoundingClientRect().height>0'):tap('#workspaceMobileViews [data-pane=training]')
+            if js('document.body.dataset.mobilePane!=="training"&&document.querySelector("#workspaceMobileViews [data-pane=training]")?.getBoundingClientRect().height>0'):tap('#workspaceMobileViews [data-pane=training]')
             tap('#trainingMode-steps');tap('#dirToggle [data-dir='+json.dumps(direction)+']')
             for selector,value in [('#trainStart',80),('#trainStep',4),('#trainInterval',1),('#trainIntervalUnit','seconds')]:set_value(selector,value)
             tap('#trainBtn');wait('isPlaying&&training.active');wait('tempo',lambda bpm:bpm==target,timeout=8)
@@ -111,7 +111,7 @@ def run_control_checks(api):
             tap(selector);wait('!isPlaying&&!training.engaged')
             rows.append({'direction':direction,'first_step_bpm':target,'step':4,'interval_seconds':1,'stopped':True})
         nav('training')
-        if js('document.querySelector("#workspaceMobileViews [data-pane=training]")?.getBoundingClientRect().height>0'):tap('#workspaceMobileViews [data-pane=training]')
+        if js('document.body.dataset.mobilePane!=="training"&&document.querySelector("#workspaceMobileViews [data-pane=training]")?.getBoundingClientRect().height>0'):tap('#workspaceMobileViews [data-pane=training]')
         tap('#trainingMode-progressive')
         return rows
 

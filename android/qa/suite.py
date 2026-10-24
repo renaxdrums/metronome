@@ -1,6 +1,6 @@
 """Functional checks inside the real Android release WebView, with native gestures/SAF."""
 from pathlib import Path
-import json, socket, subprocess, time, traceback, sys, re
+import json, socket, subprocess, time, traceback, sys, re, hashlib
 from voice_checks import run_voice_checks, check_guide
 from control_checks import run_control_checks
 from media_checks import midi_summary
@@ -101,7 +101,7 @@ def wait_native_file(filename):
   if any(filename.casefold() in (n['text']+' '+n['desc']).casefold() for n in nodes()):return
   time.sleep(.3)
  raise AssertionError('Native file is not visible: '+filename)
-def save_picker(filename):
+def save_picker(filename,persist=True):
  deadline=time.monotonic()+15;current=[]
  while time.monotonic()<deadline:
   current=nodes()
@@ -119,6 +119,7 @@ def save_picker(filename):
   time.sleep(.3)
  else:
   native_click_text(['Show roots','Open navigation drawer']);native_click_text(['Downloads','Téléchargements']);native_click_text(['Save','Enregistrer']);time.sleep(.5)
+ wait('!window.__renaxNativeSave.busy',timeout=90)
  path='/sdcard/Download/'+filename; deadline=time.monotonic()+10;data=b''
  while time.monotonic()<deadline:
   candidates=[filename]
@@ -128,7 +129,8 @@ def save_picker(filename):
   if data and b'No such file' not in data and b'Permission denied' not in data:break
   time.sleep(.3)
  require(bool(data) and b'No such file' not in data,'Saved file missing: '+path)
- (out/filename).write_bytes(data);return data
+ if persist:(out/filename).write_bytes(data)
+ return data
 
 def play_stop():
  nav('metronome');tap('#playBtn');wait('typeof isPlaying!=="undefined"&&isPlaying');state=wait('typeof audioCtx!=="undefined"&&audioCtx?audioCtx.state:null',lambda s:s=='running')
@@ -232,6 +234,28 @@ def import_json():
  after=wait('RENAX_SONGS.library.profiles.length',lambda n:n==before+len(exported['profiles']))
  return {'native_picker':True,'profiles_before':before,'profiles_after':after,'original_profiles_preserved':True}
 
+def export_cancel():
+ js('(()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["cancel"],{type:"application/json"}));a.download="renax-cancel.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000);return true})()')
+ deadline=time.monotonic()+15
+ while time.monotonic()<deadline:
+  if any('documentsui' in n.get('package','') for n in nodes()):break
+  time.sleep(.2)
+ else:raise AssertionError('Cancellation test picker did not open')
+ adb('shell','input','keyevent','BACK')
+ wait('!window.__renaxNativeSave.busy')
+ require(request('exportCacheCount')==0,'Cancelled export left a private temporary file')
+ return {'native_picker_cancelled':True,'bridge_released':True,'temporary_files_remaining':0}
+
+def export_large():
+ size=25*1024*1024
+ js('(()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(['+json.dumps('{"payload":"')+',"A".repeat('+str(size)+'),'+json.dumps('"}')+'],{type:"application/json"}));a.download="renax-large-native-test.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),30000);return true})()')
+ data=save_picker('renax-large-native-test.json',persist=False)
+ expected=b'{"payload":"'+b'A'*size+b'"}'
+ require(hashlib.sha256(data).digest()==hashlib.sha256(expected).digest(),'Large export bytes changed')
+ require(request('exportCacheCount')==0,'Completed export left a private temporary file')
+ adb('shell','rm','/sdcard/Download/renax-large-native-test.json')
+ return {'native_picker':True,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'greater_than_previous_20_MiB_limit':True,'temporary_files_remaining':0}
+
 def export_midi():
  nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"playlist",profile:RENAX_SONGS.library.activeProfile,song:null})')
  tap('#mp3ExportOpen');set_value('#songExportFormat','midi');tap('#mp3ExportSave')
@@ -333,6 +357,8 @@ try:
  check('native_json_import_preserves_existing_data',import_json)
  check('native_mp3_export_and_signature',export_mp3)
  check('native_midi_export',export_midi)
+ check('native_export_cancel_and_cleanup',export_cancel)
+ check('native_export_above_20_MiB_bytes',export_large)
  check('screen_awake_only_during_playback',screen_policy)
  check('background_continuous_playback_30_seconds',background)
  check('activity_recreation_local_storage',persistence)

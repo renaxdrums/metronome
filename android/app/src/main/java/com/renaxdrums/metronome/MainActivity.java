@@ -20,10 +20,16 @@ import org.json.JSONObject;
 public final class MainActivity extends Activity {
   private static final String ORIGIN="https://appassets.androidplatform.net";
   private static final String SITE="https://renaxdrums.github.io/metronome/";
-  private static final int OPEN_FILE=10,SAVE_FILE=11,MAX_EXPORT=20*1024*1024;
+  private static final int OPEN_FILE=10,SAVE_FILE=11,EXPORT_CHUNK=64*1024;
   private WebView web;
   private ValueCallback<Uri[]> fileCallback;
-  private byte[] pendingExport;
+  private File exportFile;
+  private OutputStream exportWriter;
+  private String exportId,exportName,exportMime;
+  private long exportSize,exportReceived;
+  private int exportSequence;
+  private boolean savingExport;
+  private boolean destroyed;
   private WebMessagePort nativePort;
 
   @Override public void onCreate(Bundle state){
@@ -99,39 +105,99 @@ public final class MainActivity extends Activity {
     if(file.endsWith(".woff2"))return "font/woff2";if(file.endsWith(".woff"))return "font/woff";
     String mime=java.net.URLConnection.guessContentTypeFromName(file);return mime==null?"application/octet-stream":mime;
   }
+  private void reply(WebMessagePort port,String id,int seq,boolean ok,boolean cancelled){
+    try{port.postMessage(new WebMessage(new JSONObject().put("id",id).put("seq",seq).put("ok",ok).put("cancelled",cancelled).toString()));}catch(Exception ignored){}
+  }
+  private void clearExport(){
+    if(exportWriter!=null)try{exportWriter.close();}catch(IOException ignored){}
+    exportWriter=null;
+    if(exportFile!=null)exportFile.delete();
+    exportFile=null;exportId=null;exportName=null;exportMime=null;
+    exportSize=0;exportReceived=0;exportSequence=0;
+  }
+  private void receiveExport(WebMessagePort port,JSONObject data) throws Exception {
+    String kind=data.optString("kind"),id=data.optString("id");int seq=data.optInt("seq",-1);
+    if(id.isEmpty()||id.length()>80)throw new IOException("Invalid transfer identifier");
+    if("abort".equals(kind)){if(id.equals(exportId)&&!savingExport)clearExport();return;}
+    if("begin".equals(kind)){
+      if(exportId!=null||savingExport){reply(port,id,seq,false,false);return;}
+      String mime=data.getString("mime"),name=data.getString("name");
+      double size=data.getDouble("size");
+      if(seq!=0||!Arrays.asList("application/json","audio/mpeg","audio/wav","audio/mp3","audio/midi").contains(mime)||!Double.isFinite(size)||size<0||size>9007199254740991d||size!=Math.floor(size))throw new IOException("Invalid export");
+      name=name.replaceAll("[\\\\/\\p{Cntrl}]","_");if(name.length()>120)name=name.substring(0,120);if(name.isEmpty())name="renax-export";
+      exportId=id;exportName=name;exportMime=mime;exportSize=(long)size;exportReceived=0;exportSequence=0;
+      exportFile=File.createTempFile("renax-export-",".tmp",getCacheDir());
+      exportWriter=new BufferedOutputStream(new FileOutputStream(exportFile),EXPORT_CHUNK);
+      reply(port,id,seq,true,false);return;
+    }
+    if(!id.equals(exportId)||savingExport){reply(port,id,seq,false,false);return;}
+    if(seq!=exportSequence+1||exportWriter==null)throw new IOException("Invalid transfer order");
+    if("chunk".equals(kind)){
+      String encoded=data.getString("data");if(encoded.length()>(EXPORT_CHUNK+2)/3*4)throw new IOException("Chunk too large");
+      byte[] bytes=Base64.decode(encoded,Base64.NO_WRAP);
+      if(bytes.length==0||bytes.length>EXPORT_CHUNK||bytes.length>exportSize-exportReceived)throw new IOException("Invalid chunk size");
+      exportWriter.write(bytes);exportReceived+=bytes.length;exportSequence=seq;
+      reply(port,id,seq,true,false);return;
+    }
+    if(!"finish".equals(kind)||exportReceived!=exportSize)throw new IOException("Incomplete export");
+    exportWriter.close();exportWriter=null;exportSequence=seq;savingExport=true;
+    // Android 15 maps audio/midi to .rtx; keep the supplied .mid filename.
+    Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT);save.addCategory(Intent.CATEGORY_OPENABLE);
+    save.setType("audio/midi".equals(exportMime)?"application/octet-stream":exportMime);save.putExtra(Intent.EXTRA_TITLE,exportName);
+    try{startActivityForResult(save,SAVE_FILE);}catch(Exception error){savingExport=false;throw error;}
+    // The finish acknowledgement follows the actual save or picker cancellation.
+  }
   private void installPort(){
-    if(nativePort!=null)nativePort.close();
-    final String nonce=UUID.randomUUID().toString();WebMessagePort[] ports=web.createWebMessageChannel();nativePort=ports[0];
+    if(savingExport)return;
+    clearExport();if(nativePort!=null)nativePort.close();
+    final String nonce=UUID.randomUUID().toString();final WebMessagePort[] ports=web.createWebMessageChannel();nativePort=ports[0];
     nativePort.setWebMessageCallback(new WebMessagePort.WebMessageCallback(){@Override public void onMessage(WebMessagePort port,WebMessage message){
+      JSONObject data=null;
       try{
         if(!(ORIGIN+"/app/index.html").equals(web.getUrl()))return;
-        String raw=message.getData();if(raw==null||raw.length()>MAX_EXPORT*4/3+4096)return;
-        JSONObject data=new JSONObject(raw);
+        String raw=message.getData();if(raw==null||raw.length()>EXPORT_CHUNK*2)return;
+        data=new JSONObject(raw);
         if("screen".equals(data.optString("kind"))){if(data.optBoolean("keep"))getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);return;}
-        if(pendingExport!=null)return;
-        String mime=data.optString("mime"),name=data.optString("name");
-        if(!Arrays.asList("application/json","audio/mpeg","audio/wav","audio/mp3","audio/midi").contains(mime))return;
-        byte[] bytes=Base64.decode(data.getString("data"),Base64.DEFAULT);if(bytes.length>MAX_EXPORT)return;
-        pendingExport=bytes;name=name.replaceAll("[\\\\/\\p{Cntrl}]","_");if(name.length()>120)name=name.substring(0,120);
-        // Android 15 maps audio/midi to .rtx. Preserve the supplied .mid name;
-        // the validated SMF bytes and their MIME type remain unchanged.
-        Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT);save.addCategory(Intent.CATEGORY_OPENABLE);save.setType("audio/midi".equals(mime)?"application/octet-stream":mime);save.putExtra(Intent.EXTRA_TITLE,name);
-        startActivityForResult(save,SAVE_FILE);
-      }catch(Exception error){pendingExport=null;Toast.makeText(MainActivity.this,"Export impossible",Toast.LENGTH_SHORT).show();}
+        receiveExport(port,data);
+      }catch(Exception error){
+        if(data!=null){String id=data.optString("id");reply(port,id,data.optInt("seq",-1),false,false);if(id.equals(exportId)&&!savingExport)clearExport();}
+      }
     }});
-    String script="(function(){const nonce='"+nonce+"';let bridge=window.__renaxNativeSave;if(bridge){bridge.nonce=nonce;bridge.port=null;return;}bridge=window.__renaxNativeSave={nonce,port:null};window.addEventListener('message',function(e){if(e.data==='renax-native:'+bridge.nonce&&e.ports.length)bridge.port=e.ports[0];});function save(a){if(!a.download||!a.href.startsWith('blob:'))return false;if(!bridge.port){alert('Export indisponible, réessaie.');return true;}fetch(a.href).then(r=>r.blob()).then(blob=>{if(blob.size>"+MAX_EXPORT+"){alert('Export trop volumineux (20 Mo maximum).');return;}const reader=new FileReader();reader.onload=()=>bridge.port.postMessage(JSON.stringify({name:a.download,mime:blob.type||'application/json',data:String(reader.result).split(',')[1]}));reader.readAsDataURL(blob);}).catch(()=>alert('Export impossible.'));return true;}const click=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(){if(!save(this))return click.call(this);};document.addEventListener('click',function(e){const account=e.target.closest('#directAccountBtn');if(account){e.preventDefault();e.stopImmediatePropagation();location.href='"+ORIGIN+"/open-website';return;}const a=e.target.closest('a[download]');if(a&&save(a)){e.preventDefault();e.stopImmediatePropagation();}},true);})();";
-    String screenScript="(function(){const bridge=window.__renaxNativeSave;if(bridge.screenTimer)return;let last;function report(){if(!bridge.port)return;const keep=(typeof isPlaying!=='undefined'&&isPlaying)||!!document.fullscreenElement;if(keep!==last){bridge.port.postMessage(JSON.stringify({kind:'screen',keep}));last=keep;}}bridge.screenTimer=setInterval(report,250);document.addEventListener('fullscreenchange',report);})();";
-    web.evaluateJavascript(script+screenScript,new ValueCallback<String>(){@Override public void onReceiveValue(String ignored){web.postWebMessage(new WebMessage("renax-native:"+nonce,new WebMessagePort[]{ports[1]}),Uri.parse(ORIGIN));}});
+    try{
+      ByteArrayOutputStream source=new ByteArrayOutputStream();
+      try(InputStream input=getAssets().open("site/android-native-bridge.js")){byte[] buffer=new byte[4096];int count;while((count=input.read(buffer))!=-1)source.write(buffer,0,count);}
+      String script=source.toString("UTF-8")+"("+JSONObject.quote(nonce)+","+EXPORT_CHUNK+","+JSONObject.quote(ORIGIN+"/open-website")+");";
+      web.evaluateJavascript(script,new ValueCallback<String>(){@Override public void onReceiveValue(String ignored){if(!destroyed)web.postWebMessage(new WebMessage("renax-native:"+nonce,new WebMessagePort[]{ports[1]}),Uri.parse(ORIGIN));}});
+    }catch(IOException error){Toast.makeText(this,"Export indisponible",Toast.LENGTH_SHORT).show();}
+  }
+  private void saveExportResult(int result,Intent data){
+    if(!savingExport||exportFile==null)return;
+    final WebMessagePort port=nativePort;final String id=exportId;final int seq=exportSequence;
+    final Uri uri=data==null?null:data.getData();
+    if(result!=RESULT_OK||uri==null||!"content".equals(uri.getScheme())){
+      savingExport=false;clearExport();reply(port,id,seq,true,true);return;
+    }
+    final File file=exportFile;exportFile=null;
+    new Thread(new Runnable(){@Override public void run(){
+      boolean success=false;
+      try{try(InputStream input=new BufferedInputStream(new FileInputStream(file));OutputStream output=getContentResolver().openOutputStream(uri,"wt")){
+        if(output==null)throw new IOException("No output stream");
+        byte[] buffer=new byte[EXPORT_CHUNK];int count;while((count=input.read(buffer))!=-1)output.write(buffer,0,count);
+        output.flush();
+      }success=true;}catch(Exception ignored){}finally{file.delete();}
+      final boolean saved=success;
+      runOnUiThread(new Runnable(){@Override public void run(){savingExport=false;clearExport();if(!destroyed){reply(port,id,seq,saved,false);if(!saved)Toast.makeText(MainActivity.this,"Enregistrement impossible",Toast.LENGTH_SHORT).show();}}});
+    }},"renax-native-export").start();
   }
   private void openSite(){openExternal(Uri.parse(SITE));}
   private void openExternal(Uri uri){try{startActivity(new Intent(Intent.ACTION_VIEW,uri));}catch(Exception ignored){}}
   @Override protected void onActivityResult(int request,int result,Intent data){
     super.onActivityResult(request,result,data);
     if(request==OPEN_FILE&&fileCallback!=null){Uri uri=data==null?null:data.getData();fileCallback.onReceiveValue(result==RESULT_OK&&uri!=null&&"content".equals(uri.getScheme())?new Uri[]{uri}:null);fileCallback=null;}
-    if(request==SAVE_FILE){try{if(result==RESULT_OK&&data!=null&&data.getData()!=null&&"content".equals(data.getData().getScheme())&&pendingExport!=null)try(OutputStream output=getContentResolver().openOutputStream(data.getData())){if(output!=null)output.write(pendingExport);}}catch(Exception error){Toast.makeText(this,"Enregistrement impossible",Toast.LENGTH_SHORT).show();}finally{pendingExport=null;}}
+    if(request==SAVE_FILE)saveExportResult(result,data);
   }
   @Override public void onBackPressed(){if(web.canGoBack())web.goBack();else super.onBackPressed();}
   @Override protected void onPause(){web.onPause();super.onPause();}
   @Override protected void onResume(){super.onResume();if(web!=null)web.onResume();}
-  @Override protected void onDestroy(){if(fileCallback!=null)fileCallback.onReceiveValue(null);if(nativePort!=null)nativePort.close();web.destroy();super.onDestroy();}
+  @Override protected void onDestroy(){destroyed=true;clearExport();if(fileCallback!=null)fileCallback.onReceiveValue(null);if(nativePort!=null)nativePort.close();web.destroy();super.onDestroy();}
 }

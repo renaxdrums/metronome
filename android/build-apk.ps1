@@ -20,6 +20,7 @@ $html=Get-Content $indexPath -Raw
 $html=[regex]::Replace($html,'<script[^>]+src="offline-cache\.js[^" ]*"[^>]*></script>','')
 $html=$html.Replace('</body>','<script src="android-mode.js"></script></body>')
 Copy-Item (Join-Path $PSScriptRoot 'app/src/main/web/local-mode.js') (Join-Path $build 'assets/site/android-mode.js') -Force
+Copy-Item (Join-Path $PSScriptRoot 'app/src/main/web/native-bridge.js') (Join-Path $build 'assets/site/android-native-bridge.js') -Force
 Set-Content $indexPath $html -Encoding utf8NoBOM -NoNewline
 @'
 // The installed application keeps data on-device. Account management opens

@@ -110,6 +110,7 @@ public final class Probe extends Instrumentation {
   }
   private Object command(JSONObject q) throws Exception {
     String action=q.getString("action");
+    if(action.equals("exportCacheCount")){File[] files=activity.getCacheDir().listFiles((dir,name)->name.startsWith("renax-export-"));return files==null?0:files.length;}
     if(action.equals("keepScreenOn")){final boolean[] keep=new boolean[1];runOnMainSync(()->keep[0]=(activity.getWindow().getAttributes().flags&android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)!=0);return keep[0];}
     if(action.equals("refreshPort")){runOnMainSync(()->{try{java.lang.reflect.Method m=activity.getClass().getDeclaredMethod("installPort");m.setAccessible(true);m.invoke(activity);}catch(Exception e){throw new RuntimeException(e);}});return true;}
     if(action.equals("nativeFile"))return nativeFile(getUiAutomation().getRootInActiveWindow(),q.getString("filename"));

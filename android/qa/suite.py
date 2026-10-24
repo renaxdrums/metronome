@@ -2,6 +2,8 @@
 from pathlib import Path
 import json, socket, subprocess, time, traceback, sys, re
 from voice_checks import run_voice_checks, check_guide
+from control_checks import run_control_checks
+from media_checks import midi_summary
 
 root=Path(__file__).resolve().parents[2]; out=root/'android/build/native-qa/output'
 results=[]; process=None; log=None; api='unknown'
@@ -61,7 +63,7 @@ def require(value,message):
 def ready():
  wait('!!(window.RENAX_SONGS&&window.RENAX_I18N&&window.RENAX_WORKSPACE&&document.querySelector("#playBtn"))',timeout=45)
  wait('!document.querySelector("#renaxArrival")||document.querySelector("#renaxArrival").hidden',timeout=25)
- state=js('({url:location.href,title:document.title,workspace:document.body.dataset.workspace,body:document.body.innerText.slice(0,800)})')
+ state=js('({url:location.href,title:document.title,workspace:document.body.dataset.workspace,viewport:{width:innerWidth,height:innerHeight,scale:devicePixelRatio},body:document.body.innerText.slice(0,800)})')
  require(state['url']=='https://appassets.androidplatform.net/app/index.html','Unexpected startup URL')
  require('ERR_HTTP_RESPONSE_CODE_FAILURE' not in state['body'],'Startup HTTP error')
  return state
@@ -171,6 +173,7 @@ def modes(landscape):
  visited=[]
  for mode in ['metronome','polyrhythm','training','sequence','multi','tracks']:
   nav(mode);selected=js('document.querySelector("#workspaceNav [aria-selected=true]").dataset.workspace');require(selected==mode,'Wrong selected tab');visited.append(mode)
+  (out/(('landscape-' if landscape else 'portrait-')+mode+'.png')).write_bytes(adb('exec-out','screencap','-p').stdout)
  return visited
 
 def preferences():
@@ -232,7 +235,7 @@ def export_midi():
  wait('!!document.querySelector("#mp3ExportDownload")&&!document.querySelector("#mp3ExportDownload").hidden')
  name=js('document.querySelector("#mp3ExportDownload").download');tap('#mp3ExportDownload');time.sleep(1)
  if any('documentsui' in n.get('package','') for n in nodes()):
-  data=save_picker(name);require(data.startswith(b'MThd'),'Invalid MIDI header');click('#mp3ExportDialog .mp3-actions button:last-child');return {'native_picker':True,'bytes':len(data)}
+  data=save_picker(name);summary=midi_summary(data);click('#mp3ExportDialog .mp3-actions button:last-child');return {'native_picker':True,'file':name,'bytes':len(data),'musical_events':summary}
  click('#mp3ExportDialog .mp3-actions button:last-child')
  raise AssertionError('Native MIDI save picker did not open')
 
@@ -270,14 +273,18 @@ def offline():
 
 try:
  adb('root',check=False);adb('wait-for-device');api=adb('shell','getprop','ro.build.version.sdk').stdout.decode().strip()
+ # 1080 physical pixels at 480 dpi: a 360-CSS-pixel Android phone, not mdpi desktop geometry.
+ adb('shell','wm','density','480')
  adb('install','--no-incremental','-r',out/'app.apk');adb('install','--no-incremental','-r',out/'probe.apk')
  adb('logcat','-c');start_probe('first')
  check('startup_local_https',ready)
+ check('phone_360_css_pixels',lambda:require(js('innerWidth===360&&devicePixelRatio===3'),'Emulator is not using the intended phone scale'))
  check('portrait_six_workspaces',lambda:modes(False))
  check('landscape_six_workspaces',lambda:modes(True))
  request('rotate',landscape=False);wait('innerWidth<innerHeight')
  check('tempo_and_7_8_metric',tempo_and_metric)
  voice_api=(js,wait,tap,nav,set_value,check,require)
+ run_control_checks(voice_api)
  run_voice_checks(voice_api)
  check('every_sound_bank_scheduled_and_output_signal',banks)
  check('native_touch_play_stop_audio_context',play_stop)

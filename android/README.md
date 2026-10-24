@@ -1,7 +1,7 @@
 # Renax Drums - Métronome
 
 Application Android contenant le métronome et ses sons. Identifiant :
-`com.renaxdrums.metronome`, version 1.0.0, Android 8.0 minimum.
+`com.renaxdrums.metronome`, version 1.0.1, Android 8.0 minimum.
 
 Le métronome, les sons embarqués, les partitions et les sauvegardes locales
 fonctionnent sans connexion. Les voix/modèles téléchargés et les ressources
@@ -10,6 +10,19 @@ sur le site officiel dans le navigateur ; les données de l’APK ne sont pas
 automatiquement transférées au navigateur. L’import/export JSON permet leur
 transfert volontaire. Les exports JSON/MP3/WAV utilisent le sélecteur Android.
 La lecture s’arrête en arrière-plan ; aucun service audio permanent n’est installé.
+Le pont d’export actuel est limité à 20 Mo. Ces différences avec le site restent
+des limites de l’APK, pas des fonctions validées comme équivalentes au site.
+
+Les travailleurs du guide vocal embarquent leurs dépendances locales et la
+configuration Piper dans leur compilation Android. Les moteurs et modèles
+distants restent identiques à ceux du site. Le changement de banque vocale pendant
+la lecture attend le décodage des enregistrements avant d’activer la voix.
+Le sélecteur Android conserve le nom `.mid` sans lui ajouter `.rtx`.
+
+La QA native utilise Android 14 et 15 à 360 pixels CSS (1080 pixels physiques,
+densité 480), vérifie toutes les banques et les 40 voix, génère les vrais guides
+FR/EN et décode le MP3 effectivement enregistré. Les résultats détaillés font foi :
+ces contrôles automatisés ne constituent pas une écoute sur téléphone physique.
 
 ## Compilation
 

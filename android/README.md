@@ -13,8 +13,12 @@ Le lanceur ne force plus l’arrêt quand l’application passe en arrière-plan
 Aucun service audio permanent n’est installé : la continuité lors des restrictions
 de batterie ou de la fermeture du processus reste à vérifier sur téléphone.
 Le maintien de l’écran allumé suit la lecture et se libère après Stop.
-Le pont d’export actuel est limité à 20 Mo. Ces différences avec le site restent
-des limites de l’APK, pas des fonctions validées comme équivalentes au site.
+Le pont d’export transfère les fichiers par blocs de 64 Ko avec accusé de réception,
+puis les écrit via un fichier temporaire privé sans charger tout le contenu en
+mémoire Java. Il n’impose plus le plafond de 20 Mo ; l’espace de stockage disponible
+reste nécessaire. L’annulation du sélecteur libère le transfert et son fichier temporaire.
+Les différences de compte et de restrictions de batterie restent des limites de
+l’APK, pas des fonctions validées comme équivalentes au site.
 
 Les travailleurs du guide vocal embarquent leurs dépendances locales et la
 configuration Piper dans leur compilation Android. Les moteurs et modèles

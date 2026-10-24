@@ -6,7 +6,7 @@ from control_checks import run_control_checks
 from media_checks import midi_summary
 
 root=Path(__file__).resolve().parents[2]; out=root/'android/build/native-qa/output'
-results=[]; process=None; log=None; api='unknown'
+results=[]; process=None; log=None; logcat_process=None; logcat_file=None; api='unknown'
 TARGET='com.renaxdrums.metronome'
 def adb(*args,check=True):
  return subprocess.run(['adb',*map(str,args)],capture_output=True,check=check,timeout=60)
@@ -332,7 +332,10 @@ try:
  # 1080 physical pixels at 480 dpi: a 360-CSS-pixel Android phone, not mdpi desktop geometry.
  adb('shell','wm','density','480')
  adb('install','--no-incremental','-r',out/'app.apk');adb('install','--no-incremental','-r',out/'probe.apk')
- adb('logcat','-c');start_probe('first')
+ adb('logcat','-c')
+ logcat_file=(out/'native-logcat.txt').open('wb')
+ logcat_process=subprocess.Popen(['adb','logcat','-v','threadtime'],stdout=logcat_file,stderr=subprocess.STDOUT)
+ start_probe('first')
  check('startup_local_https',ready)
  check('phone_360_css_pixels',lambda:require(js('innerWidth===360&&devicePixelRatio===3'),'Emulator is not using the intended phone scale'))
  check('portrait_six_workspaces',lambda:modes(False))
@@ -371,7 +374,10 @@ finally:
  try:stop_probe()
  except Exception:pass
  report=save_report()
- try:(out/'native-logcat.txt').write_bytes(adb('logcat','-d',check=False).stdout)
- except Exception as e:print('Log collection unavailable: '+str(e),flush=True)
+ if logcat_process:
+  logcat_process.terminate()
+  try:logcat_process.wait(timeout=5)
+  except subprocess.TimeoutExpired:logcat_process.kill()
+ if logcat_file:logcat_file.close()
  print(json.dumps(report,indent=2,ensure_ascii=False))
  sys.exit(1 if any(r['status']=='failed' for r in results) else 0)

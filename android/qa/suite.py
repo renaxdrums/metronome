@@ -35,7 +35,7 @@ def set_value(selector,value,event='change'):
 def nav(mode):
  if js('document.querySelector("#beatEditor")?.hidden===false'):
   tap('#beatEditor [aria-label="Fermer"]');wait('document.querySelector("#beatEditor").hidden')
- tap('[data-workspace="'+mode+'"]');wait('document.body.dataset.workspace',lambda x:x==mode)
+ tap('#workspaceNav [data-workspace="'+mode+'"]');wait('document.body.dataset.workspace',lambda x:x==mode)
 def save_report():
  report={'android_api':api,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'tests':results}
  (out/'native-report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))

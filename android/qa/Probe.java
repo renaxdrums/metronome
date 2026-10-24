@@ -130,7 +130,6 @@ public final class Probe extends Instrumentation {
       int[] location=new int[2];runOnMainSync(()->web.getLocationOnScreen(location));
       double scale=web.getWidth()/r.getDouble("w");
       pointer(location[0]+(int)Math.round(r.getDouble("x")*scale),location[1]+(int)Math.round(r.getDouble("y")*scale));
-      visualReady();
       return true;
     }
     if(action.equals("nodes")){JSONArray list=new JSONArray();nodes(getUiAutomation().getRootInActiveWindow(),list,0);return list;}

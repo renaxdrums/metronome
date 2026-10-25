@@ -201,7 +201,9 @@ def add_sequence():
  nav('sequence');before=js('Number(document.querySelector("#measureCount").value)');tap('#sequenceAddMeasure');wait('Number(document.querySelector("#measureCount").value)',lambda x:x==before+1)
  set_value('#measureCount',before);return {'before':before,'after_add':before+1,'restored':before}
 def add_multitrack():
- nav('multi');tap('#multiPresetLibrary > button');before=js('document.querySelector("#multiTracks").children.length');tap('#multiControls .multi-add');after=wait('document.querySelector("#multiTracks").children.length',lambda x:x>before)
+ nav('multi')
+ if js('!document.querySelector("#multiPresetLibrary").hidden'):tap('#multiPresetLibrary > button')
+ before=js('document.querySelector("#multiTracks").children.length');tap('#multiControls .multi-add');after=wait('document.querySelector("#multiTracks").children.length',lambda x:x>before)
  return {'before':before,'after':after,'mode_active':js('RENAX_MULTI.active')}
 def create_track():
  nav('tracks');profile=js('RENAX_SONGS.library.activeProfile')
@@ -293,7 +295,8 @@ def microphone_diagnostics():
  def permission_button(labels):
   deadline=time.monotonic()+15
   while time.monotonic()<deadline:
-   if any('permissioncontroller' in n.get('package','') for n in nodes()):break
+   wanted={x.casefold() for x in labels}
+   if any(n['text'].strip().casefold() in wanted or n['desc'].strip().casefold() in wanted for n in nodes()):break
    time.sleep(.2)
   else:raise AssertionError('Android microphone permission dialog was not shown')
   native_click_text(labels)
@@ -308,8 +311,12 @@ def microphone_diagnostics():
   require(js('__qaMicTracks.length>0&&__qaMicTracks.every(t=>t.readyState==="ended")'),'Diagnostic left microphone capture running')
   return {'android_permission_denied_then_granted':True,'output_identification':state,'all_capture_tracks_stopped':True}
  finally:
-  js('(()=>{navigator.mediaDevices.getUserMedia=__qaGetUserMedia;return true})()')
-  if js('document.querySelector("#index2SettingsBtn").getAttribute("aria-expanded")==="true"'):tap('#index2SettingsBtn')
+  try:
+   if any('permissioncontroller' in n.get('package','') for n in nodes()):
+    adb('shell','input','keyevent','BACK',check=False);time.sleep(.4)
+   js('(()=>{navigator.mediaDevices.getUserMedia=__qaGetUserMedia;return true})()')
+   if js('document.querySelector("#index2SettingsBtn").getAttribute("aria-expanded")==="true"'):tap('#index2SettingsBtn')
+  except Exception as error:print('Microphone test cleanup: '+str(error),flush=True)
 
 def background():
  nav('metronome');set_value('#bpmSlider',120,'input');tap('#playBtn');wait('isPlaying')

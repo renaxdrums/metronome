@@ -46,14 +46,16 @@
     "feature": "silent",
     "description": "Mesures vides, tous les nombres proposés",
     "required_tests": [
-      "all_silent_cycle_count_options"
+      "all_silent_cycle_count_options",
+      "silent_cycle_creates_actual_missing_beats"
     ]
   },
   {
     "feature": "score",
     "description": "Partition Bravura et regroupement",
     "required_tests": [
-      "bravura_partition_editor_and_grouping"
+      "bravura_partition_editor_and_grouping",
+      "partition_all_note_duration_controls"
     ]
   },
   {
@@ -95,7 +97,8 @@
     "required_tests": [
       "track_create_add_section",
       "track_rename_duplicate_delete_native_actions",
-      "section_count_tempo_ramp_copy_delete_and_count_in"
+      "section_count_tempo_ramp_copy_delete_and_count_in",
+      "native_long_press_block_reorder"
     ]
   },
   {

@@ -25,35 +25,41 @@ def run_extended_checks(api, api_request):
     def tap_tempo():
         nav('metronome')
         if not js('document.querySelector("#workspaceControls").open'):tap('#workspaceControls summary')
-        js('(()=>{window.__qaTapTimes=[];window.__qaTapListener=()=>__qaTapTimes.push(performance.now());tapBtn.addEventListener("click",__qaTapListener);return true})()')
+        js('(()=>{window.__qaTapTimes=[];window.__qaTapListener=()=>__qaTapTimes.push(performance.now());tapBtn.addEventListener("click",__qaTapListener,true);return true})()')
         try:
             for _ in range(4):tap('#tapBtn');time.sleep(.25)
+            wait('__qaTapTimes.length',lambda x:x==4)
             state=js('({times:__qaTapTimes,bpm:tempo,measure:measures[activeMeasureIndex].tempo})')
             expected=round(60000/((state['times'][-1]-state['times'][0])/3))
             require(len(state['times'])==4 and abs(state['bpm']-expected)<=1 and state['measure']==state['bpm'],'Tap tempo differs from the real tap intervals')
             return {'four_native_taps':True,'measured_bpm':expected,'applied_bpm':state['bpm']}
         finally:
-            js('(()=>{tapBtn.removeEventListener("click",__qaTapListener);return true})()');set_value('#bpmSlider',120,'input')
+            js('(()=>{tapBtn.removeEventListener("click",__qaTapListener,true);return true})()');set_value('#bpmSlider',120,'input')
 
     def step_limits():
         nav('metronome');rows=[]
+        if not js('document.querySelector("#workspaceControls").open'):tap('#workspaceControls summary')
         for bpm,button,expected in [(2,'tempoDecrease',2),(2,'tempoIncrease',3),(999,'tempoIncrease',999),(999,'tempoDecrease',998)]:
-            set_value('#bpmSlider',bpm,'input');tap('#'+button);value=js('tempo');require(value==expected,'Tempo boundary button failed');rows.append({'from':bpm,'button':button,'result':value})
+            set_value('#bpmSlider',bpm,'input')
+            disabled=js('document.querySelector('+json.dumps('#'+button)+').disabled')
+            if disabled:require(expected==bpm,'Valid stepper action is disabled')
+            else:tap('#'+button)
+            value=wait('tempo',lambda x:x==expected);require(value==expected,'Tempo boundary button failed: '+str({'from':bpm,'button':button,'actual':value,'expected':expected}));rows.append({'from':bpm,'button':button,'result':value})
         set_value('#bpmSlider',120,'input');return rows
 
     def volume_output():
         nav('metronome');set_value('#soundBank','clic');set_value('#bpmSlider',240,'input');tap('#playBtn');wait('isPlaying')
-        js('(()=>{window.__qaVolumeAnalyser=audioCtx.createAnalyser();__qaVolumeAnalyser.fftSize=4096;getAudioMixDestination(audioCtx).connect(__qaVolumeAnalyser);return true})()')
+        js('(()=>{window.__qaVolumeAnalyser=audioCtx.createAnalyser();__qaVolumeAnalyser.fftSize=4096;window.__qaVolumeSink=audioCtx.createMediaStreamDestination();__qaVolumeAnalyser.connect(__qaVolumeSink);getAudioMixDestination(audioCtx).connect(__qaVolumeAnalyser);window.__qaVolumeEvents=[];window.__qaVolumeClick=playClick;playClick=function(...args){__qaVolumeEvents.push({volume:masterVolume,bank:currentBank,time:args[1]});return __qaVolumeClick(...args)};return true})()')
         peaks=[]
         try:
             for value in [0,80]:
                 set_value('#volumeSlider',value,'input')
                 js('(()=>{window.__qaVolumePeak=null;const data=new Float32Array(__qaVolumeAnalyser.fftSize),start=performance.now();let peak=0;const timer=setInterval(()=>{__qaVolumeAnalyser.getFloatTimeDomainData(data);if(performance.now()-start>300)for(const x of data)peak=Math.max(peak,Math.abs(x));if(performance.now()-start>900){clearInterval(timer);__qaVolumePeak=peak}},20);return true})()')
                 peak=wait('window.__qaVolumePeak',lambda x:x is not None);peaks.append({'volume':value,'peak':peak})
-            require(peaks[0]['peak']<1e-7 and peaks[1]['peak']>1e-5,'Volume control did not mute/unmute the audio output')
+            require(peaks[0]['peak']<1e-7 and peaks[1]['peak']>1e-5,'Volume control did not mute/unmute the audio output: '+str(peaks)+'; events='+str(js('__qaVolumeEvents')))
             return peaks
         finally:
-            js('(()=>{getAudioMixDestination(audioCtx).disconnect(__qaVolumeAnalyser);return true})()');tap('#playBtn');wait('!isPlaying');set_value('#bpmSlider',120,'input');set_value('#volumeSlider',80,'input')
+            js('(()=>{getAudioMixDestination(audioCtx).disconnect(__qaVolumeAnalyser);__qaVolumeAnalyser.disconnect();__qaVolumeSink.stream.getTracks().forEach(t=>t.stop());playClick=__qaVolumeClick;return true})()');tap('#playBtn');wait('!isPlaying');set_value('#bpmSlider',120,'input');set_value('#volumeSlider',80,'input')
 
     def reset_undo():
         nav('metronome');set_value('#volumeSlider',25,'input');time.sleep(.35);set_value('#volumeSlider',50,'input');time.sleep(.35)
@@ -240,12 +246,67 @@ def run_extended_checks(api, api_request):
             return {'native_long_press_and_drag':True,'result_order':order}
         finally:restore_tracks(original)
 
+    def score_duration_options():
+        nav('metronome');tap('#panicBtn');set_value('#activeNumerator',8);set_value('#activeDenominator',4)
+        tap('#scorePartitionBtn');wait('!!document.querySelector("#rhythmScore svg")',timeout=30)
+        tap('#scoreEditBtn');tap('#scoreFreeMeasureBtn');wait('measures[0].rhythmEditor?.free')
+        tap('#rhythmScore [data-event="0"]')
+        rows=[]
+        try:
+            for duration in [1,2,4,8,16,32]:
+                for dotted in [False,True]:
+                    selector='#rhythmEditor [data-duration="'+str(duration)+'"][data-dotted="'+str(dotted).lower()+'"]'
+                    disabled=js('document.querySelector('+json.dumps(selector)+').disabled')
+                    expected=4/duration*(1.5 if dotted else 1)
+                    if disabled:
+                        require(duration==32 and dotted,'Unexpected disabled note duration')
+                        rows.append({'duration':duration,'dotted':dotted,'disabled_by_32nd_note_resolution':True})
+                    else:
+                        tap(selector);actual=wait('measures[0].rhythmEditor.events[0].end-measures[0].rhythmEditor.events[0].start',lambda x:abs(x-expected)<1e-8)
+                        rows.append({'duration':duration,'dotted':dotted,'beat_units':actual})
+            return {'free_measure_enabled':True,'all_twelve_duration_controls':rows}
+        finally:
+            if js('document.querySelector("#scoreEditBtn").getAttribute("aria-pressed")==="true"'):tap('#scoreEditBtn')
+            tap('#scoreMetronomeBtn');tap('#panicBtn')
+
+    def silent_audio():
+        nav('training')
+        if js('document.body.dataset.mobilePane!=="training"'):tap('#workspaceMobileViews [data-pane=training]')
+        if not js('document.querySelector(".silent-section").classList.contains("is-expanded")'):tap('.silent-collapse')
+        set_value('#activeNumerator',2);set_value('#activeDenominator',4)
+        for selector,value in [('#trainStart',300),('#trainEnd',301),('#trainDuration',3),('#trainDurationUnit','seconds')]:set_value(selector,value)
+        if not js('silentModeEnabled'):tap('#silentToggle')
+        set_value('#clickMeasureCount',1);set_value('#silentMeasureCount',1);set_value('#soundBank','clic')
+        js('(()=>{window.__qaSilentCalls=[];window.__qaSilentClick=playClick;playClick=function(...args){__qaSilentCalls.push(args[1]);return __qaSilentClick(...args)};return true})()')
+        try:
+            tap('#trainBtn');wait('isPlaying');wait('!isPlaying&&!training.engaged',timeout=8)
+            calls=js('__qaSilentCalls');gaps=[b-a for a,b in zip(calls,calls[1:])]
+            require(len(calls)>=4 and min(gaps)<.22 and max(gaps)>.5,'Silent measures did not create the expected missing beats: '+str(gaps))
+            return {'recorded_note_times':calls,'note_intervals':gaps,'one_audible_one_silent_bar':True}
+        finally:
+            js('(()=>{playClick=__qaSilentClick;stopMetronome();endTraining();return true})()')
+            nav('training')
+            if js('silentModeEnabled'):tap('#silentToggle')
+            set_value('#activeNumerator',4);set_value('#activeDenominator',4);set_value('#trainStart',80);set_value('#trainEnd',140);set_value('#trainDuration',2)
+
+    def native_block_reorder():
+        nav('tracks');original=seed_tracks()
+        try:
+            js('(()=>{const l=JSON.parse(JSON.stringify(RENAX_SONGS.library)),s=l.profiles.find(p=>p.id==="qa-first").songs[0];s.sections=[{id:"qa-block-A",label:"Intro",count:1,measure:createMeasure(4,4,120)},{id:"qa-block-B",label:"Refrain",count:1,measure:createMeasure(4,4,120)}];RENAX_SONGS.replaceLibrary(l,true);RENAX_SONGS.restoreNavigation({pane:"songs",view:"detail",profile:"qa-first",song:s.id});return true})()')
+            api_request('dragCss',source='.song-section[data-section-id="qa-block-A"] .song-block-header',target='.song-section[data-section-id="qa-block-B"] .song-block-header')
+            order=wait('RENAX_SONGS.library.profiles.find(p=>p.id==="qa-first").songs[0].sections.map(s=>s.id)',lambda x:x==['qa-block-B','qa-block-A'])
+            return {'native_block_long_press_and_drag':True,'result_order':order}
+        finally:restore_tracks(original)
+
     for name,fn in [
         ('sequence_all_counts_and_edit_actions',sequence_actions),
         ('multipiste_track_and_preset_edit_actions',multi_actions),
         ('playlist_create_rename_delete',playlist_actions),
         ('track_copy_and_move_between_playlists',copy_move_track),
         ('native_long_press_track_reorder',native_reorder),
+        ('partition_all_note_duration_controls',score_duration_options),
+        ('silent_cycle_creates_actual_missing_beats',silent_audio),
+        ('native_long_press_block_reorder',native_block_reorder),
         ('native_tap_tempo_measured_intervals',tap_tempo),
         ('native_tempo_stepper_boundaries',step_limits),
         ('volume_zero_mutes_actual_signal',volume_output),

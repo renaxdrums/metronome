@@ -8,11 +8,10 @@ def run_control_checks(api):
     def tempos():
         nav('metronome')
         tested=[]
-        for bpm in range(2,1000):
-            set_value('#bpmSlider',bpm,'input')
-            state=js('({tempo,measure:measures[activeMeasureIndex].tempo,display:Number(bpmSlider.value)})')
-            require(all(value==bpm for value in state.values()),'Tempo mismatch '+str(state))
-            tested.append(state)
+        for first in range(2,1000,50):
+            last=min(1000,first+50)
+            rows=js('(()=>{const rows=[];for(let bpm='+str(first)+';bpm<'+str(last)+';bpm++){bpmSlider.value=String(bpm);bpmSlider.dispatchEvent(new Event("input",{bubbles:true}));const state={tempo,measure:measures[activeMeasureIndex].tempo,display:Number(bpmSlider.value)};if(Object.values(state).some(v=>v!==bpm))throw Error("Tempo mismatch "+JSON.stringify(state));rows.push(state)}return rows})()')
+            tested.extend(rows)
         set_value('#bpmSlider',120,'input')
         return tested
 
@@ -55,10 +54,7 @@ def run_control_checks(api):
 
     def volume():
         nav('metronome');rows=[]
-        for value in range(101):
-            set_value('#volumeSlider',value,'input')
-            actual=js('masterVolume');require(abs(actual-value/100)<1e-8,'Volume mismatch')
-            rows.append({'slider':value,'gain':actual})
+        rows=js('(()=>{const rows=[];for(let value=0;value<=100;value++){volumeSlider.value=String(value);volumeSlider.dispatchEvent(new Event("input",{bubbles:true}));if(Math.abs(masterVolume-value/100)>1e-8)throw Error("Volume mismatch "+value);rows.push({slider:value,gain:masterVolume})}return rows})()')
         set_value('#volumeSlider',80,'input')
         return rows
 

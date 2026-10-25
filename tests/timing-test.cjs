@@ -273,14 +273,14 @@ const assert = require('node:assert/strict');
             assert(Math.abs(scenario.maxAttackErrorMs - injectedOffset * 1000) <= 1.1);
         } else {
           validate();
-          assert.equal(result.results.length, 20);
+          assert.equal(result.results.length, 22);
         }
         reports.push(result);
         await page.close();
       }
     save('timing-results.json', reports);
     console.log(
-      'PASS 20 scenarios at 44100 and 48000 Hz; injected 25 ms shifts detected at both rates',
+      'PASS 22 scenarios at 44100 and 48000 Hz; injected 25 ms shifts detected at both rates',
     );
   } finally {
     await browser.close();

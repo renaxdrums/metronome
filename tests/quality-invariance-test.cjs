@@ -163,9 +163,9 @@ async function baselineRoute(page, url) {
       await p.waitForFunction(() => allVoiceAudioReady);
       if (before && !referenceAgainstItself)
         await p.evaluate(() => {
-          // Approved change: only T timing of "two"; keep its old vowel gain.
-          // The independent consonant test checks the shifts and unchanged PCM.
-          for (const [gender, onset] of Object.entries({ male: 0.05, female: 0.001 })) {
+          // Approved change: two uses the same vowel timing as all other numbers.
+          // The independent two regression checks both shifts and unchanged PCM.
+          for (const [gender, onset] of Object.entries({ male: 0.175, female: 0.095 })) {
             voiceLoudnessGain(
               VOICE_METRONOME_BUFFERS[gender]['2'],
               VOICE_ATTACK_SECONDS[gender][2],

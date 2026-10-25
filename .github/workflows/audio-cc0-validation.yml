@@ -148,7 +148,13 @@ jobs:
           version: '11.25.0'
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm exec playwright install chromium --with-deps
-      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Ensure FFmpeg is available
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo timeout 120 apt-get update -qq
+            sudo timeout 180 apt-get install -y ffmpeg
+          fi
+          ffmpeg -version
       - name: Build and verify actual release
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"

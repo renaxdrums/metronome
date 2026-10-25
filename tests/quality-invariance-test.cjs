@@ -100,7 +100,7 @@ async function baselineRoute(page, url) {
       body = Buffer.from(original.replace(ivoryControlsBefore, ivoryControlsAfter));
       correctedReferenceFiles.add(file);
     }
-    if (file === 'entry-sequence-edit-transport.css') {
+    if (file === 'entry-sequence-edit-transport.css' || file === 'index.html') {
       const original = body.toString();
       const oldDisplay = '#playBtn{position:relative;display:inline-flex!important;';
       if (original.includes(oldDisplay)) {
@@ -108,8 +108,8 @@ async function baselineRoute(page, url) {
         body = Buffer.from(
           original.replace(
             oldDisplay,
-            '#playBtn{position:relative;display:var(--play-button-display,inline-flex)!important;',
-          ) + '\n#playBtn[hidden]{--play-button-display:none;}\n',
+            '#playBtn[hidden]{--play-button-display:none;}\n#playBtn{position:relative;display:var(--play-button-display,inline-flex)!important;',
+          ),
         );
         correctedReferenceFiles.add(file);
       }

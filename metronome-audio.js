@@ -406,7 +406,7 @@
     });
     const INSTRUMENT_SAMPLE_MAX_DURATION = Object.freeze({
       clic: [0.065, 0.065, 0.065],
-      cloche: [0.25, 0.25, 0.25],
+      cloche: [Infinity, Infinity, Infinity],
       claves: [0.09, 0.09, 0.09],
       clic808: [0.085, 0.085, 0.20],
       beep: [0.09, 0.09, 0.09]
@@ -486,6 +486,7 @@
         return prepareInstrumentSample(buffer, INSTRUMENT_SAMPLE_MAX_DURATION[bank][state - 1]);
       })).then(samples => {
         instrumentSamples[bank] = samples;
+        if(bank==='cloche')SOUND_BANKS[bank].tail=Math.max(...samples.map(sample=>sample.duration));
       }).catch(error => {
         delete instrumentSampleLoads[bank];
         throw error;
@@ -510,10 +511,12 @@
         const stateGain = state === 1 ? 0.78 : state === 2 ? 0.91 : 1;
         const accentGain = isFirst ? 1.12 : context.isOtherStrongBeat ? 1.08 : 1;
         gain.gain.setValueAtTime(sample.gain * stateGain * accentGain, time);
-        // Short click-free release; the entire transient remains untouched.
-        const fadeTime = Math.min(0.006, playbackDuration / 5);
-        gain.gain.setValueAtTime(sample.gain * stateGain * accentGain, time + playbackDuration - fadeTime);
-        gain.gain.linearRampToValueAtTime(0, time + playbackDuration);
+        // The bell keeps its full natural decay, including overlapping hits.
+        if(bank!=='cloche'){
+          const fadeTime = Math.min(0.006, playbackDuration / 5);
+          gain.gain.setValueAtTime(sample.gain * stateGain * accentGain, time + playbackDuration - fadeTime);
+          gain.gain.linearRampToValueAtTime(0, time + playbackDuration);
+        }
         src.connect(gain);
         gain.connect(dest);
         scheduledVoiceSources.add(src);

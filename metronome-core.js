@@ -923,7 +923,7 @@
         });pads.appendChild(button);
       }
       beatEditor.appendChild(pads);
-      if(document.body.dataset.workspace==='metronome'){
+      if(appMode==='metronome'){
         const duplicate=document.createElement('button');
         duplicate.id='beatEditorDuplicateFirst';duplicate.type='button';duplicate.className='btn';
         duplicate.textContent='Dupliquer le temps 1 sur tous les temps';

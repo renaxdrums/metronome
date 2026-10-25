@@ -73,6 +73,41 @@ const { start, newTrack, save } = require('./audio-harness.cjs');
       assert.deepEqual(errors,[]);
       results.push({viewport,emptyTrackHidden:true,creationAndDeletion:true,otherWorkspacesUnaffected:true,duplicationAndUndo:true,independentCopies:true,liveBeatGridStable:true,themes:3,languages:5});
       await page.close();
+      for(const workspace of ['sequence','training','multi','tracks']){
+        const p=await h.browser.newPage({viewport});
+        await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_WORKSPACE&&window.RENAX_SONGS);
+        await p.evaluate(workspace=>RENAX_WORKSPACE.go(workspace),workspace);
+        if(workspace==='multi'){
+          await p.getByRole('button',{name:'Nouveau preset',exact:true}).click();
+          await p.locator('#multiControls .multi-add').click();
+          await p.locator('.multi-track-name').first().click();
+        }else if(workspace==='tracks'){
+          await newTrack(p);
+          await p.getByRole('button',{name:'+ Ajouter une section',exact:true}).click();
+          await p.locator('.song-block-header').first().click();
+        }
+        await p.evaluate(()=>switchTab('visu'));
+        await p.locator('#sequencerContainer .step').first().click();
+        await p.locator('#beatEditorDivision').selectOption('4');
+        for(const [index,clicks] of [[1,2],[2,0],[3,3]])for(let i=0;i<clicks;i++)await p.locator('#beatEditorPads button').nth(index).click();
+        await p.keyboard.press('Escape');await p.waitForTimeout(300);
+        const before=await p.evaluate(()=>JSON.stringify(measures));
+        await p.locator('#sequencerContainer .step').nth(1).click();
+        const duplicate=p.locator('#beatEditorDuplicateFirst');
+        assert(await duplicate.isVisible(),workspace);
+        await duplicate.click();await p.waitForTimeout(300);
+        assert.deepEqual(await p.evaluate(()=>measures[activeMeasureIndex].beatStates),Array.from({length:4},()=>[1,2,0,3]),workspace);
+        assert(await p.evaluate(()=>new Set(measures[activeMeasureIndex].beatStates).size===4),workspace);
+        if(workspace==='tracks')assert.deepEqual(await p.evaluate(()=>RENAX_SONGS.library.profiles[0].songs[0].sections[0].measure.beatStates),Array.from({length:4},()=>[1,2,0,3]));
+        if(workspace==='multi')assert.deepEqual(await p.evaluate(()=>JSON.parse(localStorage.getItem('renax.multimetro.v1')).tracks[0].beatStates),Array.from({length:4},()=>[1,2,0,3]));
+        await p.keyboard.press('Escape');assert(await p.locator('#undoBtn').isEnabled(),workspace+' Undo disabled');await p.locator('#undoBtn').click();
+        assert.equal(await p.evaluate(()=>JSON.stringify(measures)),before,workspace+' Undo');
+        await p.evaluate(()=>RENAX_WORKSPACE.go('polyrhythm'));
+        assert.equal(await p.locator('#beatEditorDuplicateFirst:visible').count(),0);
+        assert(await p.evaluate(()=>appMode==='polyrhythm'&&beatEditor.hidden));
+        results.push({viewport,workspace,duplicationAndUndo:true,polyrhythmExcluded:true});
+        await p.close();
+      }
     }
     save('track-beat-corrections-results.json',results);
     console.log(results);

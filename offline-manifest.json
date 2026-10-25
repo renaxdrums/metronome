@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "d6176bae50fbc0f3",
+  "revision": "66c4ce84e86917d1",
   "resources": [
     {
       "path": "accessibility.css",
@@ -269,7 +269,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "aee063000ce7e082fda39b0f1ea36fd1b8cebe33cbb2376279f532203903b31b",
+      "sha256": "70d4236351087b2654d606734a24aa698678f2c98b2b6cfdc409bf96dc5d1c85",
       "text": true
     },
     {
@@ -319,12 +319,12 @@
     },
     {
       "path": "metronome-audio.js",
-      "sha256": "37565874f01568cf0e56c2d2dff3aaeca0279eb92117fe3e3d77bb83c73d0bde",
+      "sha256": "511a04bb2da232bca048d82eaca6a212f734f5c50004e0ba4bbcf8fe599562e9",
       "text": true
     },
     {
       "path": "metronome-core.js",
-      "sha256": "42262403d018aeb9ded289e8691f6a8d8932d826be28d0a2de1330907663ac19",
+      "sha256": "7b9eeab841da94fa31db2d6c7ac4243905e664f6cff3af3f2c7421384430d78f",
       "text": true
     },
     {
@@ -354,7 +354,7 @@
     },
     {
       "path": "mp3-export.js",
-      "sha256": "6da695e66ac8f9d72761f920edd9618e2edbb327b20216476f3b7f81f92134f6",
+      "sha256": "759ed0de890c170d341804c395ed3b17b94c0c44aee01209402b67557f9f74b8",
       "text": true
     },
     {
@@ -369,7 +369,7 @@
     },
     {
       "path": "multi-metronome.js",
-      "sha256": "ec9e737bfa57b6d4a6fc8e04ec147ff9e249cb3a53b9f17d83fe7d022f2cab17",
+      "sha256": "287ba922f2cf0cb75cd40b44f6f170ba8a4dbb55020fb1a8a8715018ff8ab597",
       "text": true
     },
     {
@@ -414,7 +414,7 @@
     },
     {
       "path": "pro-sound-bank.js",
-      "sha256": "4380a78e5f34ea485db008e688ace7168cd4d5642d1d6bdef41e0a73ecca7506",
+      "sha256": "5a4ad356541f6274b193932731fbe8380de4e22d8afc44a61822b168bd4c7301",
       "text": true
     },
     {
@@ -469,7 +469,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "344d6cb5c75879105250b96ccc9f8264bdc3b32cb5fcbdc0803e29338c712515",
+      "sha256": "e36d9ed025708dfca509fb595bb8c2258d0c7b6255db8d8da034eef0e23c4b23",
       "text": true
     },
     {

@@ -371,12 +371,12 @@
 
   <script src="ui-feedback.js?v=eae7d41e1fb6"></script>
 <script src="numbox-controls.js?v=da106d639f33"></script>
-  <script src="metronome-audio.js?v=37565874f015"></script>
-  <script src="metronome-core.js?v=42262403d018"></script>
+  <script src="metronome-audio.js?v=511a04bb2da2"></script>
+  <script src="metronome-core.js?v=7b9eeab841da"></script>
   <link rel="stylesheet" href="playback-support.css?v=be7d47c55905">
   <script src="playback-support.js?v=906fd4c12e7e"></script>
   <script src="metronome-transport.js?v=3d3a45b2a38d"></script>
-  <script src="pro-sound-bank.js?v=4380a78e5f34"></script>
+  <script src="pro-sound-bank.js?v=5a4ad356541f"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
 </script>
@@ -385,7 +385,7 @@
 <script src="local-backup.js?v=6fb6848845c2"></script>
   <script src="amorce-song.js?v=9f00d2d74e2c"></script>
   <script src="song-tempo-ramp.js?v=84e7c800f469"></script>
-  <script src="songs-index2.js?v=344d6cb5c758"></script>
+  <script src="songs-index2.js?v=e36d9ed02570"></script>
   <script type="module" src="cloud-backup.js?v=de176ef95986"></script>
   <script>
     // Index 2 : ouvrir les morceaux de la playlist avec les sections repliées.
@@ -489,7 +489,7 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
 <script src="multi-clock.js?v=200171f7f4fd"></script>
-<script src="multi-metronome.js?v=ec9e737bfa57"></script>
+<script src="multi-metronome.js?v=287ba922f2cf"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
 <script src="interface-translations.js?v=ebb0dbd85c35"></script>
 <script src="vendor/i18next-25.6.0.js?v=6077ce0b0640"></script>

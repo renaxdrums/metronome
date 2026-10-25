@@ -59,13 +59,13 @@ Un APK signé n’équivaut pas à un essai sur appareil. Vérifier : installati
 démarrage, mode avion, son et tempo, rotation, import/export, mise en arrière-plan
 et retour. Le rapport livré précise les essais réellement exécutés.
 
-## Autorisation au premier lancement
+## Export sans demande d’accès au micro ou au stockage
 
-Le premier lancement après installation présente la demande Android pour le
-microphone. Le refus laisse le métronome utilisable et ne relance pas cette
-demande à chaque ouverture. Le diagnostic audio peut demander le micro au moment
-de son utilisation si l’autorisation n’a pas été accordée. L’autorisation normale
-`MODIFY_AUDIO_SETTINGS`, requise par WebView avec `RECORD_AUDIO`, est déclarée.
-L’import/export conserve le sélecteur de documents ; aucun accès général au
-stockage ni permission caméra n’est ajouté. La QA vérifie l’acceptation, puis
-réinstalle le même APK sur l’émulateur jetable pour vérifier le refus.
+À la demande de l’utilisateur, aucune autorisation micro n’est déclarée ni
+demandée, au démarrage ou pendant l’utilisation. Le diagnostic qui utilisait le
+micro est retiré de l’interface Android. Seule la permission normale Internet
+est déclarée, pour les modèles vocaux et ressources distantes.
+
+L’export MP3 utilise les sons de l’application et le sélecteur de documents
+Android : il ne nécessite ni microphone, ni accès général aux fichiers du
+téléphone. L’import/export JSON et MIDI conserve également ce sélecteur.

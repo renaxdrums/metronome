@@ -41,15 +41,9 @@ jobs:
         run: |
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg pulseaudio
+          sudo apt-get install -y ffmpeg
           python3 -m pip install --disable-pip-version-check numpy==2.3.5
           sudo chmod a+rw /dev/kvm
-      - name: Provide virtual audio input and output
-        run: |
-          pulseaudio --start --exit-idle-time=-1
-          pactl load-module module-null-sink sink_name=renax_native_audio
-          pactl set-default-sink renax_native_audio
-          pactl set-default-source renax_native_audio.monitor
       - name: Build release activity and separate test probe
         env:
           NODE_PATH: ${{ runner.temp }}/renax-native-deps/node_modules
@@ -62,11 +56,9 @@ jobs:
           arch: x86_64
           emulator-build: ${{ matrix.emulator_build }}
           ram-size: 6144
-          emulator-options: -no-window -gpu swiftshader -feature -Vulkan -allow-host-audio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340 -memory 6144 -show-kernel -verbose
+          emulator-options: -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340 -memory 6144 -show-kernel -verbose
           disable-animations: true
-          script: |
-            adb emu avd hostmicon
-            python3 android/qa/suite.py
+          script: python3 android/qa/suite.py
       - name: Preserve host diagnostics after native testing
         if: always()
         run: |

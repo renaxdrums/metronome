@@ -3,6 +3,9 @@
   style.textContent = '#backupAccount .backup-auth,#backupAccount .backup-choices>label,#backupAccount .backup-choices>button:not([aria-controls="backup-local"]){display:none!important}';
   document.head.append(style);
   function adapt() {
+    for (const selector of ['#latencyIdentifyOutputs', '#latencyStatus', '[data-i18n-key="latency.identifyHelp"]']) {
+      document.querySelector(selector)?.remove();
+    }
     const root = document.getElementById('backupAccount');
     if (!root) return;
     const hint = root.querySelector('.backup-hint');

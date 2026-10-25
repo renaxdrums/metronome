@@ -1,8 +1,6 @@
 package com.renaxdrums.metronome;
 
 import android.app.Activity;
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -24,8 +22,6 @@ public final class MainActivity extends Activity {
   private static final String SITE="https://renaxdrums.github.io/metronome/";
   private static final int OPEN_FILE=10,SAVE_FILE=11,EXPORT_CHUNK=64*1024;
   private WebView web;
-  private static final int AUDIO_PERMISSION=12,STARTUP_AUDIO_PERMISSION=13;
-  private PermissionRequest audioPermission;
   private ValueCallback<Uri[]> fileCallback;
   private File exportFile;
   private OutputStream exportWriter;
@@ -71,15 +67,6 @@ public final class MainActivity extends Activity {
       @Override public void onPageFinished(WebView v,String url){if((ORIGIN+"/app/index.html").equals(url))installPort();}
     });
     web.setWebChromeClient(new WebChromeClient(){
-      @Override public void onPermissionRequest(PermissionRequest request){
-        if(!trustedAudioRequest(request)){request.deny();return;}
-        if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED){request.grant(new String[]{PermissionRequest.RESOURCE_AUDIO_CAPTURE});return;}
-        if(audioPermission!=null)audioPermission.deny();
-        audioPermission=request;
-        requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},AUDIO_PERMISSION);
-      }
-      @Override public void onPermissionRequestCanceled(PermissionRequest request){if(audioPermission==request)audioPermission=null;}
-
       @Override public boolean onShowFileChooser(WebView v,ValueCallback<Uri[]> callback,FileChooserParams params){
         if(!(ORIGIN+"/app/index.html").equals(v.getUrl()))return false;
         if(fileCallback!=null)fileCallback.onReceiveValue(null);fileCallback=callback;
@@ -93,21 +80,7 @@ public final class MainActivity extends Activity {
       if(url.startsWith("https://")&&allowedHost(Uri.parse(url).getHost()))openExternal(Uri.parse(url));
     }});
     web.loadUrl(ORIGIN+"/app/index.html");
-    if(!getPreferences(MODE_PRIVATE).getBoolean("audio_permission_requested",false)){
-      getPreferences(MODE_PRIVATE).edit().putBoolean("audio_permission_requested",true).apply();
-      if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED)
-        requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},STARTUP_AUDIO_PERMISSION);
-    }
-  }
-  private boolean trustedAudioRequest(PermissionRequest request){
-    Uri origin=request.getOrigin();String[] resources=request.getResources();
-    return !destroyed&&(ORIGIN+"/app/index.html").equals(web.getUrl())&&"https".equals(origin.getScheme())&&"appassets.androidplatform.net".equals(origin.getHost())&&(origin.getPort()==-1||origin.getPort()==443)&&resources.length==1&&PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resources[0]);
-  }
-  @Override public void onRequestPermissionsResult(int code,String[] permissions,int[] grants){
-    super.onRequestPermissionsResult(code,permissions,grants);
-    if(code!=AUDIO_PERMISSION||audioPermission==null)return;
-    PermissionRequest request=audioPermission;audioPermission=null;
-    if(grants.length==1&&grants[0]==PackageManager.PERMISSION_GRANTED&&trustedAudioRequest(request))request.grant(new String[]{PermissionRequest.RESOURCE_AUDIO_CAPTURE});else request.deny();
+
   }
   private boolean allowedHost(String h){
     return h!=null&&(h.equals("cdn.jsdelivr.net")||h.equals("fonts.googleapis.com")||h.equals("fonts.gstatic.com")||h.equals("huggingface.co")||h.endsWith(".huggingface.co")||h.endsWith(".hf.co"));
@@ -227,5 +200,5 @@ public final class MainActivity extends Activity {
   @Override public void onBackPressed(){if(web.canGoBack())web.goBack();else super.onBackPressed();}
   @Override protected void onPause(){web.onPause();super.onPause();}
   @Override protected void onResume(){super.onResume();if(web!=null)web.onResume();}
-  @Override protected void onDestroy(){destroyed=true;if(audioPermission!=null){audioPermission.deny();audioPermission=null;}clearExport();if(fileCallback!=null)fileCallback.onReceiveValue(null);if(nativePort!=null)nativePort.close();web.destroy();super.onDestroy();}
+  @Override protected void onDestroy(){destroyed=true;clearExport();if(fileCallback!=null)fileCallback.onReceiveValue(null);if(nativePort!=null)nativePort.close();web.destroy();super.onDestroy();}
 }

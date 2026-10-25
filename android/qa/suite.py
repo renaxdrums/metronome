@@ -326,63 +326,11 @@ def export_mp3():
  require(len(samples)>48000 and all(math.isfinite(x) for x in samples),'MP3 cannot be decoded as finite audio')
  peak=max(abs(x) for x in samples);require(peak>1e-5,'Silent MP3')
  click('#mp3ExportDialog .mp3-actions button:last-child');return {'file':name,'bytes':len(data),'native_picker':True,'decoded_samples':len(samples),'peak':peak}
-def permission_button(labels):
- deadline=time.monotonic()+15;previous=None
- while time.monotonic()<deadline:
-  wanted={x.casefold() for x in labels}
-  matches=[n for n in nodes() if n['text'].strip().casefold() in wanted or n['desc'].strip().casefold() in wanted]
-  position=[(n['x'],n['y'],n['w'],n['h']) for n in matches if n['w']>0 and n['h']>0]
-  if position and position==previous:break
-  previous=position;time.sleep(.2)
- else:raise AssertionError('Android microphone permission dialog was not shown')
- match=next((n for label in labels for n in nodes() if n['text'].strip().casefold()==label.casefold() and n['w']>0 and n['h']>0),None)
- require(match is not None and request('nativeFile',filename=match['text']),'Native Android permission choice could not be activated')
- deadline=time.monotonic()+10
- while time.monotonic()<deadline:
-  if not any('permissioncontroller' in n.get('package','') for n in nodes()):return
-  time.sleep(.2)
- raise AssertionError('Android microphone permission dialog did not close after the native tap')
-
-def startup_permission_grant():
- permission_button(['While using the app','Only this time','Allow'])
- deadline=time.monotonic()+10
- while not request('microphoneGranted') and time.monotonic()<deadline:time.sleep(.2)
- require(request('microphoneGranted'),'Microphone permission was not granted at first launch')
- return {'first_launch_native_permission_prompt':True,'user_granted':True,'file_access_via_document_picker':True}
-
-def microphone_diagnostics():
- nav('metronome');tap('#index2SettingsBtn')
- js('(()=>{window.__qaMicTracks=[];window.__qaGetUserMedia=navigator.mediaDevices.getUserMedia;navigator.mediaDevices.getUserMedia=async function(...args){const stream=await __qaGetUserMedia.apply(this,args);__qaMicTracks.push(...stream.getTracks());return stream};return true})()')
-
- try:
-  require(request('microphoneGranted'),'First-launch microphone consent was not retained')
-  tap('#latencyIdentifyOutputs')
-  state=wait('RENAX_PLAYBACK.diagnosticSnapshot(audioCtx).outputIdentification',lambda x:x['status'] not in ['pending','notRequested'],timeout=30)
-  require(request('microphoneGranted') and state['status']=='ready','Audio output identification failed after granting microphone access: '+str(state))
-  require(js('__qaMicTracks.length>0&&__qaMicTracks.every(t=>t.readyState==="ended")'),'Diagnostic left microphone capture running')
-  return {'android_permission_granted_at_first_launch':True,'output_identification':state,'all_capture_tracks_stopped':True}
- finally:
-  try:
-   if any('permissioncontroller' in n.get('package','') for n in nodes()):
-    adb('shell','input','keyevent','BACK',check=False);time.sleep(.4)
-   js('(()=>{navigator.mediaDevices.getUserMedia=__qaGetUserMedia;return true})()')
-   if js('document.querySelector("#index2SettingsBtn").getAttribute("aria-expanded")==="true"'):click('#index2SettingsBtn')
-  except Exception as error:print('Microphone test cleanup: '+str(error),flush=True)
-
-def startup_permission_refusal():
- # Reinstall the same tested APK on the disposable emulator to exercise a genuinely fresh install.
- stop_probe();adb('uninstall',TARGET);adb('install','--no-incremental',out/'app.apk');adb('install','--no-incremental','-r',out/'probe.apk');start_probe('fresh-install-refused')
- permission_button(["Don't allow","Don’t allow","Deny","Refuser"])
- require(not request('microphoneGranted'),'Refusal unexpectedly granted microphone access')
- nav('metronome');tap('#index2SettingsBtn');tap('#latencyIdentifyOutputs')
- permission_button(["Don't allow","Don’t allow","Deny","Refuser"])
- state=wait('RENAX_PLAYBACK.diagnosticSnapshot(audioCtx).outputIdentification',lambda x:x['status']=='failed')
- require(state['error']=='NotAllowedError','Microphone refusal did not reach the diagnostic')
- click('#index2SettingsBtn');tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying')
- request('relaunch');ready()
- require(not any('permissioncontroller' in n.get('package','') for n in nodes()),'Startup repeatedly requested a refused permission')
- tap('#playBtn');wait('isPlaying');tap('#playBtn');wait('!isPlaying')
- return {'fresh_install_of_same_apk':True,'startup_refusal_respected':True,'diagnostic_refusal':state['error'],'metronome_usable_without_permission':True,'no_repeated_startup_prompt':True,'disposable_test_data_reset':True}
+def no_recording_permissions():
+ permissions=request('declaredPermissions')
+ require(permissions==['android.permission.INTERNET'],'Unexpected application permissions: '+str(permissions))
+ require(js("""!document.querySelector('#latencyIdentifyOutputs')&&!document.querySelector('[data-i18n-key="latency.identifyHelp"]')"""),'Microphone diagnostic is still offered in the APK')
+ return {'declared_permissions':permissions,'no_microphone_permission':True,'no_general_storage_permission':True,'microphone_controls_removed':True,'mp3_uses_native_document_picker':True}
 
 def background():
  nav('metronome');set_value('#bpmSlider',120,'input');tap('#playBtn');wait('isPlaying')
@@ -447,8 +395,8 @@ try:
  logcat_file=(out/'native-logcat.txt').open('wb')
  logcat_process=subprocess.Popen(['adb','logcat','-v','threadtime'],stdout=logcat_file,stderr=subprocess.STDOUT)
  start_probe('first')
- check('native_first_launch_microphone_permission',startup_permission_grant)
  check('startup_local_https',ready)
+ check('no_recording_or_storage_permissions',no_recording_permissions)
  check('phone_360_css_pixels',lambda:require(js('innerWidth===360&&devicePixelRatio===3'),'Emulator is not using the intended phone scale'))
  check('portrait_six_workspaces',lambda:modes(False))
  check('landscape_six_workspaces',lambda:modes(True))
@@ -478,13 +426,11 @@ try:
  check('native_export_cancel_and_cleanup',export_cancel)
  check('native_export_above_20_MiB_bytes',export_large)
  check('screen_awake_only_during_playback',screen_policy)
- check('microphone_permission_and_output_identification',microphone_diagnostics)
  check('background_continuous_playback_30_seconds',background)
  check('activity_recreation_local_storage',persistence)
  stop_probe();start_probe('second')
  check('process_restart_local_storage',lambda:require(js('localStorage.getItem("renax-native-qa-marker")')=='persisted','Local data lost after process restart'))
  check('offline_start_and_play_stop',offline)
- check('fresh_install_refusal_preserves_metronome_and_diagnostic_feedback',startup_permission_refusal)
 except Exception as e:
  results.append({'name':'native_suite_execution','status':'failed','error':str(e),'traceback':traceback.format_exc()})
 finally:

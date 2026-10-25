@@ -8,7 +8,7 @@ def run_control_checks(api):
     def tempos():
         nav('metronome')
         tested=[]
-        for bpm in [2,30,60,99,100,120,137,300,998,999]:
+        for bpm in range(2,1000):
             set_value('#bpmSlider',bpm,'input')
             state=js('({tempo,measure:measures[activeMeasureIndex].tempo,display:Number(bpmSlider.value)})')
             require(all(value==bpm for value in state.values()),'Tempo mismatch '+str(state))
@@ -55,7 +55,7 @@ def run_control_checks(api):
 
     def volume():
         nav('metronome');rows=[]
-        for value in [0,1,25,50,80,100]:
+        for value in range(101):
             set_value('#volumeSlider',value,'input')
             actual=js('masterVolume');require(abs(actual-value/100)<1e-8,'Volume mismatch')
             rows.append({'slider':value,'gain':actual})

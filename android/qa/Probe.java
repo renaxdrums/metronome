@@ -110,12 +110,23 @@ public final class Probe extends Instrumentation {
   }
   private Object command(JSONObject q) throws Exception {
     String action=q.getString("action");
+    if(action.equals("microphoneGranted"))return activity.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)==android.content.pm.PackageManager.PERMISSION_GRANTED;
     if(action.equals("exportCacheCount")){File[] files=activity.getCacheDir().listFiles((dir,name)->name.startsWith("renax-export-"));return files==null?0:files.length;}
     if(action.equals("keepScreenOn")){final boolean[] keep=new boolean[1];runOnMainSync(()->keep[0]=(activity.getWindow().getAttributes().flags&android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)!=0);return keep[0];}
     if(action.equals("refreshPort")){runOnMainSync(()->{try{java.lang.reflect.Method m=activity.getClass().getDeclaredMethod("installPort");m.setAccessible(true);m.invoke(activity);}catch(Exception e){throw new RuntimeException(e);}});return true;}
     if(action.equals("nativeFile"))return nativeFile(getUiAutomation().getRootInActiveWindow(),q.getString("filename"));
     if(action.equals("eval"))return evaluate(q.getString("script"));
     if(action.equals("tap")){pointer(q.getInt("x"),q.getInt("y"));return true;}
+    if(action.equals("dragCss")) {
+      String from=JSONObject.quote(q.getString("source")),to=JSONObject.quote(q.getString("target"));
+      evaluate("(()=>{document.querySelector("+from+").scrollIntoView({block:'nearest',behavior:'instant'});return true})()");visualReady();
+      JSONObject r=new JSONObject((String)evaluate("JSON.stringify((()=>{const a=document.querySelector("+from+").getBoundingClientRect(),b=document.querySelector("+to+").getBoundingClientRect();return {x:a.x+a.width/2,y:a.y+a.height/2,tx:b.x+b.width/2,ty:b.bottom-3,w:innerWidth}})())"));
+      int[] location=new int[2];runOnMainSync(()->web.getLocationOnScreen(location));double scale=web.getWidth()/r.getDouble("w");
+      float x=location[0]+(float)(r.getDouble("x")*scale),y=location[1]+(float)(r.getDouble("y")*scale),tx=location[0]+(float)(r.getDouble("tx")*scale),ty=location[1]+(float)(r.getDouble("ty")*scale);
+      long down=SystemClock.uptimeMillis();MotionEvent event=MotionEvent.obtain(down,down,MotionEvent.ACTION_DOWN,x,y,0);event.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);getUiAutomation().injectInputEvent(event,true);event.recycle();SystemClock.sleep(400);
+      for(int step=1;step<=20;step++){float f=step/20f;event=MotionEvent.obtain(down,SystemClock.uptimeMillis(),MotionEvent.ACTION_MOVE,x+(tx-x)*f,y+(ty-y)*f,0);event.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);getUiAutomation().injectInputEvent(event,true);event.recycle();SystemClock.sleep(25);}
+      event=MotionEvent.obtain(down,SystemClock.uptimeMillis(),MotionEvent.ACTION_UP,tx,ty,0);event.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);getUiAutomation().injectInputEvent(event,true);event.recycle();SystemClock.sleep(200);return true;
+    }
     if(action.equals("tapCss")) {
       String selector=JSONObject.quote(q.getString("selector"));
       evaluate("(()=>{const e=document.querySelector("+selector+");if(e)e.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return true})()");visualReady();

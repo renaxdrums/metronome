@@ -2,3 +2,5 @@ build/
 signing/
 app/src/main/assets/
 local.properties
+
+qa/__pycache__/

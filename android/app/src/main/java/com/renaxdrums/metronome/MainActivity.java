@@ -24,7 +24,7 @@ public final class MainActivity extends Activity {
   private static final String SITE="https://renaxdrums.github.io/metronome/";
   private static final int OPEN_FILE=10,SAVE_FILE=11,EXPORT_CHUNK=64*1024;
   private WebView web;
-  private static final int AUDIO_PERMISSION=12;
+  private static final int AUDIO_PERMISSION=12,STARTUP_AUDIO_PERMISSION=13;
   private PermissionRequest audioPermission;
   private ValueCallback<Uri[]> fileCallback;
   private File exportFile;
@@ -93,6 +93,11 @@ public final class MainActivity extends Activity {
       if(url.startsWith("https://")&&allowedHost(Uri.parse(url).getHost()))openExternal(Uri.parse(url));
     }});
     web.loadUrl(ORIGIN+"/app/index.html");
+    if(!getPreferences(MODE_PRIVATE).getBoolean("audio_permission_requested",false)){
+      getPreferences(MODE_PRIVATE).edit().putBoolean("audio_permission_requested",true).apply();
+      if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED)
+        requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},STARTUP_AUDIO_PERMISSION);
+    }
   }
   private boolean trustedAudioRequest(PermissionRequest request){
     Uri origin=request.getOrigin();String[] resources=request.getResources();

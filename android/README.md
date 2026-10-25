@@ -58,3 +58,14 @@ l’APK ni au dépôt. Les fichiers de compilation et ressources générées son
 Un APK signé n’équivaut pas à un essai sur appareil. Vérifier : installation,
 démarrage, mode avion, son et tempo, rotation, import/export, mise en arrière-plan
 et retour. Le rapport livré précise les essais réellement exécutés.
+
+## Autorisation au premier lancement
+
+Le premier lancement après installation présente la demande Android pour le
+microphone. Le refus laisse le métronome utilisable et ne relance pas cette
+demande à chaque ouverture. Le diagnostic audio peut demander le micro au moment
+de son utilisation si l’autorisation n’a pas été accordée. L’autorisation normale
+`MODIFY_AUDIO_SETTINGS`, requise par WebView avec `RECORD_AUDIO`, est déclarée.
+L’import/export conserve le sélecteur de documents ; aucun accès général au
+stockage ni permission caméra n’est ajouté. La QA vérifie l’acceptation, puis
+réinstalle le même APK sur l’émulateur jetable pour vérifier le refus.

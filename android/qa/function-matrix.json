@@ -165,9 +165,11 @@
   },
   {
     "feature": "diagnostic",
-    "description": "Permission micro, identification de sortie et arrêt de capture",
+    "description": "Autorisation au premier lancement, refus non bloquant, diagnostic et arrêt de capture",
     "required_tests": [
-      "microphone_permission_and_output_identification"
+      "microphone_permission_and_output_identification",
+      "native_first_launch_microphone_permission",
+      "fresh_install_refusal_preserves_metronome_and_diagnostic_feedback"
     ]
   },
   {

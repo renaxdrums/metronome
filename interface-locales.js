@@ -58,6 +58,7 @@ Beat unit|Unidad de tiempo|Zählzeit|Unità di movimento
 Bars with clicks|Compases con clic|Takte mit Klick|Battute con clic
 Silent bars|Compases silenciosos|Stumme Takte|Battute silenziose
 Subdivide this beat|Subdividir este tiempo|Diesen Schlag unterteilen|Suddividi questo movimento
+Copy beat 1 to all beats|Copiar el tiempo 1 a todos los tiempos|Schlag 1 auf alle Schläge kopieren|Copia il movimento 1 su tutti i movimenti
 Ivory|Marfil|Elfenbein|Avorio
 Play|Reproducir|Abspielen|Riproduci
 Stop|Detener|Stopp|Ferma

@@ -240,6 +240,7 @@
     syncDirectSongPlay();
     const songContext=!!(loaded||!songsRoot.hidden);
     playBtn.dataset.songTransport=String(songContext);
+    playBtn.hidden=songContext&&!loaded&&!transportSong();
     if(!isPlaying)playBtn.textContent=songContext?'Lire le morceau':'Start';
   }
   let songStartEpoch=0,preparingAmorce=false;

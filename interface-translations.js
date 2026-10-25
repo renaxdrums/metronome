@@ -1,6 +1,7 @@
 /* Offline French/English interface resources. */
 window.RENAX_TRANSLATIONS = Object.freeze({
   "legacy": {
+"Dupliquer le temps 1 sur tous les temps":"Copy beat 1 to all beats",
 "Pistes":"Tracks",
 "Copie locale automatique. Connectez-vous pour retrouver vos morceaux sur vos appareils.":"Automatic local backup. Sign in to access your songs on your devices.",
 "Animation d’arrivée":"Intro animation", "Animation d’arrivée Métronome":"Metronome introduction", "Presets multipistes":"Multitrack presets", "Nouveau preset":"New preset", "Crée ton premier preset multipiste.":"Create your first multitrack preset.", "Modifications non enregistrées":"Unsaved changes", "Écouter cette piste seule":"Play this track solo",

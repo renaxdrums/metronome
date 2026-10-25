@@ -1,4 +1,4 @@
-"""Check independently annotated vowel landmarks and shipped sample integrity."""
+"""Check annotated vowel/T landmarks and unchanged shipped recordings."""
 import pathlib,wave,json,hashlib,numpy as np
 root=pathlib.Path(__file__).resolve().parents[1]
 annotations=json.loads((root/'tests/voice-anchors.json').read_text(encoding='utf-8'))
@@ -17,11 +17,15 @@ for a in annotations:
  mid=np.fft.irfft(spec*mask,n=len(x))
  env=smooth(np.sqrt(np.maximum(0,np.convolve(mid*mid,np.ones(480)/480,'same')))[::48])
  slope=np.gradient(env);lo,hi=a['region_ms'];hi=min(hi,len(slope))
- measured=int(lo+np.argmax(slope[lo:hi]));err=measured-a['anchor_ms']
+ if a.get('landmark')=='consonant_onset':
+  blocks=np.sqrt(np.mean(x[:len(x)//48*48].reshape(-1,48)**2,axis=1))
+  measured=int(np.flatnonzero(blocks>.002)[0])
+ else:measured=int(lo+np.argmax(slope[lo:hi]))
+ err=measured-a['anchor_ms']
  assert abs(err)<=1,(a,measured)
  sha=hashlib.sha256(p.read_bytes()).hexdigest()
  assert sha==a['sha256'],f"Sample changed; recalibration required: {p}"
  results.append(dict(gender=a['gender'],number=a['number'],annotated_ms=a['anchor_ms'],measured_ms=measured,error_ms=err,sha256=sha,duration_ms=len(x)/48))
 out=root/'tests/results';out.mkdir(exist_ok=True)
 (out/'sample-analysis.json').write_text(json.dumps(results,indent=2)+'\n')
-print(f"{len(results)} vowel landmarks verified; maximum error {max(abs(r['error_ms']) for r in results)} ms.")
+print(f"{len(results)} vowel/T landmarks verified; maximum error {max(abs(r['error_ms']) for r in results)} ms.")

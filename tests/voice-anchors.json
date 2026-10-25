@@ -13,13 +13,15 @@
   {
     "gender": "male",
     "number": 2,
-    "anchor_ms": 175,
+    "anchor_ms": 50,
     "region_ms": [
-      150,
-      201
+      0,
+      100
     ],
-    "note": "Rising vowel/formant nucleus in the region transferred from the reviewed candidate; complete original consonants and internal pauses retained.",
-    "sha256": "668005178adb76ca1f6745a89ad5b8ddf8126752b82bd1cde15141aeb73da79f"
+    "note": "T consonant onset: first non-overlapping 1 ms PCM block above RMS 0.002. Original recording, vowel gain and pitch unchanged.",
+    "sha256": "668005178adb76ca1f6745a89ad5b8ddf8126752b82bd1cde15141aeb73da79f",
+    "landmark": "consonant_onset",
+    "waveform_match_ms": 175
   },
   {
     "gender": "male",
@@ -233,13 +235,15 @@
   {
     "gender": "female",
     "number": 2,
-    "anchor_ms": 95,
+    "anchor_ms": 1,
     "region_ms": [
-      70,
-      121
+      0,
+      100
     ],
-    "note": "Rising vowel/formant nucleus in the region transferred from the reviewed candidate; complete original consonants and internal pauses retained.",
-    "sha256": "ad5084062427fb38e7f9d6a27e3da5ee3e2525803dd3e501cce9eb48f7849a8a"
+    "note": "T consonant onset: first non-overlapping 1 ms PCM block above RMS 0.002. Original recording, vowel gain and pitch unchanged.",
+    "sha256": "ad5084062427fb38e7f9d6a27e3da5ee3e2525803dd3e501cce9eb48f7849a8a",
+    "landmark": "consonant_onset",
+    "waveform_match_ms": 95
   },
   {
     "gender": "female",

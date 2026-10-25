@@ -151,19 +151,24 @@ const assert = require('node:assert/strict');
                   const x = rendered.getChannelData(i),
                     start = starts[i];
                   if (start.offset > 0) lateStarts++;
-                  // Locate the actual rendered vowel landmark by matching an independently
-                  // annotated region of the original word, not by repeating the scheduling math.
+                  // Match a stable original-word region independently of scheduling.
+                  // For "two", keep the vowel as a resampling-stable match window;
+                  // its independently measured offset from T locates the beat.
                   const gender = { voiceMale: 'male', voiceFemale: 'female' }[bank];
                   const annotation = anchors.find(
                     (a) => a.gender === gender && a.number === expected[i].number,
                   );
                   const raw =
                     VOICE_METRONOME_BUFFERS[gender][String(expected[i].number)].getChannelData(0);
-                  const referenceSeconds = annotation.anchor_ms / 1000,
+                  const matchMs = annotation.waveform_match_ms ?? annotation.anchor_ms,
+                    referenceSeconds = matchMs / 1000,
                     rawRate =
                       VOICE_METRONOME_BUFFERS[gender][String(expected[i].number)].sampleRate;
                   const ref = Math.round(referenceSeconds * rawRate),
-                    center = Math.round(expected[i].time * rendered.sampleRate),
+                    center = Math.round(
+                      (expected[i].time + (matchMs - annotation.anchor_ms) / 1000) *
+                        rendered.sampleRate,
+                    ),
                     radius = Math.round(rawRate * 0.005),
                     stride = Math.max(1, Math.round(rawRate / 12000));
                   let bestError = Infinity,

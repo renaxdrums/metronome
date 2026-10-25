@@ -1,5 +1,7 @@
 {
   "nightly": [
+    "tests/track-beat-corrections-test.cjs",
+    "tests/two-consonant-timing-test.cjs",
     "tests/accessibility-test.cjs",
     "tests/account-back-regression-test.cjs",
     "tests/amorce-background-ui-test.cjs",
@@ -92,6 +94,7 @@
     "tests/track-playlist-chain-test.cjs",
     "tests/training-modes-test.cjs",
     "tests/transport-timer-test.cjs",
+    "tests/voice-bank-switch-test.cjs",
     "tests/voice-subdivision-gain-test.cjs"
   ],
   "excluded": {

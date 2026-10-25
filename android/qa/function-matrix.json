@@ -1,0 +1,202 @@
+[
+  {
+    "feature": "tempo",
+    "description": "Plage 2–999, boutons limites et Tap Tempo",
+    "required_tests": [
+      "tempo_range_and_boundaries",
+      "native_tempo_stepper_boundaries",
+      "native_tap_tempo_measured_intervals"
+    ]
+  },
+  {
+    "feature": "metric",
+    "description": "100 métriques et 361 polyrythmies",
+    "required_tests": [
+      "all_100_metric_options",
+      "all_361_polyrhythm_ratios"
+    ]
+  },
+  {
+    "feature": "subdivision",
+    "description": "8 subdivisions et 4 états d’accent",
+    "required_tests": [
+      "all_subdivisions_and_four_accent_states"
+    ]
+  },
+  {
+    "feature": "sound",
+    "description": "24 banques et 40 enregistrements originaux",
+    "required_tests": [
+      "every_sound_bank_scheduled_and_output_signal",
+      "forty_original_voice_samples_decoded_and_rendered",
+      "cold_switch_to_male_voice_during_playback",
+      "switch_to_female_voice_during_playback",
+      "multitrack_male_and_female_live_switches"
+    ]
+  },
+  {
+    "feature": "volume",
+    "description": "101 valeurs et silence réel à zéro",
+    "required_tests": [
+      "volume_controls_zero_to_full",
+      "volume_zero_mutes_actual_signal"
+    ]
+  },
+  {
+    "feature": "silent",
+    "description": "Mesures vides, tous les nombres proposés",
+    "required_tests": [
+      "all_silent_cycle_count_options",
+      "silent_cycle_creates_actual_missing_beats"
+    ]
+  },
+  {
+    "feature": "score",
+    "description": "Partition Bravura et regroupement",
+    "required_tests": [
+      "bravura_partition_editor_and_grouping",
+      "partition_all_note_duration_controls"
+    ]
+  },
+  {
+    "feature": "edit",
+    "description": "Reset et Annuler",
+    "required_tests": [
+      "reset_and_undo_controls"
+    ]
+  },
+  {
+    "feature": "training",
+    "description": "12 courbes et paliers dans les deux sens",
+    "required_tests": [
+      "all_twelve_training_curves_and_end_stop",
+      "training_steps_up_and_down_real_clock"
+    ]
+  },
+  {
+    "feature": "sequence",
+    "description": "Ajout/retrait et lecture séquenceur",
+    "required_tests": [
+      "sequence_add_remove_measure",
+      "native_play_stop_sequence",
+      "sequence_all_counts_and_edit_actions"
+    ]
+  },
+  {
+    "feature": "multi",
+    "description": "Ajout de piste et lecture multipiste",
+    "required_tests": [
+      "multitrack_add_track",
+      "native_play_stop_multi",
+      "multipiste_track_and_preset_edit_actions"
+    ]
+  },
+  {
+    "feature": "track",
+    "description": "Création et actions d’édition",
+    "required_tests": [
+      "track_create_add_section",
+      "track_rename_duplicate_delete_native_actions",
+      "section_count_tempo_ramp_copy_delete_and_count_in",
+      "native_long_press_block_reorder"
+    ]
+  },
+  {
+    "feature": "playlist",
+    "description": "Sélection, arrêt, enchaînement limité à la playlist",
+    "required_tests": [
+      "track_first_selected_chain_and_playlist_boundaries",
+      "empty_track_workspace_does_not_start_metronome",
+      "playlist_create_rename_delete",
+      "track_copy_and_move_between_playlists",
+      "native_long_press_track_reorder"
+    ]
+  },
+  {
+    "feature": "guide",
+    "description": "Vrais modèles neuronaux français et anglais",
+    "required_tests": [
+      "real_neural_guide_fr",
+      "real_neural_guide_en"
+    ]
+  },
+  {
+    "feature": "json",
+    "description": "Sauvegarde JSON et import non destructif",
+    "required_tests": [
+      "native_json_export_and_bytes",
+      "native_json_import_preserves_existing_data",
+      "native_json_rejects_invalid_schema_syntax_and_oversize"
+    ]
+  },
+  {
+    "feature": "mp3",
+    "description": "Enregistrement et présence des voix/du guide dans le MP3",
+    "required_tests": [
+      "native_mp3_export_and_signature",
+      "native_mp3_contains_male_voice_waveform",
+      "native_mp3_contains_female_voice_waveform",
+      "native_mp3_contains_fr_voice_waveform",
+      "native_mp3_contains_en_voice_waveform"
+    ]
+  },
+  {
+    "feature": "midi",
+    "description": "Fichier MIDI enregistré et événements musicaux",
+    "required_tests": [
+      "native_midi_export"
+    ]
+  },
+  {
+    "feature": "transfer",
+    "description": "Annulation et fichier de plus de 20 Mio",
+    "required_tests": [
+      "native_export_cancel_and_cleanup",
+      "native_export_above_20_MiB_bytes"
+    ]
+  },
+  {
+    "feature": "settings",
+    "description": "Thèmes, langues, roue dentée, correction Bluetooth",
+    "required_tests": [
+      "three_themes_five_languages",
+      "preferences_gear_and_bluetooth_storage"
+    ]
+  },
+  {
+    "feature": "diagnostic",
+    "description": "Aucun accès micro/stockage général ; diagnostic micro retiré à la demande utilisateur",
+    "required_tests": [
+      "no_recording_or_storage_permissions"
+    ]
+  },
+  {
+    "feature": "device",
+    "description": "Écran, arrière-plan, redémarrage et réseau coupé",
+    "required_tests": [
+      "screen_awake_only_during_playback",
+      "background_continuous_playback_30_seconds",
+      "activity_recreation_local_storage",
+      "process_restart_local_storage",
+      "offline_start_and_play_stop"
+    ]
+  },
+  {
+    "feature": "cloud_account",
+    "description": "Connexion Google et synchronisation intégrées à l’APK",
+    "status": "not_implemented_in_current_apk",
+    "reason": "Le lanceur livré désactive Firebase et ouvre le site externe. Écart fonctionnel à résoudre."
+  },
+  {
+    "feature": "midi_hardware_start",
+    "description": "Déclenchement matériel MIDI START",
+    "status": "not_offered_on_current_site",
+    "reason": "Contrôles désactivés et explicitement annoncés pour une prochaine version sur le site."
+  },
+  {
+    "feature": "physical_bluetooth",
+    "description": "Écoute, route Bluetooth réelle et latence sur Samsung S23",
+    "status": "requires_physical_device",
+    "reason": "La correction logicielle est testée ; le périphérique physique ne peut pas être simulé fidèlement."
+  }
+]

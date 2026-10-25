@@ -15,8 +15,10 @@
 .sequence-more-actions{display:flex;flex-direction:column;gap:3px;min-width:132px;}
 .sequence-more-actions button{width:100%;padding:0 12px;text-align:left;font:600 12px var(--font);}
 #measureList .drop-target{border-top:3px solid var(--cyan);}#measureList .measure-card{touch-action:none;}#measureList .dragging{border-color:var(--orange);cursor:grabbing;} .sequence-drag-placeholder{border:1px dashed var(--orange);border-radius:8px;background:#ff6b0010;}
-#playBtn{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:9px;width:auto!important;min-width:116px!important;height:42px!important;min-height:42px!important;padding:10px 18px!important;border-radius:7px!important;background:rgba(0,229,255,.08)!important;border:1px solid rgba(0,229,255,.65)!important;box-shadow:none!important;color:var(--text)!important;font-size:0!important;line-height:1.35;transition:background .15s,border-color .15s;}
+#playBtn{position:relative;display:var(--play-button-display,inline-flex)!important;align-items:center;justify-content:center;gap:9px;width:auto!important;min-width:116px!important;height:42px!important;min-height:42px!important;padding:10px 18px!important;border-radius:7px!important;background:rgba(0,229,255,.08)!important;border:1px solid rgba(0,229,255,.65)!important;box-shadow:none!important;color:var(--text)!important;font-size:0!important;line-height:1.35;transition:background .15s,border-color .15s;}
 #playBtn::before{content:'';position:static;display:block;flex:none;width:0;height:0;border-left:10px solid var(--cyan);border-top:6px solid transparent;border-bottom:6px solid transparent;}
+#playBtn[hidden]{--play-button-display:none;}
+#beatEditorDuplicateFirst{width:100%;margin:0 0 16px;white-space:normal;}
 #playBtn::after{content:attr(data-transport-label);font:600 11px/1.35 var(--font);letter-spacing:.3px;text-transform:none;}
 #playBtn:hover{background:rgba(0,229,255,.14)!important;border-color:var(--cyan)!important;transform:none;box-shadow:none!important;}
 #playBtn:active{background:rgba(0,229,255,.22)!important;}

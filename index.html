@@ -57,7 +57,7 @@
 
 <link rel="stylesheet" href="entry-07.css?v=463aca5615bf">
 
-<link id="sequence-edit-transport" rel="stylesheet" href="entry-sequence-edit-transport.css?v=8075137715c1">
+<link id="sequence-edit-transport" rel="stylesheet" href="entry-sequence-edit-transport.css?v=6e7949514369">
 <link rel="stylesheet" href="entry-09.css?v=a66a57940143"><link id="circular-view-legend" rel="stylesheet" href="entry-circular-view-legend.css?v=b7784e722d76"><link rel="stylesheet" href="entry-11.css?v=a9bea4c245c7">
 <link rel="stylesheet" href="entry-12.css?v=5956b2c2f6c4">
 <link rel="stylesheet" href="multi-metronome.css?v=1f1df82d778f">
@@ -371,11 +371,11 @@
 
   <script src="ui-feedback.js?v=eae7d41e1fb6"></script>
 <script src="numbox-controls.js?v=da106d639f33"></script>
-  <script src="metronome-audio.js?v=d8297fa53c84"></script>
-  <script src="metronome-core.js?v=a607bf8e2622"></script>
+  <script src="metronome-audio.js?v=37565874f015"></script>
+  <script src="metronome-core.js?v=42262403d018"></script>
   <link rel="stylesheet" href="playback-support.css?v=be7d47c55905">
   <script src="playback-support.js?v=906fd4c12e7e"></script>
-  <script src="metronome-transport.js?v=265a71e59c7e"></script>
+  <script src="metronome-transport.js?v=3d3a45b2a38d"></script>
   <script src="pro-sound-bank.js?v=4380a78e5f34"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
@@ -385,7 +385,7 @@
 <script src="local-backup.js?v=6fb6848845c2"></script>
   <script src="amorce-song.js?v=9f00d2d74e2c"></script>
   <script src="song-tempo-ramp.js?v=84e7c800f469"></script>
-  <script src="songs-index2.js?v=fa99e1a2757b"></script>
+  <script src="songs-index2.js?v=344d6cb5c758"></script>
   <script type="module" src="cloud-backup.js?v=de176ef95986"></script>
   <script>
     // Index 2 : ouvrir les morceaux de la playlist avec les sections repliées.
@@ -489,11 +489,11 @@ bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',syn
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
 <script src="multi-clock.js?v=200171f7f4fd"></script>
-<script src="multi-metronome.js?v=6f20f7386b95"></script>
+<script src="multi-metronome.js?v=ec9e737bfa57"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
-<script src="interface-translations.js?v=6f6ea6af0d2f"></script>
+<script src="interface-translations.js?v=ebb0dbd85c35"></script>
 <script src="vendor/i18next-25.6.0.js?v=6077ce0b0640"></script>
-<script src="interface-locales.js?v=05159d261d88"></script>
+<script src="interface-locales.js?v=de74ed43ce89"></script>
 <link rel="stylesheet" href="interface-language.css?v=3995c298df9e">
 <script src="interface-language.js?v=291439ae445e"></script>
 <script src="workspace-layout.js?v=c6eb3e433097"></script>

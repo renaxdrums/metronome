@@ -1,3 +1,11 @@
+# Recalage de « two » — 25 octobre 2026
+
+Les vidéos utilisateur montrent une irrégularité vocale répétée. Le code calait « two » sur le T, contrairement aux 38 autres nombres calés sur leur montée vocalique. Repères corrigés : homme 50→175 ms (lecture avancée de 125 ms), femme 1→95 ms (avancée de 94 ms). Les WAV complets, hauteurs, gains, autres nombres, clics et grille temporelle restent identiques. Les consonnes restent en pré-roll ; aucune compression du mot ni égalisation artificielle des durées.
+
+Contrôle local : 40 montées vocaliques remesurées dans les WAV, erreur 0 ms au pas de 1 ms et empreintes SHA-256 identiques. Le test de calage couvre maintenant aussi 80 BPM, ainsi que 44,1/48 kHz et un décalage volontaire de 25 ms. La régression « two » vérifie les 40 rendus, les deux seules avances attendues et la conservation des autres formes d’onde et niveaux. Ces vérifications navigateur sont obligatoires avant le déploiement Pages ; leur résultat est consultable dans le workflow du commit.
+
+Contrôle à l’écoute à effectuer sur l’appareil : 4/4, sans subdivision, voix homme puis femme à 80 et 120 BPM, huit mesures ; vérifier un espacement régulier 1→2→3→4→1, puis Stop/Play et un changement de tempo. La perception sur la sortie audio de l’utilisateur reste à confirmer.
+
 # Cercle par temps et réglage sur clic — 6 octobre 2026
 
 Le cercle conserve un bloc numéroté par temps. Le clic ou Entrée/Espace ouvre la fenêtre de réglage de ce temps : nombre de subdivisions, puis boutons d’états/accents. La lecture continue pendant l’édition ; Échap, × ou clic extérieur ferme la fenêtre. Le temps édité est repéré par un contour orange, le temps joué conserve sa surbrillance.

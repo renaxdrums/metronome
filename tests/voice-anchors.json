@@ -13,15 +13,13 @@
   {
     "gender": "male",
     "number": 2,
-    "anchor_ms": 50,
+    "anchor_ms": 175,
     "region_ms": [
-      0,
-      100
+      150,
+      201
     ],
-    "note": "T consonant onset: first non-overlapping 1 ms PCM block above RMS 0.002. Original recording, vowel gain and pitch unchanged.",
-    "sha256": "668005178adb76ca1f6745a89ad5b8ddf8126752b82bd1cde15141aeb73da79f",
-    "landmark": "consonant_onset",
-    "waveform_match_ms": 175
+    "note": "Rising vowel/formant nucleus, aligned with the same landmark as the other spoken numbers. Complete T consonant pre-roll and original recording retained.",
+    "sha256": "668005178adb76ca1f6745a89ad5b8ddf8126752b82bd1cde15141aeb73da79f"
   },
   {
     "gender": "male",
@@ -235,15 +233,13 @@
   {
     "gender": "female",
     "number": 2,
-    "anchor_ms": 1,
+    "anchor_ms": 95,
     "region_ms": [
-      0,
-      100
+      70,
+      121
     ],
-    "note": "T consonant onset: first non-overlapping 1 ms PCM block above RMS 0.002. Original recording, vowel gain and pitch unchanged.",
-    "sha256": "ad5084062427fb38e7f9d6a27e3da5ee3e2525803dd3e501cce9eb48f7849a8a",
-    "landmark": "consonant_onset",
-    "waveform_match_ms": 95
+    "note": "Rising vowel/formant nucleus, aligned with the same landmark as the other spoken numbers. Complete T consonant pre-roll and original recording retained.",
+    "sha256": "ad5084062427fb38e7f9d6a27e3da5ee3e2525803dd3e501cce9eb48f7849a8a"
   },
   {
     "gender": "female",

@@ -47,6 +47,7 @@ const assert = require('node:assert/strict');
               { name: 'Tous les nombres 1-20 a 60 BPM', ms: [[20, 60, [1]]] },
               { name: 'Tous les nombres 1-20', ms: [[20, 120, [1]]] },
               { name: '60 BPM 4/4', ms: [[4, 60, [1]]] },
+              { name: '80 BPM 4/4', ms: [[4, 80, [1]]] },
               { name: '120 BPM 4/4', ms: [[4, 120, [1]]] },
               { name: '60 BPM 3/4', ms: [[3, 60, [1]]] },
               { name: '120 BPM 5/4', ms: [[5, 120, [1]]] },
@@ -152,8 +153,7 @@ const assert = require('node:assert/strict');
                     start = starts[i];
                   if (start.offset > 0) lateStarts++;
                   // Match a stable original-word region independently of scheduling.
-                  // For "two", keep the vowel as a resampling-stable match window;
-                  // its independently measured offset from T locates the beat.
+                  // All numbers use the same reviewed vowel-nucleus landmark.
                   const gender = { voiceMale: 'male', voiceFemale: 'female' }[bank];
                   const annotation = anchors.find(
                     (a) => a.gender === gender && a.number === expected[i].number,
@@ -273,14 +273,14 @@ const assert = require('node:assert/strict');
             assert(Math.abs(scenario.maxAttackErrorMs - injectedOffset * 1000) <= 1.1);
         } else {
           validate();
-          assert.equal(result.results.length, 20);
+          assert.equal(result.results.length, 22);
         }
         reports.push(result);
         await page.close();
       }
     save('timing-results.json', reports);
     console.log(
-      'PASS 20 scenarios at 44100 and 48000 Hz; injected 25 ms shifts detected at both rates',
+      'PASS 22 scenarios at 44100 and 48000 Hz; injected 25 ms shifts detected at both rates',
     );
   } finally {
     await browser.close();

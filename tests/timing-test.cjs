@@ -47,6 +47,7 @@ const assert = require('node:assert/strict');
               { name: 'Tous les nombres 1-20 a 60 BPM', ms: [[20, 60, [1]]] },
               { name: 'Tous les nombres 1-20', ms: [[20, 120, [1]]] },
               { name: '60 BPM 4/4', ms: [[4, 60, [1]]] },
+              { name: '80 BPM 4/4', ms: [[4, 80, [1]]] },
               { name: '120 BPM 4/4', ms: [[4, 120, [1]]] },
               { name: '60 BPM 3/4', ms: [[3, 60, [1]]] },
               { name: '120 BPM 5/4', ms: [[5, 120, [1]]] },
@@ -152,8 +153,7 @@ const assert = require('node:assert/strict');
                     start = starts[i];
                   if (start.offset > 0) lateStarts++;
                   // Match a stable original-word region independently of scheduling.
-                  // For "two", keep the vowel as a resampling-stable match window;
-                  // its independently measured offset from T locates the beat.
+                  // All numbers use the same reviewed vowel-nucleus landmark.
                   const gender = { voiceMale: 'male', voiceFemale: 'female' }[bank];
                   const annotation = anchors.find(
                     (a) => a.gender === gender && a.number === expected[i].number,

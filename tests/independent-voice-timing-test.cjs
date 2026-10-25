@@ -15,6 +15,6 @@ playVoiceMetronome('male',{},10,1,false,{beatNumber:2,subIndex:0});
 `);
 execute(table,calls);
 for(let n=1;n<=20;n++)assert.ok(Math.abs(calls[n-1].t+table.male[n]-10)<1e-9);
-assert.equal(calls[20].t,9.6);assert.equal(calls[21].t,9.95);
+assert.equal(calls[20].t,9.6);assert.equal(calls[21].t,9.825);
 assert.ok(!guide.includes("currentBank='voiceMale'"));assert.ok(guide.includes("renderVoiceCount('male'"));
 console.log('PASS: 40 validated anchors; 20 scheduled male words; independent song cue timing.');

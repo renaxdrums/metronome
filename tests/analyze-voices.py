@@ -1,4 +1,4 @@
-"""Check annotated vowel/T landmarks and unchanged shipped recordings."""
+"""Check annotated vowel landmarks and unchanged shipped recordings."""
 import pathlib,wave,json,hashlib,numpy as np
 root=pathlib.Path(__file__).resolve().parents[1]
 annotations=json.loads((root/'tests/voice-anchors.json').read_text(encoding='utf-8'))
@@ -28,4 +28,4 @@ for a in annotations:
  results.append(dict(gender=a['gender'],number=a['number'],annotated_ms=a['anchor_ms'],measured_ms=measured,error_ms=err,sha256=sha,duration_ms=len(x)/48))
 out=root/'tests/results';out.mkdir(exist_ok=True)
 (out/'sample-analysis.json').write_text(json.dumps(results,indent=2)+'\n')
-print(f"{len(results)} vowel/T landmarks verified; maximum error {max(abs(r['error_ms']) for r in results)} ms.")
+print(f"{len(results)} vowel landmarks verified; maximum error {max(abs(r['error_ms']) for r in results)} ms.")

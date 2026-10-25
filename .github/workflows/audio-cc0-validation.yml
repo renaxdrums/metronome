@@ -64,6 +64,8 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/timing-test.cjs
+          node tests/two-consonant-timing-test.cjs
+          node tests/independent-voice-timing-test.cjs
           node tests/tooling-guards-test.cjs
       - name: Phase 2 playback ownership and unchanged PCM
         run: |

@@ -20,6 +20,7 @@ jobs:
         include:
           - api: 34
             target: google_apis
+            emulator_build: 15507667 # Official 36.6.11 stable; compare with current emulator on API 35/36.
           - api: 35
             target: default
           - api: 36
@@ -40,9 +41,15 @@ jobs:
         run: |
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg
+          sudo apt-get install -y ffmpeg pulseaudio
           python3 -m pip install --disable-pip-version-check numpy==2.3.5
           sudo chmod a+rw /dev/kvm
+      - name: Provide virtual audio input and output
+        run: |
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=renax_native_audio
+          pactl set-default-sink renax_native_audio
+          pactl set-default-source renax_native_audio.monitor
       - name: Build release activity and separate test probe
         env:
           NODE_PATH: ${{ runner.temp }}/renax-native-deps/node_modules
@@ -53,16 +60,20 @@ jobs:
           api-level: ${{ matrix.api }}
           target: ${{ matrix.target }}
           arch: x86_64
+          emulator-build: ${{ matrix.emulator_build }}
           ram-size: 4096M
-          emulator-options: -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340
+          emulator-options: -no-window -gpu swiftshader -feature -Vulkan -allow-host-audio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340
           disable-animations: true
-          script: python3 android/qa/suite.py
+          script: |
+            adb emu avd hostmicon
+            python3 android/qa/suite.py
       - name: Preserve host diagnostics after native testing
         if: always()
         run: |
           mkdir -p android/build/native-qa/output
           {
             free -h
+            ps -eo pid,comm,rss
             df -h
             sudo dmesg --ctime | tail -100
           } > android/build/native-qa/output/native-host-diagnostics.txt 2>&1

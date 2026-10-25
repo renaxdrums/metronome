@@ -37,6 +37,8 @@ def run_control_checks(api):
         nav('metronome')
         if js('document.querySelector("#workspaceMobileViews [data-pane=visu]")?.getBoundingClientRect().height>0'):tap('#workspaceMobileViews [data-pane=visu]')
         tap('.step[data-beat="0"]')
+        bounds=js('(()=>{beatEditor.style.left=innerWidth+"px";beatEditor.style.right="auto";refreshBeatEditor();const r=beatEditor.getBoundingClientRect();return {left:r.left,right:r.right,width:innerWidth}})()')
+        require(bounds['left']>=0 and bounds['right']<=bounds['width'],'Beat editor reopened outside the phone viewport: '+str(bounds))
         rows=[]
         for division in range(1,9):
             set_value('#beatEditorDivision',division)
@@ -49,8 +51,8 @@ def run_control_checks(api):
             tap('#beatEditorPads button')
             state=js('measures[activeMeasureIndex].beatStates[0][0]')
             require(state==(before+index+1)%4,'Accent cycle mismatch');states.append(state)
-        tap('#beatEditor [aria-label="Fermer"]')
-        return {'subdivisions':rows,'accent_states':states}
+        tap('#beatEditor [aria-label="Fermer"]');wait('document.querySelector("#beatEditor").hidden')
+        return {'subdivisions':rows,'accent_states':states,'immediate_popup_bounds':bounds}
 
     def volume():
         nav('metronome');rows=[]

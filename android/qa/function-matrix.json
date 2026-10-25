@@ -125,7 +125,8 @@
     "description": "Sauvegarde JSON et import non destructif",
     "required_tests": [
       "native_json_export_and_bytes",
-      "native_json_import_preserves_existing_data"
+      "native_json_import_preserves_existing_data",
+      "native_json_rejects_invalid_schema_syntax_and_oversize"
     ]
   },
   {

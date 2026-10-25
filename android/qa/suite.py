@@ -11,7 +11,9 @@ root=Path(__file__).resolve().parents[2]; out=root/'android/build/native-qa/outp
 results=[]; process=None; log=None; logcat_process=None; logcat_file=None; api='unknown'
 TARGET='com.renaxdrums.metronome'
 def adb(*args,check=True):
- return subprocess.run(['adb',*map(str,args)],capture_output=True,check=check,timeout=60)
+ result=subprocess.run(['adb',*map(str,args)],capture_output=True,timeout=60)
+ if check and result.returncode:raise RuntimeError('adb '+str(args[:3])+' failed with '+str(result.returncode)+': '+(result.stderr or result.stdout).decode(errors='replace')[-1500:])
+ return result
 def request(action,**values):
  with socket.create_connection(('127.0.0.1',18765),timeout=35) as s:
   s.settimeout(40);s.sendall((json.dumps({'action':action,**values})+'\n').encode())
@@ -245,6 +247,28 @@ def import_json():
  after=wait('RENAX_SONGS.library.profiles.length',lambda n:n==before+len(exported['profiles']))
  return {'native_picker':True,'profiles_before':before,'profiles_after':after,'original_profiles_preserved':True}
 
+def import_invalid_json():
+ rows=[]
+ for kind,payload in [('syntax','{invalid'),('schema','{"version":1,"profiles":"invalid"}'),('oversize',' '*5000001)]:
+  nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"profile",profile:RENAX_SONGS.library.activeProfile,song:null})')
+  wait('!!document.querySelector("#backup-local .song-actions button")')
+  if js('!!document.querySelector("#backupAccount [aria-controls=backup-local]")'):click('#backupAccount [aria-controls=backup-local]')
+  original=js('JSON.stringify(RENAX_SONGS.library)');stored=js('RENAX_STORAGE.read()')
+  name='qa-refused-'+kind+'.json';fixture=out/name;fixture.write_text(payload)
+  try:
+   adb('push',fixture,'/sdcard/Download/'+name)
+   js('(()=>{document.querySelector("#songStatus").textContent="";return true})()')
+   tap('#backup-local .song-actions button:nth-child(2)');wait_native_file(name)
+   require(request('nativeFile',filename=name),'Native invalid JSON selection failed')
+   message=wait('document.querySelector("#songStatus")?.textContent',lambda t:bool(t) and t.startswith('Import refusé'))
+   if kind=='oversize':require('trop volumineux' in message,'Oversized JSON was not rejected for its size')
+   require(js('JSON.stringify(RENAX_SONGS.library)')==original and js('RENAX_STORAGE.read()')==stored,'Rejected JSON modified existing tracks')
+   require(not js('!!document.querySelector("dialog.song-confirmation[open]")'),'Rejected JSON reached import confirmation')
+   rows.append({'kind':kind,'bytes':len(payload),'native_picker':True,'message':message,'existing_data_preserved':True})
+  finally:
+   adb('shell','rm','/sdcard/Download/'+name,check=False);fixture.unlink(missing_ok=True)
+ return rows
+
 def export_cancel():
  js('(()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["cancel"],{type:"application/json"}));a.download="renax-cancel.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000);return true})()')
  deadline=time.monotonic()+15
@@ -293,13 +317,21 @@ def microphone_diagnostics():
  nav('metronome');tap('#index2SettingsBtn')
  js('(()=>{window.__qaMicTracks=[];window.__qaGetUserMedia=navigator.mediaDevices.getUserMedia;navigator.mediaDevices.getUserMedia=async function(...args){const stream=await __qaGetUserMedia.apply(this,args);__qaMicTracks.push(...stream.getTracks());return stream};return true})()')
  def permission_button(labels):
-  deadline=time.monotonic()+15
+  deadline=time.monotonic()+15;previous=None
   while time.monotonic()<deadline:
    wanted={x.casefold() for x in labels}
-   if any(n['text'].strip().casefold() in wanted or n['desc'].strip().casefold() in wanted for n in nodes()):break
-   time.sleep(.2)
+   matches=[n for n in nodes() if n['text'].strip().casefold() in wanted or n['desc'].strip().casefold() in wanted]
+   position=[(n['x'],n['y'],n['w'],n['h']) for n in matches if n['w']>0 and n['h']>0]
+   if position and position==previous:break
+   previous=position;time.sleep(.2)
   else:raise AssertionError('Android microphone permission dialog was not shown')
   native_click_text(labels)
+  deadline=time.monotonic()+10
+  while time.monotonic()<deadline:
+   if not any('permissioncontroller' in n.get('package','') for n in nodes()):return
+   time.sleep(.2)
+  raise AssertionError('Android microphone permission dialog did not close after the native tap')
+
  try:
   require(not request('microphoneGranted'),'Unexpected pre-granted microphone permission')
   tap('#latencyIdentifyOutputs');permission_button(["Don't allow","Don’t allow","Deny","Refuser"])
@@ -399,6 +431,7 @@ try:
   check('real_neural_guide_'+language,lambda language=language:check_guide(language,voice_api))
  check('native_json_export_and_bytes',export_json)
  check('native_json_import_preserves_existing_data',import_json)
+ check('native_json_rejects_invalid_schema_syntax_and_oversize',import_invalid_json)
  check('native_mp3_export_and_signature',export_mp3)
  check('native_midi_export',export_midi)
  run_export_checks(voice_api,save_picker,out)

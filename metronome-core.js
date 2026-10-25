@@ -926,6 +926,7 @@
       const legend=document.createElement('p');legend.className='beat-editor-legend';legend.style.cssText='display:flex;justify-content:center;flex-wrap:wrap;gap:8px 12px;margin:0;font-size:11px;color:var(--text-muted)';
       ['Éteint','Clic 1','Clic 2','Clic 3'].forEach((text,state)=>{const item=document.createElement('span'),dot=document.createElement('span');item.style.cssText='display:inline-flex;align-items:center;gap:5px';dot.setAttribute('aria-hidden','true');dot.style.cssText='width:9px;height:9px;border-radius:2px;background:'+['var(--grey)','var(--cyan)','var(--yellow)','var(--orange)'][state];item.append(dot,document.createTextNode(text));legend.append(item);});beatEditor.appendChild(legend);
       if(isPlaying){const note=document.createElement('p');note.textContent='Les divisions prennent effet au prochain passage de la mesure.';note.style.cssText='font-size:11px;color:var(--text-muted)';beatEditor.appendChild(note);}
+      keepBeatEditorInView();
     }
     function highlightBeatEditor(m,beat,subIndex,scheduledSubdivisions) {
       if(!beatEditorSelection || beatEditorSelection.m!==m || beatEditorSelection.beat!==beat)return;

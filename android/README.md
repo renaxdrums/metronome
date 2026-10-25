@@ -8,7 +8,7 @@ fonctionnent sans connexion. Les voix/modèles téléchargés et les ressources
 externes ont besoin d’Internet. Le compte et la synchronisation cloud s’ouvrent
 sur le site officiel dans le navigateur ; les données de l’APK ne sont pas
 automatiquement transférées au navigateur. L’import/export JSON permet leur
-transfert volontaire. Les exports JSON/MP3/WAV utilisent le sélecteur Android.
+transfert volontaire. Les exports JSON/MP3/MIDI utilisent le sélecteur Android.
 Le lanceur ne force plus l’arrêt quand l’application passe en arrière-plan.
 Aucun service audio permanent n’est installé : la continuité lors des restrictions
 de batterie ou de la fermeture du processus reste à vérifier sur téléphone.

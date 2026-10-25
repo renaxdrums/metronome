@@ -1,5 +1,7 @@
 {
   "nightly": [
+    "tests/track-beat-corrections-test.cjs",
+    "tests/two-consonant-timing-test.cjs",
     "tests/accessibility-test.cjs",
     "tests/account-back-regression-test.cjs",
     "tests/amorce-background-ui-test.cjs",

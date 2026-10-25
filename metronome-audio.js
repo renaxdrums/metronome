@@ -138,12 +138,12 @@
       female:   'assets/voices/voice-female-en',
     };
 
-    // Reviewed vowel-nucleus anchors in the complete original human recordings.
+    // Reviewed vowel anchors, except "two": its T consonant lands on the beat.
     // See tests/voice-anchors.json; consonant pre-roll and internal pauses are retained.
     // Natural pitch is preserved and the Web Audio beat grid never moves.
     const VOICE_ATTACK_SECONDS = {
-      male: [0, 0.116, 0.175, 0.262, 0.143, 0.195, 0.256, 0.216, 0.097, 0.12, 0.176, 0.211, 0.15, 0.128, 0.125, 0.105, 0.189, 0.187, 0.091, 0.129, 0.14],
-      female: [0,0.107,0.095,0.076,0.118,0.105,0.175,0.17,0.093,0.078,0.071,0.163,0.098,0.022,0.116,0.112,0.131,0.138,0.019,0.06,0.074],
+      male: [0, 0.116, 0.05, 0.262, 0.143, 0.195, 0.256, 0.216, 0.097, 0.12, 0.176, 0.211, 0.15, 0.128, 0.125, 0.105, 0.189, 0.187, 0.091, 0.129, 0.14],
+      female: [0,0.107,0.001,0.076,0.118,0.105,0.175,0.17,0.093,0.078,0.071,0.163,0.098,0.022,0.116,0.112,0.131,0.138,0.019,0.06,0.074],
     };
     const VOICE_MAX_ATTACK_SECONDS = Math.max(...Object.values(VOICE_ATTACK_SECONDS).flat());
     const VOICE_AUDIO_REVISION = '20261005-complete-v2';
@@ -285,7 +285,9 @@
 
         let vol = settings.volumes[state] || settings.volumes[1];
         if (isFirst) vol *= settings.firstGain;
-        if(settings.normalizeVolume)vol*=voiceLoudnessGain(buffer,attack);
+        // Preserve the approved vowel-based gain when only T timing changes.
+        const volumeAnchor=beatNumber===2?({male:.175,female:.095}[gender]??attack):attack;
+        if(settings.normalizeVolume)vol*=voiceLoudnessGain(buffer,volumeAnchor);
         gain.gain.setValueAtTime(vol, startTime);
 
         src.connect(gain);

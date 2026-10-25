@@ -120,8 +120,9 @@ def run_extended_checks(api, api_request):
         nav('tracks');original=seed_tracks()
         try:
             js('RENAX_SONGS.replaceLibrary({version:1,activeProfile:"only-empty",profiles:[{id:"only-empty",name:"Vide",songs:[]}]},true)')
-            tap('#playBtn');require(not js('isPlaying'),'Empty track workspace started another mode')
-            return {'empty_playlist_keeps_transport_stopped':True}
+            require(js('document.querySelector("#playBtn").hidden&&getComputedStyle(document.querySelector("#playBtn")).display==="none"'),'Empty Track still shows a play button')
+            js('startMetronome()');require(not js('isPlaying'),'Empty track workspace started another mode')
+            return {'empty_playlist_keeps_transport_stopped':True,'empty_track_play_button_hidden':True}
         finally:restore_tracks(original)
 
     def track_actions():

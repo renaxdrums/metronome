@@ -14,6 +14,8 @@ Ne fournir aucune clé privée de compte de service ou clé administrative.
 Identité de l’application à enregistrer dans le projet existant :
 
 - Package : `com.renaxdrums.metronome`.
+- Certificat de signature RENAX conservé, SHA-1 (client OAuth Android) :
+  `6A:AC:89:56:FF:0C:89:EF:F2:DE:89:0F:0C:30:86:7B:F6:09:87:14`.
 - Certificat de signature RENAX conservé, SHA-256 :
   `59:5E:5C:26:0D:9E:1F:E7:AE:B2:08:B5:9C:FF:87:3C:28:EB:93:3F:56:F1:26:90:67:C1:98:78:C7:1E:AA:2A`.
 - Les comptes et les données doivent rester dans le projet existant ; ne pas

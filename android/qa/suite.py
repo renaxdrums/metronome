@@ -8,7 +8,7 @@ from export_checks import run_export_checks
 from media_checks import midi_summary
 
 root=Path(__file__).resolve().parents[2]; out=root/'android/build/native-qa/output'
-results=[]; process=None; log=None; logcat_process=None; logcat_file=None; api='unknown'
+results=[]; launcher_boot_dialogs=[]; process=None; log=None; logcat_process=None; logcat_file=None; api='unknown'
 TARGET='com.renaxdrums.metronome'
 def adb(*args,check=True):
  result=subprocess.run(['adb',*map(str,args)],capture_output=True,timeout=60)
@@ -46,7 +46,7 @@ def save_report():
  for feature in matrix:
   expected=feature.get('required_tests',[])
   if expected:feature['status']='pending' if any(name not in by_name for name in expected) else 'passed' if all(by_name[name]['status']=='passed' for name in expected) else 'failed'
- report={'android_api':api,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'all_expected_functions_validated':all(x['status'] in ['passed','not_offered_on_current_site'] for x in matrix),'function_matrix':matrix,'tests':results}
+ report={'android_api':api,'instrumentation_separate_from_release_apk':True,'physical_device_tested':False,'audible_output_and_bluetooth_tested':False,'all_expected_functions_validated':all(x['status'] in ['passed','not_offered_on_current_site'] for x in matrix),'function_matrix':matrix,'external_launcher_boot_dialogs':launcher_boot_dialogs,'tests':results}
  (out/'native-report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
  return report
 def check(name,fn):
@@ -89,7 +89,8 @@ def start_probe(suffix):
  deadline=time.monotonic()+120
  while time.monotonic()<deadline:
   if process.poll() is not None:raise RuntimeError('Instrumentation exited: '+(out/('instrumentation-'+suffix+'.txt')).read_text())
-  try:return ready()
+  try:
+   state=ready();dismiss_launcher_boot_dialog();return state
   except (OSError,ValueError,TypeError):time.sleep(.5)
  raise TimeoutError('Native QA probe did not become ready')
 def stop_probe():
@@ -106,6 +107,17 @@ def native_click_text(texts):
  found=[n for n in choices if n['text'].strip().casefold() in wanted or n['desc'].strip().casefold() in wanted or any(n['desc'].strip().casefold()=='preview the file '+w for w in wanted)]
  if not found:raise AssertionError('Native control missing: '+str(texts)+'; available='+str([(n['text'],n['desc']) for n in choices])[:1600])
  n=next((n for n in found if n['clickable']),found[-1]);request('tap',x=n['x'],y=n['y'])
+def dismiss_launcher_boot_dialog():
+ titles={"Quickstep isn't responding","Quickstep isn’t responding","Launcher3 isn't responding","Launcher3 isn’t responding"}
+ current=nodes();found=[n['text'] for n in current if n.get('package')=='android' and n['text'] in titles]
+ if not found:return
+ # This is the emulator's launcher, never the application under test.
+ (out/'external-launcher-boot-anr.png').write_bytes(adb('exec-out','screencap','-p',check=False).stdout)
+ require(request('nativeFile',filename='Close app'),'Could not close the unrelated launcher boot error')
+ launcher_boot_dialogs.append({'title':found[0],'action':'Close app through native accessibility','application_anr_dismissed':False})
+ print('Emulator startup: closed unrelated launcher ANR: '+found[0],flush=True)
+ request('resume');wait('document.hasFocus()')
+
 def wait_native_file(filename):
  deadline=time.monotonic()+10
  while time.monotonic()<deadline:
@@ -224,7 +236,7 @@ def export_json():
  nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"profile",profile:RENAX_SONGS.library.activeProfile,song:null})')
  wait('!!document.querySelector("#backup-local .song-actions button")')
  control=js('!!document.querySelector("#backupAccount [aria-controls=backup-local]")')
- if control:click('#backupAccount [aria-controls=backup-local]')
+ if control and js('document.querySelector("#backup-local").style.display==="none"'):click('#backupAccount [aria-controls=backup-local]')
  request('refreshPort');request('refreshPort');time.sleep(.3)
  expected=js('RENAX_SONGS.library');click('#backup-local .song-actions button')
  data=save_picker('renax-morceaux.json');require(json.loads(data)==expected,'JSON content changed through native export');return {'bytes':len(data),'native_picker':True}
@@ -252,12 +264,13 @@ def import_invalid_json():
  for kind,payload in [('syntax','{invalid'),('schema','{"version":1,"profiles":"invalid"}'),('oversize',' '*5000001)]:
   nav('tracks');js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"profile",profile:RENAX_SONGS.library.activeProfile,song:null})')
   wait('!!document.querySelector("#backup-local .song-actions button")')
-  if js('!!document.querySelector("#backupAccount [aria-controls=backup-local]")'):click('#backupAccount [aria-controls=backup-local]')
+  if js('!!document.querySelector("#backupAccount [aria-controls=backup-local]")&&document.querySelector("#backup-local").style.display==="none"'):click('#backupAccount [aria-controls=backup-local]')
   original=js('JSON.stringify(RENAX_SONGS.library)');stored=js('RENAX_STORAGE.read()')
   name='qa-refused-'+kind+'.json';fixture=out/name;fixture.write_text(payload)
   try:
    adb('push',fixture,'/sdcard/Download/'+name)
    js('(()=>{document.querySelector("#songStatus").textContent="";return true})()')
+   wait('document.querySelector("#backup-local .song-actions button:nth-child(2)")?.getBoundingClientRect().height>0')
    tap('#backup-local .song-actions button:nth-child(2)');wait_native_file(name)
    require(request('nativeFile',filename=name),'Native invalid JSON selection failed')
    message=wait('document.querySelector("#songStatus")?.textContent',lambda t:bool(t) and t.startswith('Import refusé'))
@@ -347,7 +360,7 @@ def microphone_diagnostics():
    if any('permissioncontroller' in n.get('package','') for n in nodes()):
     adb('shell','input','keyevent','BACK',check=False);time.sleep(.4)
    js('(()=>{navigator.mediaDevices.getUserMedia=__qaGetUserMedia;return true})()')
-   if js('document.querySelector("#index2SettingsBtn").getAttribute("aria-expanded")==="true"'):tap('#index2SettingsBtn')
+   if js('document.querySelector("#index2SettingsBtn").getAttribute("aria-expanded")==="true"'):click('#index2SettingsBtn')
   except Exception as error:print('Microphone test cleanup: '+str(error),flush=True)
 
 def background():
@@ -400,7 +413,9 @@ def offline():
   for tool,rule in reversed(installed):adb('shell',tool,'-D','OUTPUT',*rule,check=False)
 
 try:
- adb('root',check=False);adb('wait-for-device');api=adb('shell','getprop','ro.build.version.sdk').stdout.decode().strip()
+ adb('root',check=False);adb('wait-for-device')
+ for _ in range(3):time.sleep(5)
+ api=adb('shell','getprop','ro.build.version.sdk').stdout.decode().strip()
  # 1080 physical pixels at 480 dpi: a 360-CSS-pixel Android phone, not mdpi desktop geometry.
  adb('shell','wm','density','480')
  adb('install','--no-incremental','-r',out/'app.apk');adb('install','--no-incremental','-r',out/'probe.apk')

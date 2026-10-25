@@ -29,9 +29,9 @@ def run_extended_checks(api, api_request):
         try:
             for _ in range(4):tap('#tapBtn');time.sleep(.25)
             wait('__qaTapTimes.length',lambda x:x==4)
-            state=js('({times:__qaTapTimes,bpm:tempo,measure:measures[activeMeasureIndex].tempo})')
+            state=js('({times:__qaTapTimes,bpm:tempo,measure:measures[activeMeasureIndex].tempo,retained:tapTimes.slice()})')
             expected=round(60000/((state['times'][-1]-state['times'][0])/3))
-            require(len(state['times'])==4 and abs(state['bpm']-expected)<=1 and state['measure']==state['bpm'],'Tap tempo differs from the real tap intervals')
+            require(len(state['times'])==4 and abs(state['bpm']-expected)<=1 and state['measure']==state['bpm'],'Tap tempo differs from the real tap intervals: '+str(state)+'; expected='+str(expected))
             return {'four_native_taps':True,'measured_bpm':expected,'applied_bpm':state['bpm']}
         finally:
             js('(()=>{tapBtn.removeEventListener("click",__qaTapListener,true);return true})()');set_value('#bpmSlider',120,'input')

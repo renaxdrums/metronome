@@ -61,8 +61,8 @@ jobs:
           target: ${{ matrix.target }}
           arch: x86_64
           emulator-build: ${{ matrix.emulator_build }}
-          ram-size: 4096M
-          emulator-options: -no-window -gpu swiftshader -feature -Vulkan -allow-host-audio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340
+          ram-size: 6144M
+          emulator-options: -no-window -gpu swiftshader -feature -Vulkan -allow-host-audio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340 -show-kernel -verbose
           disable-animations: true
           script: |
             adb emu avd hostmicon

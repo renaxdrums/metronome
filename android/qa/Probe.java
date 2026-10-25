@@ -74,8 +74,6 @@ public final class Probe extends Instrumentation {
     long t=SystemClock.uptimeMillis();
     MotionEvent down=MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,x,y,0);
     MotionEvent up=MotionEvent.obtain(t,t+60,MotionEvent.ACTION_UP,x,y,0);
-    down.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
-    up.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
     try {
       if(!getUiAutomation().injectInputEvent(down,true))throw new IllegalStateException("Pointer down rejected");
       SystemClock.sleep(60);

@@ -690,7 +690,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
   render();
   window.RENAX_SONGS={flushPending,playbackSections,validateLibrary,loadSong,unload,locate,
     replaceLibrary(value,preserveNavigation=false){validateLibrary(value);clearTimeout(persistTimer);persistTimer=null;persistFailed=false;unload();library=clone(value);chainedPlaylists.clear();lastTrackSelection=null;if(!preserveNavigation){selectedSong=null;openSectionId=null;songView='home';}else if(!profile().songs.some(s=>s.id===selectedSong)){selectedSong=null;openSectionId=null;if(songView==='detail')songView='playlist';}render();},
-    get navigation(){return {pane:songsRoot.hidden?'sequence':'songs',view:songView,song:selectedSong,profile:library.activeProfile};},
+    get navigation(){return {pane:songsRoot.hidden?'sequence':'songs',view:songView,song:selectedSong,profile:library.activeProfile,section:openSectionId};},
     restoreNavigation(state){
       const target=library.profiles.find(p=>p.id===state.profile)||profile();
       const targetSong=target.songs.find(s=>s.id===state.song);
@@ -699,7 +699,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
        if(targetSong)lastTrackSelection={playlistId:target.id,songId:targetSong.id};
       songView=['home','profile','playlists','playlist','detail'].includes(state.view)?state.view:'home';
       if(songView==='detail'&&!targetSong)songView='playlist';
-      openSectionId=null;render();tab(state.pane==='songs'?'songs':'sequence');
+      openSectionId=targetSong?.sections.some(section=>section.id===state.section)?state.section:null;render();tab(state.pane==='songs'?'songs':'sequence');
     },
     get preparing(){return preparingAmorce;},get library(){return library;},get loaded(){return loaded;}};
   // Restore only against the same primary snapshot and untouched model. A newer tab/account always wins.

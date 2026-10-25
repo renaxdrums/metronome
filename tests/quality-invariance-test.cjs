@@ -202,19 +202,37 @@ async function baselineRoute(page, url) {
                       { beatNumber: state, subIndex: 0, beatDurationSec: 0.5 },
                     );
                 const x = (await audioCtx.startRendering()).getChannelData(0);
+                const attackDigest = await crypto.subtle.digest(
+                  'SHA-256',
+                  x.slice(Math.round(rate * 0.4), Math.round(rate * 0.48)).buffer,
+                );
                 const digest = await crypto.subtle.digest('SHA-256', x.buffer);
                 hashes[bank] = {
                   sha256: [...new Uint8Array(digest)]
                     .map((b) => b.toString(16).padStart(2, '0'))
                     .join(''),
                   samples: x.length,
+                  attackSha256: [...new Uint8Array(attackDigest)]
+                    .map((b) => b.toString(16).padStart(2, '0'))
+                    .join(''),
                 };
               }
               return hashes;
             }, rate),
           );
-        assert.deepEqual(outputs[1], outputs[0], 'PCM changed at ' + rate);
-        pcm.push({ rate, banks: outputs[1], identical: true });
+        for (const bank of Object.keys(outputs[0])) {
+          if (['cloche', 'proCowbell'].includes(bank)) {
+            // Approved full resonance: the independent bell test checks the
+            // complete decay and overlapping hits. Its attack stays identical.
+            assert.equal(
+              outputs[1][bank].attackSha256,
+              outputs[0][bank].attackSha256,
+              bank + ' attack changed at ' + rate,
+            );
+          } else
+            assert.deepEqual(outputs[1][bank], outputs[0][bank], bank + ' PCM changed at ' + rate);
+        }
+        pcm.push({ rate, banks: outputs[1], identicalExceptBellResonance: true });
       }
     for (const p of pages) await p.close();
     if (process.env.PCM_ONLY !== '1')
@@ -498,7 +516,9 @@ async function baselineRoute(page, url) {
       'Screenshots differ; inspect quality-invariance-results.json',
     );
     console.log(
-      (pcm.length ? 'PASS identical PCM at both rates; ' : 'PASS visual-only validation; ') +
+      (pcm.length
+        ? 'PASS unchanged PCM except approved bell decay, unchanged attacks at both rates; '
+        : 'PASS visual-only validation; ') +
         visuals.length +
         ' baseline screenshot and strict computed-style comparisons; maximum channel difference: ' +
         Math.max(0, ...visuals.map((v) => v.maxChannelDifference)) +

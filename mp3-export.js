@@ -10,6 +10,7 @@
     if(!SOUND_BANKS[bank]||!Number.isFinite(volume)||volume<0||volume>1)throw Error('Réglages audio incorrects.');
     const voice=!!SOUND_BANKS[bank].isVoice;
     if(voice)await prepareAllVoiceAudio();else if(allVoiceAudioPromise)await allVoiceAudioPromise;
+    if(!voice)await ensureInstrumentBankReady(bank);
     if(audioCtx)await audioCtx.close();
     let duration=0;const sections=[];
     for(const section of song.sections){
@@ -18,7 +19,7 @@
       duration+=barDuration*section.count;
     }
     const lead=voice?VOICE_MAX_ATTACK_SECONDS:0;
-    // Oscillator tails are allowed to finish, just as in finite live playback.
+    // Recorded resonance finishes after the score, including the slowest cowbell pitch.
     const tail=voice?0:(SOUND_BANKS[bank].tail??(bank==='cloche'?.44:bank==='clic808'?.22:bank==='claves'?.075:bank==='beep'?.075:.055));
     const length=Math.ceil((lead+duration+tail)*RATE);
     if(!Number.isSafeInteger(length)||length>2147483647)throw Error('Morceau trop long pour le rendu audio de ce navigateur.');

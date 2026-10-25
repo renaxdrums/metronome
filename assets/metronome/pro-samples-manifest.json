@@ -12,8 +12,22 @@
       "key": "proCowbell",
       "name": "Cowbell acoustique",
       "rate": 24000,
-      "frames": 2880,
-      "pcmSha256": "2e3b73f2a24eab71c6483f01f579af97194f57aa08a1e49a4015d23e296e38d1"
+      "frames": 27138,
+      "pcmSha256": "36f717108f4e2e91e6cf639559b819f3fb1f7b476031cdc84cfa762f574ec615",
+      "sourcePath": "assets/metronome/cloche-2.wav",
+      "sourceSha256": "7d9f6e6b6b36fd792aead29df0268c53255b95a886aaf765e57b7593562ff9a6",
+      "sourceTitle": "Cowbell1_Hit_v2_rr1_Sum.wav · VSCO 2 CE · Versilian Studios · CC0",
+      "processing": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "tailGain": 3.357283896221408,
+        "preservedAttackMs": 100,
+        "joinMs": [
+          100,
+          110
+        ],
+        "release": "Full source decay; no loop, stretch or added reverb."
+      }
     },
     {
       "key": "proTriangle",

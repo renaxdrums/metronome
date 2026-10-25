@@ -92,7 +92,7 @@
  }
  window.addEventListener('storage',event=>{if(event.key!==KEY&&event.key!==null)return;if(event.key===KEY&&event.newValue===lastStorageRaw)return;storageError='Un autre onglet a modifié les presets multipistes. Exportez votre copie puis rechargez avant de continuer.';syncStorageNotice();});
  function snapshot(){return JSON.stringify({tracks,bpm:tempo,bank:currentBank});}
- function syncUndo(){if(!active)return;const undo=document.getElementById('undoBtn');if(undo&&undo.disabled!==!history.length)undo.disabled=!history.length;}
+ function syncUndo(){if(!active)return;const undo=document.getElementById('undoBtn');if(undo){if(undo.disabled!==!history.length)undo.disabled=!history.length;undo.setAttribute('aria-disabled',String(!history.length));}}
  function ensureCurrentPreset(){
   if(presets.some(p=>p.id===selectedPreset))return;
   while(presets.some(p=>p.name==='Preset '+nextPresetNumber))nextPresetNumber++;

@@ -100,6 +100,20 @@ async function baselineRoute(page, url) {
       body = Buffer.from(original.replace(ivoryControlsBefore, ivoryControlsAfter));
       correctedReferenceFiles.add(file);
     }
+    if (file === 'entry-sequence-edit-transport.css') {
+      const original = body.toString();
+      const oldDisplay = '#playBtn{position:relative;display:inline-flex!important;';
+      if (original.includes(oldDisplay)) {
+        assert.equal(original.split(oldDisplay).length, 2);
+        body = Buffer.from(
+          original.replace(
+            oldDisplay,
+            '#playBtn{position:relative;display:var(--play-button-display,inline-flex)!important;',
+          ) + '\n#playBtn[hidden]{--play-button-display:none;}\n',
+        );
+        correctedReferenceFiles.add(file);
+      }
+    }
     const contentType = /\.html$/.test(file)
       ? 'text/html'
       : /\.(js|mjs)$/.test(file)
@@ -147,6 +161,18 @@ async function baselineRoute(page, url) {
       await p.goto(h.url);
       await p.evaluate(() => prepareAllVoiceAudio());
       await p.waitForFunction(() => allVoiceAudioReady);
+      if (before && !referenceAgainstItself)
+        await p.evaluate(() => {
+          // Approved change: only T timing of "two"; keep its old vowel gain.
+          // The independent consonant test checks the shifts and unchanged PCM.
+          for (const [gender, onset] of Object.entries({ male: 0.05, female: 0.001 })) {
+            voiceLoudnessGain(
+              VOICE_METRONOME_BUFFERS[gender]['2'],
+              VOICE_ATTACK_SECONDS[gender][2],
+            );
+            VOICE_ATTACK_SECONDS[gender][2] = onset;
+          }
+        });
       await p.evaluate(async () => {
         for (const bank of Object.keys(SOUND_BANKS)) await ensureInstrumentBankReady(bank);
       });
@@ -236,17 +262,24 @@ async function baselineRoute(page, url) {
               await p.locator('#index2SettingsBtn').click();
               await p.locator('[data-appearance=' + theme + ']').click();
               await p.locator('#index2SettingsClose').click();
-              await p.getByRole('tab', { name: module, exact: true }).click();
-              if (!i && module === 'Track') {
-                // Approved Track-only transport fix: the main Play button is now
-                // the song control even before a track has been opened.
+              if (!i || referenceAgainstItself) {
+                // Approved Track-only change: no play control for a new empty library.
                 // Normalize exactly this button on the reference page;
                 // keep strict pixel and computed-style checks everywhere else.
+                await p.evaluate((module) => {
+                  playBtn.hidden = module === 'Track';
+                  if (module === 'Track') {
+                    if (RENAX_SONGS.library.profiles.some((profile) => profile.songs.length))
+                      throw Error('Expected an empty Track library for visual reference');
+                  }
+                }, module);
+              }
+              await p.getByRole('tab', { name: module, exact: true }).click();
+              if ((!i || referenceAgainstItself) && module === 'Track')
                 await p.evaluate(() => {
                   playBtn.dataset.songTransport = 'true';
                   playBtn.textContent = 'Lire le morceau';
                 });
-              }
               if (i) await applyProbe(p);
               await p.mouse.move(0, 0);
               await p.evaluate(() => {
@@ -374,6 +407,26 @@ async function baselineRoute(page, url) {
                           'outline-width',
                         ].map((k) => [k, s.getPropertyValue(k)]),
                       );
+                      if (
+                        e.id === 'sequencerContainer' &&
+                        document.body.dataset.workspace === 'tracks' &&
+                        typeof e.computedStyleMap === 'function'
+                      ) {
+                        // Chromium can expose different resolved auto margins with identical
+                        // computed CSS, geometry and pixels after the empty transport disappears.
+                        // Compare the actual computed auto value, and additionally require exact bounds.
+                        const values = out[parts.join(' > ')],
+                          typed = e.computedStyleMap();
+                        for (const property of [
+                          'margin',
+                          'margin-top',
+                          'margin-right',
+                          'margin-bottom',
+                          'margin-left',
+                        ])
+                          if (typed.get(property)?.toString() === 'auto') values[property] = 'auto';
+                        values['track-ring-bounds'] = [b.x, b.y, b.width, b.height].join(',');
+                      }
                     }
                     return out;
                   }),
@@ -416,6 +469,9 @@ async function baselineRoute(page, url) {
       baseline,
       referenceAgainstItself,
       approvedReferenceCorrection: {
+        trackTransport:
+          'Empty Track has no play control; all other controls remain strictly compared',
+        counting: 'Only the male/female T onset of two changes; original loudness is preserved',
         issue:
           'Ivory training controls retain their themed surface; tempo digits reserve a stable native fader origin',
         files: [...correctedReferenceFiles],

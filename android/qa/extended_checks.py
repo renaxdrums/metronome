@@ -30,7 +30,15 @@ def run_extended_checks(api, api_request):
             for _ in range(4):tap('#tapBtn');time.sleep(.25)
             wait('__qaTapTimes.length',lambda x:x==4)
             state=js('({times:__qaTapTimes,bpm:tempo,measure:measures[activeMeasureIndex].tempo,retained:tapTimes.slice()})')
-            expected=round(60000/((state['times'][-1]-state['times'][0])/3))
+            # Native gestures can exceed the app's two-second reset on a busy emulator.
+            # Derive the last uninterrupted series from captured event times, not its BPM.
+            retained=[]
+            for instant in state['times']:
+                if retained and instant-retained[-1]>=2000:retained=[]
+                retained.append(instant)
+            require(len(retained)>=2,'Emulator too slow to retain two Tap events: '+str(state))
+            require(len(state['retained'])==len(retained) and all(abs(a-b)<5 for a,b in zip(state['retained'],retained)),'Tap history does not match captured events and the two-second reset: '+str(state))
+            expected=round(60000/((retained[-1]-retained[0])/(len(retained)-1)))
             require(len(state['times'])==4 and abs(state['bpm']-expected)<=1 and state['measure']==state['bpm'],'Tap tempo differs from the real tap intervals: '+str(state)+'; expected='+str(expected))
             return {'four_native_taps':True,'measured_bpm':expected,'applied_bpm':state['bpm']}
         finally:

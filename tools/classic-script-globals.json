@@ -29,6 +29,7 @@
     "interface-locales.js",
     "interface-language.js",
     "workspace-layout.js",
+    "avant-garde-motion.js",
     "header-wave.js",
     "kern-intro-scene.js",
     "console-intro.js"

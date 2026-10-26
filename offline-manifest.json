@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "2ea883ca190cf25d",
+  "revision": "a9115bd2ce54ab50",
   "resources": [
     {
       "path": "accessibility.css",
@@ -120,6 +120,16 @@
     {
       "path": "audio-landscape.js",
       "sha256": "d6b42e560193705b23cb02675f2e9dcfceeb64d20dcf903f2697113b0b2e7636",
+      "text": true
+    },
+    {
+      "path": "avant-garde-motion.js",
+      "sha256": "502d1d826916447835a9f652a573b7e7a648c9bc67c4105fd894737d846ad377",
+      "text": true
+    },
+    {
+      "path": "avant-garde-theme.css",
+      "sha256": "dc553f8bd4d8fe8fb5df387858f5c200b19540c7597ce8eab31fdb818238952c",
       "text": true
     },
     {
@@ -269,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "369b495abdeddb3e3f479953911b1e7f6c8ec540013906f3bd8c2939b04a0cdf",
+      "sha256": "67f2f4ad6e29807faab35538d167fe544a9dcd514ba14d470567ab72689e3d9c",
       "text": true
     },
     {

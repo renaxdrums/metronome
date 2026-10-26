@@ -74,7 +74,24 @@ function main() {
       cwd: root,
       encoding: 'utf8',
     });
-    if (old.status === 0) errors.push(...compare(budget, JSON.parse(old.stdout), 'Reference'));
+    if (old.status === 0) {
+      const previous = JSON.parse(old.stdout);
+      /* A new opt-in appearance may declare its initial budget only once.
+         All legacy sheets and scripts must keep their existing ratchets. */
+      const firstRegistration = {
+        css: new Set(['avant-garde-theme.css']),
+        javascript: new Set(['avant-garde-motion.js']),
+      };
+      const previouslyTracked = { css: {}, javascript: {} };
+      for (const category of ['css', 'javascript']) {
+        for (const [name, value] of Object.entries(budget[category])) {
+          if (!Object.hasOwn(previous[category], name) && firstRegistration[category].has(name))
+            continue;
+          previouslyTracked[category][name] = value;
+        }
+      }
+      errors.push(...compare(previouslyTracked, previous, 'Reference'));
+    }
     else if (
       cp.spawnSync('git', ['cat-file', '-e', base + '^{commit}'], { cwd: root }).status !== 0
     )

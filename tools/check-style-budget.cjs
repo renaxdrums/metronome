@@ -85,8 +85,8 @@ function main() {
       const previouslyTracked = { css: {}, javascript: {} };
       for (const category of ['css', 'javascript']) {
         for (const [name, value] of Object.entries(budget[category])) {
-          if (!Object.hasOwn(previous[category], name) && firstRegistration[category].has(name))
-            continue;
+          const isNewFile = !Object.hasOwn(previous[category], name);
+          if (isNewFile && firstRegistration[category].has(name)) continue;
           previouslyTracked[category][name] = value;
         }
       }

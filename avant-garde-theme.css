@@ -1,0 +1,364 @@
+/* RENAX DRUMS | Avant-garde typographique — fourth opt-in appearance.
+   Decorative only. No layout relocation, audio, timing, icons or logo sizing. */
+html#renaxApp[data-theme="avant"] {
+  color-scheme: light;
+  --bg: #eae9df;
+  --panel: #f4f3ec;
+  --border: #c8cbc0;
+  --text: #171b16;
+  --text-muted: #4e584d;
+  --orange: #fa7623;
+  --cyan: #387a89;
+  --yellow: #d8f321;
+  --grey: #efeee6;
+  --grey-hover: #e3e7d9;
+  --card-active-bg: #edf5c9;
+  --card-selected: #edf5c9;
+  --card-selected-border: #9cba13;
+  --focus-ring: #4c6500;
+  --ag-ink: #161a15;
+  --ag-paper: #f5f3eb;
+  --ag-mist: #ebeae2;
+  --ag-line: #c9ccc1;
+  --ag-lime: #d7f218;
+  --ag-muted: #586155;
+  --ag-shadow: 0 15px 42px rgba(16,20,16,.05);
+}
+html#renaxApp[data-theme="avant"] body {
+  color: var(--ag-ink) !important;
+  background-color: #eae9e0 !important;
+  background-image:
+    linear-gradient(117deg,transparent 0 62%,rgba(10,15,10,.028) 62.06% 62.16%,transparent 62.24%),
+    repeating-linear-gradient(0deg,transparent 0 54px,rgba(10,15,10,.017) 55px 56px) !important;
+  font-family: "Bahnschrift","Helvetica Neue",Arial,sans-serif;
+}
+html#renaxApp[data-theme="avant"] body :is(button,input,select,textarea){font-family:inherit}
+html#renaxApp[data-theme="avant"] body>header {
+  background:#161a16 !important;
+  color:#f4f2e9 !important;
+  border:1px solid #242924 !important;
+  border-radius:9px !important;
+  padding-inline:14px !important;
+  margin-bottom:4px !important;
+}
+html#renaxApp[data-theme="avant"] header :is(.brand h1,.header-center h2) {
+  color:#f4f2e9 !important;
+  text-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] header .header-center .title-orange {
+  color:var(--ag-lime) !important;
+}
+html#renaxApp[data-theme="avant"] header .index2-header-btn {
+  background:#232823 !important;
+  color:#f4f2e9 !important;
+  border:1px solid #4a5148 !important;
+  box-shadow:none !important;
+  border-radius:6px !important;
+}
+html#renaxApp[data-theme="avant"] #renaxHeaderWave {
+  opacity:.12 !important;
+  filter:grayscale(1) !important;
+  mix-blend-mode:screen !important;
+}
+html#renaxApp[data-theme="avant"] body #workspaceNav {
+  background:#161a16 !important;
+  border:1px solid #242924 !important;
+  border-radius:8px !important;
+  gap:3px !important;
+  padding:4px !important;
+  box-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body #workspaceNav button {
+  color:#dddcd3 !important;
+  background:transparent !important;
+  border:1px solid transparent !important;
+  border-radius:5px !important;
+  box-shadow:none !important;
+  font-weight:600 !important;
+  transition:background-color .18s ease,color .18s ease,border-color .18s ease;
+}
+html#renaxApp[data-theme="avant"] body #workspaceNav button svg {
+  color:inherit !important;
+  stroke:currentColor !important;
+}
+html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"] {
+  color:#171c0b !important;
+  background:var(--ag-lime) !important;
+  border-color:var(--ag-lime) !important;
+}
+html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"] svg {
+  stroke:#171c0b !important;
+}
+html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"]::before,
+html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"]::after {
+  background:#171c0b !important;
+}
+html#renaxApp[data-theme="avant"] body #workspaceNav button:hover:not([aria-selected="true"]) {
+  color:#fff !important;
+  background:#30362f !important;
+}
+html#renaxApp[data-theme="avant"] body .main-grid>.panel {
+  background:var(--ag-paper) !important;
+  border:1px solid var(--ag-line) !important;
+  border-radius:10px !important;
+  color:var(--ag-ink) !important;
+  box-shadow:var(--ag-shadow) !important;
+}
+html#renaxApp[data-theme="avant"] body .main-grid>.panel-visu {
+  background:
+    linear-gradient(125deg,rgba(15,21,15,.028) 0 17%,transparent 17.05% 82%,rgba(15,21,15,.025) 82.05%),
+    var(--ag-paper) !important;
+}
+html#renaxApp[data-theme="avant"] body .panel-visu .visu-toolbar,
+html#renaxApp[data-theme="avant"] body #workspaceControls {
+  background:#eeeDE5 !important;
+  color:var(--ag-ink) !important;
+  border:1px solid var(--ag-line) !important;
+  border-radius:7px !important;
+  box-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body .visu-toolbar :is(.workspace-control-group,#workspaceTimer) {
+  border-left-color:var(--ag-line) !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .panel-title,.measure-label,.control-group>label,.workspace-timer-label,
+  .training-row .row-label,.training-row .unit,.tempo-label,.tempo-unit,.legend
+) {
+  color:var(--ag-muted) !important;
+  font-weight:650 !important;
+  letter-spacing:.065em !important;
+}
+html#renaxApp[data-theme="avant"] body :is(#bpmDisplay,.tempo-display) {
+  color:var(--ag-ink) !important;
+  font-family:"Bahnschrift Condensed","Bahnschrift","Arial Narrow",Arial,sans-serif !important;
+  font-weight:800 !important;
+  font-stretch:condensed;
+  letter-spacing:-.065em !important;
+  font-variant-numeric:tabular-nums;
+  text-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body :is(#trainTimer,.volume-value) {
+  color:var(--ag-ink) !important;
+  font-variant-numeric:tabular-nums;
+  text-shadow:none !important;
+}
+@media(min-width:1381px) {
+  html#renaxApp[data-theme="avant"] body .visu-toolbar .tempo-display{font-size:32px !important}
+}
+@media(min-width:1101px) and (max-width:1380px){
+  html#renaxApp[data-theme="avant"] body .visu-toolbar .tempo-display{font-size:23px !important}
+}
+html#renaxApp[data-theme="avant"] body .panel-visu .sequencer-wrapper {
+  background:transparent !important;
+}
+html#renaxApp[data-theme="avant"] body .panel-visu:not(.score-view) .sequencer-wrapper {
+  background-image:
+    radial-gradient(circle at center,rgba(205,221,172,.28),transparent 68%) !important;
+}
+html#renaxApp[data-theme="avant"] body .panel-visu:not(.score-view) .beat-number {
+  color:#191d18 !important;
+  font-family:"Bahnschrift Condensed","Bahnschrift","Arial Narrow",Arial,sans-serif !important;
+  font-weight:800 !important;
+  letter-spacing:-.05em !important;
+  text-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body .panel-visu:not(.score-view) .beat-number.pulse {
+  color:#3b5d2d !important;
+  text-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body .beat-divider {
+  box-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  input:not([type="range"]):not([type="checkbox"]),select,textarea,.numbox-button,
+  .training-mode-tabs button,.dir-toggle button
+) {
+  color:var(--ag-ink) !important;
+  background:#fbfaf5 !important;
+  border-color:var(--ag-line) !important;
+  border-radius:6px !important;
+  box-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .numbox-dropdown,.numbox-menu,.numbox-options,.sound-bank-menu,
+  .training-curve-menu,.sequence-more-actions,.multi-actions,.song-more-menu
+) {
+  color:var(--ag-ink) !important;
+  background:#fbfaf5 !important;
+  border-color:var(--ag-line) !important;
+  box-shadow:0 14px 38px rgba(0,0,0,.12) !important;
+}
+html#renaxApp[data-theme="avant"] body :is(.numbox-option,.numbox-option button,.multi-actions button,.sequence-more-actions button) {
+  color:var(--ag-ink) !important;
+}
+html#renaxApp[data-theme="avant"] body :is(.numbox-option:hover,.numbox-option[aria-selected="true"],.training-mode-tabs button.active,.dir-toggle button.active) {
+  background:#e8f5b6 !important;
+  color:var(--ag-ink) !important;
+  border-color:#90a93e !important;
+}
+html#renaxApp[data-theme="avant"] body :is(#tapBtn,.tap-tempo-btn,#workspaceTempoShortcut) {
+  color:var(--ag-ink) !important;
+  background:#fbfaf5 !important;
+  border:1px solid var(--ag-line) !important;
+  border-radius:6px !important;
+  box-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body input[type="range"] {
+  accent-color:#9fb919 !important;
+  background:#c9cfc3 !important;
+}
+html#renaxApp[data-theme="avant"] body input[type="range"]::-webkit-slider-thumb {
+  background:var(--ag-lime) !important;
+  box-shadow:0 0 0 2px #242b1e !important;
+}
+html#renaxApp[data-theme="avant"] body :is(#playBtn,#trainBtn,#trainingVisualBtn) {
+  color:#161b0c !important;
+  background:var(--ag-lime) !important;
+  border:1px solid #aecb13 !important;
+  border-radius:7px !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  transition:background-color .18s ease,transform .16s ease;
+}
+html#renaxApp[data-theme="avant"] body :is(#playBtn,#trainBtn,#trainingVisualBtn):hover {
+  background:#e7ff59 !important;
+}
+html#renaxApp[data-theme="avant"] body :is(#playBtn,#trainBtn,#trainingVisualBtn):active {
+  transform:scale(.987);
+}
+html#renaxApp[data-theme="avant"] body .reset-undo-tools :is(#panicBtn,#undoBtn) {
+  color:var(--ag-ink) !important;
+  background:#fbfaf5 !important;
+  border:1px solid var(--ag-line) !important;
+  border-radius:7px !important;
+  box-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .measure-card,.song-section,.song-card,.song-block,.playlist-choice,
+  .song-playlist-card,.multi-track,.multi-preset-card
+) {
+  color:var(--ag-ink) !important;
+  background:#eeeee6 !important;
+  border-color:var(--ag-line) !important;
+  border-radius:7px !important;
+  box-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .measure-card.active,.song-section.active,.song-card.active,.song-block.active,
+  .playlist-choice.active,.song-playlist-card.active,.multi-track.active,.multi-preset-card.active
+) {
+  background:#ebf7c3 !important;
+  border-color:#a2ba3b !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .sequence-preview-play,.sequence-more summary,.multi-more summary,.multi-track-head button,
+  .song-block-header-actions button,.song-back,.multi-solo,.multi-mute,.view-toggle button,
+  .score-view-switch button,.appearance-options button
+) {
+  color:var(--ag-ink) !important;
+  background:#fbfaf5 !important;
+  border-color:var(--ag-line) !important;
+  border-radius:6px !important;
+  box-shadow:none !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .score-view-switch button[aria-pressed="true"],.appearance-options button[aria-pressed="true"],
+  .multi-mode-tabs button[aria-selected="true"],.song-tabs button[aria-selected="true"]
+) {
+  color:var(--ag-ink) !important;
+  background:#e4f4a3 !important;
+  border-color:#a7bd3f !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  #index2SettingsPanel,.index2-settings-panel,.rhythm-editor,.beat-editor,
+  dialog,.backup-profile,.backup-json,.song-export-dialog,.sound-bank-dialog
+) {
+  color:var(--ag-ink) !important;
+  background:#f5f3eb !important;
+  border-color:var(--ag-line) !important;
+}
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel .index2-settings-section {
+  background:#edede5 !important;
+  border-color:var(--ag-line) !important;
+}
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel :is(button,select,.numbox-button){
+  background:#fafaf5 !important;
+  color:var(--ag-ink) !important;
+  border-color:var(--ag-line) !important;
+}
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel button[data-appearance][aria-pressed="true"] {
+  background:var(--ag-lime) !important;
+  color:var(--ag-ink) !important;
+  border-color:#9bae24 !important;
+  box-shadow:inset 0 -2px #161a16 !important;
+}
+html#renaxApp[data-theme="avant"] body :is(.song-block-summary,.song-note,.multi-preset-status,.index2-settings-note) {
+  color:var(--ag-muted) !important;
+}
+html#renaxApp[data-theme="avant"] body .rhythm-score {
+  background:#f7f6f0 !important;
+  color:var(--ag-ink) !important;
+  border-color:var(--ag-line) !important;
+}
+html#renaxApp[data-theme="avant"] body .score-view-switch button:focus-visible,
+html#renaxApp[data-theme="avant"] body :is(button,input,select,textarea,a,summary,[tabindex]):focus-visible {
+  outline:2px solid #4b6200 !important;
+  outline-offset:3px !important;
+}
+html#renaxApp[data-theme="avant"] * {
+  scrollbar-color:#a1b855 #e8e8dc;
+}
+@media(max-width:1100px){
+  html#renaxApp[data-theme="avant"] body #workspaceNav button {
+    border-radius:5px !important;
+    padding-inline:2px !important;
+  }
+  html#renaxApp[data-theme="avant"] body #workspaceMobileViews button {
+    color:var(--ag-ink) !important;
+    background:#f5f3ec !important;
+    border-color:var(--ag-line) !important;
+  }
+  html#renaxApp[data-theme="avant"] body #workspaceMobileViews button[aria-pressed="true"] {
+    background:var(--ag-lime) !important;
+    border-color:#a7b840 !important;
+  }
+  html#renaxApp[data-theme="avant"] body .panel-visu:not(.score-view) .sequencer-wrapper {
+    background:transparent !important;
+  }
+  html#renaxApp[data-theme="avant"] body .visu-toolbar .tempo-display {
+    font-size:27px !important;
+  }
+}
+/* Decorative pointer halo: no overlay intercepts input. */
+html#renaxApp[data-theme="avant"] .renax-avant-halo {
+  pointer-events:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:320px;
+  height:320px;
+  margin:-160px 0 0 -160px;
+  opacity:0;
+  z-index:8;
+  transform:translate3d(-500px,-500px,0);
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(201,232,17,.15) 0%,rgba(201,232,17,.055) 35%,transparent 68%);
+  mix-blend-mode:multiply;
+  filter:blur(23px);
+  transition:opacity .35s ease;
+}
+@media(prefers-reduced-motion:reduce),(hover:none),(pointer:coarse){
+  html#renaxApp[data-theme="avant"] .renax-avant-halo{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  html#renaxApp[data-theme="avant"] body #workspaceNav button,
+  html#renaxApp[data-theme="avant"] body :is(#playBtn,#trainBtn,#trainingVisualBtn){transition:none !important}
+}
+/* Four themes: header changes apply to app UI only, never #renaxArrival. */
+html#renaxApp body>header .header-left .brand>p{display:none !important}
+html#renaxApp body>header .header-left .brand h1{
+  font-size:10.5px !important;
+  letter-spacing:.12em !important;
+  line-height:1.25 !important;
+}
+/* Preserve .brand-logo dimensions, artwork, and intro styling intact. */

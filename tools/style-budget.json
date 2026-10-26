@@ -3,6 +3,7 @@
     "accessibility.css": 16,
     "app-base.css": 3,
     "appearance-theme.css": 355,
+    "avant-garde-theme.css": 159,
     "backup-index2.css": 0,
     "console-theme.css": 264,
     "entry-01.css": 0,
@@ -27,6 +28,7 @@
     "entry-tap-tempo-fit27.css": 20,
     "interface-language.css": 0,
     "ivory-theme.css": 287,
+    "kern-intro.css": 0,
     "mobile-landscape.css": 60,
     "mp3-export.css": 1,
     "multi-metronome.css": 4,
@@ -39,13 +41,13 @@
     "song-entry.css": 0,
     "songs.css": 6,
     "training-modes.css": 14,
-    "workspace-layout.css": 127,
-    "kern-intro.css": 0
+    "workspace-layout.css": 127
   },
   "javascript": {
     "amorce-plan.mjs": 0,
     "amorce-song.js": 0,
     "audio-landscape.js": 2,
+    "avant-garde-motion.js": 3,
     "cloud-backup.js": 14,
     "compact-controls.js": 8,
     "console-intro.js": 2,
@@ -57,6 +59,7 @@
     "interface-language.js": 0,
     "interface-locales.js": 0,
     "interface-translations.js": 0,
+    "kern-intro-scene.js": 0,
     "local-backup.js": 0,
     "metronome-audio.js": 1,
     "metronome-core.js": 21,
@@ -105,7 +108,6 @@
     "training-modes.js": 0,
     "training-numbox.js": 7,
     "ui-feedback.js": 0,
-    "workspace-layout.js": 0,
-    "kern-intro-scene.js": 0
+    "workspace-layout.js": 0
   }
 }

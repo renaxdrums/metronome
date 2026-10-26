@@ -354,6 +354,18 @@ html#renaxApp[data-theme="avant"] .renax-avant-halo {
   html#renaxApp[data-theme="avant"] body #workspaceNav button,
   html#renaxApp[data-theme="avant"] body :is(#playBtn,#trainBtn,#trainingVisualBtn){transition:none !important}
 }
+/* Four choices need a readable 2 × 2 layout on small settings panels. */
+@media(max-width:700px){
+  html#renaxApp body #appearanceSettings .appearance-options {
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  html#renaxApp body #appearanceSettings .appearance-options button {
+    min-width:0;
+    min-height:42px;
+  }
+}
 /* Four themes: header changes apply to app UI only, never #renaxArrival. */
 html#renaxApp body>header .header-left .brand>p{display:none !important}
 html#renaxApp body>header .header-left .brand h1{

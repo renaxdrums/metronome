@@ -252,6 +252,17 @@ async function baselineRoute(page, url) {
           if (before || referenceAgainstItself) await baselineRoute(p, h.url);
 
           await p.goto(h.url);
+          // User-approved global header adjustment: align only these two header
+          // selectors in the historical comparison. All remaining pixels and
+          // computed properties must still match the original three themes.
+          if (before && !referenceAgainstItself)
+            await p.addStyleTag({
+              content:
+                'html#renaxApp body>header .header-left .brand>p{display:none!important}' +
+                'html#renaxApp body>header .header-left .brand h1{' +
+                'font-size:10.5px!important;letter-spacing:.12em!important;' +
+                'line-height:1.25!important}',
+            });
           await p.evaluate(() => prepareAllVoiceAudio());
           await p.waitForFunction(() => allVoiceAudioReady && window.RENAX_SONGS);
           await p.waitForFunction(() =>

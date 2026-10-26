@@ -91,8 +91,7 @@ function main() {
         }
       }
       errors.push(...compare(previouslyTracked, previous, 'Reference'));
-    }
-    else if (
+    } else if (
       cp.spawnSync('git', ['cat-file', '-e', base + '^{commit}'], { cwd: root }).status !== 0
     )
       throw Error('Cannot validate style budget against missing base commit ' + base);

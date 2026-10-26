@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "a3f7369f78503e87",
+  "revision": "e302a28c3d0156e7",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "b97eaaba821f96af792c1a44112708e94aceb94e71d62a337b4812f2b7c36390",
+      "sha256": "167782c26ce7499c2888e10e4af334251ebae1771c112e4cd607f0cbc8667639",
       "text": true
     },
     {

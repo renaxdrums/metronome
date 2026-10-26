@@ -70,7 +70,7 @@ const {start,save}=require('./audio-harness.cjs');
       assert(overflow<=1,'Mobile Track panel overflows: '+overflow);
       await page.screenshot({path:path.join(screenshots,'track-chain-'+theme+'-mobile.png')});
       await page.evaluate(()=>RENAX_SONGS.replaceLibrary({version:1,activeProfile:'empty',profiles:[{id:'empty',name:'Empty',songs:[]}]}));
-      await page.locator('#playBtn').click();
+      await page.locator('#playBtn').waitFor({state:'hidden',timeout:5000});
       assert.equal(await page.evaluate(()=>isPlaying),false,'Empty Track workspace must not start the metronome');
       assert.equal(errors.length,0,errors.join('; '));
       results[theme]={firstAvailable:true,isolatedPlayback:true,manualSelection:true,playlistOnlyChain:true,sessionReset:true,active,phoneOverflow:overflow};

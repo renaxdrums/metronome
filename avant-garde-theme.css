@@ -34,24 +34,26 @@ html#renaxApp[data-theme="avant"] body {
 }
 html#renaxApp[data-theme="avant"] body :is(button,input,select,textarea){font-family:inherit}
 html#renaxApp[data-theme="avant"] body>header {
-  background:#161a16 !important;
+  background:#343b45 !important;
   color:#f4f2e9 !important;
-  border:1px solid #242924 !important;
+  border:1px solid #505b69 !important;
   border-radius:9px !important;
   padding-inline:14px !important;
   margin-bottom:4px !important;
 }
-html#renaxApp[data-theme="avant"] header :is(.brand h1,.header-center h2) {
-  color:#f4f2e9 !important;
+html#renaxApp[data-theme="avant"] header .brand h1 {
+  color:var(--ag-lime) !important;
   text-shadow:none !important;
 }
 html#renaxApp[data-theme="avant"] header .header-center .title-orange {
   color:var(--ag-lime) !important;
 }
-html#renaxApp[data-theme="avant"] header .index2-header-btn {
-  background:#232823 !important;
-  color:#f4f2e9 !important;
-  border:1px solid #4a5148 !important;
+html#renaxApp[data-theme="avant"] header .index2-header-btn,
+html#renaxApp[data-theme="avant"] body>header :is(#directAccountBtn,#fullscreenBtn),
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel .index2-close {
+  background:#343b45 !important;
+  color:var(--ag-lime) !important;
+  border:1px solid #505b69 !important;
   box-shadow:none !important;
   border-radius:6px !important;
 }
@@ -61,15 +63,15 @@ html#renaxApp[data-theme="avant"] #renaxHeaderWave {
   mix-blend-mode:screen !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav {
-  background:#161a16 !important;
-  border:1px solid #242924 !important;
+  background:#343b45 !important;
+  border:1px solid #505b69 !important;
   border-radius:8px !important;
   gap:3px !important;
   padding:4px !important;
   box-shadow:none !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav button {
-  color:#dddcd3 !important;
+  color:var(--ag-lime) !important;
   background:transparent !important;
   border:1px solid transparent !important;
   border-radius:5px !important;
@@ -77,16 +79,21 @@ html#renaxApp[data-theme="avant"] body #workspaceNav button {
   font-weight:600 !important;
   transition:background-color .18s ease,color .18s ease,border-color .18s ease;
 }
-html#renaxApp[data-theme="avant"] body #workspaceNav button svg {
+html#renaxApp[data-theme="avant"] body :is(
+  #workspaceNav button svg,.orange-ui-icon,.panel-title svg,
+  .control-group>label svg,#sequenceAddMeasure svg,
+  #multiControls>.multi-add svg,.training-section .training-curve-options button svg
+) {
   color:inherit !important;
-  stroke:currentColor !important;
+  stroke:var(--ag-icon-stroke,currentColor) !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"] {
   color:#171c0b !important;
   background:var(--ag-lime) !important;
   border-color:var(--ag-lime) !important;
 }
-html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"] svg {
+html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"] svg,
+html#renaxApp[data-theme="avant"] body #scoreViewSwitch button[aria-pressed="true"] svg {
   stroke:#171c0b !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"]::before,
@@ -94,8 +101,8 @@ html#renaxApp[data-theme="avant"] body #workspaceNav button[aria-selected="true"
   background:#171c0b !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav button:hover:not([aria-selected="true"]) {
-  color:#fff !important;
-  background:#30362f !important;
+  color:var(--ag-lime) !important;
+  background:#414a56 !important;
 }
 html#renaxApp[data-theme="avant"] body .main-grid>.panel {
   background:var(--ag-paper) !important;
@@ -211,10 +218,16 @@ html#renaxApp[data-theme="avant"] body input[type="range"]::-webkit-slider-thumb
   background:var(--ag-lime) !important;
   box-shadow:0 0 0 2px #242b1e !important;
 }
-html#renaxApp[data-theme="avant"] body :is(#playBtn,#trainBtn,#trainingVisualBtn) {
-  color:#161b0c !important;
-  background:var(--ag-lime) !important;
-  border:1px solid #aecb13 !important;
+html#renaxApp[data-theme="avant"] body :is(
+  #playBtn,#trainBtn,#trainingVisualBtn,
+  #sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,
+  #songsRoot .track-create,#songsRoot .track-add-section,#songsHome>.song-entry,
+  #songsRoot #songPane .song-actions>.btn:not(.track-create):not(.song-back),
+  dialog.song-name-dialog .song-confirm-actions button
+) {
+  color:var(--ag-action-text,#161b0c) !important;
+  background:var(--ag-action-bg,var(--ag-lime)) !important;
+  border:1px solid var(--ag-action-border,#aecb13) !important;
   border-radius:7px !important;
   box-shadow:none !important;
   text-shadow:none !important;
@@ -253,11 +266,12 @@ html#renaxApp[data-theme="avant"] body :is(
 html#renaxApp[data-theme="avant"] body :is(
   .sequence-preview-play,.sequence-more summary,.multi-more summary,.multi-track-head button,
   .song-block-header-actions button,.song-back,.multi-solo,.multi-mute,.view-toggle button,
-  .score-view-switch button,.appearance-options button
+  .score-view-switch button,.appearance-options button,
+  .training-section .training-curve-options button,#songsRoot #songPane .song-more
 ) {
-  color:var(--ag-ink) !important;
-  background:#fbfaf5 !important;
-  border-color:var(--ag-line) !important;
+  color:var(--ag-lime) !important;
+  background:#343b45 !important;
+  border-color:var(--ag-control-border,var(--ag-line)) !important;
   border-radius:6px !important;
   box-shadow:none !important;
 }
@@ -266,8 +280,8 @@ html#renaxApp[data-theme="avant"] body :is(
   .multi-mode-tabs button[aria-selected="true"],.song-tabs button[aria-selected="true"]
 ) {
   color:var(--ag-ink) !important;
-  background:#e4f4a3 !important;
-  border-color:#a7bd3f !important;
+  background:var(--ag-lime) !important;
+  border-color:var(--ag-lime) !important;
 }
 html#renaxApp[data-theme="avant"] body :is(
   #index2SettingsPanel,.index2-settings-panel,.rhythm-editor,.beat-editor,
@@ -314,13 +328,14 @@ html#renaxApp[data-theme="avant"] * {
     padding-inline:2px !important;
   }
   html#renaxApp[data-theme="avant"] body #workspaceMobileViews button {
-    color:var(--ag-ink) !important;
-    background:#f5f3ec !important;
-    border-color:var(--ag-line) !important;
+    color:var(--ag-mobile-ink,var(--ag-lime)) !important;
+    background:#343b45 !important;
+    border-color:#505b69 !important;
   }
   html#renaxApp[data-theme="avant"] body #workspaceMobileViews button[aria-pressed="true"] {
     background:var(--ag-lime) !important;
-    border-color:#a7b840 !important;
+    --ag-mobile-ink:var(--ag-ink);
+    border-color:var(--ag-lime) !important;
   }
   html#renaxApp[data-theme="avant"] body .panel-visu:not(.score-view) .sequencer-wrapper {
     background:transparent !important;
@@ -374,3 +389,90 @@ html#renaxApp body>header .header-left .brand h1{
   line-height:1.25 !important;
 }
 /* Preserve .brand-logo dimensions, artwork, and intro styling intact. */
+
+/* Meixs — visual audit, 27 October 2026. No changes to the other themes. */
+html#renaxApp[data-theme="avant"] header .header-center h2 {color:#f4f2e9}
+html#renaxApp[data-theme="avant"] body>header :is(#directAccountBtn,#fullscreenBtn,#index2SettingsBtn) {color:var(--ag-lime)}
+html#renaxApp[data-theme="avant"] body>header .brand-logo {
+  filter:brightness(0) saturate(100%) invert(92%) sepia(61%) saturate(703%) hue-rotate(12deg) brightness(101%) contrast(97%);
+}
+html#renaxApp[data-theme="avant"] body .sequencer-cross,
+html#renaxApp[data-theme="avant"] body .sequencer-cross::before,
+html#renaxApp[data-theme="avant"] body .sequencer-cross::after {background:var(--ag-ink)}
+html#renaxApp[data-theme="avant"] body #polyControls .numbox-custom.open {z-index:1300}
+html#renaxApp[data-theme="avant"] body .visu-toolbar:has(#polyControls .numbox-custom.open) {position:relative;z-index:1300;overflow:visible}
+html#renaxApp[data-theme="avant"] body #scoreViewSwitch button svg {stroke:currentColor}
+html#renaxApp[data-theme="avant"] body #scoreViewSwitch button[aria-pressed="true"] svg {stroke:var(--ag-ink)}
+html#renaxApp[data-theme="avant"] body :is(.orange-ui-icon,.panel-title svg,.control-group>label svg) {stroke:var(--ag-lime)}
+html#renaxApp[data-theme="avant"] body :is(.song-tabs>button,.song-back,#songsHome>.song-entry)::before {background:var(--ag-lime)}
+html#renaxApp[data-theme="avant"] body :is(
+  #sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,
+  #songsRoot .track-create,#songsRoot .track-add-section,#songsHome>.song-entry
+) {
+  background:rgba(66,207,225,.12);
+  color:var(--cyan);
+  border-color:var(--ag-line);
+}
+html#renaxApp[data-theme="avant"] body :is(#sequenceAddMeasure,#multiControls>.multi-add) svg {stroke:var(--ag-lime)}
+html#renaxApp[data-theme="avant"] body dialog.song-name-dialog .song-confirm-actions button {
+  background:#28424b;
+  color:var(--ag-lime);
+  border-color:#4b7884;
+}
+html#renaxApp[data-theme="avant"] body #songsRoot #songPane .song-actions>.btn:not(.track-create):not(.song-back) {
+  background:#28424b;
+  color:var(--ag-lime);
+  border-color:#4b7884;
+}
+html#renaxApp[data-theme="avant"] body #songsRoot #songPane .song-actions>.btn svg {stroke:var(--ag-lime);color:var(--ag-lime)}
+html#renaxApp[data-theme="avant"] body :is(.song-back,.song-more,.sequence-preview-play,.multi-more summary) {color:var(--ag-lime)}
+html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label {
+  background:var(--ag-paper);
+  color:var(--ag-ink);
+}
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel .index2-close,
+html#renaxApp[data-theme="avant"] body [aria-label="Fermer"] {
+  background:#343b45;
+  color:var(--ag-lime);
+  border-color:#505b69;
+}
+html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button {
+  background:#343b45;
+  color:var(--ag-lime);
+  border-color:#505b69;
+}
+html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button[aria-pressed="true"] {
+  background:#343b45;
+  border-color:var(--ag-lime);
+}
+html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button svg,
+html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button .curve-axis {
+  stroke:var(--ag-lime);
+}
+@media(max-width:1100px) {
+  html#renaxApp[data-theme="avant"] body #workspaceMobileViews {
+    margin-top:5px;
+  }
+}
+
+/* Per-control variables reuse existing important rules without expanding their number. */
+html#renaxApp[data-theme="avant"] body :is(
+  #sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,
+  #songsRoot .track-create,#songsRoot .track-add-section,#songsHome>.song-entry
+) {
+  --ag-action-text:var(--cyan);
+  --ag-action-bg:rgba(66,207,225,.12);
+  --ag-action-border:var(--ag-line);
+  --ag-icon-stroke:var(--ag-lime);
+}
+html#renaxApp[data-theme="avant"] body :is(
+  #songsRoot #songPane .song-actions>.btn:not(.track-create):not(.song-back),
+  dialog.song-name-dialog .song-confirm-actions button
+) {
+  --ag-action-text:var(--ag-lime);
+  --ag-action-bg:#28424b;
+  --ag-action-border:#4b7884;
+}
+html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button[aria-pressed="true"] {
+  --ag-control-border:var(--ag-lime);
+}

@@ -476,3 +476,38 @@ html#renaxApp[data-theme="avant"] body :is(
 html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button[aria-pressed="true"] {
   --ag-control-border:var(--ag-lime);
 }
+
+
+/* Issue #45 — Meixs-only color overrides, shared by desktop and mobile.
+   Visual styling only; no geometry, event handlers or audio changes. */
+html#renaxApp[data-theme="avant"] body :is(
+  #sequenceAddMeasure,
+  #multiControls>.multi-add,
+  #songsRoot .playlist-create,
+  #songsRoot .track-create,
+  #songsRoot .track-add-section
+) {
+  background:#343b45 !important;
+  color:var(--ag-lime) !important;
+  border-color:#505b69 !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  #sequenceAddMeasure,#multiControls>.multi-add,
+  #songsRoot .playlist-create,#songsRoot .track-create,
+  #songsRoot .track-add-section
+) svg {
+  color:var(--ag-lime) !important;
+  stroke:currentColor !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .sequence-more-actions,.multi-actions,.song-more-menu
+) {
+  background:#343b45 !important;
+  color:var(--ag-lime) !important;
+  border-color:#505b69 !important;
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .sequence-more-actions,.multi-actions,.song-more-menu
+) :is(button,svg) {
+  color:var(--ag-lime) !important;
+}

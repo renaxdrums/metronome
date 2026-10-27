@@ -511,3 +511,52 @@ html#renaxApp[data-theme="avant"] body :is(
 ) :is(button,svg) {
   color:var(--ag-lime) !important;
 }
+
+/* Issue #45 follow-up — colour-only Meixs harmonisation for PC and mobile. */
+html#renaxApp[data-theme="avant"] body :is(
+  .numbox-arrow,.numbox-button svg,.numbox-custom svg,
+  .numbox-chevron,.numbox-toggle,.sound-bank-trigger svg,
+  .sound-bank-arrow,.sound-bank-chevron,select,
+  .control-group select,.training-section summary svg
+) {color:var(--ag-lime) !important;accent-color:var(--ag-lime) !important}
+html#renaxApp[data-theme="avant"] body :is(
+  .numbox-arrow,.numbox-button svg,.numbox-custom svg,
+  .sound-bank-trigger svg,.sound-bank-arrow,.sound-bank-chevron
+) {stroke:currentColor !important}
+html#renaxApp[data-theme="avant"] body :is(
+  .sound-bank-menu,.sound-bank-dropdown,.sound-bank-options,
+  .sound-bank-list,.numbox-dropdown,.numbox-menu,.numbox-options,
+  .sequence-more-actions,.song-more-menu
+) {background:#343b45 !important;color:var(--ag-lime) !important;border-color:#505b69 !important}
+html#renaxApp[data-theme="avant"] body :is(
+  .sound-bank-menu,.sound-bank-dropdown,.sound-bank-options,
+  .sound-bank-list,.numbox-dropdown,.numbox-menu,.numbox-options,
+  .sequence-more-actions,.song-more-menu
+) :is(button,span,label,svg,option) {color:var(--ag-lime) !important;stroke:currentColor !important}
+html#renaxApp[data-theme="avant"] body .training-mode-tabs button.active,
+html#renaxApp[data-theme="avant"] body .training-mode-tabs button[aria-selected="true"],
+html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button[aria-pressed="true"] {
+  background:var(--ag-lime) !important;color:var(--ag-ink) !important;border-color:var(--ag-lime) !important
+}
+html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button[aria-pressed="true"] :is(svg,.curve-axis) {
+  color:var(--ag-ink) !important;stroke:var(--ag-ink) !important
+}
+html#renaxApp[data-theme="avant"] body .training-mode-tabs button:not(.active):not([aria-selected="true"]) {
+  background:#343b45 !important;color:var(--ag-lime) !important;border-color:#505b69 !important
+}
+html#renaxApp[data-theme="avant"] body :is(
+  .song-more-menu,.sequence-more-actions,.song-back,
+  .song-export-dialog button,.backup-profile button,.backup-json button
+) :is(svg,path) {color:var(--ag-lime) !important;stroke:currentColor !important}
+html#renaxApp[data-theme="avant"] body :is(
+  .song-more-menu,.sequence-more-actions
+) button {background:#343b45 !important;color:var(--ag-lime) !important}
+html#renaxApp[data-theme="avant"] body :is(
+  .song-block-header-actions button,.multi-mute,
+  .song-actions button,.song-export-dialog button,
+  .song-confirm-actions button
+) {color:var(--ag-lime) !important}
+html#renaxApp[data-theme="avant"] body :is(
+  .song-block-header-actions button,.multi-mute,
+  .song-actions button,.song-export-dialog button
+) svg {color:var(--ag-lime) !important;stroke:currentColor !important}

@@ -480,8 +480,8 @@ html#renaxApp[data-theme="avant"] body :is(
   dialog.song-name-dialog .song-confirm-actions button
 ) {
   --ag-action-text:var(--ag-lime);
-  --ag-action-bg:#28424b;
-  --ag-action-border:#4b7884;
+  --ag-action-bg:var(--ag-name-action-bg,#28424b);
+  --ag-action-border:var(--ag-name-action-border,#4b7884);
 }
 html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button[aria-pressed="true"] {
   --ag-control-border:var(--ag-lime);
@@ -578,7 +578,7 @@ html#renaxApp[data-theme="avant"] body #songsRoot #backupAccount {
 }
 html#renaxApp[data-theme="avant"] body #scoreFreeMeasureBtn[aria-pressed="true"] svg {stroke:var(--ag-lime)}
 
-/* Preserve the previously approved section-add and naming-dialog colours. */
+/* Preserve the previously approved section-add colours. */
 html#renaxApp[data-theme="avant"] body #songsRoot .track-add-section:not(#mp3ExportOpen) {
   --ag-action-text:var(--cyan);
   --ag-action-bg:rgba(66,207,225,.12);
@@ -596,4 +596,25 @@ html#renaxApp[data-theme="avant"] body #mp3ExportOpen {
   --ag-action-bg:var(--ag-header);
   --ag-action-border:var(--ag-header-border);
   --orange:var(--ag-lime);
+}
+
+/* Naming windows share the Meixs header palette across all workspaces. */
+html#renaxApp[data-theme="avant"] body :is(.multi-modal:has(input),dialog.song-name-dialog:has(input[type="text"])) {
+  --text:var(--ag-lime);
+  --text-muted:var(--ag-lime);
+  --cyan:var(--ag-lime);
+  --ag-surface-bg:var(--ag-header);
+  --ag-surface-text:var(--ag-lime);
+  --ag-surface-border:var(--ag-header-border);
+  --ag-field-bg:var(--ag-header);
+  --ag-field-text:var(--ag-lime);
+  --ag-field-border:var(--ag-header-border);
+  --ag-name-action-bg:var(--ag-header);
+  --ag-name-action-border:var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input),
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input) .multi-modal-actions button {
+  background:var(--ag-header);
+  color:var(--ag-lime);
+  border-color:var(--ag-header-border);
 }

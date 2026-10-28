@@ -26,8 +26,12 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
         Element.prototype.requestFullscreen = undefined;
       });
       await p.goto(h.url);
-      await p.waitForFunction(() => window.RENAX_BACKUP);
-      await p.evaluate(() => (document.documentElement.dataset.theme = 'avant'));
+      await p.waitForFunction(
+        () => window.RENAX_BACKUP && document.documentElement.dataset.workspaceReady === 'ready',
+      );
+      await p.locator('#index2SettingsBtn').click();
+      await p.locator('[data-appearance=avant]').click();
+      await p.locator('#index2SettingsClose').click();
       await p.addStyleTag({
         content:
           '*,*::before,*::after{transition:none!important;animation:none!important;caret-color:transparent!important}',
@@ -71,10 +75,15 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
                 return [
                   e.tagName,
                   e.id.startsWith('vf-auto') ? '' : e.id,
+                  e.getAttribute('class'),
                   ...['x', 'y', 'width', 'height'].map((k) => Math.round(r[k] * 100) / 100),
                   s.font,
                   s.padding,
-                  s.margin,
+                  // Typed OM retains `auto`; getComputedStyle can alternate between
+                  // zero and used auto margins even with identical bounding boxes.
+                  ...['margin-top', 'margin-right', 'margin-bottom', 'margin-left'].map((k) =>
+                    e.computedStyleMap().get(k).toString(),
+                  ),
                   s.borderWidth,
                   s.borderRadius,
                 ];
@@ -117,6 +126,50 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       const tab = async (name) => {
         await p.getByRole('tab', { name, exact: true }).click();
       };
+      const namingWindow = async (name, open, renamed) => {
+        await open();
+        const dialog = p.getByRole('dialog');
+        await dialog.waitFor({ state: 'visible' });
+        const selector = '.multi-modal:has(input),dialog.song-name-dialog:has(input[type="text"])';
+        await action(selector);
+        await colour(
+          selector
+            .split(',')
+            .map((s) => s + ' h3')
+            .join(','),
+          'color',
+          palette.lime,
+        );
+        const fields = selector
+          .split(',')
+          .map((s) => s + ' input')
+          .join(',');
+        const buttons = selector
+          .split(',')
+          .map((s) => s + ' button')
+          .join(',');
+        await action(fields);
+        await action(buttons);
+        if (await dialog.locator('label').count())
+          await colour('.song-name-dialog .song-name-label', 'color', palette.lime);
+        await dialog.locator('input').fill(renamed + ' annulé');
+        await dialog.getByRole('button', { name: 'Annuler', exact: true }).click();
+        await open();
+        assert.notEqual(await dialog.locator('input').inputValue(), renamed + ' annulé');
+        await dialog.locator('input').fill(renamed);
+        await dialog.locator('button').last().hover();
+        await action(buttons);
+        await capture(name);
+        const bounds = await dialog.boundingBox();
+        assert(bounds.x >= 0 && bounds.x + bounds.width <= width, name + ' fits the viewport');
+        await dialog.locator('input').press('Enter');
+        await dialog.waitFor({ state: 'detached' });
+        await open();
+        assert.equal(await dialog.locator('input').inputValue(), renamed);
+        await p.keyboard.press('Escape');
+        await dialog.waitFor({ state: 'detached' });
+        await showMeasures(p);
+      };
       await colour('#sequencerContainer .beat-divider', 'backgroundColor', palette.header);
       await colour('#scoreMetronomeBtn', 'backgroundColor', palette.lime);
       await colour('#scoreMetronomeBtn svg', 'stroke', palette.ink);
@@ -135,6 +188,9 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await p.locator('#scorePartitionBtn').click();
       await colour('#scorePartitionBtn', 'backgroundColor', palette.lime);
       await p.locator('#scoreEditBtn').click();
+      await p.waitForFunction(
+        () => document.querySelector('#scoreEditBtn').getAttribute('aria-pressed') === 'true',
+      );
       await colour('#scoreEditBtn', 'backgroundColor', palette.lime);
       await p.locator('#scoreFreeMeasureBtn').click();
       await colour('#scoreFreeMeasureBtn[aria-pressed=true] svg', 'stroke', palette.lime);
@@ -187,9 +243,59 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await p.locator('.sequence-more summary').first().click();
       await action('.sequence-more-actions,.sequence-more-actions button');
       await capture('sequence-menu');
+      await p.locator('.sequence-more summary').first().click();
+      await namingWindow(
+        'rename-sequence-block',
+        async () => {
+          await p.locator('.sequence-more summary').first().click();
+          await p
+            .locator('.sequence-more-actions')
+            .first()
+            .getByRole('button', { name: 'Renommer', exact: true })
+            .click();
+        },
+        'Bloc renommé',
+      );
       await tab('Multipiste');
       await showMeasures(p);
-      await p.getByRole('button', { name: 'Ouvrir Preset 1', exact: true }).click();
+      await namingWindow(
+        'rename-multitrack-preset',
+        async () => {
+          if (
+            !(await p
+              .locator('#multiPresetLibrary .multi-more')
+              .first()
+              .evaluate((e) => e.open))
+          )
+            await p.locator('#multiPresetLibrary .multi-more summary').first().click();
+          await p
+            .locator('#multiPresetLibrary .multi-actions')
+            .first()
+            .getByRole('button', { name: 'Renommer', exact: true })
+            .click();
+        },
+        'Preset renommé',
+      );
+      await showMeasures(p);
+      await p.locator('#multiPresetLibrary .multi-preset-open').first().click();
+      await namingWindow(
+        'rename-multitrack-track',
+        async () => {
+          if (
+            !(await p
+              .locator('#multiTracks .multi-more')
+              .first()
+              .evaluate((e) => e.open))
+          )
+            await p.locator('#multiTracks .multi-more summary').first().click();
+          await p
+            .locator('#multiTracks .multi-actions')
+            .first()
+            .getByRole('button', { name: 'Renommer', exact: true })
+            .click();
+        },
+        'Piste renommée',
+      );
       await action('#multiControls>.multi-add');
       await colour('.multi-mute svg', 'stroke', palette.lime);
       const bank = p.locator('.multi-bank-row .numbox-button').first();
@@ -209,6 +315,24 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await action('.song-playlist-card .song-more-menu');
       await colour('.song-playlist-card .song-more-menu button', 'color', palette.lime);
       await capture('track-menu');
+      await p.locator('.song-playlist-card .song-more[aria-haspopup=menu]').first().click();
+      await namingWindow(
+        'rename-track',
+        async () => {
+          await p.locator('.song-playlist-card .song-more[aria-haspopup=menu]').first().click();
+          await p.getByRole('menuitem', { name: 'Renommer', exact: true }).click();
+        },
+        'Track renommé',
+      );
+      await p.getByRole('button', { name: 'Retour aux playlists', exact: true }).click();
+      await namingWindow(
+        'rename-playlist',
+        async () => {
+          await p.locator('.playlist-overview .song-more[aria-haspopup=menu]').first().click();
+          await p.getByRole('menuitem', { name: 'Renommer', exact: true }).click();
+        },
+        'Playlist renommée',
+      );
       await p.evaluate(() => RENAX_SONGS.restoreNavigation({ pane: 'songs', view: 'home' }));
       await action('#songsHome>.song-entry');
       await p.getByRole('button', { name: 'Sauvegarde', exact: true }).click();

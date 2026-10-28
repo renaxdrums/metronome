@@ -19,7 +19,33 @@ try{
 const guest=await browser.newContext({viewport:{width:1480,height:800}});await guest.addInitScript(value=>{if(!localStorage.getItem('renax-drums-songs-v1'))localStorage.setItem('renax-drums-songs-v1',JSON.stringify(value));},sample);
 let transmissions=0;guest.on('request',req=>{if(/firestore.googleapis.com|identitytoolkit.googleapis.com|securetoken.googleapis.com|gstatic.com\/firebasejs/.test(req.url()))transmissions++;});const pg=await open(guest,8765);await backup(pg);assert.equal(await pg.getByRole('button',{name:'Se connecter',exact:true}).isEnabled(),true);assert.deepEqual(await names(pg),['Morceau conservé']);assert.equal(await pg.evaluate(()=>localStorage.getItem('renax-drums-songs-v1')),JSON.stringify(sample));await pg.reload();await pg.waitForFunction(()=>RENAX_BACKUP);assert.deepEqual(await names(pg),['Morceau conservé']);assert.equal(transmissions,0);console.log('Guest: migration, preserved legacy source, reload, no remote transmission PASS');await guest.close();
 const a=await browser.newContext(),b=await browser.newContext();await a.addInitScript(value=>{if(!localStorage.getItem('renax-drums-songs-v1'))localStorage.setItem('renax-drums-songs-v1',JSON.stringify(value));},sample);
-const pa=await open(a,8766),pb=await open(b,8766),email='renax-'+Date.now()+'@example.test';await login(pa,email,true);await synced(pa);assert.deepEqual(await names(pa),['Morceau conservé']);await backup(pa);await pa.getByRole('button',{name:/Importer les .* sans compte/}).click();await pa.locator('#renaxCloudConfirm').getByRole('button',{name:'Importer',exact:true}).click();await synced(pa);assert.deepEqual(await names(pa),['Morceau conservé']);assert(await pa.evaluate(()=>RENAX_SONGS.library.profiles.some(p=>p.name==='Profil vide conservé')));const profileCount=await pa.evaluate(()=>RENAX_SONGS.library.profiles.length);await backup(pa);await pa.getByRole('button',{name:/Importer les .* sans compte/}).click();await pa.locator('#renaxCloudConfirm').getByRole('button',{name:'Importer',exact:true}).click();await synced(pa);assert.equal(await pa.evaluate(()=>RENAX_SONGS.library.profiles.length),profileCount);await login(pb,email,false);await synced(pb);assert.deepEqual(await names(pb),['Morceau conservé']);console.log('Two devices: automatic first recovery, explicit import deduplication and remote recovery PASS');
+const pa=await open(a,8766),pb=await open(b,8766),email='renax-'+Date.now()+'@example.test';
+await login(pa,email,true);await synced(pa);assert.deepEqual(await names(pa),['Morceau conservé']);
+const importGuest=async p=>{
+  await backup(p);
+  await p.getByRole('button',{name:/Importer les .* sans compte/}).click();
+  const confirmation=p.locator('#renaxCloudConfirm');
+  await confirmation.getByRole('button',{name:'Importer',exact:true}).click();
+  // close() dispatches its event asynchronously. Its handler resolves the import;
+  // reading the old Synchronisé status before that event races the receipt write.
+  await confirmation.waitFor({state:'detached'});
+  await synced(p);
+};
+const importSnapshot=async p=>p.evaluate(()=>({
+  profiles:RENAX_SONGS.library.profiles.map(p=>({id:p.id,name:p.name,songs:p.songs.map(s=>s.id)})),
+  receipt:RENAX_STORAGE.state.importDecisions.guestProfiles
+}));
+await importGuest(pa);
+assert.deepEqual(await names(pa),['Morceau conservé']);
+assert(await pa.evaluate(()=>RENAX_SONGS.library.profiles.some(p=>p.name==='Profil vide conservé')));
+const imported=await importSnapshot(pa),profileCount=imported.profiles.length;
+assert.deepEqual(Object.keys(imported.receipt).sort(),sample.profiles.map(p=>p.id).sort());
+await importGuest(pa);
+assert.equal(await pa.evaluate(()=>RENAX_SONGS.library.profiles.length),profileCount);
+assert.deepEqual(await importSnapshot(pa),imported);
+await login(pb,email,false);await synced(pb);assert.deepEqual(await names(pb),['Morceau conservé']);
+console.log('Two devices: automatic first recovery, explicit import deduplication and remote recovery PASS');
+
 if(await pa.locator('#profilePane .song-back').isVisible())await pa.locator('#profilePane .song-back').click();await pa.getByRole('button',{name:'Playlist',exact:true}).click();await pa.getByRole('button',{name:'Nouvelle playlist',exact:true}).click();await pa.getByRole('dialog').locator('input').fill('Playlist personnelle');await pa.getByRole('dialog').getByRole('button',{name:'Créer',exact:true}).click();await synced(pa);await pb.waitForFunction(()=>RENAX_SONGS.library.profiles.some(p=>p.name==='Playlist personnelle'));assert.deepEqual(await names(pa),['Morceau conservé']);assert.deepEqual(await names(pb),['Morceau conservé']);console.log('Named playlist created in UI and synchronized to second device without changing existing songs PASS');
 
 await backup(pa);if(await pa.locator('.backup-options').evaluate(e=>e.open))await pa.locator('.backup-options summary').click();const output=path.resolve(root,'../../outputs');fs.mkdirSync(output,{recursive:true});await pa.setViewportSize({width:1159,height:668});await pa.screenshot({path:path.join(output,'backup-connected-desktop.png')});await pa.setViewportSize({width:390,height:844});if(await pa.locator('#workspaceMobileViews [data-pane=seq]').isVisible())await pa.locator('#workspaceMobileViews [data-pane=seq]').click();await pa.screenshot({path:path.join(output,'backup-connected-mobile.png')});assert.equal(await pa.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await pa.setViewportSize({width:1280,height:720});

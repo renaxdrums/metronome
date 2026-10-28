@@ -82,7 +82,7 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
           const locked = () =>
             [
               ...document.querySelectorAll(
-                '.multi-actions,.multi-actions button,#index2SettingsPanel,#index2SettingsPanel .index2-settings-section,.song-section:not(.song-playlist-card) .song-more-menu,.track-add-section:not(#mp3ExportOpen)',
+                '.multi-actions,.multi-actions button,#index2SettingsPanel,#index2SettingsPanel .index2-settings-section,.song-section:not(.song-playlist-card) .song-more-menu',
               ),
             ].map((e) => {
               const s = getComputedStyle(e);
@@ -198,6 +198,10 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await capture('multitrack-bank');
       await p.keyboard.press('Escape');
       await newTrack(p);
+      // Approved correction: this action now matches Nouvelle mesure rather
+      // than the historical cyan section-add style. Other locked controls
+      // continue to be compared exactly with the PR base in capture().
+      await action('.track-add-section');
       await action('.song-count-in-button,#mp3ExportOpen');
       await p.getByRole('button', { name: 'Ajouter un décompte', exact: true }).click();
       await p.getByRole('button', { name: 'Actions du décompte', exact: true }).click();

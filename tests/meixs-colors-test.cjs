@@ -79,7 +79,11 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
                   ...['x', 'y', 'width', 'height'].map((k) => Math.round(r[k] * 100) / 100),
                   s.font,
                   s.padding,
-                  s.margin,
+                  // Typed OM retains `auto`; getComputedStyle can alternate between
+                  // zero and used auto margins even with identical bounding boxes.
+                  ...['margin-top', 'margin-right', 'margin-bottom', 'margin-left'].map((k) =>
+                    e.computedStyleMap().get(k).toString(),
+                  ),
                   s.borderWidth,
                   s.borderRadius,
                 ];
@@ -93,17 +97,12 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
               const s = getComputedStyle(e);
               return [s.backgroundColor, s.color, s.borderColor, s.boxShadow];
             });
-          // Resolve auto margins before retaining the computed-style snapshot.
-          await p.evaluate(geometry);
-          await settle();
           const current = await p.evaluate(geometry),
             lockedCurrent = await p.evaluate(locked);
           await p
             .locator('link[href^="avant-garde-theme.css"]')
             .evaluate((e) => (e.disabled = true));
           const reference = await p.addStyleTag({ content: approvedCSS });
-          await settle();
-          await p.evaluate(geometry);
           await settle();
           assert.deepEqual(
             await p.evaluate(geometry),

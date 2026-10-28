@@ -215,14 +215,14 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await action('.song-count-in-button,#mp3ExportOpen');
       await action('#songPane>.track-add-section');
       await p.locator('#songAmorceBtn').click();
-      await colour('#songAmorceBtn', 'backgroundColor', palette.lime);
+      assert((await p.locator('#songAmorceBtn').evaluate(e => getComputedStyle(e).boxShadow)).includes(palette.lime));
       await colour('#songAmorceBtn', 'color', palette.controlInk);
       await colour('#songAmorceBtn svg', 'color', palette.controlInk);
       await p.locator('#songAmorceBtn').click();
       await action('#songAmorceBtn');
       const sectionsBeforeCountIn = await p.locator('[data-section-id]').count();
       await p.getByRole('button', { name: 'Ajouter un décompte', exact: true }).click();
-      await colour('[aria-label="Désactiver le décompte"]', 'backgroundColor', palette.lime);
+      assert((await p.locator('[aria-label="Désactiver le décompte"]').evaluate(e => getComputedStyle(e).boxShadow)).includes(palette.lime));
       await colour('[aria-label="Désactiver le décompte"]', 'color', palette.controlInk);
       assert.equal(await p.locator('.song-count-in').count(), 1);
       await p.getByRole('button', { name: 'Désactiver le décompte', exact: true }).click();

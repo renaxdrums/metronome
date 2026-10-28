@@ -644,9 +644,9 @@ html#renaxApp[data-theme="avant"] body #beatEditor #beatEditorDuplicateFirst {
 
 /* In Track, the voice guide and count-in invert only in their pressed state. */
 html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button[aria-pressed="true"] {
-  background:var(--ag-lime) !important;
+  /* Inset lime fill overrides the Console background without new !important declarations. */
+  box-shadow:inset 0 0 0 999px var(--ag-lime);
   color:var(--ag-ink);
-  border-color:var(--ag-lime) !important;
   --orange:var(--ag-ink);
 }
 

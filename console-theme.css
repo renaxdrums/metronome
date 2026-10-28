@@ -208,8 +208,8 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
 #songsRoot .song-playlist-summary,#songsRoot .song-block-summary,#songsRoot .song-note{color:var(--text-muted);font:500 11px/1.5 var(--font)}
 #songsRoot .song-tempo-value{font-family:var(--font);font-variant-numeric:tabular-nums;color:var(--orange)}
 #songsRoot .song-detail-toolbar{gap:8px!important;margin:0 0 14px!important}
-#songsRoot .song-count-in-button{background:#343b45!important;border-color:#505b69!important;border-radius:6px;color:var(--text);box-shadow:none;font:600 11px/1.3 var(--font)}
-#songsRoot .song-count-in-button[aria-pressed=true]{background:#28424b!important;border-color:#4b7884!important}
+#songsRoot .song-count-in-button{background:var(--song-toggle-bg,#343b45)!important;border-color:var(--song-toggle-border,#505b69)!important;border-radius:6px;color:var(--text);box-shadow:none;font:600 11px/1.3 var(--font)}
+#songsRoot .song-count-in-button[aria-pressed=true]{background:var(--song-toggle-bg,#28424b)!important;border-color:var(--song-toggle-border,#4b7884)!important}
 #songsRoot #songPane label{font:500 11px/1.4 var(--font);color:var(--text-muted);margin:12px 0 8px}
 #songsRoot input[type=text]{min-height:38px;padding:9px 11px!important;background:#363e49!important;border:1px solid #505b69!important;border-radius:6px!important;font:500 12px/1.4 var(--font)}
 #songsRoot .song-inline-field{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:10px!important;margin:9px 0!important}
@@ -245,7 +245,7 @@ input:not([type=range]):not([type=checkbox]),select,.numbox-button{background:#3
 #songsRoot #profilePane>.song-back{margin:0 0 4px;}
 #songsRoot #profilePane>.song-back::before,#songsRoot #profilePane>.song-back::after{content:none!important}
 #profilePane>.song-back svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-dialog,#beatEditor,#index2SettingsPanel{background:#272d35!important;border-color:#505b69!important;color:var(--text)!important;font-family:var(--font)!important;border-radius:9px}
+dialog,#beatEditor,#index2SettingsPanel{background:var(--editor-surface,#272d35)!important;border-color:var(--editor-border,#505b69)!important;color:var(--text)!important;font-family:var(--font)!important;border-radius:9px}
 #mp3ExportDialog{font:500 12px/1.5 var(--font)!important;max-height:calc(100dvh - 32px);overflow:auto}
 #mp3ExportDialog h2{font:600 15px/1.4 var(--font);color:var(--text)}
 #mp3ExportDialog label{font:500 12px/1.4 var(--font);color:var(--text-muted);margin:12px 0 7px}

@@ -885,7 +885,7 @@
       title.textContent = 'Temps ' + (beat+1) + ' · mesure ' + (measureIndex+1);
       const close = document.createElement('button');
       close.textContent = '×'; close.setAttribute('aria-label','Fermer');
-      close.style.cssText='width:32px;height:32px;padding:0;background:transparent;border:1px solid var(--orange);border-radius:4px;color:var(--orange);font-size:22px;cursor:pointer';
+      close.style.cssText='width:32px;height:32px;padding:0;background:transparent;border:1px solid var(--beat-editor-close,var(--orange));border-radius:4px;color:var(--beat-editor-close,var(--orange));font-size:22px;cursor:pointer';
       close.addEventListener('click',closeBeatEditor);
       header.append(title,close); beatEditor.appendChild(header);
       const label = document.createElement('label');
@@ -911,7 +911,7 @@
         button.dataset.subIndex=i;button.dataset.state=m.beatStates[beat][i];
         button.textContent=i+1;
         const state=m.beatStates[beat][i];
-        button.style.cssText='flex:1 0 28px;min-width:28px;height:48px;padding:0;border:2px solid transparent;border-radius:7px;font-weight:700;background:'+['var(--grey)','var(--cyan)','var(--yellow)','var(--orange)'][state]+';color:'+(state?'#111':'#ddd');
+        button.style.cssText='flex:1 0 28px;min-width:28px;height:48px;padding:0;border:2px solid transparent;border-radius:7px;font-weight:700;background:'+['var(--beat-pad-off-bg,var(--grey))','var(--cyan)','var(--yellow)','var(--orange)'][state]+';color:var(--beat-pad-text-'+state+','+(state?'#111':'#ddd')+')';
         button.setAttribute('aria-label','Subdivision '+(i+1)+', '+['éteint','clic 1','clic 2','clic 3'][state]);
         button.addEventListener('click',()=>{
           m.beatStates[beat][i]=(m.beatStates[beat][i]+1)%4;

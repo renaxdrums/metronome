@@ -46,12 +46,12 @@
 
 
 .multi-modal-overlay{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:20px;background:#0009}
-.multi-modal{width:min(360px,100%);box-sizing:border-box;padding:20px;border:1px solid #008e9f;border-radius:10px;background:#1c1e27;box-shadow:0 18px 60px #0009}
-.multi-modal h3{font-size:14px;font-weight:600;margin:0 0 16px;color:var(--text)}
+.multi-modal{width:min(360px,100%);box-sizing:border-box;padding:20px;border:1px solid var(--modal-border,#008e9f);border-radius:10px;background:var(--modal-bg,#1c1e27);box-shadow:0 18px 60px #0009}
+.multi-modal h3{font-size:14px;font-weight:600;margin:0 0 16px;color:var(--modal-text,var(--text))}
 .multi-modal input{width:100%;box-sizing:border-box;height:40px;padding:8px 10px;border:1px solid var(--border);color:var(--text);font-size:13px}
 .multi-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-.multi-modal-actions button{padding:9px 15px;border:1px solid var(--border);border-radius:6px;background:#282b35;color:var(--text);font-size:12px;cursor:pointer}
-.multi-modal-actions button:last-child{border-color:var(--cyan);background:rgba(0,207,232,.10)}
+.multi-modal-actions button{padding:9px 15px;border:1px solid var(--modal-border,var(--border));border-radius:6px;background:var(--modal-bg,#282b35);color:var(--modal-text,var(--text));font-size:12px;cursor:pointer}
+.multi-modal-actions button:last-child{border-color:var(--modal-primary-border,var(--cyan));background:var(--modal-bg,rgba(0,207,232,.10))}
 
 .multi-preset-row .numbox-button,.multi-preset-row .numbox-button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:10px}
 

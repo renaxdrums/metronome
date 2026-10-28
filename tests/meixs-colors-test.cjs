@@ -239,6 +239,11 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await action('.song-playlist-card .song-more-menu');
       await colour('.song-playlist-card .song-more-menu button', 'color', palette.lime);
       await capture('track-menu');
+      await p.getByRole('menuitem', { name: 'Supprimer', exact: true }).click();
+      await colour('dialog.song-confirmation:not(.song-name-dialog)', 'backgroundColor', palette.header);
+      await colour('dialog.song-confirmation:not(.song-name-dialog) h3', 'color', palette.lime);
+      await colour('dialog.song-confirmation:not(.song-name-dialog) .song-confirm-actions button', 'color', palette.lime);
+      await p.getByRole('button', { name: 'Annuler', exact: true }).click();
       await p.evaluate(() => RENAX_SONGS.restoreNavigation({ pane: 'songs', view: 'home' }));
       await action('#songsHome>.song-entry');
       await p.getByRole('button', { name: 'Sauvegarde', exact: true }).click();

@@ -600,7 +600,7 @@ html#renaxApp[data-theme="avant"] body #mp3ExportOpen {
 
 /* Meixs beat editor: keep the dark panel and make its copy and list readable. */
 html#renaxApp[data-theme="avant"] body #beatEditor {
-  color:var(--ag-lime);
+  --text:var(--ag-lime);
   --text-muted:var(--ag-lime);
 }
 html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label {
@@ -644,8 +644,18 @@ html#renaxApp[data-theme="avant"] body #beatEditor #beatEditorDuplicateFirst {
 
 /* In Track, the voice guide and count-in invert only in their pressed state. */
 html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button[aria-pressed="true"] {
-  background:var(--ag-lime);
+  background:var(--ag-lime) !important;
   color:var(--ag-ink);
-  border-color:var(--ag-ink);
+  border-color:var(--ag-lime) !important;
   --orange:var(--ag-ink);
+}
+
+/* Meixs-only Track deletion confirmation; naming dialogs remain untouched. */
+html#renaxApp[data-theme="avant"] body dialog.song-confirmation:not(.song-name-dialog) {
+  --ag-surface-bg:var(--ag-header);
+  --ag-surface-text:var(--ag-lime);
+  --ag-surface-border:var(--ag-header-border);
+  --text:var(--ag-lime);
+  --text-muted:var(--ag-lime);
+  --orange:var(--ag-lime);
 }

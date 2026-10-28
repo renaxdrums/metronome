@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "45e785af5a306d11",
+  "revision": "5a270a3bfce27bdd",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "68f83ca8ce2f05c43d634c83252e185198402ef1f218c1233bc8e2b830e1bf7a",
+      "sha256": "b915bddc19f25779d1616929f79f551ee1c83148761d04dbe3c840d2a93f0bcd",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "1fb70b4b90592d436ca6a1e0b8490baaf4d3274b62dc49bc2b7a6242500d2372",
+      "sha256": "389f10f4bb70750235527c28191c6f6399c7073b1393f9de9fcc81c348c335cc",
       "text": true
     },
     {
@@ -479,7 +479,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "9aed2da49cc9823d8b38f6d4a9275ab85c0e2f6893959faca3135395b4d64c8f",
+      "sha256": "acf7ece7a90af2eef84b50e4a3e9df8e88afb57f4ac3ad62b1af160721d91210",
       "text": true
     },
     {

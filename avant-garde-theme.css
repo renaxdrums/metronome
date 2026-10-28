@@ -578,11 +578,11 @@ html#renaxApp[data-theme="avant"] body #songsRoot #backupAccount {
 }
 html#renaxApp[data-theme="avant"] body #scoreFreeMeasureBtn[aria-pressed="true"] svg {stroke:var(--ag-lime)}
 
-/* Preserve the previously approved section-add and naming-dialog colours. */
-html#renaxApp[data-theme="avant"] body #songsRoot .track-add-section:not(#mp3ExportOpen) {
-  --ag-action-text:var(--cyan);
-  --ag-action-bg:rgba(66,207,225,.12);
-  --ag-action-border:var(--ag-line);
+/* Approved Track section-add colours: the Meixs header background and lime text. */
+html#renaxApp[data-theme="avant"] body #songsRoot #songPane>.track-add-section {
+  --ag-action-text:var(--ag-lime);
+  --ag-action-bg:var(--ag-header);
+  --ag-action-border:var(--ag-header-border);
 }
 html#renaxApp[data-theme="avant"] body #songsRoot #songPane .song-actions>.btn:not(.track-create):not(.song-back) {
   --ag-action-bg:var(--ag-header);
@@ -595,5 +595,67 @@ html#renaxApp[data-theme="avant"] body #mp3ExportOpen {
   --ag-action-text:var(--ag-lime);
   --ag-action-bg:var(--ag-header);
   --ag-action-border:var(--ag-header-border);
+  --orange:var(--ag-lime);
+}
+
+/* Meixs beat editor: keep the dark panel and make its copy and list readable. */
+html#renaxApp[data-theme="avant"] body #beatEditor {
+  --text:var(--ag-lime);
+  --text-muted:var(--ag-lime);
+}
+html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label {
+  color:var(--ag-lime);
+  background:transparent;
+}
+html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label>.numbox-custom {
+  width:100%;
+  flex:1 1 auto;
+  --ag-field-bg:var(--ag-header);
+  --ag-field-text:var(--ag-lime);
+  --ag-field-border:var(--ag-header-border);
+  --ag-menu-bg:var(--ag-header);
+  --ag-menu-text:var(--ag-lime);
+  --ag-menu-border:var(--ag-header-border);
+  --ag-selected-bg:var(--ag-lime);
+  --ag-selected-text:var(--ag-ink);
+  --ag-selected-border:var(--ag-lime);
+  --orange:var(--ag-lime);
+}
+html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label .numbox-button {
+  min-height:44px;
+  padding-inline:12px;
+  font-size:14px;
+  font-weight:600;
+}
+html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label .numbox-menu {
+  padding:4px;
+  scrollbar-color:var(--ag-lime) var(--ag-header);
+}
+html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label .numbox-option {
+  min-height:38px;
+  text-align:left;
+  padding-inline:12px;
+}
+html#renaxApp[data-theme="avant"] body #beatEditor #beatEditorDuplicateFirst {
+  background:var(--ag-header);
+  color:var(--ag-lime);
+  border-color:var(--ag-header-border);
+}
+
+/* In Track, the voice guide and count-in invert only in their pressed state. */
+html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button[aria-pressed="true"] {
+  /* Inset lime fill overrides the Console background without new !important declarations. */
+  box-shadow:inset 0 0 0 999px var(--ag-lime);
+  color:var(--ag-ink);
+  --orange:var(--ag-ink);
+}
+
+/* Meixs-only Track deletion confirmation; naming dialogs remain untouched. */
+html#renaxApp[data-theme="avant"] body dialog.song-confirmation:not(.song-name-dialog) {
+  --ag-surface-bg:var(--ag-header);
+  --ag-surface-text:var(--ag-lime);
+  --ag-surface-border:var(--ag-header-border);
+  --text:var(--ag-lime);
+  --text-muted:var(--ag-lime);
   --orange:var(--ag-lime);
 }

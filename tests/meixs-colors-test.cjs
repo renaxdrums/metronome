@@ -138,6 +138,8 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await colour('#beatEditor .numbox-option:not(.active)', 'color', palette.lime);
       await colour('#beatEditor .numbox-option.active', 'backgroundColor', palette.lime);
       await colour('#beatEditor .numbox-option.active', 'color', palette.controlInk);
+      await p.keyboard.press('Escape');
+      await p.locator('#beatEditor .numbox-menu').waitFor({ state: 'hidden' });
       await p.locator('#beatEditor [aria-label="Fermer"]').click();
       await openControls(p);
       await p.locator('#soundBank + .numbox-button').click();

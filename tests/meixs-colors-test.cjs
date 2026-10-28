@@ -135,7 +135,7 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await colour('#beatEditorDuplicateFirst', 'color', palette.lime);
       await p.locator('#beatEditor .numbox-button').click();
       await colour('#beatEditor .numbox-menu', 'backgroundColor', palette.header);
-      await colour('#beatEditor .numbox-option', 'color', palette.lime);
+      await colour('#beatEditor .numbox-option:not(.active)', 'color', palette.lime);
       await colour('#beatEditor .numbox-option.active', 'backgroundColor', palette.lime);
       await colour('#beatEditor .numbox-option.active', 'color', palette.controlInk);
       await p.locator('#beatEditor [aria-label="Fermer"]').click();

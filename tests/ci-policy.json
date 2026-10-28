@@ -1,5 +1,6 @@
 {
   "nightly": [
+    "tests/track-last-block-test.cjs",
     "tests/meixs-colors-test.cjs",
     "tests/bell-resonance-test.cjs",
     "tests/track-beat-corrections-test.cjs",

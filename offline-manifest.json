@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "45e785af5a306d11",
+  "revision": "641a29348cdb5e63",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "68f83ca8ce2f05c43d634c83252e185198402ef1f218c1233bc8e2b830e1bf7a",
+      "sha256": "6aa1f892ed9db10117c5ff842027465fb2ebe26f9e311a47670ec913b6ce4263",
       "text": true
     },
     {
@@ -154,7 +154,7 @@
     },
     {
       "path": "console-theme.css",
-      "sha256": "60331a02e90f15c5b7b8374c7412f31d3581569e489eef95c005501f4d549464",
+      "sha256": "19ed4f9d3ef5916774cd6ed0b5bd97f01c77db2d726075203c718bdadabcbc5a",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "1fb70b4b90592d436ca6a1e0b8490baaf4d3274b62dc49bc2b7a6242500d2372",
+      "sha256": "b14ff353705918ac26b0b086a06d9b8f5369bd15a6ac1c2170da615a57acb9d9",
       "text": true
     },
     {
@@ -334,7 +334,7 @@
     },
     {
       "path": "metronome-core.js",
-      "sha256": "7b9eeab841da94fa31db2d6c7ac4243905e664f6cff3af3f2c7421384430d78f",
+      "sha256": "ebbff371908a681625ccb6e1dd4624dde46cf0e33e5c5d7109f0eb49ab2c7b2e",
       "text": true
     },
     {
@@ -374,7 +374,7 @@
     },
     {
       "path": "multi-metronome.css",
-      "sha256": "1f1df82d778f6612a75310c6da8044d02b3b55af628896189fb504af5d9919f4",
+      "sha256": "f6354c473f35354364e1039435cedbac62801655ffdf31bc49585fb41c40a8bc",
       "text": true
     },
     {
@@ -479,7 +479,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "9aed2da49cc9823d8b38f6d4a9275ab85c0e2f6893959faca3135395b4d64c8f",
+      "sha256": "03912cba306c0b85975b3a25bfa6eb45dde5487a48f8b05e070a1709ff2be16a",
       "text": true
     },
     {

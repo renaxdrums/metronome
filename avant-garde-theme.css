@@ -63,7 +63,7 @@ html#renaxApp[data-theme="avant"] body #index2SettingsPanel .index2-close {
   border-radius:6px !important;
 }
 html#renaxApp[data-theme="avant"] #renaxHeaderWave {
-  opacity:.12 !important;
+  opacity:.52 !important;
   filter:grayscale(1) !important;
   mix-blend-mode:screen !important;
 }
@@ -230,7 +230,7 @@ html#renaxApp[data-theme="avant"] body input[type="range"]::-webkit-slider-thumb
 }
 html#renaxApp[data-theme="avant"] body :is(
   #playBtn,#trainBtn,#trainingVisualBtn,
-  #sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,
+  #sequenceAddMeasure,#multiControls>.multi-add,#multiPresetLibrary>.btn,#songsRoot .playlist-create,
   #songsRoot .track-create,#songsRoot .track-add-section,#songsHome>.song-entry,
   #songsRoot #songPane .song-actions>.btn:not(.track-create):not(.song-back),
   dialog.song-name-dialog .song-confirm-actions button
@@ -416,7 +416,7 @@ html#renaxApp[data-theme="avant"] body #scoreViewSwitch button[aria-pressed="tru
 html#renaxApp[data-theme="avant"] body :is(.orange-ui-icon,.panel-title svg,.control-group>label svg) {stroke:var(--ag-lime)}
 html#renaxApp[data-theme="avant"] body :is(.song-tabs>button,.song-back,#songsHome>.song-entry)::before {background:var(--ag-lime)}
 html#renaxApp[data-theme="avant"] body :is(
-  #sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,
+  #sequenceAddMeasure,#multiControls>.multi-add,#multiPresetLibrary>.btn,#songsRoot .playlist-create,
   #songsRoot .track-create,#songsRoot .track-add-section,#songsHome>.song-entry
 ) {
   background:rgba(66,207,225,.12);
@@ -437,8 +437,8 @@ html#renaxApp[data-theme="avant"] body #songsRoot #songPane .song-actions>.btn:n
 html#renaxApp[data-theme="avant"] body #songsRoot #songPane .song-actions>.btn svg {stroke:var(--ag-lime);color:var(--ag-lime)}
 html#renaxApp[data-theme="avant"] body :is(.song-back,.song-more,.sequence-preview-play,.multi-more summary) {color:var(--ag-lime)}
 html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label {
-  background:var(--ag-paper);
-  color:var(--ag-ink);
+  background:var(--ag-header);
+  color:var(--ag-lime);
 }
 html#renaxApp[data-theme="avant"] body #index2SettingsPanel .index2-close,
 html#renaxApp[data-theme="avant"] body [aria-label="Fermer"] {
@@ -467,7 +467,7 @@ html#renaxApp[data-theme="avant"] body .training-section .training-curve-options
 
 /* Per-control variables reuse existing important rules without expanding their number. */
 html#renaxApp[data-theme="avant"] body :is(
-  #sequenceAddMeasure,#multiControls>.multi-add,#songsRoot .playlist-create,
+  #sequenceAddMeasure,#multiControls>.multi-add,#multiPresetLibrary>.btn,#songsRoot .playlist-create,
   #songsRoot .track-create,#songsRoot .track-add-section,#songsHome>.song-entry
 ) {
   --ag-action-text:var(--ag-lime);
@@ -558,9 +558,9 @@ html#renaxApp[data-theme="avant"] body #profilePane :is(.backup-json,.backup-cho
   border-color:var(--ag-header-border);
 }
 html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button {
-  background:var(--ag-header);
-  color:var(--ag-lime);
-  border-color:var(--ag-header-border);
+  background:var(--song-toggle-bg,var(--ag-header));
+  color:var(--song-toggle-text,var(--ag-lime));
+  border-color:var(--song-toggle-border,var(--ag-header-border));
   --orange:var(--ag-lime);
 }
 
@@ -578,11 +578,20 @@ html#renaxApp[data-theme="avant"] body #songsRoot #backupAccount {
 }
 html#renaxApp[data-theme="avant"] body #scoreFreeMeasureBtn[aria-pressed="true"] svg {stroke:var(--ag-lime)}
 
-/* Preserve the previously approved section-add and naming-dialog colours. */
+/* Section creation follows the approved sequence-add action. */
 html#renaxApp[data-theme="avant"] body #songsRoot .track-add-section:not(#mp3ExportOpen) {
-  --ag-action-text:var(--cyan);
-  --ag-action-bg:rgba(66,207,225,.12);
-  --ag-action-border:var(--ag-line);
+  --ag-action-text:var(--ag-lime);
+  --ag-action-bg:var(--ag-header);
+  --ag-action-border:var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body :is(#multiPresetLibrary>.btn,#songsRoot .track-add-section) {
+  font:600 11px/1.3 var(--font);
+  letter-spacing:normal;
+  text-transform:none;
+  min-height:40px;
+}
+@media(max-width:1100px) {
+  html#renaxApp[data-theme="avant"] body :is(#multiPresetLibrary>.btn,#songsRoot .track-add-section) {min-height:44px;}
 }
 html#renaxApp[data-theme="avant"] body #songsRoot #songPane .song-actions>.btn:not(.track-create):not(.song-back) {
   --ag-action-bg:var(--ag-header);
@@ -596,4 +605,49 @@ html#renaxApp[data-theme="avant"] body #mp3ExportOpen {
   --ag-action-bg:var(--ag-header);
   --ag-action-border:var(--ag-header-border);
   --orange:var(--ag-lime);
+}
+
+/* Shared subdivision editor and naming dialog, in every workspace. */
+html#renaxApp[data-theme="avant"] body #beatEditor {
+  --editor-surface:var(--ag-header);
+  --editor-border:var(--ag-header-border);
+  --text:var(--ag-lime);
+  --text-muted:var(--ag-lime);
+  --beat-editor-close:var(--ag-lime);
+  --beat-pad-off-bg:var(--ag-header);
+  --beat-pad-text-0:var(--ag-lime);
+  --beat-pad-text-1:#fff;
+  --ag-field-bg:var(--ag-header);
+  --ag-field-text:var(--ag-lime);
+  --ag-field-border:var(--ag-header-border);
+  --ag-menu-bg:var(--ag-header);
+  --ag-menu-text:var(--ag-lime);
+  --ag-menu-border:var(--ag-header-border);
+  --ag-selected-bg:var(--ag-lime);
+  --ag-selected-text:var(--ag-ink);
+  --ag-selected-border:var(--ag-lime);
+}
+html#renaxApp[data-theme="avant"] body #beatEditorDuplicateFirst {
+  --text:var(--ag-ink);
+}
+html#renaxApp[data-theme="avant"] body .multi-modal {
+  color:var(--ag-lime);
+  --modal-bg:var(--ag-header);
+  --modal-text:var(--ag-lime);
+  --modal-border:var(--ag-header-border);
+  --modal-primary-border:var(--ag-lime);
+  --ag-field-border:var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body .multi-modal input {
+  caret-color:var(--ag-ink);
+}
+html#renaxApp[data-theme="avant"] body .multi-modal input::selection {
+  color:var(--ag-ink);
+  background:var(--ag-lime);
+}
+html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button[aria-pressed="true"] {
+  --song-toggle-bg:var(--ag-lime);
+  --song-toggle-text:var(--ag-ink);
+  --song-toggle-border:var(--ag-lime);
+  --orange:var(--ag-ink);
 }

@@ -94,6 +94,7 @@
     "tests/timing-test.cjs",
     "tests/tooling-contracts-test.cjs",
     "tests/tooling-guards-test.cjs",
+    "tests/targeted-controls-test.cjs",
     "tests/track-playlist-chain-test.cjs",
     "tests/training-modes-test.cjs",
     "tests/transport-timer-test.cjs",

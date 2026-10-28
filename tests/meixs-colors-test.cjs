@@ -82,7 +82,7 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
           const locked = () =>
             [
               ...document.querySelectorAll(
-                '.multi-actions,.multi-actions button,#index2SettingsPanel,#index2SettingsPanel .index2-settings-section,.song-section:not(.song-playlist-card) .song-more-menu,.track-add-section:not(#mp3ExportOpen)',
+                '.multi-actions,.multi-actions button,#index2SettingsPanel,#index2SettingsPanel .index2-settings-section,.song-section:not(.song-playlist-card) .song-more-menu',
               ),
             ].map((e) => {
               const s = getComputedStyle(e);
@@ -125,6 +125,20 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       assert(await p.locator('#undoBtn').evaluate((e) => Number(getComputedStyle(e).opacity) < 1));
       await colour('.numbox-button', 'borderRightColor', palette.lime, '::after');
       await capture('metronome');
+      await p.locator('#sequencerContainer .step').first().click();
+      await colour('#beatEditorTitle', 'color', palette.lime);
+      await colour('#beatEditor .beat-editor-division-label', 'color', palette.lime);
+      await colour('#beatEditor .beat-editor-legend', 'color', palette.lime);
+      await colour('#beatEditor .numbox-button', 'backgroundColor', palette.header);
+      await colour('#beatEditor .numbox-button', 'color', palette.lime);
+      await colour('#beatEditorDuplicateFirst', 'backgroundColor', palette.header);
+      await colour('#beatEditorDuplicateFirst', 'color', palette.lime);
+      await p.locator('#beatEditor .numbox-button').click();
+      await colour('#beatEditor .numbox-menu', 'backgroundColor', palette.header);
+      await colour('#beatEditor .numbox-option', 'color', palette.lime);
+      await colour('#beatEditor .numbox-option.active', 'backgroundColor', palette.lime);
+      await colour('#beatEditor .numbox-option.active', 'color', palette.controlInk);
+      await p.locator('#beatEditor [aria-label="Fermer"]').click();
       await openControls(p);
       await p.locator('#soundBank + .numbox-button').click();
       await p.locator('.sound-bank-cards.open .numbox-menu').waitFor({ state: 'visible' });
@@ -199,6 +213,22 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await p.keyboard.press('Escape');
       await newTrack(p);
       await action('.song-count-in-button,#mp3ExportOpen');
+      await action('#songPane>.track-add-section');
+      await p.locator('#songAmorceBtn').click();
+      await colour('#songAmorceBtn', 'backgroundColor', palette.lime);
+      await colour('#songAmorceBtn', 'color', palette.controlInk);
+      await colour('#songAmorceBtn svg', 'color', palette.controlInk);
+      await p.locator('#songAmorceBtn').click();
+      await action('#songAmorceBtn');
+      const sectionsBeforeCountIn = await p.locator('[data-section-id]').count();
+      await p.getByRole('button', { name: 'Ajouter un décompte', exact: true }).click();
+      await colour('[aria-label="Désactiver le décompte"]', 'backgroundColor', palette.lime);
+      await colour('[aria-label="Désactiver le décompte"]', 'color', palette.controlInk);
+      assert.equal(await p.locator('.song-count-in').count(), 1);
+      await p.getByRole('button', { name: 'Désactiver le décompte', exact: true }).click();
+      assert.equal(await p.locator('.song-count-in').count(), 0);
+      assert.equal(await p.locator('[data-section-id]').count(), sectionsBeforeCountIn);
+      assert.equal(await p.evaluate(() => RENAX_SONGS.library.profiles.find(x => x.id === RENAX_SONGS.library.activeProfile).songs[0].countIn), undefined);
       await p.getByRole('button', { name: 'Ajouter un décompte', exact: true }).click();
       await p.getByRole('button', { name: 'Actions du décompte', exact: true }).click();
       await action('.song-count-in .song-more-menu');

@@ -61,6 +61,7 @@ jobs:
           node tests/instrument-samples-test.cjs
           node tests/bell-resonance-test.cjs
           node tests/track-beat-corrections-test.cjs
+          node tests/track-last-block-test.cjs
       - name: Timing at both device sample rates, with a negative control
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"

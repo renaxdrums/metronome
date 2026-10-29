@@ -3,10 +3,14 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
 const cp = require('node:child_process');
+const normalizeVisualReference = require('./visual-reference-normalizations.cjs');
 const approvedCSS = process.env.MEIXS_BASE_REF
-  ? cp.execFileSync('git', ['show', process.env.MEIXS_BASE_REF + ':avant-garde-theme.css'], {
-      encoding: 'utf8',
-    })
+  ? normalizeVisualReference(
+      cp.execFileSync('git', ['show', process.env.MEIXS_BASE_REF + ':avant-garde-theme.css'], {
+        encoding: 'utf8',
+      }),
+      'avant-garde-theme.css',
+    )
   : null;
 const { start, showMeasures, openControls, newTrack } = require('./audio-harness.cjs');
 (async () => {

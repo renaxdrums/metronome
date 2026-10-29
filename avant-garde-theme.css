@@ -179,6 +179,13 @@ html#renaxApp[data-theme="avant"] body .panel-visu:not(.score-view) .beat-number
   color:#3b5d2d !important;
   text-shadow:none !important;
 }
+@media(min-width:1101px) {
+  html#renaxApp[data-theme="avant"] body:not(.poly-mode) .panel-visu:not(.score-view) #beatDisplay {
+    text-box-trim:trim-both;
+    text-box-edge:cap alphabetic;
+    padding-inline-end:.05em;
+  }
+}
 html#renaxApp[data-theme="avant"] body .beat-divider {
   background:var(--ag-header);
   box-shadow:none !important;

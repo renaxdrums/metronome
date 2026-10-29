@@ -48,6 +48,7 @@
     "tests/mp3-published-test.cjs",
     "tests/mp3-score-reference-test.cjs",
     "tests/multilingual-interface-test.cjs",
+    "tests/multi-visualizer-layout-test.cjs",
     "tests/numbox-accessibility-test.cjs",
     "tests/offline-cache-test.cjs",
     "tests/particle-cleanup-test.cjs",

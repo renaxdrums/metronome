@@ -15,6 +15,7 @@
 #backupAccount .backup-status.is-confirmed::before {content:'●';font-size:8px;margin-right:6px;}
 #backupAccount .backup-identity {font-size:12px;}
 #backupAccount .backup-hint {color:var(--text-muted);font-size:11px;}
+#backupAccount #backupRemember {flex:0 0 auto;width:auto;margin:0;}
 .backup-options {border-top:1px solid var(--border);padding-top:8px;}
 .backup-options summary {cursor:pointer;color:var(--text-muted);font-size:11px;min-height:32px;line-height:32px;}
 .backup-options summary:focus-visible {outline:2px solid var(--cyan);outline-offset:2px;}

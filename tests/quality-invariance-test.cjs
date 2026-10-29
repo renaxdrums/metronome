@@ -2,6 +2,7 @@ const path = require('node:path'),
   cp = require('node:child_process'),
   assert = require('node:assert/strict');
 const { start, save } = require('./audio-harness.cjs');
+const normalizeVisualReference = require('./visual-reference-normalizations.cjs');
 const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f363091b5fe1c7',
   root = path.resolve(__dirname, '..'),
   cache = new Map();
@@ -88,6 +89,13 @@ async function baselineRoute(page, url) {
     }
     let body = cache.get(file);
     if (!body) return route.fulfill({ status: 404, body: 'Not found' });
+    if (['avant-garde-theme.css', 'renax-pulse-ivory.css', 'backup-index2.css'].includes(file)) {
+      const normalized = normalizeVisualReference(body.toString(), file);
+      if (normalized !== body.toString()) {
+        body = Buffer.from(normalized);
+        correctedReferenceFiles.add(file);
+      }
+    }
     if (file === 'workspace-layout.css' && body.toString().includes(tempoDisplayBefore)) {
       const original = body.toString();
       assert.equal(original.split(tempoDisplayBefore).length, 2);

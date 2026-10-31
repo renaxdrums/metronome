@@ -24,6 +24,7 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       p.on('pageerror', (e) => errors.push(e.message));
       await p.addInitScript(() => {
         Element.prototype.requestFullscreen = undefined;
+        window.showSaveFilePicker = undefined;
       });
       await p.goto(h.url);
       await p.waitForFunction(() => window.RENAX_BACKUP);
@@ -211,6 +212,27 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       // continue to be compared exactly with the PR base in capture().
       await action('.track-add-section');
       await action('.song-count-in-button,#mp3ExportOpen');
+      await p.locator('#mp3ExportOpen').click();
+      await action('#mp3ExportDialog');
+      await colour(
+        '#mp3ExportDialog h2,#mp3ExportDialog label,#mp3ExportStatus,#mp3ExportDialog .mp3-credit',
+        'color',
+        palette.lime,
+      );
+      await colour('#mp3ExportDialog h2', 'backgroundColor', palette.lime, '::before');
+      await action('#mp3ExportDialog .mp3-actions .btn');
+      await action('#mp3ExportDialog .numbox-button');
+      await capture('export-dialog');
+      await p.locator('#songExportFormat').selectOption('midi');
+      await p.locator('#mp3ExportSave').click();
+      await p.waitForFunction(() => !document.getElementById('mp3ExportDownload').hidden);
+      await action('#mp3ExportDownload');
+      assert.match(await p.locator('#mp3ExportDownload').getAttribute('download'), /\.mid$/);
+      await capture('export-download');
+      await p
+        .locator('#mp3ExportDialog')
+        .getByRole('button', { name: 'Fermer', exact: true })
+        .click();
       await p.getByRole('button', { name: 'Ajouter un décompte', exact: true }).click();
       await p.getByRole('button', { name: 'Actions du décompte', exact: true }).click();
       await action('.song-count-in .song-more-menu');
@@ -221,6 +243,28 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await action('.song-playlist-card .song-more-menu');
       await colour('.song-playlist-card .song-more-menu button', 'color', palette.lime);
       await capture('track-menu');
+      const songBeforeConfirmation = await p.evaluate(() => JSON.stringify(RENAX_SONGS.library));
+      await p
+        .locator('.song-playlist-card .song-more-menu')
+        .getByRole('menuitem', { name: 'Supprimer', exact: true })
+        .click();
+      await action('dialog.song-confirmation:not(.song-name-dialog)');
+      await colour(
+        '.song-confirmation h3,.song-confirm-message,.song-confirm-actions .btn',
+        'color',
+        palette.lime,
+      );
+      await action('.song-confirm-actions .btn');
+      await capture('delete-confirmation');
+      await p
+        .locator('.song-confirmation')
+        .getByRole('button', { name: 'Annuler', exact: true })
+        .click();
+      assert.equal(
+        await p.evaluate(() => JSON.stringify(RENAX_SONGS.library)),
+        songBeforeConfirmation,
+      );
+
       await p.evaluate(() => RENAX_SONGS.restoreNavigation({ pane: 'songs', view: 'home' }));
       await action('#songsHome>.song-entry');
       await p.getByRole('button', { name: 'Sauvegarde', exact: true }).click();

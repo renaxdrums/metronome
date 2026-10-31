@@ -144,8 +144,15 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await p.locator('#scorePartitionBtn').click();
       await colour('#scorePartitionBtn', 'backgroundColor', palette.lime);
       await p.locator('#scoreEditBtn').click();
+      await p.waitForFunction(
+        () => document.getElementById('scoreEditBtn').getAttribute('aria-pressed') === 'true',
+      );
       await colour('#scoreEditBtn', 'backgroundColor', palette.lime);
       await p.locator('#scoreFreeMeasureBtn').click();
+      await p.waitForFunction(
+        () =>
+          document.getElementById('scoreFreeMeasureBtn').getAttribute('aria-pressed') === 'true',
+      );
       await colour('#scoreFreeMeasureBtn[aria-pressed=true] svg', 'stroke', palette.lime);
       await capture('score-editor');
       await tab('Polyrythmie');

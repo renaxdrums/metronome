@@ -136,6 +136,8 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    assert.equal(await p.evaluate(()=>isPlaying),false,'Normal transport survives leaving Track');
    assert(await p.evaluate(()=>JSON.stringify(metronomeMeasures)===window.__nativeMeasures),'Original metronome restored after Track reload');
    await p.evaluate(()=>{document.documentElement.dataset.theme='avant';RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section:'c'});});await showMeasures(p);
+   assert.equal(await p.locator('[data-section-id=c] .song-continuous-toggle').evaluate(el=>getComputedStyle(el).display),'inline-flex');
+   assert.equal(await p.locator('[data-section-id=c] .song-continuous-toggle input').evaluate(el=>el.getBoundingClientRect().width),16);
    const shot=path.join(output,'continuous-'+width+'.png');fs.mkdirSync(path.dirname(shot),{recursive:true});await p.screenshot({path:shot});
    assert.deepEqual(errors,[]);results.push({width,transitions:true,playlistStop:true,policies,guide,settings:true});await p.close();
   }

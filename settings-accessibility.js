@@ -37,8 +37,9 @@
     }
   }
   function keydown(event){
-    if(!active||nonModal&&event.key!=='Escape')return;
+    if(!active)return;
     event.stopPropagation();
+    if(nonModal&&event.key!=='Escape')return;
     if(event.key==='Escape'){event.preventDefault();close.click();return;}
     if(event.key!=='Tab')return;
     const elements=[...panel.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),a[href],[tabindex="0"]')].filter(element=>{const box=element.getBoundingClientRect();return box.width>0&&box.height>0&&getComputedStyle(element).visibility!=='hidden'});
@@ -49,6 +50,8 @@
     if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
   }
+  const originalEditingField=isEditingField;
+  isEditingField=()=>active&&panel.contains(document.activeElement)||originalEditingField();
   panel.addEventListener('keydown',keydown);trigger.addEventListener('keydown',keydown);
   // Shared native-dialog focus contract, also used by cloud confirmations.
   window.RENAX_DIALOG_FOCUS=Object.freeze({show(dialog,initial){

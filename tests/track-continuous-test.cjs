@@ -118,6 +118,8 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
     await p.locator('#index2SettingsBtn').click();await p.waitForFunction(()=>document.getElementById('index2SettingsBtn').getAttribute('aria-expanded')==='true');
     if(theme==='avant'){
      assert.equal(await p.locator('#index2SettingsPanel').getAttribute('aria-modal'),'false');
+     await p.locator('[data-appearance=avant]').focus();await p.keyboard.press('Space');
+     assert.equal(await p.evaluate(()=>isPlaying||training.engaged),false,'Settings keyboard must not start playback');
      await p.getByRole('tab',{name:'Polyrythmie',exact:true}).click();
      await p.waitForFunction(()=>document.body.dataset.workspace==='polyrhythm'&&document.getElementById('index2SettingsBtn').getAttribute('aria-expanded')==='false');
     }else{
@@ -125,7 +127,11 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
      await p.locator('#index2SettingsClose').click();
     }
    }
-   await p.evaluate(()=>RENAX_WORKSPACE.go('metronome'));
+   await p.evaluate(()=>{document.documentElement.dataset.theme='avant';RENAX_WORKSPACE.go('training');});
+   await p.locator('#index2SettingsBtn').click();await p.locator('[data-appearance=avant]').focus();await p.keyboard.press('Space');
+   assert.equal(await p.evaluate(()=>isPlaying||training.engaged),false,'Training capture shortcut stays suspended inside preferences');
+   await p.getByRole('tab',{name:'Métronome',exact:true}).click();
+   await p.waitForFunction(()=>document.body.dataset.workspace==='metronome');
    await p.locator('#playBtn').click();await p.waitForFunction(()=>isPlaying&&!RENAX_SONGS.loaded);await p.locator('#playBtn').click();
    assert.equal(await p.evaluate(()=>isPlaying),false,'Normal transport survives leaving Track');
    assert(await p.evaluate(()=>JSON.stringify(metronomeMeasures)===window.__nativeMeasures),'Original metronome restored after Track reload');

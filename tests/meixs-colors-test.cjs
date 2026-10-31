@@ -96,7 +96,9 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
             const style = document.createElement('style');
             style.textContent = css;
             document.head.append(style);
-            document.querySelector('link[href^="avant-garde-theme.css"]').disabled = true;
+            const link = document.querySelector('link[href^="avant-garde-theme.css"]');
+            style.dataset.previousMedia = link.media;
+            link.media = 'not all';
             return style;
           }, approvedCSS);
           await settle();
@@ -111,7 +113,8 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
             `${width} ${name}: approved controls changed`,
           );
           await reference.evaluate((style) => {
-            document.querySelector('link[href^="avant-garde-theme.css"]').disabled = false;
+            document.querySelector('link[href^="avant-garde-theme.css"]').media =
+              style.dataset.previousMedia;
             style.remove();
           });
           await settle();

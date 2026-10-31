@@ -657,7 +657,7 @@ html[data-theme=avant] #index2SettingsBackdrop.open{pointer-events:none;}
 
 /* Export and deletion confirmation: use the approved Meixs dialog palette.
    Naming dialogs keep their already-approved colours. */
-html#renaxApp[data-theme="avant"] body :is(#mp3ExportDialog,dialog.song-confirmation:not(.song-name-dialog)) {
+html#renaxApp[data-theme="avant"] body :is(#mp3ExportDialog,dialog.song-confirmation[aria-labelledby="songConfirmTitle"]) {
   --ag-surface-bg:var(--ag-header);
   --ag-surface-text:var(--ag-lime);
   --ag-surface-border:var(--ag-header-border);

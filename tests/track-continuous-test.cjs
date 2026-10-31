@@ -13,11 +13,11 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    await p.route('**/neural-engine.mjs*',route=>route.fulfill({contentType:'text/javascript',body:`export async function synthesize(text){if(text==='Clic continu')throw Error('Continuous speech requested');return {pcm:new Float32Array(6000),sampleRate:24000,events:[{type:'phoneme',id:'t',audio_position:200,text_position:1},{type:'phoneme',id:'a',audio_position:220,text_position:1}]};}`}));
    await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_WORKSPACE&&window.RENAX_MP3_EXPORT);
    await p.evaluate(()=>{
-    const section=(id,continuous,n=4,d=4,bpm=240)=>({id,label:continuous?'Clic continu':id,count:1,continuous,measure:createMeasure(n,d,bpm)});
+    const section=(id,continuous,n=4,d=4,bpm=240)=>{const measure=createMeasure(n,d,bpm);measure.beatSubdivisions=Array(n).fill(1);measure.beatStates=Array.from({length:n},()=>[1]);return {id,label:continuous?'Clic continu':id,count:1,continuous,measure};};
     RENAX_SONGS.replaceLibrary({version:1,activeProfile:'p',profiles:[{id:'p',name:'Test',songs:[{id:'s',name:'Continu',sections:[section('c',true),{...section('normal',false,3,8,180),count:2},section('normal2',false,3,8,180),section('last',true,7,8,210)]},{id:'finite',name:'Fini',sections:[section('f',false)]}]}]});
     RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section:'c'});
     window.__events=[];const original=scheduleVisualUpdate;
-    scheduleVisualUpdate=function(i,step,time,pos){window.__events.push({id:RENAX_SONGS.locate(i)?.section.id,step,time,beat:pos.beat});return original.apply(this,arguments);};
+    scheduleVisualUpdate=function(i,step,time,pos){window.__events.push({id:RENAX_SONGS.loaded?RENAX_SONGS.locate(i)?.section.id:null,step,time,beat:pos.beat});return original.apply(this,arguments);};
    });
    await showMeasures(p);
    assert.equal(await p.locator('.song-section.song-continuous').count(),2);
@@ -41,7 +41,7 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    await p.evaluate(()=>{
     RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section:'c'});
     window.__events=[];const original=scheduleVisualUpdate;
-    scheduleVisualUpdate=function(i,step,time,pos){window.__events.push({id:RENAX_SONGS.locate(i)?.section.id,step,time,beat:pos.beat});return original.apply(this,arguments);};
+    scheduleVisualUpdate=function(i,step,time,pos){window.__events.push({id:RENAX_SONGS.loaded?RENAX_SONGS.locate(i)?.section.id:null,step,time,beat:pos.beat});return original.apply(this,arguments);};
    });
    await showMeasures(p);
    // Start by user gesture, then inspect the exact times submitted to the real scheduler.
@@ -123,6 +123,9 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
      await p.locator('#index2SettingsClose').click();
     }
    }
+   await p.evaluate(()=>RENAX_WORKSPACE.go('metronome'));
+   await p.locator('#playBtn').click();await p.waitForFunction(()=>isPlaying&&!RENAX_SONGS.loaded);await p.locator('#playBtn').click();
+   assert.equal(await p.evaluate(()=>isPlaying),false,'Normal transport survives leaving Track');
    await p.evaluate(()=>{document.documentElement.dataset.theme='avant';RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section:'c'});});await showMeasures(p);
    const shot=path.join(output,'continuous-'+width+'.png');fs.mkdirSync(path.dirname(shot),{recursive:true});await p.screenshot({path:shot});
    assert.deepEqual(errors,[]);results.push({width,transitions:true,playlistStop:true,policies,guide,settings:true});await p.close();

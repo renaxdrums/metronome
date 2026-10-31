@@ -274,7 +274,7 @@
       const p=library.profiles.find(p=>p.id===button.dataset.playPlaylistId);
       button.setAttribute('aria-pressed',String(!!(isPlaying&&p?.songs[0]?.id===loaded?.song.id)));
     });
-    const next=document.getElementById('songNextSection');if(next)next.hidden=!(isPlaying&&locate(playingMeasureIndex)?.section.continuous);
+    const next=document.getElementById('songNextSection');if(next)next.hidden=!(isPlaying&&loaded&&locate(playingMeasureIndex)?.section.continuous);
     updatePosition();
   }
   function syncSongTransport(){

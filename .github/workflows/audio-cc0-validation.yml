@@ -111,7 +111,10 @@ jobs:
         if: always()
         with:
           name: sound-menu-foreground
-          path: tests/results/sound-menu-*
+          path: |
+            tests/results/sound-menu-*
+            tests/results/continuous-*
+            tests/results/track-continuous-results.json
 
   firebase:
     runs-on: ubuntu-latest

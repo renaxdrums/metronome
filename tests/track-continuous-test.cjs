@@ -13,7 +13,7 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_WORKSPACE&&window.RENAX_MP3_EXPORT);
    await p.evaluate(()=>{
     const section=(id,continuous,n=4,d=4,bpm=240)=>({id,label:continuous?'Clic continu':id,count:1,continuous,measure:createMeasure(n,d,bpm)});
-    RENAX_SONGS.replaceLibrary({version:1,activeProfile:'p',profiles:[{id:'p',name:'Test',songs:[{id:'s',name:'Continu',sections:[section('c',true),section('normal',false,3,8,180),section('normal2',false,3,8,180),section('last',true,7,8,210)]},{id:'finite',name:'Fini',sections:[section('f',false)]}]}]});
+    RENAX_SONGS.replaceLibrary({version:1,activeProfile:'p',profiles:[{id:'p',name:'Test',songs:[{id:'s',name:'Continu',sections:[section('c',true),{...section('normal',false,3,8,180),count:2},section('normal2',false,3,8,180),section('last',true,7,8,210)]},{id:'finite',name:'Fini',sections:[section('f',false)]}]}]});
     RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section:'c'});
     window.__events=[];const original=scheduleVisualUpdate;
     scheduleVisualUpdate=function(i,step,time,pos){window.__events.push({id:RENAX_SONGS.locate(i)?.section.id,step,time,beat:pos.beat});return original.apply(this,arguments);};
@@ -62,7 +62,7 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
     const mp3=await RENAX_MP3_EXPORT.exportSong(finite,'beep',.5);out.mp3Bytes=mp3.blob.size;out.mp3Duration=mp3.report.score.duration;
     return out;
    });
-   assert.equal(policies.ignored,2);assert.deepEqual(policies.counts,[2,1,1,2]);assert(policies.originalUnchanged);assert(policies.mp3Bytes>1000);assert.equal(policies.mp3Duration,policies.duration);
+   assert.equal(policies.ignored,2);assert.deepEqual(policies.counts,[2,2,1,2]);assert(policies.originalUnchanged);assert(policies.mp3Bytes>1000);assert.equal(policies.mp3Duration,policies.duration);
    // Both export formats require an explicit finite policy through the actual dialog.
    await p.locator('#mp3ExportOpen').click();await p.locator('#mp3ExportSong').selectOption('s');
    assert.equal(await p.locator('#songExportContinuous').isVisible(),true);

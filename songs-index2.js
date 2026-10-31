@@ -13,6 +13,7 @@
   const hasContinuous=song=>song.sections.some(section=>section.continuous===true);
   const sectionCountText=section=>section.continuous?'Clic continu':section.count+' mesures';
   function durationText(song){if(hasContinuous(song))return 'Clic continu';const seconds=Math.round(playbackSections(song).reduce((total,section)=>total+RENAX_SONG_TEMPO.duration(section),0));return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');}
+  function durationSummary(song){return hasContinuous(song)?'Durée illimitée · passage manuel des sections en clic continu':song.sections.reduce((n,s)=>n+s.count,0)+' mesures · Durée totale : '+durationText(song)+' · arrêt à la fin du morceau';}
   function finiteExport(song,policy=null,count=null){
     const snapshot=clone(song);
     if(!hasContinuous(snapshot))return snapshot;
@@ -20,7 +21,7 @@
     if(policy==='duration'&&(!Number.isSafeInteger(count)||count<1||count>1000000))throw Error('La durée du clic continu doit être comprise entre 1 et 1 000 000 de mesures.');
     snapshot.sections=snapshot.sections.flatMap(section=>{
       if(!section.continuous)return [section];
-      return policy==='ignore'?[]:[{...section,continuous:false,count,_guideDisabled:true}];
+      return policy==='ignore'?[]:[{...section,continuous:false,count,_guideDisabled:true,...(section.tempoRamp?{tempoRamp:{...section.tempoRamp,enabled:false}}:{})}];
     });
     if(!snapshot.sections.length)throw Error('Aucune section à exporter. Définissez une durée finie pour le clic continu.');
     return snapshot;
@@ -373,7 +374,7 @@
   }
   function refreshSongCards(){
     const current=song();if(!current)return;
-    const duration=document.getElementById('songDuration');if(duration)duration.textContent=current.sections.reduce((n,section)=>n+section.count,0)+' mesures · Durée totale : '+durationText(current)+' · arrêt à la fin du morceau';
+    const duration=document.getElementById('songDuration');if(duration)duration.textContent=durationSummary(current);
     const countInTempo=songPane.querySelector('.song-count-in-tempo');if(countInTempo)countInTempo.textContent=current.sections[0].measure.tempo+' BPM · tempo du premier bloc';
     if(loaded?.song.sections[0].measure.countIn)loaded.song.sections[0].measure.tempo=current.sections[0].measure.tempo;
     songPane.querySelectorAll('[data-section-id]').forEach(card=>{
@@ -616,7 +617,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const signature=el('span',meters.length===1?meters[0]:'Mixte',open,'measure-sig');signature.title=meters.join(' · ');labelWithValue(open,'Sélectionner {user} '+signature.textContent,item.name);
         const tempos=item.sections.flatMap(s=>RENAX_SONG_TEMPO.active(s)?[s.measure.tempo,s.tempoRamp.endTempo]:[s.measure.tempo]),min=Math.min(...tempos),max=Math.max(...tempos);
         const tempoRow=el('div',undefined,row,'measure-tempo-row');el('span','TEMPO',tempoRow,'measure-tempo-label');el('span',min===max?String(min):min+'–'+max,tempoRow,'song-tempo-value');el('span','BPM',tempoRow,'measure-tempo-unit');
-        el('p',item.sections.length+' sections · '+item.sections.reduce((n,s)=>n+s.count,0)+' mesures · '+durationText(item),row,'song-playlist-summary');
+        el('p',item.sections.length+' sections · '+(hasContinuous(item)?'Clic continu':item.sections.reduce((n,s)=>n+s.count,0)+' mesures · '+durationText(item)),row,'song-playlist-summary');
         const preview=el('div',undefined,row,'measure-preview');preview.title='Début du morceau';for(const states of item.sections[0].measure.beatStates){const group=el('div',undefined,preview,'preview-beat');for(const state of states)el('span',undefined,group,'preview-dot').dataset.state=state;}
         addSongMenu(row,item,openSong);
 
@@ -673,7 +674,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         continuous.onchange=()=>{section.continuous=continuous.checked;changed();};
         if(section.continuous)el('p','Guide vocal désactivé pour cette section.',body,'song-note');
         const fields=el('div',undefined,body,'song-block-controls');if(!section.continuous)songNumbox('Mesures',fields,section.count,(value,input)=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1){input.value=section.count;return;}const total=s.sections.reduce((n,x)=>n+(x===section?0:x.count),0)+n;if(!Number.isSafeInteger(total)){input.value=section.count;return;}section.count=n;changed();},Array.from({length:64},(_,i)=>i+1));
-        const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999||section.tempoRamp?.enabled&&n>=section.tempoRamp.endTempo){input.value=section.measure.tempo;if(section.tempoRamp?.enabled&&n>=section.tempoRamp.endTempo)status('Le tempo de départ doit rester inférieur au tempo d’arrivée.');return;}if(section.measure.tempo===n){input.value=String(n);return;}unload();section.measure.tempo=n;resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';
+        const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999||RENAX_SONG_TEMPO.active(section)&&n>=section.tempoRamp.endTempo){input.value=section.measure.tempo;if(RENAX_SONG_TEMPO.active(section)&&n>=section.tempoRamp.endTempo)status('Le tempo de départ doit rester inférieur au tempo d’arrivée.');return;}if(section.measure.tempo===n){input.value=String(n);return;}unload();section.measure.tempo=n;resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';
         const rampControls=el('div',undefined,body,'song-ramp-controls');
         const rampLabel=el('label',undefined,rampControls,'song-ramp-toggle');
         const rampToggle=el('input',undefined,rampLabel);rampToggle.type='checkbox';rampToggle.checked=!!section.tempoRamp?.enabled;rampToggle.disabled=!!section.continuous||section.measure.tempo>=999;
@@ -683,7 +684,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
           else section.tempoRamp={...section.tempoRamp,enabled:false};
           changed();
         });
-        if(section.tempoRamp?.enabled){
+        if(section.tempoRamp?.enabled&&!section.continuous){
           const arrival=songNumbox('Arrivée (BPM)',rampControls,section.tempoRamp.endTempo,(v,input)=>{
             const n=Number(v);
             if(!Number.isFinite(n)||n<=section.measure.tempo||n>999){input.value=section.tempoRamp.endTempo;status('Le tempo d’arrivée doit être supérieur au tempo de départ.');return;}
@@ -708,7 +709,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         head.after(controls);controls.classList.add('song-block-header-actions');controls.addEventListener('click',e=>e.stopPropagation());
         controls.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();menu.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.focus();}});
       });button('+ Ajouter une section',songPane,()=>{const section=blankSection();section.amorceLanguage=s.amorceDefaultLanguage||'fr';s.sections.push(section);openSectionId=section.id;changed();}).classList.add('track-add-section');
-      el('p',s.sections.reduce((n,s)=>n+s.count,0)+' mesures · Durée totale : '+durationText(s)+' · arrêt à la fin du morceau',songPane,'song-note').id='songDuration';
+      el('p',durationSummary(s),songPane,'song-note').id='songDuration';
     }
     const labels=el('datalist',undefined,songPane);labels.id='songLabels';for(const name of ['Intro','Couplet 1','Couplet 2','Refrain 1','Refrain 2','Bridge','Solo','Outro'])el('option',name,labels).value=name;
     const transferPane=el('section',undefined,profilePane,'backup-json');el('h3','Copie JSON',transferPane);

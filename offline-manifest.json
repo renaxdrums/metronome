@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "4872a2c8e1a142f2",
+  "revision": "408622d5c9a9914e",
   "resources": [
     {
       "path": "accessibility.css",
@@ -14,7 +14,7 @@
     },
     {
       "path": "amorce-song.js",
-      "sha256": "85c13a5671333ba6283cab7d40dafe8fc12542b14f25dba138208b51f9e451cd",
+      "sha256": "1e931e07c4972bfcb07a3977330dedebd2f73381594a3e072a4e4347e849adb6",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "fffdd840a3586fdb32e72b544cf76db9cae470eea171bae321d802c5696f83ed",
+      "sha256": "787356dc345daab524316cf173a726990a518d2142b6577f71b2d574f260a20f",
       "text": true
     },
     {
@@ -479,7 +479,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "45b679ea6a31fb1923be569685ad688c8f231ea69b3084f701d2d450fc334975",
+      "sha256": "7d9356806252f58405614f59c57d763030e08e6b4893996b4a6b7b35af9e6e7a",
       "text": true
     },
     {

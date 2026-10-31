@@ -3,7 +3,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const {start,save,showMeasures}=require('./audio-harness.cjs');
 (async()=>{
- const h=await start(),results=[];
+ const h=await start(),results=[],output=path.resolve(process.env.TEST_OUTPUT_DIR||'tests/results');
+ fs.mkdirSync(output,{recursive:true});
  try{
   for(const width of [1440,390]){
    const p=await h.browser.newPage({viewport:{width,height:900},hasTouch:width<1100,reducedMotion:'reduce'}),errors=[];
@@ -85,7 +86,7 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    await p.locator('#songExportContinuousBars').fill('0');await p.locator('#mp3ExportSave').click();
    assert.match(await p.locator('#mp3ExportStatus').textContent(),/comprise/);
    await p.locator('#songExportContinuousBars').fill('2');
-   await p.screenshot({path:path.resolve('tests/results/continuous-export-'+width+'.png')});
+   await p.screenshot({path:path.join(output,'continuous-export-'+width+'.png')});
    await p.locator('#songExportContinuousPolicy').selectOption('');
    await p.locator('#mp3ExportSave').click();assert.match(await p.locator('#mp3ExportStatus').textContent(),/Choisissez/);
    await p.locator('#songExportFormat').selectOption('midi');await p.locator('#songExportContinuousPolicy').selectOption('ignore');
@@ -99,6 +100,17 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
     return {count:plan.sections[0].count,first:plan.sections[0].measure.countIn,initial:plan.announcements.length,following:plan.segmentPlans.normal.announcements.length,without:without.sections[0].id};
    });
    assert.equal(guide.count,1);assert.equal(guide.first,true);assert.equal(guide.initial,0);assert.equal(guide.following,1);assert.equal(guide.without,'c');
+   await p.evaluate(()=>{
+    const library=JSON.parse(JSON.stringify(RENAX_SONGS.library)),song=library.profiles[0].songs[0];song.amorce=true;song.countIn={count:1,numerator:4,denominator:4};
+    RENAX_SONGS.replaceLibrary(library);RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section:null});
+    window.__guideInstalls=[];const install=RENAX_AMORCE.install;
+    RENAX_AMORCE.install=function(plan){window.__guideInstalls.push({segments:!!plan.segmentPlans,announcements:plan.announcements.map(a=>({start:a.start,index:a.index}))});return install(plan);};
+   });await showMeasures(p);
+   await p.locator('#playBtn').click();await p.waitForFunction(()=>isPlaying&&RENAX_SONGS.locate(playingMeasureIndex)?.section.id==='c');
+   await p.evaluate(()=>RENAX_SONGS.requestNextSection());
+   await p.waitForFunction(()=>window.__guideInstalls.some(plan=>!plan.segments&&plan.announcements.length===1));
+   assert(await p.evaluate(()=>window.__guideInstalls.every(plan=>plan.announcements.every(a=>a.start>=0))),'No vocal announcement leaks across the manual transition');
+   await p.evaluate(()=>stopMetronome());
    for(const theme of ['avant','dark','light','ivory']){
     await p.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
     await p.locator('#index2SettingsBtn').click();await p.waitForFunction(()=>document.getElementById('index2SettingsBtn').getAttribute('aria-expanded')==='true');
@@ -112,7 +124,7 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
     }
    }
    await p.evaluate(()=>{document.documentElement.dataset.theme='avant';RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section:'c'});});await showMeasures(p);
-   const shot=path.resolve('tests/results/continuous-'+width+'.png');fs.mkdirSync(path.dirname(shot),{recursive:true});await p.screenshot({path:shot});
+   const shot=path.join(output,'continuous-'+width+'.png');fs.mkdirSync(path.dirname(shot),{recursive:true});await p.screenshot({path:shot});
    assert.deepEqual(errors,[]);results.push({width,transitions:true,playlistStop:true,policies,guide,settings:true});await p.close();
   }
  }finally{await h.browser.close();h.server?.close();}

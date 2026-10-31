@@ -40,6 +40,10 @@ jobs:
           STYLE_BUDGET_BASE=${{ github.event.pull_request.base.sha }} pnpm check:styles
           pnpm test:coverage:core
           node tests/midi-resource-test.cjs
+      - name: Continuous Track, real exports and device layouts
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/track-continuous-test.cjs
       - name: Library resilience and accessible controls
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
@@ -62,7 +66,6 @@ jobs:
           node tests/bell-resonance-test.cjs
           node tests/track-beat-corrections-test.cjs
           node tests/track-last-block-test.cjs
-          node tests/track-continuous-test.cjs
       - name: Timing at both device sample rates, with a negative control
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"

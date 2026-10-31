@@ -217,7 +217,7 @@
       seconds:RENAX_SONG_TEMPO.stepDuration(section,bar,beat,subIndex,subdivisions),
       beatSeconds:RENAX_SONG_TEMPO.stepDuration(section,bar,beat,0,1)};
   };
-  function loadSong(sectionId=null,amorcePlan=null){const s=song();if(!s||sectionId&&!s.sections.some(section=>section.id===sectionId))return;songReloadDepth++;try{unload();stopMetronome();endTraining();if(appMode!=='metronome')setAppMode('metronome');setSilentMode(false);resetCustomizationTimer();const previous=metronomeMeasures;const snapshot=clone(s);snapshot.sections=sectionId?snapshot.sections.filter(section=>section.id===sectionId):(amorcePlan?amorcePlan.sections:playbackSections(snapshot));loaded={song:snapshot,previous,guidePlan:amorcePlan,nextRequested:false,preview:!!sectionId,total:snapshot.sections.reduce((n,s)=>n+s.count,0)};
+  function loadSong(sectionId=null,amorcePlan=null){const s=song();if(!s||sectionId&&!s.sections.some(section=>section.id===sectionId))return;songReloadDepth++;try{unload();stopMetronome();endTraining();if(appMode!=='metronome')setAppMode('metronome');setSilentMode(false);resetCustomizationTimer();const previous=metronomeMeasures;const snapshot=clone(s);snapshot.sections=sectionId?snapshot.sections.filter(section=>section.id===sectionId):(amorcePlan?amorcePlan.sections:playbackSections(snapshot));loaded={song:snapshot,previous,guidePlan:amorcePlan,continuous:hasContinuous(snapshot),nextRequested:false,preview:!!sectionId,total:snapshot.sections.reduce((n,s)=>n+s.count,0)};
     // Repeat section templates lazily: no array of every bar and no eight-bar limit.
     measures=new Proxy([], {get(target,key){if(key==='length')return loaded.total;if(key==='indexOf')return m=>{if(locate(activeMeasureIndex)?.section.measure===m)return activeMeasureIndex;let n=0;for(const s of loaded.song.sections){if(s.measure===m)return n;n+=s.count;}return -1;};if(typeof key==='string'&&/^\d+$/.test(key))return locate(Number(key))?.section.measure;return Reflect.get(target,key);}});
     metronomeMeasures=measures;activeMeasureIndex=0;playingMeasureIndex=0;currentStepInMeasure=0;renderSequencerList();renderActiveMeasure();updatePosition();
@@ -230,7 +230,7 @@
     loaded.nextRequested=true;status('Passage à la section suivante au premier temps de la prochaine mesure.');
   }
   window.songAtEnd=()=>{
-    if(loaded&&currentStepInMeasure===0){
+    if(loaded?.continuous&&currentStepInMeasure===0){
       const previous=locate((playingMeasureIndex+loaded.total-1)%loaded.total);
       if(previous?.section.continuous){
         if(!loaded.nextRequested){playingMeasureIndex=previous.start;return false;}
@@ -261,10 +261,11 @@
     return true;
   };
   function syncDirectSongPlay(){
+    const songsById=new Map(profile().songs.map(item=>[item.id,item]));
     songPane.querySelectorAll('.song-direct-play').forEach(button=>{
       const active=!!(isPlaying&&loaded?.song.id===button.dataset.playSongId);
       button.setAttribute('aria-pressed',String(active));
-      const item=library.profiles.flatMap(p=>p.songs).find(s=>s.id===button.dataset.playSongId);
+      const item=songsById.get(button.dataset.playSongId);
       if(item)labelWithValue(button,active?'Arrêter le morceau {user}':'Lire le morceau {user}',item.name);
       button.title=active?'Arrêter ce morceau':'Lire uniquement ce morceau';
       button.querySelector('path')?.setAttribute('d',active?'M3 3h10v10H3z':'M4 2.5v11l9-5.5z');

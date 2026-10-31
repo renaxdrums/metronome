@@ -9,6 +9,7 @@ const output = path.resolve(
   process.env.TEST_OUTPUT_DIR || path.join(root, 'tests/results/production'),
 );
 const available = [
+  'tests/track-continuous-test.cjs',
   'tests/robustness-boundaries-test.cjs',
   'tests/pro-sound-context-test.cjs',
   'tests/mobile-landscape-test.cjs',

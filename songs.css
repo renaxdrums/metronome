@@ -122,3 +122,8 @@ html[data-theme="ivory"] #songPane .playlist-heading > .song-chain-toggle[aria-p
   font:600 11px/1.3 var(--font);pointer-events:none;
 }
 #songPane .playlist-heading > .song-chain-hint[hidden]{display:none;}
+
+/* A persistent thin red outline identifies unbounded arrangements in every theme. */
+#songPane .song-section.song-continuous::before{content:'';position:absolute;inset:0;border:1px solid #e5484d;border-radius:inherit;pointer-events:none;z-index:1;}
+#songPane .song-continuous-toggle{display:inline-flex;align-items:center;gap:8px;margin:10px 0;font-size:12px;cursor:pointer;}
+#songPane .song-continuous-toggle input{width:16px;height:16px;min-width:16px;flex:0 0 16px;margin:0;accent-color:var(--ag-lime,var(--orange));}

@@ -651,3 +651,6 @@ html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button[aria-pres
   --song-toggle-border:var(--ag-lime);
   --orange:var(--ag-ink);
 }
+
+/* Allow the same outside click to close preferences and reach its control. */
+html[data-theme=avant] #index2SettingsBackdrop.open{pointer-events:none;}

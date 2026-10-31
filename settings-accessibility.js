@@ -8,23 +8,29 @@
   trigger.setAttribute('aria-expanded','false');
   panel.setAttribute('aria-owns',trigger.id);
   let active=false,returnFocus;
+  const isMeixs=()=>document.documentElement.dataset.theme==='avant';
+  let nonModal=false;
   panel.setAttribute('role','dialog');
   function sync(){
     const open=panel.classList.contains('open')||panel.classList.contains('mobile-active');
-    if(open===active)return;
+    const nextNonModal=open&&isMeixs();
+    if(open===active&&nextNonModal===nonModal)return;
+    for(const [element,inert]of previousInert)element.inert=inert;previousInert.clear();
+    const wasOpen=active;
+    nonModal=nextNonModal;
     active=open;
-    panel.setAttribute('aria-modal',String(open));
+    panel.setAttribute('aria-modal',String(open&&!nonModal));
     trigger.setAttribute('aria-expanded',String(open));
     document.documentElement.classList.toggle('renax-settings-open',open);
     if(open){
-      returnFocus=document.activeElement;
+      if(!wasOpen)returnFocus=document.activeElement;
       function isolate(parent){for(const child of parent.children){
         if(child===panel||child===trigger||child.id==='index2SettingsBackdrop'||['SCRIPT','STYLE','LINK'].includes(child.tagName))continue;
         if(child.contains(panel)||child.contains(trigger)){isolate(child);continue;}
         previousInert.set(child,child.inert);child.inert=true;
       }}
-      isolate(document.body);
-      close.focus();
+      if(!nonModal)isolate(document.body);
+      if(!wasOpen)close.focus();
     }else{
       for(const [element,inert]of previousInert)element.inert=inert;
       previousInert.clear();if(returnFocus?.isConnected)returnFocus.focus();
@@ -33,6 +39,7 @@
   function keydown(event){
     if(!active)return;
     event.stopPropagation();
+    if(nonModal&&event.key!=='Escape')return;
     if(event.key==='Escape'){event.preventDefault();close.click();return;}
     if(event.key!=='Tab')return;
     const elements=[...panel.querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),a[href],[tabindex="0"]')].filter(element=>{const box=element.getBoundingClientRect();return box.width>0&&box.height>0&&getComputedStyle(element).visibility!=='hidden'});
@@ -43,6 +50,8 @@
     if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
   }
+  const originalEditingField=isEditingField;
+  isEditingField=()=>active&&panel.contains(document.activeElement)||originalEditingField();
   panel.addEventListener('keydown',keydown);trigger.addEventListener('keydown',keydown);
   // Shared native-dialog focus contract, also used by cloud confirmations.
   window.RENAX_DIALOG_FOCUS=Object.freeze({show(dialog,initial){
@@ -82,5 +91,12 @@
       try{window.RENAX_DIALOG_FOCUS.show(dialog,cancel);}catch(error){dialog.remove();window.removeEventListener('renax-language-changed',render);resolve(false);console.warn('Confirmation unavailable',error);}
     });
   }});
+  document.addEventListener('click',event=>{
+    if(!active||!isMeixs()||panel.contains(event.target)||trigger.contains(event.target)||event.target.closest('dialog'))return;
+    panel.classList.remove('open','mobile-active');document.getElementById('index2SettingsBackdrop').classList.remove('open');
+    if(innerWidth<=1100&&document.body.dataset.mobilePane==='settings')switchTab('visu');
+    sync();
+  },true);
+  new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   new MutationObserver(sync).observe(panel,{attributes:true,attributeFilter:['class']});sync();
 })();

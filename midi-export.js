@@ -16,6 +16,8 @@
   }
   /** @param {import('./types/library').Song} song */
   function exportSong(song) {
+    if (song.sections.some((section) => section.continuous))
+      throw Error('Définissez une durée finie ou ignorez le clic continu avant l’export MIDI.');
     RENAX_SONGS.validateLibrary({
       version: 1,
       profiles: [{ id: 'midi', name: 'Export', songs: [song] }],

@@ -5,7 +5,7 @@
   * @returns {section is import('./types/library').Section & {tempoRamp:{enabled:true,endTempo:number}}} */
  function active(section){
    const start=section?.measure?.tempo,end=section?.tempoRamp?.endTempo;
-   return section?.tempoRamp?.enabled===true&&Number.isFinite(start)&&typeof end==='number'&&Number.isFinite(end)&&end>start&&end<=999;
+   return !section?.continuous&&section?.tempoRamp?.enabled===true&&Number.isFinite(start)&&typeof end==='number'&&Number.isFinite(end)&&end>start&&end<=999;
  }
  /** @param {import('./types/library').Section} section @param {number} startBeat @param {number} beatCount */
  function spanDuration(section,startBeat,beatCount){

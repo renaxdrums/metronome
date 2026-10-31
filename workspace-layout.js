@@ -32,7 +32,7 @@
  const musicalStates=new Map();
  const nativeWorkspaces=new Set(['metronome','training','sequence']);
  const initialBank=currentBank;
- function captureMusic(){return {measures:metronomeMeasures,index:activeMeasureIndex,bank:currentBank,silent:silentModeEnabled,click:clickMeasures,quiet:silentMeasures};}
+ function captureMusic(){return {measures:window.RENAX_SONGS?.loaded?.previous||metronomeMeasures,index:activeMeasureIndex,bank:currentBank,silent:silentModeEnabled,click:clickMeasures,quiet:silentMeasures};}
  musicalStates.set('metronome',captureMusic());
  function restoreMusic(workspace){
   let state=musicalStates.get(workspace);

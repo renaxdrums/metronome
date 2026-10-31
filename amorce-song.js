@@ -11,10 +11,30 @@
   out.connect(getVoiceMixDestination(audioCtx));
   renderVoiceCount('male',out,time,state,isFirst,context,guideVoice);
  }
- const key=s=>JSON.stringify([s.id,s.sections.map(b=>[b.label,b.amorceLanguage||'fr',b.count,b.measure,b.tempoRamp]),s.countIn]);
+ const key=s=>JSON.stringify([s.id,s.sections.map(b=>[b.id,b.label,b.amorceLanguage||'fr',b.count,b.continuous,b._guideDisabled,b.measure,b.tempoRamp]),s.countIn]);
  const load=()=>modules||(modules=Promise.all([import('./prototypes/amorce/neural-engine.mjs?v=20261010-label-fast1'),import('./prototypes/amorce/syllables.mjs'),import('./amorce-plan.mjs?v=20261014-block-ramp1')]).catch(error=>{modules=null;throw error;}));
  async function prepare(song){const k=key(song);if(plans.has(k))return plans.get(k);const snapshot=JSON.parse(JSON.stringify(song));
-  const job=(async()=>{const [engine,syllables,planner]=await load();const speeches=await Promise.all(snapshot.sections.map(b=>engine.synthesize(b.label,b.amorceLanguage||'fr')));const candidates=speeches.map((s,i)=>syllables.lastSyllableCandidate(s.events,snapshot.sections[i].amorceLanguage||'fr'));return {...planner.planAmorce(snapshot,speeches,candidates),speeches,candidates};})();plans.set(k,job);job.catch(()=>plans.delete(k));if(plans.size>12)plans.delete(plans.keys().next().value);return job;
+  if(snapshot.sections.some(section=>section.continuous)){
+    const job=(async()=>{
+      const segmentPlans=Object.create(null);let initial=null;
+      for(let start=0;start<snapshot.sections.length;){
+        if(snapshot.sections[start].continuous){start++;continue;}
+        let end=start+1;while(end<snapshot.sections.length&&!snapshot.sections[end].continuous)end++;
+        const run={...snapshot,sections:snapshot.sections.slice(start,end)};
+        if(start>0)delete run.countIn;
+        const plan=await prepare(run);
+        if(start===0)initial=plan;
+        else{
+          const lead=plan.sections[0].count*240*plan.sections[0].measure.numerator/plan.sections[0].measure.denominator/plan.sections[0].measure.tempo;
+          segmentPlans[run.sections[0].id]={...plan,sections:run.sections,announcements:plan.announcements.filter(a=>a.index>0&&a.start>=lead).map(a=>({...a,start:a.start-lead,end:a.end-lead,target:a.target-lead,blockStart:a.blockStart-lead}))};
+        }
+        start=end;
+      }
+      const sections=initial?[initial.sections[0],...snapshot.sections]:RENAX_SONGS.playbackSections(snapshot);
+      return {...(initial||{announcements:[],speeches:[],candidates:[],countInMeasures:snapshot.countIn?.count||0}),sections,segmentPlans};
+    })();plans.set(k,job);job.catch(()=>plans.delete(k));if(plans.size>12)plans.delete(plans.keys().next().value);return job;
+  }
+  const job=(async()=>{const [engine,syllables,planner]=await load();const speeches=await Promise.all(snapshot.sections.map(b=>b._guideDisabled?{pcm:new Float32Array(0),sampleRate:48000,events:[]}:engine.synthesize(b.label,b.amorceLanguage||'fr')));const candidates=speeches.map((s,i)=>snapshot.sections[i]._guideDisabled?{anchorSeconds:0}:syllables.lastSyllableCandidate(s.events,snapshot.sections[i].amorceLanguage||'fr'));return {...planner.planAmorce(snapshot,speeches,candidates),speeches,candidates};})();plans.set(k,job);job.catch(()=>plans.delete(k));if(plans.size>12)plans.delete(plans.keys().next().value);return job;
  }
  function stop(){generation++;session=null;for(const source of sources){try{source.stop();}catch{}}sources.clear();}
  function install(plan){session={plan,origin:null};}

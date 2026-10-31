@@ -90,10 +90,17 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
             });
           const current = await p.evaluate(geometry),
             lockedCurrent = await p.evaluate(locked);
-          await p
-            .locator('link[href^="avant-garde-theme.css"]')
-            .evaluate((e) => (e.disabled = true));
-          const reference = await p.addStyleTag({ content: approvedCSS });
+          // Swap atomically: an unthemed intermediate frame can run resize observers
+          // and change canvas geometry before the reference stylesheet is installed.
+          const reference = await p.evaluateHandle((css) => {
+            const style = document.createElement('style');
+            style.textContent = css;
+            document.head.append(style);
+            const link = document.querySelector('link[href^="avant-garde-theme.css"]');
+            style.dataset.previousMedia = link.media;
+            link.media = 'not all';
+            return style;
+          }, approvedCSS);
           await settle();
           assert.deepEqual(
             await p.evaluate(geometry),
@@ -105,10 +112,11 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
             lockedCurrent,
             `${width} ${name}: approved controls changed`,
           );
-          await reference.evaluate((e) => e.remove());
-          await p
-            .locator('link[href^="avant-garde-theme.css"]')
-            .evaluate((e) => (e.disabled = false));
+          await reference.evaluate((style) => {
+            document.querySelector('link[href^="avant-garde-theme.css"]').media =
+              style.dataset.previousMedia;
+            style.remove();
+          });
           await settle();
         }
         console.log(width, name);

@@ -40,6 +40,10 @@ jobs:
           STYLE_BUDGET_BASE=${{ github.event.pull_request.base.sha }} pnpm check:styles
           pnpm test:coverage:core
           node tests/midi-resource-test.cjs
+      - name: Continuous Track, real exports and device layouts
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/track-continuous-test.cjs
       - name: Library resilience and accessible controls
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
@@ -110,7 +114,10 @@ jobs:
         if: always()
         with:
           name: sound-menu-foreground
-          path: tests/results/sound-menu-*
+          path: |
+            tests/results/sound-menu-*
+            tests/results/continuous-*
+            tests/results/track-continuous-results.json
 
   firebase:
     runs-on: ubuntu-latest

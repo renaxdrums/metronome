@@ -265,6 +265,44 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
         songBeforeConfirmation,
       );
 
+      // Fullscreen confirmation is appended to the fullscreen root, outside body.
+      // Exercise that real portal path without relying on a headless fullscreen grant.
+      await p.evaluate(() =>
+        Object.defineProperty(document, 'fullscreenElement', {
+          configurable: true,
+          get: () => document.documentElement,
+        }),
+      );
+      await p.locator('.song-playlist-card .song-more[aria-haspopup=menu]').first().click();
+      await p
+        .locator('.song-playlist-card .song-more-menu')
+        .getByRole('menuitem', { name: 'Supprimer', exact: true })
+        .click();
+      assert(
+        await p
+          .locator('.song-confirmation')
+          .evaluate((el) => el.parentElement === document.documentElement),
+      );
+      await action('dialog.song-confirmation:not(.song-name-dialog)');
+      await colour(
+        '.song-confirmation h3,.song-confirm-message,.song-confirm-actions .btn',
+        'color',
+        palette.lime,
+      );
+      await action('.song-confirm-actions .btn');
+      await capture('delete-confirmation-fullscreen');
+      await p
+        .locator('.song-confirmation')
+        .getByRole('button', { name: 'Annuler', exact: true })
+        .click();
+      await p.evaluate(() => {
+        delete document.fullscreenElement;
+      });
+      assert.equal(
+        await p.evaluate(() => JSON.stringify(RENAX_SONGS.library)),
+        songBeforeConfirmation,
+      );
+
       await p.evaluate(() => RENAX_SONGS.restoreNavigation({ pane: 'songs', view: 'home' }));
       await action('#songsHome>.song-entry');
       await p.getByRole('button', { name: 'Sauvegarde', exact: true }).click();

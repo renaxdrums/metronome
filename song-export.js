@@ -10,6 +10,7 @@
   const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const canPickFile=typeof window.showSaveFilePicker==='function'&&!isMobile;
   async function renderPCM(song,bank,volume,amorcePlan=null) {
+    song=RENAX_SONGS.finiteExport(song);
     RENAX_SONGS.validateLibrary({version:1,profiles:[{id:'export',name:'Export',songs:[song]}]});
     if(!SOUND_BANKS[bank]||!Number.isFinite(volume)||volume<0||volume>1)throw Error('Réglages audio incorrects.');
     if(song.amorce){amorcePlan=amorcePlan||await RENAX_AMORCE.prepare(song);song={...song,sections:amorcePlan.sections};await prepareAllVoiceAudio();}
@@ -86,6 +87,7 @@
     }finally{frame.remove();}
   }
   async function exportSong(song,bank,volume,progress=()=>{},level='original'){
+    song=RENAX_SONGS.finiteExport(song);
     progress('Rendu du morceau complet…');
     const rendered=await isolatedRender(clone(song),bank,volume),client=workerClient();
     try{
@@ -122,12 +124,22 @@
     const select=document.createElement('select');select.id='mp3ExportSong';select.dataset.noTranslate='';
     for(const song of playlistSongs()){const option=document.createElement('option');option.value=song.id;option.textContent=song.name;select.append(option);}
     if(songId)select.value=songId;
-    select.onchange=()=>{clearDownload();status.textContent='';};
+    select.onchange=()=>{clearDownload();status.textContent='';syncContinuous();};
     const levelLabel=document.createElement('label');levelLabel.htmlFor='mp3ExportLevel';levelLabel.textContent='Volume du fichier';
     const levelSelect=document.createElement('select');levelSelect.id='mp3ExportLevel';
     for(const [value,text] of [['boost','Renforcé'],['original','Dynamique d’origine']]){const option=document.createElement('option');option.value=value;option.textContent=text;levelSelect.append(option);}
     const levelGroup=document.createElement('div');levelGroup.className='mp3-export-level';levelGroup.append(levelLabel,levelSelect);
     levelSelect.onchange=()=>{clearDownload();status.textContent='';};
+    const continuousGroup=document.createElement('fieldset');continuousGroup.id='songExportContinuous';
+    const continuousTitle=document.createElement('legend');continuousTitle.textContent='Clic continu';
+    const policy=document.createElement('select');policy.id='songExportContinuousPolicy';policy.setAttribute('aria-label','Exporter le clic continu');
+    for(const [value,text]of [['','Choisir…'],['ignore','Ignorer les sections en clic continu'],['duration','Définir une durée finie']]){const option=document.createElement('option');option.value=value;option.textContent=text;policy.append(option);}
+    const durationLabel=document.createElement('label');durationLabel.textContent='Mesures par section en clic continu';
+    const duration=document.createElement('input');duration.id='songExportContinuousBars';duration.type='number';duration.min='1';duration.max='1000000';duration.step='1';duration.value='4';durationLabel.append(duration);
+    continuousGroup.append(continuousTitle,policy,durationLabel);
+    function syncContinuous(){const song=playlistSongs().find(s=>s.id===select.value);continuousGroup.hidden=!song||!RENAX_SONGS.hasContinuous(song);durationLabel.hidden=policy.value!=='duration';}
+    policy.onchange=()=>{clearDownload();status.textContent='';syncContinuous();};duration.oninput=()=>{clearDownload();status.textContent='';};
+    syncContinuous();
     const actions=document.createElement('div');actions.className='mp3-actions';
     const save=document.createElement('button');save.id='mp3ExportSave';save.className='btn';save.textContent=canPickFile?'Choisir l’emplacement et exporter':'Préparer le téléchargement';save.type='button';
     const close=document.createElement('button');close.className='btn';close.textContent='Fermer';close.type='button';close.onclick=()=>dialog.close();
@@ -157,10 +169,11 @@
       if(closeTimer){clearTimeout(closeTimer);closeTimer=null;}
       const song=playlistSongs().find(s=>s.id===select.value);if(!song||busy)return;
       clearDownload();
-      const snapshot=clone(song),bank=currentBank,volume=masterVolume;
+      let snapshot;try{snapshot=RENAX_SONGS.finiteExport(song,policy.value,Number(duration.value));}catch(error){status.textContent=error.message;return;}
+      const bank=currentBank,volume=masterVolume;
       const midi=format.value==='midi',level=levelSelect.value;
       const suggestedName=midi?filename(song.name).replace(/\.mp3$/,'.mid'):filename(song.name);
-      busy=true;select.disabled=true;format.disabled=true;levelSelect.disabled=true;save.disabled=true;close.disabled=true;
+      busy=true;policy.disabled=true;duration.disabled=true;select.disabled=true;format.disabled=true;levelSelect.disabled=true;save.disabled=true;close.disabled=true;
       try{
         let handle=null,pickerError=null;
         // Ask for the destination immediately on PC while the click is still a user gesture.
@@ -204,12 +217,12 @@
       }catch(error){
         status.textContent=error.name==='AbortError'?'Export annulé.':(error.message||'Échec de l’export.');
       }finally{
-        busy=false;select.disabled=false;format.disabled=false;levelSelect.disabled=false;save.disabled=false;close.disabled=false;
+        busy=false;policy.disabled=false;duration.disabled=false;select.disabled=false;format.disabled=false;levelSelect.disabled=false;save.disabled=false;close.disabled=false;
       }
     };
     dialog.addEventListener('cancel',e=>{if(busy)e.preventDefault();});
     dialog.addEventListener('close',()=>{if(closeTimer)clearTimeout(closeTimer);clearDownload();dialog.remove();dialog=null;});
-    actions.append(save,close);dialog.append(title,label,select,formatLabel,format,levelGroup,midiNote,actions,status,downloadLink,credit);document.body.append(dialog);dialog.showModal();
+    actions.append(save,close);dialog.append(title,label,select,continuousGroup,formatLabel,format,levelGroup,midiNote,actions,status,downloadLink,credit);document.body.append(dialog);dialog.showModal();
   }
   function install(){
     const pane=document.getElementById('songPane');if(!pane||pane.hidden||document.getElementById('mp3ExportOpen'))return;

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "641a29348cdb5e63",
+  "revision": "4872a2c8e1a142f2",
   "resources": [
     {
       "path": "accessibility.css",
@@ -9,12 +9,12 @@
     },
     {
       "path": "amorce-plan.mjs",
-      "sha256": "0dc51815bb107268efae1ff967a1c2ad2f96b6e62ab19309a207fb5fc04f59d9",
+      "sha256": "232da05f453599efd317c9193aeecc03c1a30e9752a89210fcf434326c84567e",
       "text": true
     },
     {
       "path": "amorce-song.js",
-      "sha256": "9f00d2d74e2cb6835288da52525470db2486978d5a7748abfd83c14efc7f1107",
+      "sha256": "85c13a5671333ba6283cab7d40dafe8fc12542b14f25dba138208b51f9e451cd",
       "text": true
     },
     {
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "6aa1f892ed9db10117c5ff842027465fb2ebe26f9e311a47670ec913b6ce4263",
+      "sha256": "1e02bf5a27febbdcd48754050e0cac8c2f34b751758ed5a60dbcf1b83755b533",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "b14ff353705918ac26b0b086a06d9b8f5369bd15a6ac1c2170da615a57acb9d9",
+      "sha256": "fffdd840a3586fdb32e72b544cf76db9cae470eea171bae321d802c5696f83ed",
       "text": true
     },
     {
@@ -344,7 +344,7 @@
     },
     {
       "path": "midi-export.js",
-      "sha256": "f3a3106d75bdc475089325bc82da0b6fb6c1ae4db4b9e3f9fee5817859c66d04",
+      "sha256": "08b4e13a18a137652af2c39b4d38ffb9a1b376b3837ad3aca70aaee9a951356f",
       "text": true
     },
     {
@@ -459,7 +459,7 @@
     },
     {
       "path": "settings-accessibility.js",
-      "sha256": "0c5ce31d148baf434392d512025962e8f4c726c673f2644dc9177a24edc653a2",
+      "sha256": "f4e8619493f0ff148f9d461de72e858a97182724c5e8f19c33ea1ffbfc469000",
       "text": true
     },
     {
@@ -469,22 +469,22 @@
     },
     {
       "path": "song-export.js",
-      "sha256": "1ba2f86f345ff214df82c70599bea7f9929eb6ed5c5b0720ca38b8c5f5cf83e3",
+      "sha256": "94473d09774f4fefaf02bc99c892eda389f1340134a84f6347f1b695ffb62c70",
       "text": true
     },
     {
       "path": "song-tempo-ramp.js",
-      "sha256": "84e7c800f4690a95424dafa4b1c14039e1372a6ef5987c1c9db2634dd4a69832",
+      "sha256": "c8cc903662b67b5a85cbe9b4f88bd639646ef6d51c674301718c447f77a583b7",
       "text": true
     },
     {
       "path": "songs-index2.js",
-      "sha256": "03912cba306c0b85975b3a25bfa6eb45dde5487a48f8b05e070a1709ff2be16a",
+      "sha256": "45b679ea6a31fb1923be569685ad688c8f231ea69b3084f701d2d450fc334975",
       "text": true
     },
     {
       "path": "songs.css",
-      "sha256": "00e3acee75e11f8da09814f40261a4836337ab5074409b6171bdf0f9bb1d8010",
+      "sha256": "f5561e61cbaac072d6d2b88b5d5a539acbd9b7e5f3f14ac22409a156799cb293",
       "text": true
     },
     {

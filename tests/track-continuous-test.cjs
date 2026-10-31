@@ -20,6 +20,21 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    });
    await showMeasures(p);
    assert.equal(await p.locator('.song-section.song-continuous').count(),2);
+   // Both conversion directions update the section and parent-song markers.
+   for(const sectionId of ['c','last']){
+    await p.evaluate(section=>RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section}),sectionId);await showMeasures(p);
+    await p.locator('[data-section-id='+sectionId+'] .song-continuous-toggle input').uncheck();
+   }
+   assert.equal(await p.locator('.song-section.song-continuous').count(),0);
+   await p.evaluate(()=>RENAX_SONGS.restoreNavigation({pane:'songs',view:'playlist',profile:'p',song:'s'}));await showMeasures(p);
+   assert.equal(await p.locator('[data-song-id=s].song-continuous').count(),0);
+   for(const sectionId of ['c','last']){
+    await p.evaluate(section=>RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:'s',section}),sectionId);await showMeasures(p);
+    await p.locator('[data-section-id='+sectionId+'] .song-continuous-toggle input').check();
+   }
+   await p.evaluate(()=>RENAX_SONGS.restoreNavigation({pane:'songs',view:'playlist',profile:'p',song:'s'}));await showMeasures(p);
+   assert.equal(await p.locator('[data-song-id=s].song-continuous').count(),1);
+   assert.equal(await p.locator('[data-song-id=s]').evaluate(el=>getComputedStyle(el,'::before').borderTopColor),'rgb(229, 72, 77)');
    await p.evaluate(()=>RENAX_SONGS.flushPending());await p.reload();await p.waitForFunction(()=>window.RENAX_SONGS);
    assert.equal(await p.evaluate(()=>RENAX_SONGS.library.profiles[0].songs[0].sections[0].continuous),true,'Persist continuous flag');
    await p.evaluate(()=>{
@@ -66,6 +81,12 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    // Both export formats require an explicit finite policy through the actual dialog.
    await p.locator('#mp3ExportOpen').click();await p.locator('#mp3ExportSong').selectOption('s');
    assert.equal(await p.locator('#songExportContinuous').isVisible(),true);
+   await p.locator('#songExportContinuousPolicy').selectOption('duration');
+   await p.locator('#songExportContinuousBars').fill('0');await p.locator('#mp3ExportSave').click();
+   assert.match(await p.locator('#mp3ExportStatus').textContent(),/comprise/);
+   await p.locator('#songExportContinuousBars').fill('2');
+   await p.screenshot({path:path.resolve('tests/results/continuous-export-'+width+'.png')});
+   await p.locator('#songExportContinuousPolicy').selectOption('');
    await p.locator('#mp3ExportSave').click();assert.match(await p.locator('#mp3ExportStatus').textContent(),/Choisissez/);
    await p.locator('#songExportFormat').selectOption('midi');await p.locator('#songExportContinuousPolicy').selectOption('ignore');
    await p.locator('#mp3ExportSave').click();await p.waitForFunction(()=>!document.getElementById('mp3ExportDownload').hidden);

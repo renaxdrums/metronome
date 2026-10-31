@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "408622d5c9a9914e",
+  "revision": "07fc975d15d6f6c1",
   "resources": [
     {
       "path": "accessibility.css",
@@ -9,7 +9,7 @@
     },
     {
       "path": "amorce-plan.mjs",
-      "sha256": "232da05f453599efd317c9193aeecc03c1a30e9752a89210fcf434326c84567e",
+      "sha256": "0e3cd1d094c6bff0cf415980509b0dedded34bb16f001fac357fcea65ebba9ac",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "787356dc345daab524316cf173a726990a518d2142b6577f71b2d574f260a20f",
+      "sha256": "22123a8329da939c8afcffd37cf315f62d5f15ea31498874da0f01d7c47e5b37",
       "text": true
     },
     {
@@ -359,7 +359,7 @@
     },
     {
       "path": "mp3-export.css",
-      "sha256": "b0417b0140492f7a9403e3c62ceca29cb42b829807a021ce65e82b4c55064406",
+      "sha256": "86771b5d6ae9c6caf06fbf5cfe4b2ec4bdb8dc6316bddb44a7eb78821d656bd0",
       "text": true
     },
     {
@@ -469,7 +469,7 @@
     },
     {
       "path": "song-export.js",
-      "sha256": "94473d09774f4fefaf02bc99c892eda389f1340134a84f6347f1b695ffb62c70",
+      "sha256": "8eee74326447f104045f9b45b851978c18f06dc7829cbc0e98eb5ce50875bcb3",
       "text": true
     },
     {
@@ -484,7 +484,7 @@
     },
     {
       "path": "songs.css",
-      "sha256": "f5561e61cbaac072d6d2b88b5d5a539acbd9b7e5f3f14ac22409a156799cb293",
+      "sha256": "d5fdd7ad4901a58e211e3506c55c53f5bd6418415f144e4a318fa3ce82e59faa",
       "text": true
     },
     {

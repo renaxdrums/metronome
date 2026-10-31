@@ -27,3 +27,10 @@
 
 /* Select wrappers must follow the dialog when the viewport changes. */
 #mp3ExportDialog .compact-select{width:100%!important;max-width:100%;min-width:0}
+
+/* Finite export choices only; existing export controls retain their styles. */
+#songExportContinuous{min-width:0;margin:0 0 16px;padding:12px;border:1px solid #505b69;border-radius:6px;}
+#songExportContinuous legend{padding:0 5px;font-size:12px;}
+#songExportContinuous :is(select,input){box-sizing:border-box;width:100%;min-width:0;min-height:44px;padding:9px;border:1px solid #505b69;border-radius:4px;background:var(--surface,#282934);color:inherit;font:inherit;}
+#songExportContinuous label{margin:12px 0 0;font-size:12px;line-height:1.5;}
+#songExportContinuous [hidden]{display:none;}

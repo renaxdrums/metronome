@@ -137,9 +137,8 @@
     const durationLabel=document.createElement('label');durationLabel.textContent='Mesures par section en clic continu';
     const duration=document.createElement('input');duration.id='songExportContinuousBars';duration.type='number';duration.min='1';duration.max='1000000';duration.step='1';duration.value='4';durationLabel.append(duration);
     continuousGroup.append(continuousTitle,policy,durationLabel);
-    function syncContinuous(){const song=playlistSongs().find(s=>s.id===select.value);continuousGroup.hidden=!song||!RENAX_SONGS.hasContinuous(song);durationLabel.hidden=policy.value!=='duration';}
+    function syncContinuous(){const song=playlistSongs().find(s=>s.id===select.value);if(song&&RENAX_SONGS.hasContinuous(song)){if(!dialog.contains(continuousGroup))formatLabel.before(continuousGroup);}else continuousGroup.remove();durationLabel.hidden=policy.value!=='duration';}
     policy.onchange=()=>{clearDownload();status.textContent='';syncContinuous();};duration.oninput=()=>{clearDownload();status.textContent='';};
-    syncContinuous();
     const actions=document.createElement('div');actions.className='mp3-actions';
     const save=document.createElement('button');save.id='mp3ExportSave';save.className='btn';save.textContent=canPickFile?'Choisir l’emplacement et exporter':'Préparer le téléchargement';save.type='button';
     const close=document.createElement('button');close.className='btn';close.textContent='Fermer';close.type='button';close.onclick=()=>dialog.close();
@@ -222,7 +221,7 @@
     };
     dialog.addEventListener('cancel',e=>{if(busy)e.preventDefault();});
     dialog.addEventListener('close',()=>{if(closeTimer)clearTimeout(closeTimer);clearDownload();dialog.remove();dialog=null;});
-    actions.append(save,close);dialog.append(title,label,select,continuousGroup,formatLabel,format,levelGroup,midiNote,actions,status,downloadLink,credit);document.body.append(dialog);dialog.showModal();
+    actions.append(save,close);dialog.append(title,label,select,continuousGroup,formatLabel,format,levelGroup,midiNote,actions,status,downloadLink,credit);syncContinuous();document.body.append(dialog);dialog.showModal();
   }
   function install(){
     const pane=document.getElementById('songPane');if(!pane||pane.hidden||document.getElementById('mp3ExportOpen'))return;

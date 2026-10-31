@@ -11,7 +11,7 @@ export function planAmorce(song,speeches,candidates){
  const sections=[...(effectiveCount?[{id:'count-in:'+song.id,label:'Décompte',count:effectiveCount,measure:countMeasure}]:[]),...song.sections];
  let cursor=effectiveCount*initialBar,previous={count:effectiveCount,measure:countMeasure};const announcements=[];
  for(let i=0;i<song.sections.length;i++){
-  if(song.sections[i]._guideDisabled){cursor+=duration(song.sections[i]);previous=song.sections[i];continue;}
+  if(song.sections[i]._guideDisabled||previous._guideDisabled){cursor+=duration(song.sections[i]);previous=song.sections[i];continue;}
   const target=cursor-lastBar(previous),start=target-candidates[i].anchorSeconds,end=start+speeches[i].pcm.length/speeches[i].sampleRate;
   if(start<-.000001)throw Error('Décompte insuffisant pour Amorce.');
   if(end>cursor+.000001)throw Error('Annonce trop longue pour la mesure précédente : '+song.sections[i].label);

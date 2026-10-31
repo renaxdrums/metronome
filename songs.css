@@ -124,5 +124,5 @@ html[data-theme="ivory"] #songPane .playlist-heading > .song-chain-toggle[aria-p
 #songPane .playlist-heading > .song-chain-hint[hidden]{display:none;}
 
 /* A persistent thin red outline identifies unbounded arrangements in every theme. */
-#songPane .song-section.song-continuous{outline:1px solid #e5484d;outline-offset:-1px;}
+#songPane .song-section.song-continuous::before{content:'';position:absolute;inset:0;border:1px solid #e5484d;border-radius:inherit;pointer-events:none;z-index:1;}
 .song-continuous-toggle{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:12px;}

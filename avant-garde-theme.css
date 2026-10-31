@@ -654,3 +654,31 @@ html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button[aria-pres
 
 /* Allow the same outside click to close preferences and reach its control. */
 html[data-theme=avant] #index2SettingsBackdrop.open{pointer-events:none;}
+
+/* Export and deletion confirmation: use the approved Meixs dialog palette.
+   Naming dialogs keep their already-approved colours. */
+html#renaxApp[data-theme="avant"] body :is(#mp3ExportDialog,dialog.song-confirmation[aria-labelledby="songConfirmTitle"]) {
+  --ag-surface-bg:var(--ag-header);
+  --ag-surface-text:var(--ag-lime);
+  --ag-surface-border:var(--ag-header-border);
+  --ag-field-bg:var(--ag-header);
+  --ag-field-text:var(--ag-lime);
+  --ag-field-border:var(--ag-header-border);
+  --ag-menu-bg:var(--ag-header);
+  --ag-menu-text:var(--ag-lime);
+  --ag-menu-border:var(--ag-header-border);
+  --ag-selected-bg:var(--ag-lime);
+  --ag-selected-text:var(--ag-ink);
+  --ag-selected-border:var(--ag-lime);
+  --mp3-primary-bg:var(--ag-header);
+  --mp3-primary-border:var(--ag-header-border);
+  --mp3-primary-text:var(--ag-lime);
+  --text:var(--ag-lime);
+  --text-muted:var(--ag-lime);
+  --orange:var(--ag-lime);
+  --cyan:var(--ag-lime);
+}
+html#renaxApp[data-theme="avant"] body #mp3ExportDialog #mp3ExportDownload {
+  background:var(--ag-header);
+  color:var(--ag-lime);
+}

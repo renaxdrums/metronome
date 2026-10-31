@@ -251,7 +251,7 @@ dialog,#beatEditor,#index2SettingsPanel{background:var(--editor-surface,#272d35)
 #mp3ExportDialog label{font:500 12px/1.4 var(--font);color:var(--text-muted);margin:12px 0 7px}
 #mp3ExportDialog :is(select,.numbox-button){background:#363e49!important;border-color:#505b69!important;color:var(--text)!important;font-family:var(--font)}
 #mp3ExportDialog .mp3-actions .btn{background:#343b45!important;border:1px solid #505b69!important;color:var(--text)!important;font:600 11px/1.4 var(--font)!important;letter-spacing:0;text-transform:none;border-radius:6px;white-space:normal}
-#mp3ExportDialog .mp3-actions #mp3ExportSave{background:#28424b!important;border-color:#4b7884!important;color:var(--cyan)!important}
+#mp3ExportDialog .mp3-actions #mp3ExportSave{background:var(--mp3-primary-bg,#28424b)!important;border-color:var(--mp3-primary-border,#4b7884)!important;color:var(--mp3-primary-text,var(--cyan))!important}
 #mp3ExportDialog .mp3-credit{color:var(--text-muted)}
 .numbox-menu,.numbox-dropdown,.training-curve-menu,.sequence-more-actions,.multi-actions{background:#303844!important;border-color:#596675!important}
 .numbox-option{color:var(--text)}

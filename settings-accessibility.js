@@ -16,20 +16,21 @@
     const nextNonModal=open&&isMeixs();
     if(open===active&&nextNonModal===nonModal)return;
     for(const [element,inert]of previousInert)element.inert=inert;previousInert.clear();
+    const wasOpen=active;
     nonModal=nextNonModal;
     active=open;
     panel.setAttribute('aria-modal',String(open&&!nonModal));
     trigger.setAttribute('aria-expanded',String(open));
     document.documentElement.classList.toggle('renax-settings-open',open);
     if(open){
-      returnFocus=document.activeElement;
+      if(!wasOpen)returnFocus=document.activeElement;
       function isolate(parent){for(const child of parent.children){
         if(child===panel||child===trigger||child.id==='index2SettingsBackdrop'||['SCRIPT','STYLE','LINK'].includes(child.tagName))continue;
         if(child.contains(panel)||child.contains(trigger)){isolate(child);continue;}
         previousInert.set(child,child.inert);child.inert=true;
       }}
       if(!nonModal)isolate(document.body);
-      close.focus();
+      if(!wasOpen)close.focus();
     }else{
       for(const [element,inert]of previousInert)element.inert=inert;
       previousInert.clear();if(returnFocus?.isConnected)returnFocus.focus();

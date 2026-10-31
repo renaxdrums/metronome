@@ -9,7 +9,7 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
   for(const width of [1440,390]){
    const p=await h.browser.newPage({viewport:{width,height:900},hasTouch:width<1100,reducedMotion:'reduce'}),errors=[];
    p.on('pageerror',e=>errors.push(e.message));
-   await p.addInitScript(()=>{Element.prototype.requestFullscreen=undefined;});
+   await p.addInitScript(()=>{Element.prototype.requestFullscreen=undefined;window.showSaveFilePicker=async()=>{throw new DOMException('Test download path','NotSupportedError');};});
    await p.route('**/neural-engine.mjs*',route=>route.fulfill({contentType:'text/javascript',body:`export async function synthesize(text){if(text==='Clic continu')throw Error('Continuous speech requested');return {pcm:new Float32Array(6000),sampleRate:24000,events:[{type:'phoneme',id:'t',audio_position:200,text_position:1},{type:'phoneme',id:'a',audio_position:220,text_position:1}]};}`}));
    await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_WORKSPACE&&window.RENAX_MP3_EXPORT);
    await p.evaluate(()=>{
@@ -53,7 +53,7 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    let events=await p.evaluate(()=>window.__events);
    const transition=events.findIndex(e=>e.id==='normal');assert(transition>0);
    assert.equal(events[transition].step,0);assert.equal(events[transition-1].beat,3);
-   assert(Math.abs(events[transition].time-events[transition-1].time-.25)<1e-8);
+   assert(Math.abs(events[transition].time-events[transition-1].time-.25)<1e-8,JSON.stringify({boundary:events.slice(transition-4,transition+4),tempos:await p.evaluate(()=>RENAX_SONGS.loaded.song.sections.map(s=>({id:s.id,tempo:s.measure.tempo})))}));
    const last=events.findIndex(e=>e.id==='last');assert.equal(events[last].step,0);
    assert(Math.abs(events[last].time-events[last-1].time-1/6)<1e-8,'3/8 at 180 BPM interval');
    await p.waitForFunction(()=>window.__events.filter(e=>e.id==='last').length>=14);

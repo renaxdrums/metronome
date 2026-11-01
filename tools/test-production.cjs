@@ -127,4 +127,3 @@ const available = [
   console.error(error);
   process.exitCode = 1;
 });
-

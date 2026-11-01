@@ -53,10 +53,7 @@ const { start, save } = require('./audio-harness.cjs');
         await gear.press('Enter');
         await p.locator('#index2SettingsClose').waitFor({ state: 'visible' });
         await p.locator('#index2SettingsClose').focus();
-        assert.equal(
-          await p.locator('#index2SettingsPanel').getAttribute('aria-modal'),
-          'false',
-        );
+        assert.equal(await p.locator('#index2SettingsPanel').getAttribute('aria-modal'), 'false');
         await gear.focus();
         assert.equal(await p.evaluate(() => document.activeElement.id), 'index2SettingsBtn');
         await p.keyboard.press('Enter');

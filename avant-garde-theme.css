@@ -656,8 +656,11 @@ html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button[aria-pres
 html[data-theme=avant] #index2SettingsBackdrop.open{pointer-events:none;}
 
 /* Export and deletion confirmation: use the approved Meixs dialog palette.
+   Also cover fullscreen portals attached directly to the document root.
    Naming dialogs keep their already-approved colours. */
-html#renaxApp[data-theme="avant"] body :is(#mp3ExportDialog,dialog.song-confirmation[aria-labelledby="songConfirmTitle"]) {
+html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,dialog.song-confirmation[aria-labelledby="songConfirmTitle"]) {
+  --editor-surface:var(--ag-header);
+  --editor-border:var(--ag-header-border);
   --ag-surface-bg:var(--ag-header);
   --ag-surface-text:var(--ag-lime);
   --ag-surface-border:var(--ag-header-border);
@@ -678,7 +681,7 @@ html#renaxApp[data-theme="avant"] body :is(#mp3ExportDialog,dialog.song-confirma
   --orange:var(--ag-lime);
   --cyan:var(--ag-lime);
 }
-html#renaxApp[data-theme="avant"] body #mp3ExportDialog #mp3ExportDownload {
+html#renaxApp[data-theme="avant"] #mp3ExportDialog #mp3ExportDownload {
   background:var(--ag-header);
   color:var(--ag-lime);
 }

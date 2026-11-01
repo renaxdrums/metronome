@@ -480,8 +480,8 @@ html#renaxApp[data-theme="avant"] body :is(
   dialog.song-name-dialog .song-confirm-actions button
 ) {
   --ag-action-text:var(--ag-lime);
-  --ag-action-bg:#28424b;
-  --ag-action-border:#4b7884;
+  --ag-action-bg:var(--ag-name-action-bg,#28424b);
+  --ag-action-border:var(--ag-name-action-border,#4b7884);
 }
 html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button[aria-pressed="true"] {
   --ag-control-border:var(--ag-lime);
@@ -725,3 +725,25 @@ html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step
 @media(prefers-reduced-motion:reduce){
  html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step.active{animation:none}
 }
+
+/* Citron naming windows: one approved anthracite/lime palette, without altering confirmation-only dialogs. */
+html#renaxApp[data-theme="avant"] body :is(.multi-modal:has(input[type="text"]),dialog.song-name-dialog:has(input[type="text"])) {
+  --text:var(--ag-lime);
+  --text-muted:var(--ag-lime);
+  --cyan:var(--ag-lime);
+  --ag-surface-bg:var(--ag-header);
+  --ag-surface-text:var(--ag-lime);
+  --ag-surface-border:var(--ag-header-border);
+  --ag-field-bg:var(--ag-header);
+  --ag-field-text:var(--ag-lime);
+  --ag-field-border:var(--ag-header-border);
+  --ag-name-action-bg:var(--ag-header);
+  --ag-name-action-border:var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]),
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) .multi-modal-actions button {
+  background:var(--ag-header);
+  color:var(--ag-lime);
+  border-color:var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) input {caret-color:var(--ag-lime)}

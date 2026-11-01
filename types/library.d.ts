@@ -14,7 +14,7 @@ export interface Section {
   count: number;
   continuous?: boolean;
   measure: Measure;
-  tempoRamp?: { enabled: boolean; endTempo: number };
+  tempoRamp?: { enabled: boolean; endTempo: number; curve?: string };
   amorceLanguage?: VoiceLanguage;
 }
 export interface Song {

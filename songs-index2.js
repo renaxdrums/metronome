@@ -26,7 +26,7 @@
     if(!snapshot.sections.length)throw Error('Aucune section à exporter. Définissez une durée finie pour le clic continu.');
     return snapshot;
   }
-  const tempoDescription=section=>RENAX_SONG_TEMPO.active(section)?section.measure.tempo+' → '+section.tempoRamp.endTempo:String(section.measure.tempo);
+  const tempoDescription=section=>RENAX_SONG_TEMPO.active(section)?section.measure.tempo+' → '+section.tempoRamp.endTempo+(/-(up-down|down-up)$/.test(RENAX_SONG_TEMPO.curveKey(section))?' → '+section.measure.tempo:''):String(section.measure.tempo);
   const blankSection=()=>({id:id(),label:'Couplet 1',count:4,measure:createMeasure(4,4,120)});
   const blankSong=()=>({id:id(),name:'Nouveau track',sections:[blankSection()]});
   const defaultLibrary=()=>({version:1,activeProfile:null,profiles:[{id:id(),name:'Mon profil',songs:[]}]});
@@ -74,7 +74,7 @@
           if(section.continuous!==undefined&&typeof section.continuous!=='boolean')throw Error('Clic continu incorrect.');
           const m=section.measure;
           if(typeof section.label!=='string'||!Number.isSafeInteger(section.count)||section.count<1||!m||!Number.isInteger(m.numerator)||m.numerator<1||m.numerator>20||![2,4,8,16,32].includes(m.denominator)||!Number.isFinite(m.tempo)||m.tempo<2||m.tempo>999)throw Error('Section incorrecte.');
-          if(section.tempoRamp?.enabled&&(!Number.isFinite(section.tempoRamp.endTempo)||section.tempoRamp.endTempo<=m.tempo||section.tempoRamp.endTempo>999))throw Error('Accélération du bloc incorrecte.');
+          if(section.tempoRamp?.enabled&&!RENAX_SONG_TEMPO.active({...section,continuous:false}))throw Error('Courbe de tempo du bloc incorrecte.');
           if(!Array.isArray(m.beatSubdivisions)||m.beatSubdivisions.length!==m.numerator||!Array.isArray(m.beatStates)||m.beatStates.length!==m.numerator)throw Error('Subdivisions incorrectes.');
           m.beatSubdivisions.forEach((n,b)=>{if(!allowedSubdivisions(m.denominator).includes(n)||!Array.isArray(m.beatStates[b])||m.beatStates[b].length!==n||m.beatStates[b].some(s=>![0,1,2,3].includes(s)))throw Error('Clic incorrect.');});
           total+=section.count;if(!Number.isSafeInteger(total))throw Error('Nombre de mesures trop grand.');
@@ -395,6 +395,11 @@
     if(!loaded)return false;
     const source=profile().songs.find(s=>s.id===loaded.song.id),position=locate(activeMeasureIndex);
     const section=source?.sections.find(s=>s.id===position?.section.id);
+    if(section&&!section.continuous&&section.tempoRamp?.enabled&&!RENAX_SONG_TEMPO.active({...section,measure:position.section.measure})){
+      // Global fader / tap-tempo edits must not invalidate a saved curve's direction.
+      position.section.measure.tempo=section.measure.tempo;syncTempoUI(position.section.measure);
+      status('Les tempos doivent respecter le sens de la courbe choisie.');
+    }
     if(section&&JSON.stringify(section.measure)!==JSON.stringify(position.section.measure)){section.measure=clone(position.section.measure);persist();return true;}
     return false;
   }
@@ -675,20 +680,45 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         continuous.onchange=()=>{section.continuous=continuous.checked;changed();};
         if(section.continuous)el('p','Guide vocal désactivé pour cette section.',body,'song-note');
         const fields=el('div',undefined,body,'song-block-controls');if(!section.continuous)songNumbox('Mesures',fields,section.count,(value,input)=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1){input.value=section.count;return;}const total=s.sections.reduce((n,x)=>n+(x===section?0:x.count),0)+n;if(!Number.isSafeInteger(total)){input.value=section.count;return;}section.count=n;changed();},Array.from({length:64},(_,i)=>i+1));
-        const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999||RENAX_SONG_TEMPO.active(section)&&n>=section.tempoRamp.endTempo){input.value=section.measure.tempo;if(RENAX_SONG_TEMPO.active(section)&&n>=section.tempoRamp.endTempo)status('Le tempo de départ doit rester inférieur au tempo d’arrivée.');return;}if(section.measure.tempo===n){input.value=String(n);return;}unload();section.measure.tempo=n;resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent='Tempo';
+        const validTempo=(start,end)=>RENAX_SONG_TEMPO.active({...section,continuous:false,measure:{...section.measure,tempo:start},tempoRamp:{...section.tempoRamp,enabled:true,endTempo:end}});
+        const bpm=songNumbox('Tempo (BPM)',fields,section.measure.tempo,(v,input)=>{const n=Number(v);if(!Number.isFinite(n)||n<2||n>999||RENAX_SONG_TEMPO.active(section)&&!validTempo(n,section.tempoRamp.endTempo)){input.value=section.measure.tempo;status('Les tempos doivent respecter le sens de la courbe choisie.');return;}if(section.measure.tempo===n){input.value=String(n);return;}unload();section.measure.tempo=n;resetCustomizationTimer();persist();refreshSongCards();selectOpenBlock();syncSongTransport();},Array.from({length:998},(_,i)=>i+2));const bpmRow=bpm.closest('label');bpmRow.firstChild.textContent=RENAX_SONG_TEMPO.active(section)?'Départ':'Tempo';
         const rampControls=el('div',undefined,body,'song-ramp-controls');
         const rampLabel=el('label',undefined,rampControls,'song-ramp-toggle');
-        const rampToggle=el('input',undefined,rampLabel);rampToggle.type='checkbox';rampToggle.checked=!!section.tempoRamp?.enabled;rampToggle.disabled=!!section.continuous||section.measure.tempo>=999;
-        el('span','Accélération progressive',rampLabel);
+        const rampToggle=el('input',undefined,rampLabel);rampToggle.type='checkbox';rampToggle.checked=!!section.tempoRamp?.enabled;rampToggle.disabled=!!section.continuous;
+        el('span','Accélération / ralentissement',rampLabel);
         rampToggle.addEventListener('change',()=>{
-          if(rampToggle.checked){const previous=section.tempoRamp?.endTempo;section.tempoRamp={enabled:true,endTempo:previous>section.measure.tempo?previous:Math.min(999,section.measure.tempo+20)};}
-          else section.tempoRamp={...section.tempoRamp,enabled:false};
+          if(rampToggle.checked){
+            if(!validTempo(section.measure.tempo,section.tempoRamp?.endTempo)){
+              const curve=section.measure.tempo===999?'linear-down':'linear-up';
+              section.tempoRamp={enabled:true,curve,endTempo:curve==='linear-down'?979:Math.min(999,section.measure.tempo+20)};
+            }else section.tempoRamp={...section.tempoRamp,enabled:true};
+          }else section.tempoRamp={...section.tempoRamp,enabled:false};
           changed();
         });
         if(section.tempoRamp?.enabled&&!section.continuous){
-          const arrival=songNumbox('Arrivée (BPM)',rampControls,section.tempoRamp.endTempo,(v,input)=>{
+          const key=RENAX_SONG_TEMPO.curveKey(section),profile=RENAX_SONG_TEMPO.profiles.find(item=>item[0]===key);
+          const curveField=el('div',undefined,rampControls,'song-curve-field');el('span','Courbe',curveField);
+          const selector=el('details',undefined,curveField,'song-curve-select');
+          const curveSummary=el('summary',undefined,selector);curveSummary.title='Choisir la courbe du tempo';
+          const icon=path=>'<svg viewBox="0 0 32 24" aria-hidden="true" focusable="false"><path d="M3 2v19h27" class="song-curve-axis"/><path d="'+path+'"/></svg>';
+          curveSummary.innerHTML=icon(profile[2]);el('span',profile[1],curveSummary);
+          const menu=el('div',undefined,selector,'song-curve-menu');menu.setAttribute('role','group');menu.setAttribute('aria-label','Courbes du tempo du bloc');
+          for(const [value,label,path] of RENAX_SONG_TEMPO.profiles){
+            const choice=button('',menu,()=>{
+              unload();
+              const low=Math.min(section.measure.tempo,section.tempoRamp.endTempo),high=Math.max(section.measure.tempo,section.tempoRamp.endTempo),down=RENAX_SONG_TEMPO.startsHigh(value);
+              section.measure.tempo=down?high:low;section.tempoRamp={enabled:true,curve:value,endTempo:down?low:high};changed();
+              Array.from(songPane.querySelectorAll('[data-section-id]')).find(card=>card.dataset.sectionId===section.id)?.querySelector('.song-curve-select>summary')?.focus();
+            });
+            choice.className='song-curve-option';choice.dataset.songCurve=value;choice.title=label;choice.setAttribute('aria-label',label);choice.setAttribute('aria-pressed',String(value===key));choice.innerHTML=icon(path);
+          }
+          selector.addEventListener('click',event=>event.stopPropagation());
+          selector.addEventListener('pointerdown',event=>event.stopPropagation());
+          selector.addEventListener('keydown',event=>{event.stopPropagation();if(event.key==='Escape'){selector.open=false;curveSummary.focus();}});
+          const targetLabel=key.endsWith('up-down')?'Sommet':key.endsWith('down-up')?'Minimum':'Arrivée';
+          const arrival=songNumbox(targetLabel+' (BPM)',rampControls,section.tempoRamp.endTempo,(v,input)=>{
             const n=Number(v);
-            if(!Number.isFinite(n)||n<=section.measure.tempo||n>999){input.value=section.tempoRamp.endTempo;status('Le tempo d’arrivée doit être supérieur au tempo de départ.');return;}
+            if(!validTempo(section.measure.tempo,n)){input.value=section.tempoRamp.endTempo;status('Les tempos doivent respecter le sens de la courbe choisie.');return;}
             section.tempoRamp.endTempo=n;changed();
           },Array.from({length:998},(_,i)=>i+2));
           arrival.closest('label').classList.add('song-ramp-target');
@@ -719,6 +749,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
   }
   // Song playback uses a snapshot; editing the saved arrangement stops its playback.
   // Keep ordinary sequencer and polyrhythm behavior untouched when no song is loaded.
+  document.addEventListener('click',event=>{songPane.querySelectorAll('.song-curve-select[open]').forEach(selector=>{if(!selector.contains(event.target))selector.open=false;});});
   document.addEventListener('pointerdown',event=>{
     if(event.target.closest('.song-more-wrap'))return;
     songPane.querySelectorAll('.song-more-menu').forEach(menu=>menu.hidden=true);

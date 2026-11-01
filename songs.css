@@ -127,3 +127,17 @@ html[data-theme="ivory"] #songPane .playlist-heading > .song-chain-toggle[aria-p
 #songPane .song-section.song-continuous::before{content:'';position:absolute;inset:0;border:1px solid #e5484d;border-radius:inherit;pointer-events:none;z-index:1;}
 #songPane .song-continuous-toggle{display:inline-flex;align-items:center;gap:8px;margin:10px 0;font-size:12px;cursor:pointer;}
 #songPane .song-continuous-toggle input{width:16px;height:16px;min-width:16px;flex:0 0 16px;margin:0;accent-color:var(--ag-lime,var(--orange));}
+
+/* Track tempo curves: the same twelve profile icons as Training. */
+#songPane .song-curve-field{display:flex;align-items:center;gap:8px;flex:1 1 100%;min-width:0;font-size:10px;color:var(--text-muted)}
+#songPane .song-curve-select{position:relative;flex:1;min-width:0}
+#songPane .song-curve-select>summary{list-style:none;display:flex;align-items:center;gap:8px;min-height:36px;box-sizing:border-box;padding:6px 8px;border:1px solid var(--border);border-radius:4px;background:var(--grey);color:var(--text);cursor:pointer;font-size:10px}
+#songPane .song-curve-select>summary::-webkit-details-marker{display:none}
+#songPane .song-curve-select>summary::after{content:'▾';margin-left:auto}
+#songPane .song-curve-select svg{width:32px;height:24px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#songPane .song-curve-axis{stroke-width:1;opacity:.4}
+#songPane .song-curve-menu{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;position:absolute;left:0;right:0;top:calc(100% + 4px);padding:6px;background:var(--panel);border:1px solid var(--border);border-radius:6px;z-index:100;box-shadow:0 6px 18px #0008}
+#songPane .song-curve-menu button{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:4px;background:var(--grey);color:var(--cyan);border:1px solid var(--border);border-radius:4px;cursor:pointer}
+#songPane .song-curve-menu button[aria-pressed="true"]{background:var(--grey-hover);border-color:var(--orange)}
+#songPane .song-curve-select summary:focus-visible,#songPane .song-curve-menu button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+@media(max-width:600px),(max-width:1100px) and (max-height:600px) and (pointer:coarse){#songPane .song-curve-menu{top:auto;bottom:calc(100% + 4px)}}

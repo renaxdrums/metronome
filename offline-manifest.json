@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "9474b20414c6a31e",
+  "revision": "55491313fd622164",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "b0492d768c88bcb7c537b70fc6728074080f643e483514d62723c65fb2e8163a",
+      "sha256": "a5bc4b2fb465e5f95cfb67f7ca577735063a20334440f6295c9d5de41c2f1b6b",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "f7517b8dc652d601a9878e28b3fcfb10d7a0bed6923cb7bfc45ee30d380b0969",
+      "sha256": "7e2c06885a48c83a96975cbf6030cea81465021b874c4e0c61de976d35603463",
       "text": true
     },
     {
@@ -294,12 +294,12 @@
     },
     {
       "path": "interface-locales.js",
-      "sha256": "de74ed43ce898af4736c0b47638fb8482eab56e73919ff2bdce7f6143e85fe26",
+      "sha256": "4be91f8924cca9ab122748a16320cd21b6de3290925b0fb4fa7dee16adfd6235",
       "text": true
     },
     {
       "path": "interface-translations.js",
-      "sha256": "ebb0dbd85c35cb24aae55ac198e1ea1e434ae766c545b4c57962dd59104e87c1",
+      "sha256": "73b8028afd0e3029c2e2b0c1677f6e7ab6f745d4c83df907c6d0088769af784a",
       "text": true
     },
     {
@@ -474,17 +474,17 @@
     },
     {
       "path": "song-tempo-ramp.js",
-      "sha256": "c8cc903662b67b5a85cbe9b4f88bd639646ef6d51c674301718c447f77a583b7",
+      "sha256": "482b1f3317b13a6cb5eaa3487be10b1dd296c5542eb08e8c71db8bda7fd8aaa4",
       "text": true
     },
     {
       "path": "songs-index2.js",
-      "sha256": "3d4ee6fafd443f76a3a9918c40a425a1bf0cbec799561f1290b8b8d50396cadf",
+      "sha256": "fc10c68c181be023124d141132f88c5b4ea2853a5a4b8dc44490d1a62144e938",
       "text": true
     },
     {
       "path": "songs.css",
-      "sha256": "c914ea7cfb0e884b38e1a04a6906784457e6df37dad1d026de0dad598954ed72",
+      "sha256": "916f966db855f4561d120ae0ab9bcf5f23ab71b1a2fa29a2456a00b6aa87af47",
       "text": true
     },
     {

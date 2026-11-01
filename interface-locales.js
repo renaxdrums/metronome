@@ -1,6 +1,14 @@
 /* Offline interface catalogs. Musical voice language and user content are independent. */
 (() => {
-  const rows = `Confirm import|Confirmar importación|Import bestätigen|Conferma importazione
+  const rows = `Acceleration / deceleration|Aceleración / desaceleración|Beschleunigung / Verlangsamung|Accelerazione / rallentamento
+Peak|Máximo|Höchstwert|Massimo
+Minimum|Mínimo|Minimum|Minimo
+Peak (BPM)|Máximo (BPM)|Höchstwert (BPM)|Massimo (BPM)
+Minimum (BPM)|Mínimo (BPM)|Minimum (BPM)|Minimo (BPM)
+Section tempo curves|Curvas de tempo de la sección|Tempokurven des Abschnitts|Curve del tempo della sezione
+The tempos must follow the direction of the selected curve.|Los tempos deben respetar la dirección de la curva seleccionada.|Die Tempi müssen der Richtung der gewählten Kurve entsprechen.|I tempi devono rispettare la direzione della curva selezionata.
+Invalid section tempo curve.|Curva de tempo de la sección incorrecta.|Ungültige Tempokurve des Abschnitts.|Curva del tempo della sezione non valida.
+Confirm import|Confirmar importación|Import bestätigen|Conferma importazione
 Cancel|Cancelar|Abbrechen|Annulla
 Import|Importar|Importieren|Importa
 Import {count} guest songs into {email}? No existing songs will be replaced.|¿Importar {count} temas sin cuenta en {email}? No se reemplazará ningún tema existente.|{count} Stücke ohne Konto in {email} importieren? Vorhandene Stücke werden nicht ersetzt.|Importare {count} brani senza account in {email}? Nessun brano esistente verrà sostituito.

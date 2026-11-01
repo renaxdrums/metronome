@@ -1,5 +1,6 @@
 {
   "nightly": [
+    "tests/theme-navigation-test.cjs",
     "tests/track-tempo-curves-test.cjs",
     "tests/track-continuous-test.cjs",
     "tests/track-last-block-test.cjs",

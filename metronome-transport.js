@@ -54,7 +54,7 @@
         step.style.setProperty('--angle', angle + 'deg');
         const number = document.createElement('span');
         number.textContent = b + 1;
-        number.style.cssText = 'font-size:11px;font-weight:700;color:#111;transform:rotate(' + (-angle) + 'deg)';
+        number.style.cssText = 'font-size:11px;font-weight:700;color:var(--step-number-color,#111);transform:rotate(' + (-angle) + 'deg)';
         if (!m.beatStates[b][0]) number.style.color = '#ddd';
         step.appendChild(number);
         step.addEventListener('click', () => openBeatEditor(m,b));

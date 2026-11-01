@@ -45,6 +45,7 @@ jobs:
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/song-tempo-ramp-test.cjs
           node tests/track-tempo-curves-test.cjs
+          node tests/theme-navigation-test.cjs
           node tests/track-continuous-test.cjs
       - name: Library resilience and accessible controls
         run: |
@@ -120,6 +121,8 @@ jobs:
             tests/results/sound-menu-*
             tests/results/curves-*
             tests/results/track-tempo-curves-results.json
+            tests/results/theme-audit
+            tests/results/theme-navigation-results.json
             tests/results/continuous-*
             tests/results/track-continuous-results.json
 
@@ -232,3 +235,4 @@ jobs:
       - name: Publish verified production artifact
         id: deployment
         uses: actions/deploy-pages@v4
+

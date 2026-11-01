@@ -718,8 +718,16 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
           const targetLabel=key.endsWith('up-down')?'Sommet':key.endsWith('down-up')?'Minimum':'Arrivée';
           const arrival=songNumbox(targetLabel+' (BPM)',rampControls,section.tempoRamp.endTempo,(v,input)=>{
             const n=Number(v);
-            if(!validTempo(section.measure.tempo,n)){input.value=section.tempoRamp.endTempo;status('Les tempos doivent respecter le sens de la courbe choisie.');return;}
-            section.tempoRamp.endTempo=n;changed();
+            const linear=key==='linear-up'||key==='linear-down';
+            const curve=linear&&n!==section.measure.tempo?(n<section.measure.tempo?'linear-down':'linear-up'):key;
+            const next={...section.tempoRamp,curve,endTempo:n};
+            if(!RENAX_SONG_TEMPO.active({...section,tempoRamp:next})){input.value=section.tempoRamp.endTempo;status('Les tempos doivent respecter le sens de la courbe choisie.');return;}
+            section.tempoRamp=next;changed();
+            if(curve!==key){
+              const summary=Array.from(songPane.querySelectorAll('[data-section-id]')).find(card=>card.dataset.sectionId===section.id)?.querySelector('.song-curve-select>summary');
+              summary?.classList.add('song-curve-changed');
+              setTimeout(()=>summary?.classList.remove('song-curve-changed'),1200);
+            }
           },Array.from({length:998},(_,i)=>i+2));
           arrival.closest('label').classList.add('song-ramp-target');
         }

@@ -116,16 +116,11 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    for(const theme of ['avant','dark','light','ivory']){
     await p.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
     await p.locator('#index2SettingsBtn').click();await p.waitForFunction(()=>document.getElementById('index2SettingsBtn').getAttribute('aria-expanded')==='true');
-    if(theme==='avant'){
-     assert.equal(await p.locator('#index2SettingsPanel').getAttribute('aria-modal'),'false');
-     await p.locator('[data-appearance=avant]').focus();await p.keyboard.press('Space');
-     assert.equal(await p.evaluate(()=>isPlaying||training.engaged),false,'Settings keyboard must not start playback');
-     await p.getByRole('tab',{name:'Polyrythmie',exact:true}).click();
-     await p.waitForFunction(()=>document.body.dataset.workspace==='polyrhythm'&&document.getElementById('index2SettingsBtn').getAttribute('aria-expanded')==='false');
-    }else{
-     assert.equal(await p.locator('#index2SettingsPanel').getAttribute('aria-modal'),'true');
-     await p.locator('#index2SettingsClose').click();
-    }
+    assert.equal(await p.locator('#index2SettingsPanel').getAttribute('aria-modal'),'false');
+    await p.locator('[data-appearance='+theme+']').focus();await p.keyboard.press('Space');
+    assert.equal(await p.evaluate(()=>isPlaying||training.engaged),false,'Settings keyboard must not start playback');
+    await p.getByRole('tab',{name:'Polyrythmie',exact:true}).click();
+    await p.waitForFunction(()=>document.body.dataset.workspace==='polyrhythm'&&document.getElementById('index2SettingsBtn').getAttribute('aria-expanded')==='false');
    }
    await p.evaluate(()=>{document.documentElement.dataset.theme='avant';RENAX_WORKSPACE.go('training');});
    await p.locator('#index2SettingsBtn').click();await p.locator('[data-appearance=avant]').focus();await p.keyboard.press('Space');

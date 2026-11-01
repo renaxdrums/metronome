@@ -391,7 +391,7 @@
 
     function emitBurst(stepIndex, state) {
       const { x, y } = getStepXY(stepIndex);
-      const rgb = STEP_RGB[state] || STEP_RGB[0];
+      const rgb = document.documentElement.dataset.theme==='avant'&&appMode!=='polyrhythm'&&state===1 ? [215,242,24] : STEP_RGB[state] || STEP_RGB[0];
       const isSilent = (state === 0);
       const count = isSilent ? 5 : 14;
       for (let i = 0; i < count; i++) {
@@ -415,6 +415,8 @@
 
 
     function drawOrbitPlayhead(headAngle, now=performance.now()) {
+      const citron=document.documentElement.dataset.theme==='avant'&&appMode!=='polyrhythm';
+      const trailRGB=citron?'215,242,24':'0,229,255';
       const size=sequencerContainer.clientWidth,cx=size/2,cy=sequencerContainer.clientHeight/2;
       const radius=RING_RADIUS+STEP_SIZE*.62;
       const headSize=Math.max(2.1,Math.min(4,size*.009));
@@ -438,7 +440,7 @@
         const a1=(headAngle-tailAngle*i/24-90)*Math.PI/180;
         if(tailAngle<=0)break;
         pctx.beginPath();pctx.arc(cx,cy,radius,a0,a1);
-        pctx.strokeStyle='rgba(0,229,255,'+(Math.pow(fade,2)*.65)+')';
+        pctx.strokeStyle='rgba('+trailRGB+','+(Math.pow(fade,2)*.65)+')';
         pctx.lineWidth=.35+fade*1.3;pctx.lineCap='round';pctx.stroke();
       }
       for(let i=orbitTrail.sparks.length-1;i>=0;i--){
@@ -446,12 +448,12 @@
         if(age>=p.life){orbitTrail.sparks.splice(i,1);continue;}
         p.x+=p.vx*dt;p.y+=p.vy*dt;
         const fade=1-age/p.life;
-        pctx.beginPath();pctx.arc(p.x,p.y,p.size,0,Math.PI*2);pctx.fillStyle='rgba(0,229,255,'+(fade*fade*.6)+')';pctx.fill();
+        pctx.beginPath();pctx.arc(p.x,p.y,p.size,0,Math.PI*2);pctx.fillStyle='rgba('+trailRGB+','+(fade*fade*.6)+')';pctx.fill();
       }
       const rad=headAngle*Math.PI/180,x=cx+radius*Math.sin(rad),y=cy-radius*Math.cos(rad);
-      pctx.shadowColor='rgba(0,229,255,.6)';pctx.shadowBlur=8;
-      pctx.beginPath();pctx.arc(x,y,headSize,0,Math.PI*2);pctx.fillStyle='#00e5ff';pctx.fill();
-      pctx.shadowBlur=0;pctx.beginPath();pctx.arc(x-headSize*.2,y-headSize*.2,headSize*.42,0,Math.PI*2);pctx.fillStyle='#dcfbff';pctx.fill();
+      pctx.shadowColor='rgba('+trailRGB+',.6)';pctx.shadowBlur=8;
+      pctx.beginPath();pctx.arc(x,y,headSize,0,Math.PI*2);pctx.fillStyle=citron?'#d7f218':'#00e5ff';pctx.fill();
+      pctx.shadowBlur=0;pctx.beginPath();pctx.arc(x-headSize*.2,y-headSize*.2,headSize*.42,0,Math.PI*2);pctx.fillStyle=citron?'#f4f2e9':'#dcfbff';pctx.fill();
       pctx.restore();
     }
 
@@ -917,7 +919,7 @@
           m.beatStates[beat][i]=(m.beatStates[beat][i]+1)%4;
           if(measures[activeMeasureIndex]===m){
             const block=sequencerContainer.querySelector('.step[data-beat="'+beat+'"]');
-            if(block){block.dataset.state=m.beatStates[beat][0];block.firstChild.style.color=m.beatStates[beat][0]?'#111':'#ddd';}
+            if(block){block.dataset.state=m.beatStates[beat][0];block.firstChild.style.color=m.beatStates[beat][0]?'var(--step-number-color,#111)':'#ddd';}
           }
           renderSubdivisionDots(m);refreshMeasurePreviews();refreshBeatEditor();
         });pads.appendChild(button);

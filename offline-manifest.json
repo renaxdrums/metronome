@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0f71a0415bb17ef0",
+  "revision": "32773868eccc772c",
   "resources": [
     {
       "path": "accessibility.css",
@@ -19,7 +19,7 @@
     },
     {
       "path": "app-base.css",
-      "sha256": "d81d03efde4f4dc035f3ab8ac82e3c65057b1c06a37406a3b76895c480aab629",
+      "sha256": "3382b66ffa937331674c7579286a7bc68abd008a6c8382bc05cde8399059d300",
       "text": true
     },
     {
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "c8a291efa0ebe3d4109dee88f97d40692b37cda7ee0c9ad521e35c835df3e365",
+      "sha256": "8788e7404fafecde0a875b2c7db0918c3c8c862e8bd0f5257b669e461a1b63a7",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "fc1771b3c6bad39e8b1c2c1849f9e09c326c8d2afb5aa3e8ec5dde0d6c489c61",
+      "sha256": "9396f163684b2d90dd7af045bfa7170fd53f230701c54edee95660f3672c3490",
       "text": true
     },
     {
@@ -399,7 +399,7 @@
     },
     {
       "path": "numbox-controls.js",
-      "sha256": "da106d639f338bc9c7ea90789f8906c4692f60613988a926efa6ced2672db810",
+      "sha256": "1e80ca2d03e66ffd288dc391d3e85d501fabb56691e158819740f32d7c4cde82",
       "text": true
     },
     {
@@ -479,7 +479,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "5bdb1596f6e65c1896d93b8e372dc8d99bc8cad450aca6c06dff7b5ce3601012",
+      "sha256": "3f73d2ce3e9ae298242b6d2e483462b5bf0d1ab38f2cee2bb8f71fcbb4767cb4",
       "text": true
     },
     {

@@ -66,6 +66,7 @@ async function soundMenuProbe(page,selector='.sound-bank-cards.open .numbox-menu
 async function checkSoundMenuForeground(h,proof,errors) {
  const beforeCSS=require('node:child_process').execFileSync('git',['show','b7f4f131e94bef652730e8c0b072590c7e43ca6f:entry-opaque-navigation26.css'],{encoding:'utf8'});
  const before=await h.browser.newPage({viewport:{width:390,height:844},hasTouch:true,reducedMotion:'reduce'});
+ await before.addInitScript(()=>{HTMLElement.prototype.showPopover=undefined;});
  try {
   await before.route('**/entry-opaque-navigation26.css*',route=>route.fulfill({contentType:'text/css',body:beforeCSS}));
   await before.goto(h.url);
@@ -281,6 +282,7 @@ async function metricOpeningProbe(page,id) {
 async function checkMetricMenuForeground(h,proof,errors) {
  const baseline='558207096e1ae3b6d9f005452588eed925eca7e0';
  const before=await h.browser.newPage({viewport:{width:390,height:844},hasTouch:true,reducedMotion:'reduce'});
+ await before.addInitScript(()=>{HTMLElement.prototype.showPopover=undefined;});
  try {
   for(const file of ['compact-controls.js','entry-opaque-navigation26.css']){
    const body=require('node:child_process').execFileSync('git',['show',baseline+':'+file],{encoding:'utf8'});

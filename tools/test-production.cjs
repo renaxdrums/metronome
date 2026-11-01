@@ -9,6 +9,7 @@ const output = path.resolve(
   process.env.TEST_OUTPUT_DIR || path.join(root, 'tests/results/production'),
 );
 const available = [
+  'tests/numbox-foreground-test.cjs',
   'tests/theme-navigation-test.cjs',
   'tests/track-tempo-curves-test.cjs',
   'tests/meixs-colors-test.cjs',

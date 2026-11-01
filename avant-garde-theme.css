@@ -306,11 +306,20 @@ html#renaxApp[data-theme="avant"] body #index2SettingsPanel .index2-settings-sec
   border-color:var(--ag-line) !important;
 }
 html#renaxApp[data-theme="avant"] body #index2SettingsPanel :is(button,select,.numbox-button){
-  background:#fafaf5 !important;
-  color:var(--ag-ink) !important;
-  border-color:var(--ag-line) !important;
+  background:var(--ag-appearance-bg,#fafaf5) !important;
+  color:var(--ag-appearance-text,var(--ag-ink)) !important;
+  border-color:var(--ag-appearance-border,var(--ag-line)) !important;
 }
-html#renaxApp[data-theme="avant"] body #index2SettingsPanel button[data-appearance][aria-pressed="true"] {
+/* In Appearance, inactive theme = lime on dark; active theme inverts that palette. */
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel #appearanceSettings .appearance-options button:not([aria-pressed="true"]) {
+  --ag-appearance-bg:var(--ag-header);
+  --ag-appearance-text:var(--ag-lime);
+  --ag-appearance-border:var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel #appearanceSettings .appearance-options button[data-appearance][aria-pressed="true"] {
+  --ag-appearance-bg:var(--ag-lime);
+  --ag-appearance-text:var(--ag-ink);
+  --ag-appearance-border:var(--ag-lime);
   background:var(--ag-lime) !important;
   color:var(--ag-ink) !important;
   border-color:#9bae24 !important;
@@ -411,6 +420,9 @@ html#renaxApp[data-theme="avant"] body .sequencer-cross::before,
 html#renaxApp[data-theme="avant"] body .sequencer-cross::after {background:var(--ag-header)}
 html#renaxApp[data-theme="avant"] body #polyControls .numbox-custom.open {z-index:1300}
 html#renaxApp[data-theme="avant"] body .visu-toolbar:has(#polyControls .numbox-custom.open) {position:relative;z-index:1300;overflow:visible}
+/* The Polyrythmie menus must escape the navigation's isolated stacking context. */
+html#renaxApp[data-theme="avant"] body .main-grid:has(#polyControls .numbox-custom.open) {position:relative;z-index:3;overflow:visible}
+html#renaxApp[data-theme="avant"] body .main-grid>.panel-visu:has(#polyControls .numbox-custom.open) {position:relative;z-index:3;overflow:visible}
 html#renaxApp[data-theme="avant"] body #scoreViewSwitch button svg {stroke:currentColor}
 html#renaxApp[data-theme="avant"] body #scoreViewSwitch button[aria-pressed="true"] svg {stroke:var(--ag-ink)}
 html#renaxApp[data-theme="avant"] body :is(.orange-ui-icon,.panel-title svg,.control-group>label svg) {stroke:var(--ag-lime)}
@@ -480,8 +492,8 @@ html#renaxApp[data-theme="avant"] body :is(
   dialog.song-name-dialog .song-confirm-actions button
 ) {
   --ag-action-text:var(--ag-lime);
-  --ag-action-bg:#28424b;
-  --ag-action-border:#4b7884;
+  --ag-action-bg:var(--ag-name-action-bg,#28424b);
+  --ag-action-border:var(--ag-name-action-border,#4b7884);
 }
 html#renaxApp[data-theme="avant"] body .training-section .training-curve-options button[aria-pressed="true"] {
   --ag-control-border:var(--ag-lime);
@@ -725,3 +737,25 @@ html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step
 @media(prefers-reduced-motion:reduce){
  html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step.active{animation:none}
 }
+
+/* Citron naming windows: one approved anthracite/lime palette, without altering confirmation-only dialogs. */
+html#renaxApp[data-theme="avant"] body :is(.multi-modal:has(input[type="text"]),dialog.song-name-dialog:has(input[type="text"])) {
+  --text:var(--ag-lime);
+  --text-muted:var(--ag-lime);
+  --cyan:var(--ag-lime);
+  --ag-surface-bg:var(--ag-header);
+  --ag-surface-text:var(--ag-lime);
+  --ag-surface-border:var(--ag-header-border);
+  --ag-field-bg:var(--ag-header);
+  --ag-field-text:var(--ag-lime);
+  --ag-field-border:var(--ag-header-border);
+  --ag-name-action-bg:var(--ag-header);
+  --ag-name-action-border:var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]),
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) .multi-modal-actions button {
+  background:var(--ag-header);
+  color:var(--ag-lime);
+  border-color:var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) input {caret-color:var(--ag-lime)}

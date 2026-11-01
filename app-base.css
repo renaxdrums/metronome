@@ -801,6 +801,8 @@
       scrollbar-color: rgba(0,229,255,.82) #18181f;
     }
     .numbox-custom.open .numbox-menu { display: block; }
+    /* Top-layer menus retain the existing anchored placement and theme. */
+    .numbox-menu[popover] { margin: 0; inset: auto; }
     .numbox-menu::-webkit-scrollbar { width: 4px; }
     .numbox-menu::-webkit-scrollbar-track { background: #18181f; }
     .numbox-menu::-webkit-scrollbar-thumb { background: rgba(0,229,255,.78); border-radius: 999px; }

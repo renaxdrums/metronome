@@ -184,5 +184,28 @@
     rebuild();
   }
   document.addEventListener('click', () => closeAll());
+
+  // Keep menus in their original DOM/theme while painting them in the browser's
+  // top layer. A future stacking context, transform or clipping ancestor must
+  // never put an open numbox behind navigation. Includes virtual training menus.
+  const foreground = new MutationObserver((records) => {
+    for (const record of records) {
+      const wrap = record.target;
+      if (!(wrap instanceof HTMLElement) || !wrap.classList.contains('numbox-custom')) continue;
+      const menu = wrap.querySelector('.numbox-menu');
+      if (!(menu instanceof HTMLElement) || typeof menu.showPopover !== 'function') continue;
+      if (wrap.classList.contains('open') && wrap.isConnected) {
+        menu.setAttribute('popover', 'manual');
+        if (!menu.matches(':popover-open')) menu.showPopover();
+      } else if (menu.matches(':popover-open')) {
+        menu.hidePopover();
+      }
+    }
+  });
+  foreground.observe(document.body, {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['class'],
+  });
   window.RENAX_NUMBOX = Object.freeze({ widgets, enhance, closeAll });
 })();

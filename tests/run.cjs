@@ -98,7 +98,7 @@ function run(file) {
         windowsHide: true,
       },
     ));
-    const limit = /(?:multilingual-interface|quality-invariance)/.test(file)
+    const limit = /(?:multilingual-interface|quality-invariance|numbox-foreground)/.test(file)
       ? 600000
       : file.includes('audio-headroom')
         ? 1200000

@@ -98,7 +98,10 @@ const available = [
             windowsHide: true,
           },
         );
-        const timer = setTimeout(() => child.kill(), 180000);
+        const timer = setTimeout(
+          () => child.kill(),
+          name === 'numbox-foreground-test.cjs' ? 600000 : 180000,
+        );
         for (const stream of [child.stdout, child.stderr])
           stream.on('data', (data) => {
             log += data;

@@ -700,6 +700,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
           const menu=el('div',undefined,selector,'song-curve-menu');menu.setAttribute('role','group');menu.setAttribute('aria-label','Courbes du tempo du bloc');
           for(const [value,label,path] of RENAX_SONG_TEMPO.profiles){
             const choice=button('',menu,()=>{
+              unload();
               const low=Math.min(section.measure.tempo,section.tempoRamp.endTempo),high=Math.max(section.measure.tempo,section.tempoRamp.endTempo),down=RENAX_SONG_TEMPO.startsHigh(value);
               section.measure.tempo=down?high:low;section.tempoRamp={enabled:true,curve:value,endTempo:down?low:high};changed();
               Array.from(songPane.querySelectorAll('[data-section-id]')).find(card=>card.dataset.sectionId===section.id)?.querySelector('.song-curve-select>summary')?.focus();

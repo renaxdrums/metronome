@@ -60,6 +60,7 @@ function midiTimes(bytes){
 
    await p.locator('.song-curve-select>summary').click();
    const colours=await p.locator('.song-curve-menu').evaluate(menu=>[menu.querySelector('[aria-pressed=true]'),menu.querySelector('[aria-pressed=false]')].map(el=>{const s=getComputedStyle(el);return {background:s.backgroundColor,text:s.color,stroke:getComputedStyle(el.querySelector('svg')).stroke};}));
+   assert.equal(await p.locator('.song-ramp-toggle input').evaluate(el=>getComputedStyle(el).accentColor),'rgb(215, 242, 24)');
    assert.deepEqual(colours,[{background:'rgb(215, 242, 24)',text:'rgb(22, 26, 21)',stroke:'rgb(22, 26, 21)'},{background:'rgb(52, 59, 69)',text:'rgb(215, 242, 24)',stroke:'rgb(215, 242, 24)'}]);
    for(const theme of ['avant','dark','light','ivory']){
     await p.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);

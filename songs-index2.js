@@ -710,7 +710,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
               section.measure.tempo=down?high:low;section.tempoRamp={enabled:true,curve:value,endTempo:down?low:high};changed();
               Array.from(songPane.querySelectorAll('[data-section-id]')).find(card=>card.dataset.sectionId===section.id)?.querySelector('.song-curve-select>summary')?.focus();
             });
-            choice.dataset.songCurve=value;choice.title=label;choice.setAttribute('aria-label',label);choice.setAttribute('aria-pressed',String(value===key));choice.innerHTML=icon(path);
+            choice.className='song-curve-option';choice.dataset.songCurve=value;choice.title=label;choice.setAttribute('aria-label',label);choice.setAttribute('aria-pressed',String(value===key));choice.innerHTML=icon(path);
           }
           selector.addEventListener('click',event=>event.stopPropagation());
           selector.addEventListener('pointerdown',event=>event.stopPropagation());

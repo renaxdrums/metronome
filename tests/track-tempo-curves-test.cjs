@@ -49,6 +49,15 @@ function midiTimes(bytes){
     if(key.endsWith('down-up')){assert.equal(state.middle,120);assert.equal(state.start,180);assert.equal(state.end,180);assert.match(await p.locator('.song-ramp-target').textContent(),/Minimum/);}
    }
    await p.locator('.song-curve-select>summary').click();await p.locator('[data-song-curve=round-up-down]').click();
+   const fader=await p.evaluate(()=>{
+    const s=RENAX_SONGS.library.profiles[0].songs[0].sections[0],before=s.measure.tempo;
+    bpmSlider.value='200';bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));
+    const rejected=s.measure.tempo===before&&Number(bpmSlider.value)===before&&RENAX_SONG_TEMPO.active(s);
+    bpmSlider.value='130';bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));const accepted=s.measure.tempo===130;
+    bpmSlider.value=String(before);bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));
+    RENAX_SONGS.validateLibrary(RENAX_SONGS.library);return {rejected,accepted};
+   });assert(fader.rejected&&fader.accepted,'Global fader preserves valid curve direction');
+
    await p.locator('.song-curve-select>summary').click();
    const colours=await p.locator('.song-curve-menu').evaluate(menu=>[menu.querySelector('[aria-pressed=true]'),menu.querySelector('[aria-pressed=false]')].map(el=>{const s=getComputedStyle(el);return {background:s.backgroundColor,text:s.color,stroke:getComputedStyle(el.querySelector('svg')).stroke};}));
    assert.deepEqual(colours,[{background:'rgb(215, 242, 24)',text:'rgb(22, 26, 21)',stroke:'rgb(22, 26, 21)'},{background:'rgb(52, 59, 69)',text:'rgb(215, 242, 24)',stroke:'rgb(215, 242, 24)'}]);
@@ -75,6 +84,11 @@ function midiTimes(bytes){
    await p.locator('.song-ramp-toggle input').check();assert.equal(await p.locator('.song-curve-select>summary').textContent(),'Montée puis descente arrondie');
    await p.locator('.song-continuous-toggle input').check();assert(await p.locator('.song-ramp-toggle input').isDisabled());assert.equal(await p.locator('.song-curve-select').count(),0);
    await p.locator('.song-continuous-toggle input').uncheck();assert.equal(await p.locator('.song-curve-select>summary').textContent(),'Montée puis descente arrondie');
+   await p.locator('.song-ramp-toggle input').uncheck();
+   await p.evaluate(()=>{const select=document.querySelector('[data-section-id=a] select[aria-label="Tempo (BPM)"]');select.dispatchEvent(new Event('renax-options-request'));select.value='999';select.dispatchEvent(new Event('change',{bubbles:true}));});
+   await p.locator('.song-ramp-toggle input').check();
+   assert.equal(await p.locator('.song-curve-select>summary').textContent(),'Descente linéaire');
+   assert.equal(await p.evaluate(()=>RENAX_SONGS.library.profiles[0].songs[0].sections[0].measure.tempo),999);
    results.push({width,profiles:12,iconsIdentical:true,halfBarPeak:true,persistence:true,continuousUnchanged:true,themes:4});
 
    if(width===1440){
@@ -115,9 +129,14 @@ function midiTimes(bytes){
      const song={id:'mixed',name:'Montée palier descente',countIn:{count:1,numerator:4,denominator:4},sections:[block('Montée',2,600,900,'linear-up'),block('Palier',1,900),block('Descente',2,900,600,'linear-down')]};
      const before=JSON.stringify(song),expected=RENAX_SONGS.playbackSections(song).reduce((sum,s)=>sum+RENAX_SONG_TEMPO.duration(s),0);
      const mp3=await RENAX_MP3_EXPORT.exportSong(song,'beep',.5),midi=RENAX_MIDI_EXPORT.exportSong(song);
-     return {unchanged:JSON.stringify(song)===before,expected,seconds:mp3.report.score.duration,bytes:mp3.blob.size,midi:Array.from(new Uint8Array(await midi.blob.arrayBuffer()))};
+     const starts=[];let cursor=0;for(const section of RENAX_SONGS.playbackSections(song))for(let bar=0;bar<section.count;bar++)for(let beat=0;beat<section.measure.numerator;beat++){starts.push(cursor);cursor+=RENAX_SONG_TEMPO.stepDuration(section,bar,beat,0,1);}
+     RENAX_SONGS.replaceLibrary({version:1,activeProfile:'p',profiles:[{id:'p',name:'Test',songs:[song]}]});RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:song.id,section:song.sections[0].id});window.__curveEvents=[];currentBank='beep';
+     return {unchanged:JSON.stringify(song)===before,expected,starts,seconds:mp3.report.score.duration,bytes:mp3.blob.size,midi:Array.from(new Uint8Array(await midi.blob.arrayBuffer()))};
     });
     assert(mixed.unchanged);assert(mixed.bytes>1000);assert(Math.abs(mixed.seconds-mixed.expected)<1e-8);assert(Math.abs(midiTimes(mixed.midi).seconds-mixed.expected)<3e-5);
+    await p.locator('#playBtn').click();await p.waitForFunction(()=>!isPlaying&&window.__curveEvents.length>0);
+    const mixedLive=await p.evaluate(()=>window.__curveEvents);assert.equal(mixedLive.length,mixed.starts.length);
+    for(let i=0;i<mixedLive.length;i++)assert(Math.abs(mixedLive[i].time-mixedLive[0].time-mixed.starts[i])<1e-8,'Three-block live boundary '+i);
     results.push({liveProfiles:12,pcmProfiles:12,midiProfiles:12,oddMeterHalfBeat:true,mixedThreeBlocksMP3:true,countIn:true});
    }
    assert.deepEqual(errors,[]);await p.close();

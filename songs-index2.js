@@ -395,6 +395,11 @@
     if(!loaded)return false;
     const source=profile().songs.find(s=>s.id===loaded.song.id),position=locate(activeMeasureIndex);
     const section=source?.sections.find(s=>s.id===position?.section.id);
+    if(section&&!section.continuous&&section.tempoRamp?.enabled&&!RENAX_SONG_TEMPO.active({...section,measure:position.section.measure})){
+      // Global fader / tap-tempo edits must not invalidate a saved curve's direction.
+      position.section.measure.tempo=section.measure.tempo;syncTempoUI(position.section.measure);
+      status('Les tempos doivent respecter le sens de la courbe choisie.');
+    }
     if(section&&JSON.stringify(section.measure)!==JSON.stringify(position.section.measure)){section.measure=clone(position.section.measure);persist();return true;}
     return false;
   }

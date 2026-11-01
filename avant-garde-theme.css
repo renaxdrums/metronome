@@ -685,3 +685,9 @@ html#renaxApp[data-theme="avant"] #mp3ExportDialog #mp3ExportDownload {
   background:var(--ag-header);
   color:var(--ag-lime);
 }
+
+/* Only the new Track curve selector follows the validated Meixs button palette. */
+html#renaxApp[data-theme="avant"] body #songPane .song-curve-select>summary,
+html#renaxApp[data-theme="avant"] body #songPane .song-curve-menu,
+html#renaxApp[data-theme="avant"] body #songPane .song-curve-menu button{background:var(--ag-header);color:var(--ag-lime);border-color:var(--ag-header-border)}
+html#renaxApp[data-theme="avant"] body #songPane .song-curve-menu button[aria-pressed="true"]{background:var(--ag-lime);color:var(--ag-ink);border-color:var(--ag-lime)}

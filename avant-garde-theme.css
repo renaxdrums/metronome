@@ -311,12 +311,12 @@ html#renaxApp[data-theme="avant"] body #index2SettingsPanel :is(button,select,.n
   border-color:var(--ag-appearance-border,var(--ag-line)) !important;
 }
 /* In Appearance, inactive theme = lime on dark; active theme inverts that palette. */
-html#renaxApp[data-theme="avant"] body #index2SettingsPanel .appearance-options button:not([aria-pressed="true"]) {
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel #appearanceSettings .appearance-options button:not([aria-pressed="true"]) {
   --ag-appearance-bg:var(--ag-header);
   --ag-appearance-text:var(--ag-lime);
   --ag-appearance-border:var(--ag-header-border);
 }
-html#renaxApp[data-theme="avant"] body #index2SettingsPanel .appearance-options button[data-appearance][aria-pressed="true"] {
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel #appearanceSettings .appearance-options button[data-appearance][aria-pressed="true"] {
   --ag-appearance-bg:var(--ag-lime);
   --ag-appearance-text:var(--ag-ink);
   --ag-appearance-border:var(--ag-lime);

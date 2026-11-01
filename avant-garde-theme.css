@@ -306,15 +306,15 @@ html#renaxApp[data-theme="avant"] body #index2SettingsPanel .index2-settings-sec
   border-color:var(--ag-line) !important;
 }
 html#renaxApp[data-theme="avant"] body #index2SettingsPanel :is(button,select,.numbox-button){
-  background:#fafaf5 !important;
-  color:var(--ag-ink) !important;
-  border-color:var(--ag-line) !important;
+  background:var(--ag-appearance-bg,#fafaf5) !important;
+  color:var(--ag-appearance-text,var(--ag-ink)) !important;
+  border-color:var(--ag-appearance-border,var(--ag-line)) !important;
 }
 /* In Appearance, inactive theme = lime on dark; active theme inverts that palette. */
 html#renaxApp[data-theme="avant"] body #index2SettingsPanel .appearance-options button:not([aria-pressed="true"]) {
-  background:var(--ag-header) !important;
-  color:var(--ag-lime) !important;
-  border-color:var(--ag-header-border) !important;
+  --ag-appearance-bg:var(--ag-header);
+  --ag-appearance-text:var(--ag-lime);
+  --ag-appearance-border:var(--ag-header-border);
 }
 html#renaxApp[data-theme="avant"] body #index2SettingsPanel button[data-appearance][aria-pressed="true"] {
   background:var(--ag-lime) !important;

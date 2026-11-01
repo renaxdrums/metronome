@@ -129,7 +129,7 @@ function midiTimes(bytes){
      const song={id:'mixed',name:'Montée palier descente',countIn:{count:1,numerator:4,denominator:4},sections:[block('Montée',2,600,900,'linear-up'),block('Palier',1,900),block('Descente',2,900,600,'linear-down')]};
      const before=JSON.stringify(song),expected=RENAX_SONGS.playbackSections(song).reduce((sum,s)=>sum+RENAX_SONG_TEMPO.duration(s),0);
      const mp3=await RENAX_MP3_EXPORT.exportSong(song,'beep',.5),midi=RENAX_MIDI_EXPORT.exportSong(song);
-     const starts=[];let cursor=0;for(const section of RENAX_SONGS.playbackSections(song))for(let bar=0;bar<section.count;bar++)for(let beat=0;beat<section.measure.numerator;beat++){starts.push(cursor);cursor+=RENAX_SONG_TEMPO.stepDuration(section,bar,beat,0,1);}
+     const starts=[];let cursor=0;for(const section of RENAX_SONGS.playbackSections(song))for(let bar=0;bar<section.count;bar++)for(let beat=0;beat<section.measure.numerator;beat++)for(let sub=0;sub<section.measure.beatSubdivisions[beat];sub++){starts.push(cursor);cursor+=RENAX_SONG_TEMPO.stepDuration(section,bar,beat,sub,section.measure.beatSubdivisions[beat]);}
      RENAX_SONGS.replaceLibrary({version:1,activeProfile:'p',profiles:[{id:'p',name:'Test',songs:[song]}]});RENAX_WORKSPACE.go('tracks');RENAX_SONGS.restoreNavigation({pane:'songs',view:'detail',profile:'p',song:song.id,section:song.sections[0].id});window.__curveEvents=[];currentBank='beep';
      return {unchanged:JSON.stringify(song)===before,expected,starts,seconds:mp3.report.score.duration,bytes:mp3.blob.size,midi:Array.from(new Uint8Array(await midi.blob.arrayBuffer()))};
     });

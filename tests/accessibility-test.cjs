@@ -3,7 +3,14 @@ const {default:AxeBuilder}=require('@axe-core/playwright');
 const {start,save,newTrack}=require('./audio-harness.cjs');
 (async()=>{const h=await start(),runs=[];let engine;try{
  async function scan(page,meta){
-  await page.evaluate(()=>Promise.all(document.getAnimations().filter(animation=>animation.effect?.getComputedTiming().iterations!==Infinity).map(animation=>animation.finished.catch(()=>{}))));
+  // Transition bookkeeping must not prevent the full Axe audit from running.
+  // A transition's finished promise can remain pending after navigation; give
+  // finite animations time to settle, then audit the actual rendered interface.
+  const settled=await page.evaluate(()=>Promise.race([
+   Promise.all(document.getAnimations().filter(animation=>animation.effect?.getComputedTiming().iterations!==Infinity).map(animation=>animation.finished.catch(()=>{}))).then(()=>true),
+   new Promise(resolve=>setTimeout(()=>resolve(false),2000))
+  ]));
+  if(!settled)console.log('Animation settling bounded',JSON.stringify(meta));
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();engine=result.testEngine;
   runs.push({...meta,violations:result.violations,incomplete:result.incomplete});
   console.log('AUDIT accessibility '+meta.width+' '+meta.theme+' '+meta.module+' '+result.violations.map(v=>v.id+':'+v.nodes.length).join(', '));

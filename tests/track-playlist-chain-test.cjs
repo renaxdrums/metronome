@@ -49,6 +49,7 @@ const {start,save}=require('./audio-harness.cjs');
       await toggle.click();
       assert.equal(await page.locator('#songPane .song-next-toggle').getAttribute('aria-pressed'),'true');
       await page.locator('#playBtn').click();
+      await page.waitForFunction(()=>isPlaying,{timeout:12000});
       await page.waitForFunction(()=>!isPlaying,{timeout:12000});
       assert.equal((await page.evaluate(()=>RENAX_SONGS.navigation)).profile,'set1','Final track never chains into next playlist');
       await page.evaluate(()=>RENAX_SONGS.flushPending());

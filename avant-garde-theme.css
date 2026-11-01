@@ -310,6 +310,12 @@ html#renaxApp[data-theme="avant"] body #index2SettingsPanel :is(button,select,.n
   color:var(--ag-ink) !important;
   border-color:var(--ag-line) !important;
 }
+/* In Appearance, inactive theme = lime on dark; active theme inverts that palette. */
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel .appearance-options button:not([aria-pressed="true"]) {
+  background:var(--ag-header) !important;
+  color:var(--ag-lime) !important;
+  border-color:var(--ag-header-border) !important;
+}
 html#renaxApp[data-theme="avant"] body #index2SettingsPanel button[data-appearance][aria-pressed="true"] {
   background:var(--ag-lime) !important;
   color:var(--ag-ink) !important;
@@ -411,6 +417,9 @@ html#renaxApp[data-theme="avant"] body .sequencer-cross::before,
 html#renaxApp[data-theme="avant"] body .sequencer-cross::after {background:var(--ag-header)}
 html#renaxApp[data-theme="avant"] body #polyControls .numbox-custom.open {z-index:1300}
 html#renaxApp[data-theme="avant"] body .visu-toolbar:has(#polyControls .numbox-custom.open) {position:relative;z-index:1300;overflow:visible}
+/* The Polyrythmie menus must escape the navigation's isolated stacking context. */
+html#renaxApp[data-theme="avant"] body .main-grid:has(#polyControls .numbox-custom.open) {position:relative;z-index:3;overflow:visible}
+html#renaxApp[data-theme="avant"] body .main-grid>.panel-visu:has(#polyControls .numbox-custom.open) {position:relative;z-index:3;overflow:visible}
 html#renaxApp[data-theme="avant"] body #scoreViewSwitch button svg {stroke:currentColor}
 html#renaxApp[data-theme="avant"] body #scoreViewSwitch button[aria-pressed="true"] svg {stroke:var(--ag-ink)}
 html#renaxApp[data-theme="avant"] body :is(.orange-ui-icon,.panel-title svg,.control-group>label svg) {stroke:var(--ag-lime)}

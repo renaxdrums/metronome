@@ -22,6 +22,7 @@ export interface Song {
   name: string;
   sections: Section[];
   amorce?: boolean;
+  chainNext?: boolean;
   amorceDefaultLanguage?: VoiceLanguage;
   countIn?: { count: number; numerator: number; denominator: Measure['denominator'] };
 }

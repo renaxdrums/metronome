@@ -63,21 +63,21 @@ html#renaxApp[data-theme="avant"] body #index2SettingsPanel .index2-close {
   border-radius:6px !important;
 }
 html#renaxApp[data-theme="avant"] #renaxHeaderWave {
-  opacity:.52 !important;
+  opacity:.85 !important;
   filter:grayscale(1) !important;
   mix-blend-mode:screen !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav {
-  background:var(--ag-header) !important;
+  background:var(--ag-nav-bg,var(--ag-header)) !important;
   border:1px solid var(--ag-header-border) !important;
   border-radius:8px !important;
-  gap:3px !important;
+  gap:var(--ag-nav-gap,3px) !important;
   padding:4px !important;
   box-shadow:none !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav button {
   color:var(--ag-lime) !important;
-  background:transparent !important;
+  background:var(--ag-nav-button-bg,transparent) !important;
   border:1px solid transparent !important;
   border-radius:5px !important;
   box-shadow:none !important;
@@ -653,7 +653,7 @@ html#renaxApp[data-theme="avant"] body #songPane .song-count-in-button[aria-pres
 }
 
 /* Allow the same outside click to close preferences and reach its control. */
-html[data-theme=avant] #index2SettingsBackdrop.open{pointer-events:none;}
+html[data-theme] #index2SettingsBackdrop.open{pointer-events:none;}
 
 /* Export and deletion confirmation: use the approved Meixs dialog palette.
    Also cover fullscreen portals attached directly to the document root.
@@ -692,3 +692,36 @@ html#renaxApp[data-theme="avant"] body #songPane .song-curve-menu,
 html#renaxApp[data-theme="avant"] body #songPane .song-curve-menu button{background:var(--ag-header);color:var(--ag-lime);border-color:var(--ag-header-border)}
 html#renaxApp[data-theme="avant"] body #songPane .song-curve-menu button[aria-pressed="true"]{background:var(--ag-lime);color:var(--ag-ink);border-color:var(--ag-lime)}
 html#renaxApp[data-theme="avant"] body #songPane .song-ramp-toggle input{accent-color:var(--ag-lime)}
+
+/* Citron phone navigation: the page surface separates each workspace. */
+@media(max-width:1100px){
+ html#renaxApp[data-theme="avant"] body #workspaceNav{
+  --ag-nav-gap:5px;
+  --ag-nav-bg:#eae9e0;
+  --ag-nav-button-bg:var(--ag-header);
+ }
+}
+
+/* Circular clicks keep their sound identity while the active outline marks time. */
+html#renaxApp[data-theme="avant"] body:not(.poly-mode) :is(#sequencerContainer,.visu-bottom .legend,#beatEditor){
+ --cyan:var(--ag-header);
+ --yellow:var(--ag-lime);
+ --beat-pad-text-1:var(--ag-lime);
+}
+html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step[data-state="1"]{
+ --step-number-color:var(--ag-lime);
+ box-shadow:0 0 8px #343b4530;
+}
+html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step.active{
+ border-color:var(--ag-white);
+ filter:none;
+ box-shadow:0 0 0 2px var(--ag-white),0 0 12px #f4f2e980;
+ animation:citron-beat-outline .35s ease-out;
+}
+@keyframes citron-beat-outline{
+ from{box-shadow:0 0 0 3px var(--ag-white),0 0 20px #f4f2e9bb}
+ to{box-shadow:0 0 0 2px var(--ag-white),0 0 12px #f4f2e980}
+}
+@media(prefers-reduced-motion:reduce){
+ html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step.active{animation:none}
+}

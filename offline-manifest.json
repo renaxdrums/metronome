@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "55491313fd622164",
+  "revision": "755fbe3598d4b81a",
   "resources": [
     {
       "path": "accessibility.css",
@@ -19,7 +19,7 @@
     },
     {
       "path": "app-base.css",
-      "sha256": "702768f96632e5ea3771348b0b6e56f9849d6b0938202dc99e93b21a8a9fff94",
+      "sha256": "c4fd20cc8a02d28ff40c6ff29283da75ea582d7df37c5ffdc1ed9f00a4a488d0",
       "text": true
     },
     {
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "a5bc4b2fb465e5f95cfb67f7ca577735063a20334440f6295c9d5de41c2f1b6b",
+      "sha256": "c8a291efa0ebe3d4109dee88f97d40692b37cda7ee0c9ad521e35c835df3e365",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "7e2c06885a48c83a96975cbf6030cea81465021b874c4e0c61de976d35603463",
+      "sha256": "51b71f83f13c7c62ebbdfb53031b1f142446a1197e889aaf4c04d999e89f3b8e",
       "text": true
     },
     {
@@ -334,12 +334,12 @@
     },
     {
       "path": "metronome-core.js",
-      "sha256": "ebbff371908a681625ccb6e1dd4624dde46cf0e33e5c5d7109f0eb49ab2c7b2e",
+      "sha256": "3f5e6419f55a62892c45d9a7aa2e4f188c64de6466e394d497ecae1231564d96",
       "text": true
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "3d3a45b2a38d85b3ff8792088ea63ba557524b694fbaa1171fde8f0a4b55e8ce",
+      "sha256": "3753584224645952ae56fb93a9857ebdba3ecabd1281805f16426b6507fb0e3b",
       "text": true
     },
     {
@@ -429,7 +429,7 @@
     },
     {
       "path": "renax-pulse-ivory.css",
-      "sha256": "ee765501da9fbe6c54646a00e57d7b455a8db8df51d39392de0436c88c5a06f0",
+      "sha256": "e876601b52fb0ff9b509a8e566b6cf594ecf5b19787a9ec2946605fdece3393b",
       "text": true
     },
     {
@@ -459,7 +459,7 @@
     },
     {
       "path": "settings-accessibility.js",
-      "sha256": "390cecc77eba82191bb0c0b80ab2ac93e602fdf41efeefc316c9042b3f9e5361",
+      "sha256": "6c3ccac10382f76cb71db1decc17afd254148d2d99e452004cc7cad069dd2bcb",
       "text": true
     },
     {
@@ -479,12 +479,12 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "fc10c68c181be023124d141132f88c5b4ea2853a5a4b8dc44490d1a62144e938",
+      "sha256": "5bdb1596f6e65c1896d93b8e372dc8d99bc8cad450aca6c06dff7b5ce3601012",
       "text": true
     },
     {
       "path": "songs.css",
-      "sha256": "916f966db855f4561d120ae0ab9bcf5f23ab71b1a2fa29a2456a00b6aa87af47",
+      "sha256": "55644227b2fb09b3ef3bbf7a284bc6ee1051e306e554642acd1d29ed3d0cb223",
       "text": true
     },
     {

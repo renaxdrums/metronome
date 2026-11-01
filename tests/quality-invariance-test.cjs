@@ -16,6 +16,21 @@ const ivoryControlsBefore =
 const ivoryControlsAfter =
   'html#renaxApp[data-theme=ivory] :is(.panel-visu,.panel-training) :is(.visu-toolbar,#workspaceControls){';
 const correctedReferenceFiles = new Set();
+// Approved mobile header and Ivory spacing changes. Normalize only these exact
+// declarations/labels; keep the strict pixel and computed-style gates elsewhere.
+const mobileBrandCSS = `
+    .brand-mobile { display:none; }
+    .brand-mobile .title-orange { color:var(--mobile-brand-accent,var(--orange)); }
+    @media(max-width:1100px){
+      html[data-theme=light],html[data-theme=ivory]{--mobile-brand-color:var(--text);}
+      html[data-theme=avant]{--mobile-brand-accent:var(--ag-lime);}
+      body>header .brand .brand-desktop{display:none;}
+      body>header .brand .brand-mobile{display:inline;color:var(--mobile-brand-color,#fff);}
+      body>header .header-center{display:none;}
+    }
+`;
+const mobileBrandHTML =
+  '<h1><span class="brand-desktop">RENAX DRUMS</span><span class="brand-mobile">Métro<span class="title-orange">nome</span></span></h1>';
 // Approved tempo stability fix: reserve three digits so the native range never
 // moves under the pointer at 99/100 BPM. Normalize only this exact reference
 // declaration; tempo-fader-test independently exercises the original failure.
@@ -88,6 +103,31 @@ async function baselineRoute(page, url) {
     }
     let body = cache.get(file);
     if (!body) return route.fulfill({ status: 404, body: 'Not found' });
+    if (file === 'index.html') {
+      const original = body.toString();
+      body = Buffer.from(
+        original
+          .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
+          .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>'),
+      );
+    }
+    if (file === 'app-base.css' && !body.toString().includes('.brand-mobile')) {
+      body = Buffer.from(body.toString() + mobileBrandCSS);
+    }
+    if (file === 'renax-pulse-ivory.css') {
+      body = Buffer.from(
+        body
+          .toString()
+          .replace(
+            'grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;padding:5px 0 9px!important',
+            'grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;padding:5px 0 9px!important',
+          )
+          .replace(
+            'gap:4px!important;padding:2px 0 5px!important;',
+            'gap:5px!important;padding:2px 0 5px!important;',
+          ),
+      );
+    }
     if (file === 'workspace-layout.css' && body.toString().includes(tempoDisplayBefore)) {
       const original = body.toString();
       assert.equal(original.split(tempoDisplayBefore).length, 2);

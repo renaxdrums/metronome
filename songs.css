@@ -141,3 +141,13 @@ html[data-theme="ivory"] #songPane .playlist-heading > .song-chain-toggle[aria-p
 #songPane .song-curve-menu button[aria-pressed="true"]{background:var(--grey-hover);border-color:var(--orange)}
 #songPane .song-curve-select summary:focus-visible,#songPane .song-curve-menu button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 @media(max-width:600px),(max-width:1100px) and (max-height:600px) and (pointer:coarse){#songPane .song-curve-menu{top:auto;bottom:calc(100% + 4px)}}
+
+/* Three brief highlights make an automatic linear direction change visible. */
+#songPane .song-curve-select>summary.song-curve-changed{animation:song-curve-change .4s ease-in-out 3}
+@keyframes song-curve-change{
+ 0%,100%{box-shadow:0 0 0 0 transparent}
+ 40%,60%{box-shadow:0 0 0 2px var(--ag-lime,var(--orange)),0 0 12px var(--ag-lime,var(--orange))}
+}
+@media(prefers-reduced-motion:reduce){
+ #songPane .song-curve-select>summary.song-curve-changed{animation:none;outline:2px solid var(--ag-lime,var(--orange));outline-offset:2px}
+}

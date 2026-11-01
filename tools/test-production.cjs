@@ -9,6 +9,7 @@ const output = path.resolve(
   process.env.TEST_OUTPUT_DIR || path.join(root, 'tests/results/production'),
 );
 const available = [
+  'tests/theme-navigation-test.cjs',
   'tests/track-tempo-curves-test.cjs',
   'tests/meixs-colors-test.cjs',
   'tests/track-continuous-test.cjs',
@@ -126,3 +127,4 @@ const available = [
   console.error(error);
   process.exitCode = 1;
 });
+

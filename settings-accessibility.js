@@ -8,12 +8,11 @@
   trigger.setAttribute('aria-expanded','false');
   panel.setAttribute('aria-owns',trigger.id);
   let active=false,returnFocus;
-  const isMeixs=()=>document.documentElement.dataset.theme==='avant';
   let nonModal=false;
   panel.setAttribute('role','dialog');
   function sync(){
     const open=panel.classList.contains('open')||panel.classList.contains('mobile-active');
-    const nextNonModal=open&&isMeixs();
+    const nextNonModal=open;
     if(open===active&&nextNonModal===nonModal)return;
     for(const [element,inert]of previousInert)element.inert=inert;previousInert.clear();
     const wasOpen=active;
@@ -92,7 +91,7 @@
     });
   }});
   document.addEventListener('click',event=>{
-    if(!active||!isMeixs()||panel.contains(event.target)||trigger.contains(event.target)||event.target.closest('dialog'))return;
+    if(!active||panel.contains(event.target)||trigger.contains(event.target)||event.target.closest('dialog'))return;
     panel.classList.remove('open','mobile-active');document.getElementById('index2SettingsBackdrop').classList.remove('open');
     if(innerWidth<=1100&&document.body.dataset.mobilePane==='settings')switchTab('visu');
     sync();

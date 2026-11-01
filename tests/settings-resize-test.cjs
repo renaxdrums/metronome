@@ -40,7 +40,7 @@ const { start, save } = require('./audio-harness.cjs');
     assert.equal(await p.locator('[data-appearance=dark]').isVisible(), false);
     for (const width of [390, 834, 1440]) {
       await p.setViewportSize({ width, height: 900 });
-      for (const theme of ['dark', 'light', 'ivory']) {
+      for (const theme of ['dark', 'light', 'ivory', 'avant']) {
         const gear = p.locator('#index2SettingsBtn');
         await gear.click();
         await p.locator('[data-appearance=' + theme + ']').click();
@@ -53,7 +53,11 @@ const { start, save } = require('./audio-harness.cjs');
         await gear.press('Enter');
         await p.locator('#index2SettingsClose').waitFor({ state: 'visible' });
         await p.locator('#index2SettingsClose').focus();
-        await p.keyboard.press('Shift+Tab');
+        assert.equal(
+          await p.locator('#index2SettingsPanel').getAttribute('aria-modal'),
+          'false',
+        );
+        await gear.focus();
         assert.equal(await p.evaluate(() => document.activeElement.id), 'index2SettingsBtn');
         await p.keyboard.press('Enter');
         await p.waitForFunction(

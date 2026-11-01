@@ -6,7 +6,8 @@ const cp = require('node:child_process');
 const approvedCSS = process.env.MEIXS_BASE_REF
   ? cp.execFileSync('git', ['show', process.env.MEIXS_BASE_REF + ':avant-garde-theme.css'], {
       encoding: 'utf8',
-    })
+    }) +
+    '\n@media(max-width:1100px){html#renaxApp[data-theme="avant"] body #workspaceNav{gap:5px!important}}'
   : null;
 const { start, showMeasures, openControls, newTrack } = require('./audio-harness.cjs');
 (async () => {

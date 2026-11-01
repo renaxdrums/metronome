@@ -59,12 +59,8 @@ const {start,save}=require('./audio-harness.cjs');
       assert.deepEqual(saved,[true,true],'Per-track chaining persists after reload');
       const invalid=await page.evaluate(()=>{const model=JSON.parse(JSON.stringify(RENAX_SONGS.library));model.profiles.find(p=>p.id==='set1').songs[0].chainNext='yes';try{RENAX_SONGS.validateLibrary(model);return false}catch{return true}});
       assert(invalid,'Invalid chaining flag rejected');
-      await page.getByRole('tab',{name:'Track',exact:true}).click();
-      if((await page.evaluate(()=>RENAX_SONGS.navigation)).view==='home')
-        await page.getByRole('button',{name:'Playlist',exact:true}).click();
-      if((await page.evaluate(()=>RENAX_SONGS.navigation)).view==='playlists')
-        await page.getByRole('button',{name:'Ouvrir la playlist Set 1',exact:true}).click();
-      await page.locator('.song-playlist-card').first().dblclick();
+      await page.evaluate(()=>RENAX_SONGS.restoreNavigation({pane:'songs',view:'playlist',profile:'set1',song:'Track A',section:null}));
+      await page.locator('#songPane .song-playlist-card').first().dblclick();
       await page.waitForFunction(()=>RENAX_SONGS.navigation.view==='detail');
       await page.setViewportSize({width:390,height:740});
       const mobileTab=page.locator('#workspaceMobileViews [data-pane=seq]');

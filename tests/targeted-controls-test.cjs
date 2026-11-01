@@ -103,13 +103,13 @@ function contrast(a, b) {
       await popup('multi');
       await newTrack(p);
       await action('.track-add-section');
-      await action('.song-count-in-button:not(#songAmorceBtn)');
+      await action('.song-count-in-button:not(#songAmorceBtn):not(.song-next-toggle)');
       const original = await p.evaluate(() => JSON.stringify(RENAX_SONGS.library.profiles.flatMap(p => p.songs).at(-1).sections));
-      const count = p.locator('.song-count-in-button:not(#songAmorceBtn)');
+      const count = p.locator('.song-count-in-button:not(#songAmorceBtn):not(.song-next-toggle)');
       await count.click();
       assert.equal(await count.getAttribute('aria-pressed'), 'true');
       assert.equal(await p.locator('.song-count-in').count(), 1);
-      assert.equal((await style('.song-count-in-button:not(#songAmorceBtn)')).background, lime);
+      assert.equal((await style('.song-count-in-button:not(#songAmorceBtn):not(.song-next-toggle)')).background, lime);
       await p.locator('#songAmorceBtn').click();
       assert.equal(await p.locator('#songAmorceBtn').getAttribute('aria-pressed'), 'true');
       assert.equal((await style('#songAmorceBtn')).background, lime);

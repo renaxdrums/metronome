@@ -316,7 +316,10 @@ html#renaxApp[data-theme="avant"] body #index2SettingsPanel .appearance-options 
   --ag-appearance-text:var(--ag-lime);
   --ag-appearance-border:var(--ag-header-border);
 }
-html#renaxApp[data-theme="avant"] body #index2SettingsPanel button[data-appearance][aria-pressed="true"] {
+html#renaxApp[data-theme="avant"] body #index2SettingsPanel .appearance-options button[data-appearance][aria-pressed="true"] {
+  --ag-appearance-bg:var(--ag-lime);
+  --ag-appearance-text:var(--ag-ink);
+  --ag-appearance-border:var(--ag-lime);
   background:var(--ag-lime) !important;
   color:var(--ag-ink) !important;
   border-color:#9bae24 !important;

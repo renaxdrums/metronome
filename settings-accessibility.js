@@ -10,8 +10,17 @@
   let active=false,returnFocus;
   let nonModal=false;
   panel.setAttribute('role','dialog');
+  function placePanel(){
+    panel.style.removeProperty('--settings-nav-top');
+    if(innerWidth<=1100)return;
+    const nav=document.getElementById('workspaceNav').getBoundingClientRect(),box=panel.getBoundingClientRect();
+    if(nav.right>box.left&&nav.left<box.right&&nav.bottom>box.top){
+      panel.style.setProperty('--settings-nav-top',(nav.bottom+8)+'px');
+    }
+  }
   function sync(){
     const open=panel.classList.contains('open')||panel.classList.contains('mobile-active');
+    if(open)placePanel();
     const nextNonModal=open;
     if(open===active&&nextNonModal===nonModal)return;
     for(const [element,inert]of previousInert)element.inert=inert;previousInert.clear();
@@ -97,5 +106,6 @@
     sync();
   },true);
   new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  window.addEventListener('resize',()=>{if(active)placePanel();});
   new MutationObserver(sync).observe(panel,{attributes:true,attributeFilter:['class']});sync();
 })();

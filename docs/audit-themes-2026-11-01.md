@@ -15,6 +15,8 @@ Référence : **Citron**, nouveau nom de Meixs. Base examinée : `5f38edf6fec639
 
 Le défaut des paramètres vient de trois restrictions concordantes : `isMeixs()` pour le mode non modal, le même filtre pour la fermeture extérieure, et `pointer-events:none` réservé au fond Meixs. Enlever seulement le filtre de fermeture ne suffit pas : les onglets des autres thèmes restent inaccessibles.
 
+L'essai sur la version construite a aussi confirmé un chevauchement PC : le titre de la fenêtre des paramètres recouvrait l'onglet Multipiste dans la navigation horizontale. La fenêtre est maintenant placée sous la barre uniquement lorsqu'elle la recouvrirait ; la navigation latérale Ivoire conserve sa disposition. Le positionnement est recalculé à l'ouverture, au changement de thème et au redimensionnement.
+
 ## Règles de tempo validées
 
 Dans un bloc à 120 BPM avec une courbe linéaire, choisir 84 BPM en arrivée doit conserver 84 et sélectionner la descente linéaire. Choisir ensuite 150 sélectionne la montée linéaire. Une inversion automatique déclenche trois brèves surbrillances du sélecteur ; avec la préférence de mouvements réduits, un contour fixe temporaire remplace l'animation.

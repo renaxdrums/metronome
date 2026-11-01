@@ -869,7 +869,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   letter-spacing:.6px;white-space:nowrap;
 }
 .index2-settings-panel{
-  display:none;position:fixed;z-index:60;top:70px;right:12px;bottom:52px;
+  display:none;position:fixed;z-index:60;top:var(--settings-nav-top,70px);right:12px;bottom:52px;
   width:min(390px,calc(100vw - 24px));padding:16px;
   background:#111116;border:1px solid #30303a;border-radius:10px;
   box-shadow:0 20px 70px rgba(0,0,0,.55);overflow-y:auto;

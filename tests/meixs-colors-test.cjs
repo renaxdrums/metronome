@@ -324,6 +324,7 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       );
 
       const songBeforeConfirmation = await p.evaluate(() => JSON.stringify(RENAX_SONGS.library));
+      await p.locator('.song-playlist-card .song-more[aria-haspopup=menu]').first().click();
       await p
         .locator('.song-playlist-card .song-more-menu')
         .getByRole('menuitem', { name: 'Supprimer', exact: true })

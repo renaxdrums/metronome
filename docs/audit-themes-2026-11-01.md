@@ -25,6 +25,9 @@ Les dix autres courbes restent choisies manuellement. Les limites 2–999 BPM et
 
 ## Étude complémentaire, sans correction automatique
 
+- Dans les captures à 390 px, Ivoire présente des icônes Sauvegarde/Playlist et des points extérieurs de polyrythmie nettement plus pâles que Citron. C'est un point de lisibilité à revoir ; aucune nouvelle palette n'est appliquée dans cette étude.
+- Dans Citron, les miniatures des mesures du Séquenceur utilisent encore la couleur historique du Clic 1, alors que le séquenceur circulaire adopte l'anthracite demandé. L'alignement éventuel des miniatures reste une décision distincte.
+- Ivoire conserve un sélecteur secondaire Visualisation/Mesures visible dans la vue Métronome, contrairement aux trois autres captures. C'est un écart de présentation, pas un blocage fonctionnel démontré.
 - Les couleurs des particules sont codées dans le canvas séparément des couleurs CSS des clics. Hors de Citron, une palette CSS et une particule peuvent donc différer ; vérifier visuellement avant de décider d'un changement.
 - La wave de l'en-tête Citron utilisait une opacité de 0,52, du gris et le mode de fusion `screen`. Son opacité passe à 0,85 à la demande de l'utilisateur ; la forme, la vitesse, le dégradé et les autres thèmes restent inchangés.
 - Les différences de palette, de bordures et de style propres à chaque thème ne sont pas assimilées à des bugs. La comparaison porte sur l'accès aux mêmes commandes, la navigation, les états sélectionnés, les débordements et la lisibilité.
@@ -35,7 +38,7 @@ Le scénario `tests/theme-navigation-test.cjs` couvre les quatre thèmes, les si
 
 Les contrôles de production, compatibilité des navigateurs, audio et Firebase doivent tous réussir avant fusion. Les comparaisons visuelles conservent leur seuil strict ; seules les modifications d'en-tête et d'espacement explicitement demandées sont normalisées dans la référence.
 
-État au dépôt de cette étude : syntaxe JavaScript, absence d'erreurs de diff, versions des ressources et cache vérifiés localement. Essais navigateur et revue des nouvelles captures en attente des résultats GitHub. Aucun essai sur téléphone physique.
+Vérifications déjà obtenues : syntaxe JavaScript, absence d'erreurs de diff, versions des ressources et cache ; calculs des douze courbes ; parcours des six espaces dans les quatre thèmes sur PC et mobile ; bascule linéaire dans les deux sens, maintien des courbes manuelles et sauvegarde. Les captures à 390 px ont été examinées pour les six espaces. Firebase et la compatibilité des navigateurs sont réussis sur la version fonctionnelle ; les contrôles exhaustifs de la dernière révision restent à suivre dans la [PR #56](https://github.com/renaxdrums/metronome/pull/56). Aucun essai sur téléphone physique.
 
 ## Mini-plan de test manuel
 

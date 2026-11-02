@@ -582,7 +582,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const trigger=button('⋯',controls,()=>{const opening=menu.hidden;songPane.querySelectorAll('.song-more-menu').forEach(other=>other.hidden=true);songPane.querySelectorAll('.song-more').forEach(other=>other.setAttribute('aria-expanded','false'));menu.hidden=!opening;trigger.setAttribute('aria-expanded',String(opening));});
         trigger.className='song-more';labelWithValue(trigger,'Actions de la playlist {user}',item.name==='Mon profil'?'Tracks':item.name);trigger.setAttribute('aria-haspopup','menu');trigger.setAttribute('aria-expanded','false');
         const menu=el('div',undefined,controls,'song-more-menu');menu.hidden=true;menu.setAttribute('role','menu');menu.style.top='36px';menu.style.bottom='auto';
-        const rename=button('Renommer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=await askPlaylistName(item.name==='Mon profil'?'Tracks':item.name);if(name){const current=library.profiles.find(candidate=>candidate.id===item.id);if(!current)return;current.name=name;persist();render();}});rename.setAttribute('role','menuitem');
+        const rename=button('Renommer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=await askPlaylistName(item.name==='Mon profil'?'Tracks':item.name);if(name){const current=library.profiles.find(candidate=>candidate.id===item.id);if(!current)return;current.name=name;persist();render();}});rename.setAttribute('role','menuitem');if(item.id.startsWith('shared_'))rename.disabled=true;
         const remove=button('Supprimer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(!await askSongConfirmation('Supprimer la playlist « '+(item.name==='Mon profil'?'Tracks':item.name)+' » et ses '+item.songs.length+' track(s) ?'))return;
           if(library.activeProfile===item.id)unload();library.profiles=library.profiles.filter(candidate=>candidate.id!==item.id);
           if(!library.profiles.length)library.profiles=defaultLibrary().profiles;
@@ -594,6 +594,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
     const localProfiles=el('section',undefined,songPane,'playlist-manager');localProfiles.hidden=songView!=='playlist';
     const playlistHeading=el('div',undefined,localProfiles,'playlist-heading');
     const playlistTitle=el('strong',p.name==='Mon profil'?'Tracks':p.name,playlistHeading,'playlist-heading-name');playlistTitle.dataset.noTranslate='';if(p.name==='Mon profil')playlistTitle.textContent='Tracks';
+    if(p.id.startsWith('shared_')&&songView==='playlist')el('p','Playlist partagée · lecture seule. Les mises à jour du créateur sont reçues automatiquement.',localProfiles,'song-note');
     if(songView==='playlist')playlistHeading.prepend(backSong);
     const actions=songView==='playlists'?null:el('div',undefined,songPane,'song-actions');
     const s=songView==='detail'?song():null;
@@ -749,6 +750,15 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       el('p',durationSummary(s),songPane,'song-note').id='songDuration';
     }
     const labels=el('datalist',undefined,songPane);labels.id='songLabels';for(const name of ['Intro','Couplet 1','Couplet 2','Refrain 1','Refrain 2','Bridge','Solo','Outro'])el('option',name,labels).value=name;
+    if(p.id.startsWith('shared_')&&['playlist','detail'].includes(songView)){
+      // A received playlist is a read-only subscription. Navigating and playing
+      // remain available; editing controls cannot alter the shared snapshot.
+      songPane.querySelectorAll('input,select,textarea').forEach(field=>{field.disabled=true;});
+      songPane.querySelectorAll('button').forEach(control=>{
+        if(control.matches('.song-back,.song-open,.song-direct-play,.song-block-play,#songNextSection'))return;
+        control.disabled=true;
+      });
+    }
     const transferPane=el('section',undefined,profilePane,'backup-json');el('h3','Copie JSON',transferPane);
     const transfers=el('div',undefined,transferPane,'song-actions');button('Exporter',transfers,()=>{const blob=new Blob([JSON.stringify(library,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='renax-morceaux.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});const importer=el('input',undefined,transferPane);importer.type='file';importer.accept='.json,application/json';importer.hidden=true;button('Importer',transfers,()=>importer.click());importer.onchange=async()=>{try{if(importer.files[0].size>5000000)throw Error('Fichier JSON trop volumineux.');const data=JSON.parse(await importer.files[0].text());validateLibrary(data);if(!await askSongConfirmation('Importer '+data.profiles.length+' profils et '+data.profiles.reduce((n,p)=>n+p.songs.length,0)+' tracks ? Ils seront ajoutés sans remplacer les tracks existants.','Importer'))return;unload();for(const imported of data.profiles){const p=clone(imported);p.id=id();p.name+=' (importé)';p.songs.forEach(s=>s.id=id());library.profiles.push(p);}library.activeProfile=library.profiles.at(-1).id;selectedSong=null;persist();render();status('Bibliothèque importée sans remplacer les morceaux existants.');}catch(e){status('Import refusé : '+e.message);}};
     el('p','Gardez une copie indépendante. Effacer les données du navigateur peut supprimer la sauvegarde locale.',transferPane,'song-note');el('div',storageStatus,transferPane).id='songStatus';setSectionOpen(openSectionId);selectOpenBlock();updatePosition();syncSongTransport();

@@ -37,6 +37,11 @@
   const job=(async()=>{const [engine,syllables,planner]=await load();const speeches=await Promise.all(snapshot.sections.map(b=>b._guideDisabled?{pcm:new Float32Array(0),sampleRate:48000,events:[]}:engine.synthesize(b.label,b.amorceLanguage||'fr')));const candidates=speeches.map((s,i)=>snapshot.sections[i]._guideDisabled?{anchorSeconds:0}:syllables.lastSyllableCandidate(s.events,snapshot.sections[i].amorceLanguage||'fr'));return {...planner.planAmorce(snapshot,speeches,candidates),speeches,candidates};})();plans.set(k,job);job.catch(()=>plans.delete(k));if(plans.size>12)plans.delete(plans.keys().next().value);return job;
  }
  function stop(){generation++;session=null;for(const source of sources){try{source.stop();}catch{}}sources.clear();}
+ function stopAt(when){
+   generation++;session=null;
+   for(const source of sources){try{source.stop(when);}catch{}}
+   sources.clear();
+ }
  function install(plan){session={plan,origin:null};}
  function begin(context,origin,plan=session?.plan){if(!plan)return;session={plan,origin};
   for(const a of plan.announcements){const speech=plan.speeches[a.index],buffer=context.createBuffer(1,speech.pcm.length,speech.sampleRate);buffer.copyToChannel(speech.pcm,0);const source=context.createBufferSource(),gain=context.createGain();source.buffer=buffer;gain.gain.value=.25*masterVolume;source.connect(gain);gain.connect(getAudioMixDestination(context));const planned=origin+a.start,late=Math.max(0,context.currentTime-planned);if(late>0)console.warn('Guide vocal : annonce en retard de '+Math.round(late*1000)+' ms.');if(late<buffer.duration){source.start(Math.max(planned,context.currentTime),late);sources.add(source);source.onended=()=>{sources.delete(source);source.disconnect();gain.disconnect();};}else{source.disconnect();gain.disconnect();}}
@@ -46,5 +51,5 @@
   const group=a.measure.denominator>=16?a.measure.denominator/4:1;
   if(state&&beat%group===0)playGuideCount(state,time,isFirst,{mode:'song-guide',beatNumber:Math.floor(beat/group)+1,subIndex:0,beatDurationSec:60/a.measure.tempo*4/a.measure.denominator*group});return false;
  }
- window.RENAX_AMORCE={maxAttackSeconds:Math.max(...guideVoice.anchors)/guideVoice.playbackRate,prepare,install,begin,step,stop,get active(){return !!session;},get generation(){return generation;}};
+ window.RENAX_AMORCE={maxAttackSeconds:Math.max(...guideVoice.anchors)/guideVoice.playbackRate,prepare,install,begin,step,stop,stopAt,get active(){return !!session;},get generation(){return generation;}};
 })();

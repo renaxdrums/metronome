@@ -194,7 +194,7 @@
   function status(message){storageStatus=message;const e=document.getElementById('songStatus');if(e)e.textContent=message;}
   function persist(){
     clearTimeout(persistTimer);persistTimer=null;
-    const saved=RENAX_STORAGE.state?.library;
+    const saved=library.profiles.some(p=>p.id.startsWith('shared_'))?RENAX_STORAGE.state?.library:null;
     if(saved&&library.profiles.some(current=>current.id.startsWith('shared_')&&
       JSON.stringify(current)!==JSON.stringify(saved.profiles.find(p=>p.id===current.id)))){
       // Defensive boundary: a shared subscription may only change via the
@@ -568,7 +568,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       const list=el('div',undefined,overview,'playlist-list');
       for(const item of library.profiles){
         const entry=el('div',undefined,list);entry.style.position='relative';
-        const choice=button('',entry,()=>openPlaylist(item));choice.style.paddingRight='136px';choice.classList.add('playlist-choice');labelWithValue(choice,'Ouvrir la playlist {user}',item.name==='Mon profil'?'Tracks':item.name);
+        const choice=button('',entry,()=>openPlaylist(item));choice.style.paddingRight=item.id.startsWith('shared_')?'96px':'136px';choice.classList.add('playlist-choice');labelWithValue(choice,'Ouvrir la playlist {user}',item.name==='Mon profil'?'Tracks':item.name);
         const name=el('strong',item.name==='Mon profil'?'Tracks':item.name,choice,'playlist-choice-name');name.dataset.noTranslate='';if(item.name==='Mon profil')name.textContent='Tracks';
         el('span',item.songs.length+' morceau'+(item.songs.length===1?'':'x'),choice,'playlist-choice-count');
         const controls=el('div',undefined,entry,'song-more-wrap');controls.style.top='8px';controls.style.bottom='auto';controls.style.display='inline-flex';controls.style.gap='6px';

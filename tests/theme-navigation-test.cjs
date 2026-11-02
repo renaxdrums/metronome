@@ -86,6 +86,8 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
   await p.locator('#workspaceNav [data-workspace=metronome]').click();
   await p.evaluate(()=>{document.documentElement.dataset.theme='avant';const m=measures[activeMeasureIndex];m.beatStates=[[1,0],[2,0],[3,0],[0,0]];renderActiveMeasure();});
   const colours=await p.locator('#sequencerContainer .step').evaluateAll(es=>es.map(e=>({bg:getComputedStyle(e).backgroundColor,text:getComputedStyle(e.firstChild).color})));
+  const markerRadii=await p.locator('#sequencerContainer .step,.visu-bottom .legend-color').evaluateAll(es=>es.map(e=>getComputedStyle(e).borderRadius));
+  assert(markerRadii.length>0&&markerRadii.every(radius=>radius==='50%'),'Approved Citron markers remain circular');
   assert.deepEqual(colours.slice(0,3),[{bg:'rgb(215, 242, 24)',text:'rgb(22, 26, 21)'},{bg:'rgb(168, 232, 72)',text:'rgb(22, 26, 21)'},{bg:'rgb(250, 118, 35)',text:'rgb(22, 26, 21)'}]);
   const particles=await p.evaluate(()=>{particles.length=0;emitBurst(0,1);return particles.map(p=>p.rgb);});
   assert(particles.length>0);for(const rgb of particles)assert.deepEqual(rgb,[215,242,24]);

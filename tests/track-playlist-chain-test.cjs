@@ -48,6 +48,9 @@ const {start,save}=require('./audio-harness.cjs');
        });
        await page.locator('#playBtn').click();
        await page.waitForFunction(()=>RENAX_SONGS.navigation.view==='playlist'&&RENAX_SONGS.navigation.song==='Track B'&&isPlaying,{timeout:12000});
+       // Scheduling selects Track B ahead of its acoustic boundary; wait for the
+       // deliberately deferred playlist render before inspecting its markers.
+       await page.locator('.song-playlist-card').first().waitFor({state:'visible'});
        assert.equal(await page.locator('.song-playlist-card').first().locator('.song-chain-indicator').count(),1,'Enabled song shows a passive arrow');
        assert.equal(await page.locator('.song-playlist-card').nth(1).locator('.song-chain-indicator').count(),0,'Disabled song stays unmarked');
        await page.waitForFunction(()=>!isPlaying,{timeout:9000});

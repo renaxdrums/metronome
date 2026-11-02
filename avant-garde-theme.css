@@ -811,6 +811,8 @@ html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) .mul
   color:var(--ag-lime);
   border-color:var(--ag-header-border);
 }
+/* Preserve the validated lemon border of the confirm control. */
+html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) .multi-modal-actions button:last-child{border-color:var(--ag-lime);}
 html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) input {caret-color:var(--ag-lime)}
 
 /* Approved Citron circular-only click states; other themes and the beat editor are unchanged. */

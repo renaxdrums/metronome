@@ -134,7 +134,7 @@ async function revokeShare(profileId,shareId,uid) {
   if(map[profileId]===shareId){delete map[profileId];putOutbound(uid,map);}
 }
 function linkDialog(url,name,profileId,shareId,uid) {
-  const dialog=message('Lien créé. Tu peux le partager par SMS, e-mail, WhatsApp ou une autre application.',[]);
+  const dialog=message('Lien créé. Tu peux le partager par SMS, e-mail, WhatsApp ou une autre application. Toute personne ayant ce lien pourra consulter la playlist.',[]);
   const input=document.createElement('input');input.type='text';input.readOnly=true;
   input.className='song-name-input';input.value=url;input.setAttribute('aria-label','Lien de la playlist');
   const actions=dialog.querySelector('.song-confirm-actions');

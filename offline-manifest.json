@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "b848a846bba43f5d",
+  "revision": "a80bac8a8cfc058f",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "ad538afb3e10f487c27d4198d42cfa50ab042ac6c50ee936f682e0dd8d16d915",
+      "sha256": "3d0ba9baae431e79c25f84906afcda2ec225d1333f26b6a22a0ce50b7ded88bd",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "9b3eef5801aec4434d8a8262faa72dd442bc817c59fa37b0993f69e4eac4f30b",
+      "sha256": "fdce838f6d3068962995ba21bfa81da51ec20af35af53632ee336b2f00cc07b2",
       "text": true
     },
     {

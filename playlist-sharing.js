@@ -191,7 +191,10 @@ async function share(profileId) {
 
 async function apply(document,id,navigate=false) {
   if(storage.readOnly)throw Error('Sauvegarde locale en lecture seule.');
-  if(playing()){pending.set(id,{document,navigate});return;}
+  const editing=document.activeElement?.closest?.('#songPane') &&
+    document.activeElement?.matches?.('input,textarea,select,[contenteditable="true"]');
+  if(playing()||editing){pending.set(id,{document,navigate});return;}
+  if(!api.flushPending())throw Error('Une sauvegarde locale est en attente. Mise à jour différée.');
   await storage.ready;
   const scope=storage.scope,token=storage.rawToken;
   const result=addOrUpdateSharedPlaylist(api.library,document,id,api.validateLibrary);
@@ -252,7 +255,7 @@ async function refreshSubscriptions() {
   }catch(error){console.warn('[RENAX partage] Abonnement indisponible',error);}
 }
 function flushPending(){
-  if(playing())return;
+  if(playing()||(document.activeElement?.closest?.('#songPane') && document.activeElement?.matches?.('input,textarea,select,[contenteditable="true"]')))return;
   for(const [id,value]of pending){
     pending.delete(id);
     apply(value.document,id,value.navigate).catch(showError);

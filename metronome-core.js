@@ -881,7 +881,7 @@
       const header = document.createElement('div');
       header.className='beat-editor-handle';
       header.title='Glisser pour déplacer';
-      header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;cursor:move;touch-action:none;user-select:none';
+      header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--beat-editor-header-gap,16px);cursor:move;touch-action:none;user-select:none';
       const title = document.createElement('strong');
       title.id = 'beatEditorTitle';
       title.textContent = 'Temps ' + (beat+1) + ' · mesure ' + (measureIndex+1);
@@ -907,7 +907,7 @@
       label.appendChild(select);beatEditor.appendChild(label);
       const pads = document.createElement('div');
       pads.id = 'beatEditorPads';
-      pads.style.cssText = 'display:flex;flex-wrap:nowrap;gap:6px;margin:16px 0;overflow-x:auto';
+      pads.style.cssText = 'display:flex;flex-wrap:nowrap;gap:6px;margin:var(--beat-editor-pad-gap,16px) 0;overflow-x:auto';
       for (let i=0;i<m.beatSubdivisions[beat];i++) {
         const button = document.createElement('button');
         button.dataset.subIndex=i;button.dataset.state=m.beatStates[beat][i];

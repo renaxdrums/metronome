@@ -698,6 +698,58 @@ html#renaxApp[data-theme="avant"] #mp3ExportDialog #mp3ExportDownload {
   color:var(--ag-lime);
 }
 
+/* Targeted Citron export/subdivision polish: keep the validated palette and
+   leave every other window, theme and numbox untouched. */
+html#renaxApp[data-theme="avant"] #mp3ExportDialog {
+  --mp3-primary-bg:var(--ag-lime);
+  --mp3-primary-border:var(--ag-lime);
+  --mp3-primary-text:var(--ag-ink);
+  width:min(390px,calc(100vw - 32px));
+}
+html#renaxApp[data-theme="avant"] #mp3ExportDialog .mp3-actions {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  margin-top:12px;
+}
+html#renaxApp[data-theme="avant"] #mp3ExportDialog .mp3-actions .btn {min-width:0;}
+html#renaxApp[data-theme="avant"] #mp3ExportDialog #mp3ExportDownload {
+  background:var(--ag-lime);
+  color:var(--ag-ink);
+}
+html#renaxApp[data-theme="avant"] #mp3ExportDialog :is(#mp3ExportStatus,.mp3-credit) {opacity:.85;}
+html#renaxApp[data-theme="avant"] body #beatEditor {
+  --beat-editor-header-gap:10px;
+  --beat-editor-pad-gap:10px;
+}
+html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-division-label {gap:6px;}
+html#renaxApp[data-theme="avant"] body #beatEditorPads {justify-content:safe center;}
+html#renaxApp[data-theme="avant"] body #beatEditorPads button {
+  max-width:56px;
+  outline:1px solid var(--ag-header-border);
+  outline-offset:-1px;
+}
+html#renaxApp[data-theme="avant"] body #beatEditor .beat-editor-legend>span:nth-child(2)>span {
+  outline:1px solid var(--ag-header-border);
+}
+html#renaxApp[data-theme="avant"] body #beatEditorDuplicateFirst {min-height:44px;margin-bottom:10px;}
+html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,#beatEditor) .numbox-button {min-height:44px;}
+html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,#beatEditor) {
+  --editor-scrollbar-colors:var(--ag-lime) var(--ag-header);
+  --editor-scrollbar-thumb:var(--ag-lime);
+  --editor-scrollbar-track:var(--ag-header);
+}
+html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,#beatEditor) .numbox-menu {
+  --editor-menu-limit:192px;
+  overscroll-behavior:contain;
+  scrollbar-color:var(--ag-lime) var(--ag-header);
+}
+html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,#beatEditor) .numbox-menu::-webkit-scrollbar-thumb {background:var(--ag-lime);}
+html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,#beatEditor) .numbox-menu::-webkit-scrollbar-track {background:var(--ag-header);}
+@media(max-width:359px){
+  html#renaxApp[data-theme="avant"] #mp3ExportDialog .mp3-actions {grid-template-columns:minmax(0,1fr);}
+}
+
 /* Only the new Track curve selector follows the validated Meixs button palette. */
 html#renaxApp[data-theme="avant"] body #songPane .song-curve-select>summary,
 html#renaxApp[data-theme="avant"] body #songPane .song-curve-menu,

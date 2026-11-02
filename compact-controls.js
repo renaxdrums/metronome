@@ -52,7 +52,24 @@
   });
   observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['disabled']});
   function positionMenu(button){
-    const wrap=button.closest('.numbox-custom');if(!wrap?.classList.contains('open')||(wrap.classList.contains('sound-bank-cards')&&!wrap.classList.contains('multi-sound-bank')))return;const menu=wrap.querySelector('.numbox-menu'),rect=button.getBoundingClientRect(),optionCount=menu.querySelectorAll('.numbox-option').length;menu.classList.add('compact-floating');const metric=!!wrap.querySelector(':scope > :is(#activeNumerator,#activeDenominator)'),upward=(metric&&innerWidth<=1100)||matchMedia('(max-width:600px), (max-width:1100px) and (max-height:600px) and (pointer:coarse)').matches;const below=Math.max(0,innerHeight-rect.bottom-12),above=Math.max(0,rect.top-12),available=upward?above:Math.max(below,above),shortMenu=optionCount<=8;menu.style.setProperty('--compact-option-height',shortMenu?Math.max(18,Math.min(32,Math.floor((available-8)/Math.max(1,optionCount))))+'px':'32px');const height=Math.min(menu.scrollHeight,shortMenu?available:Math.min(220,available));menu.style.width=Math.min(innerWidth-16,Math.max(rect.width,wrap.classList.contains('compact-select')?140:64))+'px';menu.style.left=Math.max(8,Math.min(rect.left,innerWidth-parseFloat(menu.style.width)-8))+'px';menu.style.top=(!upward&&innerHeight-rect.bottom-8>=height?rect.bottom+4:Math.max(8,rect.top-height-4))+'px';menu.style.maxHeight=height+'px';
+    const wrap=button.closest('.numbox-custom');
+    if(!wrap?.classList.contains('open')||(wrap.classList.contains('sound-bank-cards')&&!wrap.classList.contains('multi-sound-bank')))return;
+    const menu=wrap.querySelector('.numbox-menu'),rect=button.getBoundingClientRect(),optionCount=menu.querySelectorAll('.numbox-option').length;
+    menu.classList.add('compact-floating');
+    // Only the two Citron editors opt into bounded, touch-sized lists. Other
+    // controls retain their approved placement, sizing and top-layer behavior.
+    const localLimit=parseFloat(getComputedStyle(menu).getPropertyValue('--editor-menu-limit')),bounded=Number.isFinite(localLimit);
+    const metric=!!wrap.querySelector(':scope > :is(#activeNumerator,#activeDenominator)');
+    const upward=(metric&&innerWidth<=1100)||matchMedia('(max-width:600px), (max-width:1100px) and (max-height:600px) and (pointer:coarse)').matches;
+    const below=Math.max(0,innerHeight-rect.bottom-12),above=Math.max(0,rect.top-12),available=upward?above:Math.max(below,above),shortMenu=optionCount<=8;
+    menu.style.setProperty('--compact-option-height',bounded?'44px':shortMenu?Math.max(18,Math.min(32,Math.floor((available-8)/Math.max(1,optionCount))))+'px':'32px');
+    const originalHeight=Math.min(menu.scrollHeight,shortMenu?available:Math.min(220,available));
+    menu.style.width=Math.min(innerWidth-16,Math.max(rect.width,wrap.classList.contains('compact-select')?140:64))+'px';
+    const desired=Math.min(menu.scrollHeight,localLimit),down=bounded?(below>=desired||below>=above):(!upward&&innerHeight-rect.bottom-8>=originalHeight);
+    const height=bounded?Math.min(desired,down?below:above):originalHeight;
+    menu.style.left=Math.max(8,Math.min(rect.left,innerWidth-parseFloat(menu.style.width)-8))+'px';
+    menu.style.top=(down?rect.bottom+4:Math.max(8,rect.top-height-4))+'px';
+    menu.style.maxHeight=height+'px';
   }
   document.addEventListener('click',event=>{const button=event.target.closest('.numbox-button');if(button)setTimeout(()=>positionMenu(button),0);},true);
   // Metric controls are enhanced before this module. Position them in the

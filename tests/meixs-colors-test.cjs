@@ -66,7 +66,9 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
           await settle();
           const geometry = () =>
             [...document.querySelectorAll('body *')]
-              .filter((e) => e.getClientRects().length && !e.matches('style'))
+              // The export window has an explicitly approved layout change.
+              // Keep exact geometry comparisons for everything outside it.
+              .filter((e) => e.getClientRects().length && !e.matches('style') && !e.closest('#mp3ExportDialog'))
               .map((e) => {
                 const r = e.getBoundingClientRect(),
                   s = getComputedStyle(e);
@@ -290,13 +292,16 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
         palette.lime,
       );
       await colour('#mp3ExportDialog h2', 'backgroundColor', palette.lime, '::before');
-      await action('#mp3ExportDialog .mp3-actions .btn');
+      await action('#mp3ExportDialog .mp3-actions .btn:last-child');
+      await colour('#mp3ExportSave', 'backgroundColor', palette.lime);
+      await colour('#mp3ExportSave', 'color', palette.controlInk);
       await action('#mp3ExportDialog .numbox-button');
       await capture('export-dialog');
       await p.locator('#songExportFormat').selectOption('midi');
       await p.locator('#mp3ExportSave').click();
       await p.waitForFunction(() => !document.getElementById('mp3ExportDownload').hidden);
-      await action('#mp3ExportDownload');
+      await colour('#mp3ExportDownload', 'backgroundColor', palette.lime);
+      await colour('#mp3ExportDownload', 'color', palette.controlInk);
       assert.match(await p.locator('#mp3ExportDownload').getAttribute('download'), /\.mid$/);
       await capture('export-download');
       await p

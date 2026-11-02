@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
-import {doc,getDoc,getDocs,collection,setDoc,updateDoc,writeBatch,serverTimestamp,deleteDoc,runTransaction,Timestamp} from 'firebase/firestore';
+import {doc,getDoc,getDocs,collection,query,where,limit,setDoc,updateDoc,writeBatch,serverTimestamp,deleteDoc,runTransaction,Timestamp} from 'firebase/firestore';
 const environment=await initializeTestEnvironment({projectId:'demo-renax-backup',firestore:{host:'127.0.0.1',port:8080,rules:fs.readFileSync(new URL('../../firestore.rules',import.meta.url),'utf8')}});
 try{
 await environment.clearFirestore();const a=environment.authenticatedContext('accountA').firestore(),b=environment.authenticatedContext('accountB').firestore(),guest=environment.unauthenticatedContext().firestore();
@@ -64,6 +64,9 @@ await assertSucceeds(setDoc(shareRef,shareData));
 await assertSucceeds(getDoc(doc(guest,'playlistShares/'+shareId)));
 await assertSucceeds(getDoc(doc(b,'playlistShares/'+shareId)));
 await assertFails(getDocs(collection(guest,'playlistShares')));
+await assertFails(getDocs(collection(a,'playlistShares')));
+await assertSucceeds(getDocs(query(collection(a,'playlistShares'),where('ownerUid','==','accountA'),limit(200))));
+await assertFails(getDocs(query(collection(b,'playlistShares'),where('ownerUid','==','accountA'),limit(200))));
 await assertFails(updateDoc(doc(b,'playlistShares/'+shareId),{revision:2,payload:'tampered',updatedAt:serverTimestamp()}));
 await assertFails(updateDoc(shareRef,{ownerUid:'accountB',revision:2,updatedAt:serverTimestamp()}));
 await assertFails(updateDoc(shareRef,{revision:3,updatedAt:serverTimestamp()}));

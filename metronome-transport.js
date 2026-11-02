@@ -135,7 +135,8 @@
       const drawTime = (time - audioCtx.currentTime) * 1000 + (window.RENAX_PLAYBACK?.delayMs(audioCtx)||0);
       setTimeout(() => {
         if (!isPlaying || visualEpoch!==window.RENAX_PLAYBACK?.generation) return;
-         if (window.RENAX_SONGS?.loaded && measures[mIdx]!==visualModel) return;
+        const previousSongVisual=!!window.RENAX_SONGS?.loaded && measures[mIdx]!==visualModel;
+        if(previousSongVisual&&activeMeasureIndex!==mIdx)return;
         if(multiGeneration!==null&&(!window.RENAX_MULTI?.active||window.RENAX_MULTI.generation!==multiGeneration||measures[activeMeasureIndex]!==visualModel))return;
         if (activeMeasureIndex !== mIdx) {
           activeMeasureIndex = mIdx;
@@ -145,7 +146,7 @@
             c.classList.toggle('active', i === activeMeasureIndex);
           });
         }
-        const m = measures[mIdx];
+        const m = visualModel;
         const position = musicalPosition ?? { ...getBeatAndSub(m, sIdx), subdivisions: 1 };
         const beat = position.beat;
         const _visibleSubdivisions = m.beatSubdivisions[beat] || 1;

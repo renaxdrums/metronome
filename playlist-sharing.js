@@ -8,6 +8,7 @@ const version='12.16.0',base='https://www.gstatic.com/firebasejs/'+version+'/';
 let sdkPromise=null,readerPromise=null;
 const listeners=new Map(),pending=new Map();
 let activeScope=null,publishTimer=null,importing=false;
+let hydratedUid=null;
 
 function message(text,buttons=[['Fermer',()=>{}]]) {
   const dialog=document.createElement('dialog');
@@ -64,6 +65,25 @@ function outbound(uid) {
   }catch{return {};}
 }
 function putOutbound(uid,map){localStorage.setItem('renax-playlist-outbound-v1:'+uid,JSON.stringify(map));}
+async function discoverOwnedShares(uid) {
+  if(hydratedUid===uid)return outbound(uid);
+  const {sdk,db,uid:live}=await owner();
+  if(live!==uid)throw Error('La session a changé.');
+  const query=sdk.firestore.query(sdk.firestore.collection(db,'playlistShares'),
+    sdk.firestore.where('ownerUid','==',uid),sdk.firestore.limit(200));
+  const snapshot=await sdk.firestore.getDocsFromServer(query);
+  if(window.RENAX_BACKUP?.status.account!==uid)throw Error('La session a changé.');
+  const map=outbound(uid);
+  for(const document of snapshot.docs){
+    const share=document.data();
+    if(!share.revoked && SHARE_ID_PATTERN.test(document.id)
+       && typeof share.profileId==='string' && !map[share.profileId])
+      map[share.profileId]=document.id;
+  }
+  putOutbound(uid,map);
+  hydratedUid=uid;
+  return map;
+}
 function currentProfile(id){return api.library.profiles.find(p=>p.id===id);}
 function playing() {try{return isPlaying||!!api.preparing;}catch{return false;}}
 
@@ -84,7 +104,7 @@ async function publishOne(id,shareId,uid,source) {
 async function publishUpdates() {
   const uid=window.RENAX_BACKUP?.status.account;
   if(!uid)return;
-  const map=outbound(uid);
+  const map=await discoverOwnedShares(uid);
   for(const [id,token] of Object.entries(map)) {
     if(!SHARE_ID_PATTERN.test(token))continue;
     const source=currentProfile(id);
@@ -129,7 +149,7 @@ async function share(profileId) {
   }
   const {sdk,db,uid}=await owner();
   const scope=storage.scope;
-  const map=outbound(uid);
+  const map=await discoverOwnedShares(uid);
   let shareId=map[profileId];
   const payload=exportSharePayload(profile,api.validateLibrary);
   if(shareId&&SHARE_ID_PATTERN.test(shareId)){
@@ -221,6 +241,7 @@ window.addEventListener('renax-library-edited',()=>{schedulePublish();refreshSub
 window.addEventListener('renax-storage',()=>{
   refreshSubscriptions().catch(console.warn);
   if(storage.scope.startsWith('user:')&&!importing){
+    if(hydratedUid!==window.RENAX_BACKUP?.status.account)schedulePublish();
     let queued=null;
     try{queued=sessionStorage.getItem('renax-share-pending-v1');}catch{}
     if(queued&&SHARE_ID_PATTERN.test(queued)){

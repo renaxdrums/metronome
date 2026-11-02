@@ -194,6 +194,15 @@
   function status(message){storageStatus=message;const e=document.getElementById('songStatus');if(e)e.textContent=message;}
   function persist(){
     clearTimeout(persistTimer);persistTimer=null;
+    const saved=RENAX_STORAGE.state?.library;
+    if(saved&&library.profiles.some(current=>current.id.startsWith('shared_')&&
+      JSON.stringify(current)!==JSON.stringify(saved.profiles.find(p=>p.id===current.id)))){
+      // Defensive boundary: a shared subscription may only change via the
+      // verified remote-import path (which persists before replacing the UI).
+      library=clone(saved);persistFailed=false;render();
+      status('Cette playlist partagée est en lecture seule.');
+      return false;
+    }
     if(RENAX_STORAGE.matches(library)){persistFailed=false;return true;}
     try{RENAX_STORAGE.write(library);persistFailed=false;window.RENAX_EMERGENCY?.confirm(RENAX_STORAGE.scope,library);window.dispatchEvent(new Event('renax-library-edited'));status('Sauvegardé dans ce navigateur');return true;}
     catch(error){

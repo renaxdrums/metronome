@@ -82,7 +82,11 @@ service cloud.firestore {
   }
 }
 ) && resource.data.revoked == false;
-      allow list: if false;
+      // A signed-in owner may enumerate only their own shares with a bounded
+      // ownerUid-filtered query. Everyone else needs the exact private token.
+      allow list: if request.auth != null
+        && request.auth.uid == resource.data.ownerUid
+        && request.query.limit <= 200;
       allow create: if shareId.matches('^[0-9a-f]{32}
   }
 }

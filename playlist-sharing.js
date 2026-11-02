@@ -225,17 +225,17 @@ async function importLink(id) {
       api.library.profiles.some(profile=>profile.songs.length>0 || profile.name!=='Mon profil');
     if(localSession){
       const changed=await apply(document,id,true);
-      history.replaceState(null,'',location.pathname+location.search);
+      history.replaceState(history.state,'',location.pathname+location.search);
       if(!changed)message('Cette playlist est déjà présente dans tes playlists.');
       await refreshSubscriptions();
     }else if(storage.scope==='guest') {
       message('Comment veux-tu recevoir cette playlist ?',[
-        ['Utiliser en local',()=>apply(document,id,true).then(()=>{history.replaceState(null,'',location.pathname+location.search);refreshSubscriptions();}).catch(showError)],
+        ['Utiliser en local',()=>apply(document,id,true).then(()=>{history.replaceState(history.state,'',location.pathname+location.search);refreshSubscriptions();}).catch(showError)],
         ['Se connecter',()=>{sessionStorage.setItem('renax-share-pending-v1',id);window.RENAX_BACKUP?.openChoices();}]
       ]);
     }else{
       const changed=await apply(document,id,true);
-      history.replaceState(null,'',location.pathname+location.search);
+      history.replaceState(history.state,'',location.pathname+location.search);
       message(changed?'Playlist ajoutée à tes playlists.':'Cette playlist est déjà présente dans tes playlists.');
       refreshSubscriptions();
     }

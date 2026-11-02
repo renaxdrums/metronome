@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "13e86737af4b1387",
+  "revision": "fcb9ff07e80cc3d1",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "9b28a2130ab438df97c5732e8758905293798d0ec838fef4f1b57cfcf1296c90",
+      "sha256": "943327714809ebaded720861bb2bbc339bf3fc0d16e63efda0132c28d535e8d6",
       "text": true
     },
     {
@@ -424,7 +424,7 @@
     },
     {
       "path": "playlist-sharing.js",
-      "sha256": "3d8c6424f08a66c469175c091f70b7fb4487f990a7bc7c6ca2240103338367b7",
+      "sha256": "8aa1fcf2641ee6677c7c10b2e258836620c6e1505a3f27088133ca48b3b29bee",
       "text": true
     },
     {

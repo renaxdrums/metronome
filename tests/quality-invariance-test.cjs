@@ -344,6 +344,46 @@ async function baselineRoute(page, url) {
                 }, module);
               }
               await p.getByRole('tab', { name: module, exact: true }).click();
+              if (!i && !referenceAgainstItself && module === 'Séquenceur') {
+                // The new count field is approved. Reproduce only its initial
+                // DOM and scoped CSS in the historical baseline, preserving
+                // strict pixel and computed-style checks for everything else.
+                await p.addStyleTag({
+                  content:
+                    '#measureList .measure-repeat-row{max-width:100%;cursor:default;}' +
+                    '#measureList .measure-repeat-input{width:120px;min-width:80px;max-width:100%;box-sizing:border-box;}',
+                });
+                await p.evaluate(() => {
+                  const cards = [...document.querySelectorAll('#measureList .measure-card')];
+                  if (!cards.length) throw Error('Expected sequencer cards in visual baseline');
+                  cards.forEach((card, index) => {
+                    const tempo = card.querySelector('.measure-tempo-row');
+                    if (!tempo || card.querySelector('.measure-repeat-row'))
+                      throw Error('Unexpected historical sequencer card markup');
+                    const row = document.createElement('div');
+                    row.className = 'measure-tempo-row measure-repeat-row';
+                    const label = document.createElement('label');
+                    label.className = 'measure-tempo-label';
+                    label.textContent = 'MESURES';
+                    label.htmlFor = 'sequenceRepeatCount-' + index;
+                    const input = document.createElement('input');
+                    input.id = label.htmlFor;
+                    input.type = 'text';
+                    input.inputMode = 'numeric';
+                    input.autocomplete = 'off';
+                    input.spellcheck = false;
+                    input.className = 'measure-tempo-input measure-repeat-input';
+                    input.value = '1';
+                    input.setAttribute(
+                      'aria-label',
+                      'Nombre de mesures répétées du bloc ' + (index + 1),
+                    );
+                    input.title = 'Nombre entier positif de mesures, sans plafond prédéfini';
+                    row.append(label, input);
+                    tempo.after(row);
+                  });
+                });
+              }
               if ((!i || referenceAgainstItself) && module === 'Track')
                 await p.evaluate(() => {
                   playBtn.dataset.songTransport = 'true';

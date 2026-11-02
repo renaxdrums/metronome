@@ -559,7 +559,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       const list=el('div',undefined,overview,'playlist-list');
       for(const item of library.profiles){
         const entry=el('div',undefined,list);entry.style.position='relative';
-        const choice=button('',entry,()=>openPlaylist(item));choice.style.paddingRight='96px';choice.classList.add('playlist-choice');labelWithValue(choice,'Ouvrir la playlist {user}',item.name==='Mon profil'?'Tracks':item.name);
+        const choice=button('',entry,()=>openPlaylist(item));choice.style.paddingRight='136px';choice.classList.add('playlist-choice');labelWithValue(choice,'Ouvrir la playlist {user}',item.name==='Mon profil'?'Tracks':item.name);
         const name=el('strong',item.name==='Mon profil'?'Tracks':item.name,choice,'playlist-choice-name');name.dataset.noTranslate='';if(item.name==='Mon profil')name.textContent='Tracks';
         el('span',item.songs.length+' morceau'+(item.songs.length===1?'':'x'),choice,'playlist-choice-count');
         const controls=el('div',undefined,entry,'song-more-wrap');controls.style.top='8px';controls.style.bottom='auto';controls.style.display='inline-flex';controls.style.gap='6px';
@@ -572,6 +572,13 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         direct.className='song-more playlist-direct-play';direct.dataset.playPlaylistId=item.id;direct.disabled=!item.songs.length;
         labelWithValue(direct,'Lire le premier track de {user}',item.name==='Mon profil'?'Tracks':item.name);direct.setAttribute('aria-pressed','false');direct.title=item.songs.length?'Lire le premier track':'Playlist vide';
         direct.innerHTML='<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="currentColor"><path d="M4 2.5v11l9-5.5z"/></svg>';
+        if(!item.id.startsWith('shared_')){
+          const share=button('',controls,()=>window.RENAX_PLAYLIST_SHARING?.share(item.id));
+          share.className='song-more playlist-share-button';
+          share.setAttribute('aria-label','Partager la playlist '+item.name);
+          share.title='Partager la playlist';
+          share.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.3"/><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="19" r="2.3"/><path d="m8.2 10.9 7.6-4.6M8.2 13.1l7.6 4.6"/></svg>';
+        }
         const trigger=button('⋯',controls,()=>{const opening=menu.hidden;songPane.querySelectorAll('.song-more-menu').forEach(other=>other.hidden=true);songPane.querySelectorAll('.song-more').forEach(other=>other.setAttribute('aria-expanded','false'));menu.hidden=!opening;trigger.setAttribute('aria-expanded',String(opening));});
         trigger.className='song-more';labelWithValue(trigger,'Actions de la playlist {user}',item.name==='Mon profil'?'Tracks':item.name);trigger.setAttribute('aria-haspopup','menu');trigger.setAttribute('aria-expanded','false');
         const menu=el('div',undefined,controls,'song-more-menu');menu.hidden=true;menu.setAttribute('role','menu');menu.style.top='36px';menu.style.bottom='auto';

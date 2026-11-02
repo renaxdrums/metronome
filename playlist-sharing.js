@@ -190,6 +190,10 @@ async function share(profileId) {
   linkDialog(publicShareLink(location.href,shareId),profile.name,profileId,shareId,uid);
 }
 
+function openReceivedPlaylists() {
+  window.RENAX_WORKSPACE?.go('tracks');
+  api.restoreNavigation({pane:'songs',view:'playlists',profile:api.library.activeProfile});
+}
 async function apply(document,id,navigate=false) {
   if(storage.readOnly)throw Error('Sauvegarde locale en lecture seule.');
   const editing=document.activeElement?.closest?.('#songPane') &&
@@ -200,13 +204,13 @@ async function apply(document,id,navigate=false) {
   const scope=storage.scope,token=storage.rawToken;
   const result=addOrUpdateSharedPlaylist(api.library,document,id,api.validateLibrary);
   if(!result.changed){
-    if(navigate)api.restoreNavigation({pane:'songs',view:'playlists',profile:api.library.activeProfile});
+    if(navigate)openReceivedPlaylists();
     return false;
   }
   if(scope!==storage.scope||token!==storage.rawToken)throw Error('La session a changé pendant l’importation.');
   storage.write(result.library); // Durable write first; no in-memory replacement on failure.
   api.replaceLibrary(result.library,true);
-  if(navigate)api.restoreNavigation({pane:'songs',view:'playlists',profile:result.library.activeProfile});
+  if(navigate)openReceivedPlaylists();
   window.dispatchEvent(new CustomEvent('renax-share-updated',{detail:{shareId:id,added:result.added}}));
   return true;
 }

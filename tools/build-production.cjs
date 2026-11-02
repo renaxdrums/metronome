@@ -121,7 +121,7 @@ function prepareOutput() {
     "base-uri 'self'",
     "object-src 'none'",
     "form-action 'self'",
-    `script-src 'self' 'wasm-unsafe-eval' https://www.gstatic.com ${cdnSources} https://www.google.com ` +
+    `script-src 'self' 'wasm-unsafe-eval' https://www.gstatic.com ${cdnSources} https://www.google.com https://apis.google.com ` +
       hashes.join(' '),
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",

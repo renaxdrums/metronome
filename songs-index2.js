@@ -602,7 +602,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       const share=button('',playlistHeading,()=>window.RENAX_PLAYLIST_SHARING?.share(p.id));
       share.className='btn playlist-share-button';share.setAttribute('aria-label','Partager la playlist '+p.name);
       share.title='Partager la playlist';
-      share.style.cssText='margin-left:auto;display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;min-height:36px;padding:0;';
+      
       share.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.3"/><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="19" r="2.3"/><path d="m8.2 10.9 7.6-4.6M8.2 13.1l7.6 4.6"/></svg>';
     }
 
@@ -620,7 +620,14 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         row.addEventListener('dblclick',e=>{if(!e.target.closest('.song-more-wrap'))openSong();});
         row.addEventListener('keydown',e=>{if(e.target===row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();if(e.key==='Enter')openSong();else selectPlaylistSong(item);}});
         const open=button('',row,()=>selectPlaylistSong(item));open.className='song-open measure-head';labelWithValue(open,'Sélectionner {user}',item.name);open.setAttribute('aria-pressed',String(selectedSong===item.id));
-        el('span',item.name,open,'measure-num').dataset.noTranslate='';open.append(document.createTextNode(' '));
+        const songName=el('span',item.name,open,'measure-num');songName.dataset.noTranslate='';
+        if(item.chainNext===true){
+          const chainIcon=el('span',undefined,open,'song-chain-indicator');
+          chainIcon.setAttribute('aria-hidden','true');
+          chainIcon.title='Enchaînement activé vers le morceau suivant';
+          chainIcon.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12M4 12h12M4 17h12"/><path d="m14 4 4 3-4 3M14 14l4 3-4 3"/></svg>';
+        }
+        open.append(document.createTextNode(' '));
         const meters=[...new Set(item.sections.map(s=>s.measure.numerator+'/'+s.measure.denominator))];
         const signature=el('span',meters.length===1?meters[0]:'Mixte',open,'measure-sig');signature.title=meters.join(' · ');labelWithValue(open,'Sélectionner {user} '+signature.textContent,item.name);
         const tempos=item.sections.flatMap(s=>RENAX_SONG_TEMPO.active(s)?[s.measure.tempo,s.tempoRamp.endTempo]:[s.measure.tempo]),min=Math.min(...tempos),max=Math.max(...tempos);

@@ -78,28 +78,19 @@ service cloud.firestore {
         && data.createdAt is timestamp && data.updatedAt == request.time;
     }
     match /playlistShares/{shareId} {
-      allow get: if shareId.matches('^[0-9a-f]{32}
-  }
-}
-) && resource.data.revoked == false;
+      allow get: if shareId.matches('^[0-9a-f]{32}$') && resource.data.revoked == false;
       // A signed-in owner may enumerate only their own shares with a bounded
       // ownerUid-filtered query. Everyone else needs the exact private token.
       allow list: if request.auth != null
         && request.auth.uid == resource.data.ownerUid
         && request.query.limit <= 200;
-      allow create: if shareId.matches('^[0-9a-f]{32}
-  }
-}
-)
+      allow create: if shareId.matches('^[0-9a-f]{32}$')
         && request.auth != null && validShare(request.resource.data)
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.revision == 1
         && request.resource.data.revoked == false
         && request.resource.data.createdAt == request.time;
-      allow update: if shareId.matches('^[0-9a-f]{32}
-  }
-}
-)
+      allow update: if shareId.matches('^[0-9a-f]{32}$')
         && request.auth != null && resource.data.ownerUid == request.auth.uid
         && validShare(request.resource.data)
         && request.resource.data.ownerUid == resource.data.ownerUid

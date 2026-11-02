@@ -863,3 +863,6 @@ html#renaxApp[data-theme="avant"] body:not(.poly-mode) .visu-bottom .legend-item
   border-radius:50%;
   box-shadow:inset 0 0 0 1.5px var(--ag-white);
 }
+
+/* The active beat keeps its validated white outline, even on coloured states. */
+html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step.active{border-color:var(--ag-white);}

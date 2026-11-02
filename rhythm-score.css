@@ -30,8 +30,9 @@
 }
 .score-view-switch button[hidden],.rhythm-editor[hidden],.score-pulse[hidden]{display:none;}
 .rhythm-score{max-height:calc(100% - var(--score-controls-height,75px));}
-.rhythm-score .vf-notehead path{fill:var(--note-state-color,#111);stroke:var(--note-state-color,#111);}
-.rhythm-score .score-active-head path{fill:var(--cyan,#00e5ff);stroke:var(--cyan,#00e5ff);}
+/* A thin dark edge keeps the original note-head colours and ghost sizes intact in every theme. */
+.rhythm-score .vf-notehead path{fill:var(--note-state-color,#111);stroke:#30363a;stroke-width:.75px;stroke-linejoin:round;paint-order:stroke fill;}
+.rhythm-score .score-active-head path{fill:var(--cyan,#00e5ff);stroke:#30363a;}
 
 .rhythm-score .score-selected{filter:drop-shadow(0 0 2px rgba(0,229,255,.35));}
 .rhythm-score [data-event]{cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;}

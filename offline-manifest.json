@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0617f13cc9d98d7d",
+  "revision": "f20bb19b2b976cb3",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "d6cbc7f17ea45f66cb3cb6421859790f26698008dd880bb4687a56ff97e7eccd",
+      "sha256": "45bb701f9c2739aa95756130b0fe763f77d7909681ec5beab765c7ef5280e068",
       "text": true
     },
     {
@@ -489,7 +489,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "de8f88fc5884ce1d3ca269d59759cd8b6ed1afde3e55a8dd7f7ac05118ac6b62",
+      "sha256": "4197b45900da98a4649b0f4069bb00c526baddde0c8a871d8641324a52a59e96",
       "text": true
     },
     {

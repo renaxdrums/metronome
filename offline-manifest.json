@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "bc1a55ecb9419fbd",
+  "revision": "13e86737af4b1387",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "7420c6c66f422c89bcbc488800dfd9896178a2af20f68e72ce4a9a5a2190ae82",
+      "sha256": "9b28a2130ab438df97c5732e8758905293798d0ec838fef4f1b57cfcf1296c90",
       "text": true
     },
     {
@@ -418,6 +418,16 @@
       "text": true
     },
     {
+      "path": "playlist-sharing-core.mjs",
+      "sha256": "ed8fce7b79a3f83cc11da41592a5b62d280bbc564c826f072e64250e4c3a8845",
+      "text": true
+    },
+    {
+      "path": "playlist-sharing.js",
+      "sha256": "3d8c6424f08a66c469175c091f70b7fb4487f990a7bc7c6ca2240103338367b7",
+      "text": true
+    },
+    {
       "path": "pro-interface.css",
       "sha256": "58585adca440c15586546cc65a4148dcdfb29af677bf531bc8a733a33cdd1d9b",
       "text": true
@@ -479,7 +489,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "3f73d2ce3e9ae298242b6d2e483462b5bf0d1ab38f2cee2bb8f71fcbb4767cb4",
+      "sha256": "bd96a6e47357a096a2a2c9ddbc0abc29cb139efab9a4e2102e8def1c3df03775",
       "text": true
     },
     {

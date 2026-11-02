@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
-import {doc,getDoc,setDoc,writeBatch,serverTimestamp,deleteDoc,runTransaction,Timestamp} from 'firebase/firestore';
+import {doc,getDoc,getDocs,collection,query,where,limit,setDoc,updateDoc,writeBatch,serverTimestamp,deleteDoc,runTransaction,Timestamp} from 'firebase/firestore';
 const environment=await initializeTestEnvironment({projectId:'demo-renax-backup',firestore:{host:'127.0.0.1',port:8080,rules:fs.readFileSync(new URL('../../firestore.rules',import.meta.url),'utf8')}});
 try{
 await environment.clearFirestore();const a=environment.authenticatedContext('accountA').firestore(),b=environment.authenticatedContext('accountB').firestore(),guest=environment.unauthenticatedContext().firestore();
@@ -51,5 +51,29 @@ await assertSucceeds(paired(a,'users/accountA/records/song',data(5)));
 assert.equal((await getDoc(budget)).data().count,1);
 await assertFails(runTransaction(a,async tx=>{const first=data(1),second=data(1),commitPermit=await permit(tx,a,'users/accountA/records/extra',first);commitPermit();for(const [id,value]of [['extra',first],['bypass',second]]){tx.set(doc(a,'users/accountA/records/'+id),value);tx.set(doc(a,'users/accountA/records/'+id+'/history/1'),value);}}));
 console.log('Server write budget PASS: no omitted permit, no early reset, no cross-account read, exhausted window denied, expired window reset, multi-record bypass denied');
+// A share token grants only document-level read access, not private account access or listing.
+const shareId='0123456789abcdef0123456789abcdef';
+const shareRef=doc(a,'playlistShares/'+shareId);
+const shareData={
+  schema:1,ownerUid:'accountA',profileId:'playlist-1',revision:1,payload:'{"id":"playlist-1","name":"Concert","songs":[]}',
+  revoked:false,createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+};
+await assertFails(setDoc(doc(guest,'playlistShares/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'),shareData));
+await assertFails(setDoc(doc(b,'playlistShares/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'),shareData));
+await assertSucceeds(setDoc(shareRef,shareData));
+await assertSucceeds(getDoc(doc(guest,'playlistShares/'+shareId)));
+await assertSucceeds(getDoc(doc(b,'playlistShares/'+shareId)));
+await assertFails(getDocs(collection(guest,'playlistShares')));
+await assertFails(getDocs(collection(a,'playlistShares')));
+await assertSucceeds(getDocs(query(collection(a,'playlistShares'),where('ownerUid','==','accountA'),limit(200))));
+await assertFails(getDocs(query(collection(b,'playlistShares'),where('ownerUid','==','accountA'),limit(200))));
+await assertFails(updateDoc(doc(b,'playlistShares/'+shareId),{revision:2,payload:'tampered',updatedAt:serverTimestamp()}));
+await assertFails(updateDoc(shareRef,{ownerUid:'accountB',revision:2,updatedAt:serverTimestamp()}));
+await assertFails(updateDoc(shareRef,{revision:3,updatedAt:serverTimestamp()}));
+await assertSucceeds(updateDoc(shareRef,{revision:2,payload:'{"id":"playlist-1","name":"Concert modifié","songs":[]}',updatedAt:serverTimestamp()}));
+await assertSucceeds(updateDoc(shareRef,{revision:3,revoked:true,updatedAt:serverTimestamp()}));
+await assertFails(getDoc(doc(guest,'playlistShares/'+shareId)));
+await assertFails(updateDoc(shareRef,{revision:4,revoked:false,updatedAt:serverTimestamp()}));
+console.log('Playlist sharing rules PASS: anonymous single-link read, no listing, owner-only updates, irreversible revocation');
 console.log('Firestore rules PASS: anonymous denial, account isolation, immutable history, schema/fields, server time, revision CAS, tombstones and atomic concurrent writers');
 }finally{await environment.cleanup();}

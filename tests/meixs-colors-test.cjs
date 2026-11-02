@@ -7,7 +7,9 @@ const approvedCSS = process.env.MEIXS_BASE_REF
   ? cp.execFileSync('git', ['show', process.env.MEIXS_BASE_REF + ':avant-garde-theme.css'], {
       encoding: 'utf8',
     }) +
-    '\n@media(max-width:1100px){html#renaxApp[data-theme="avant"] body #workspaceNav{gap:5px!important}}'
+    '\n@media(max-width:1100px){html#renaxApp[data-theme="avant"] body #workspaceNav{gap:5px!important}}' +
+    // The approved Citron markers are circular; keep every other geometry check.
+    '\nhtml#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step,html#renaxApp[data-theme="avant"] body:not(.poly-mode) .visu-bottom .legend-color{border-radius:50%;}'
   : null;
 const { start, showMeasures, openControls, newTrack } = require('./audio-harness.cjs');
 (async () => {

@@ -63,6 +63,43 @@ service cloud.firestore {
       allow create, update: if owner(uid) && validBudget(uid, request.resource.data);
       allow delete: if false;
     }
+    // Link-only snapshots: owners may publish; the token is unguessable.
+    // Public access is restricted to a single known document. Enumeration and
+    // private /users/* records remain forbidden. Revocation denies further reads.
+    function validShare(data) {
+      return data.keys().hasOnly(['schema','ownerUid','profileId','revision','payload','revoked','createdAt','updatedAt'])
+        && data.keys().hasAll(['schema','ownerUid','profileId','revision','payload','revoked','createdAt','updatedAt'])
+        && data.schema == 1
+        && data.ownerUid is string && data.ownerUid.size() > 0 && data.ownerUid.size() <= 128
+        && data.profileId is string && data.profileId.size() > 0 && data.profileId.size() <= 128
+        && data.revision is int && data.revision > 0
+        && data.payload is string && data.payload.size() <= 800000
+        && data.revoked is bool
+        && data.createdAt is timestamp && data.updatedAt == request.time;
+    }
+    match /playlistShares/{shareId} {
+      allow get: if shareId.matches('^[0-9a-f]{32}$') && resource.data.revoked == false;
+      // A signed-in owner may enumerate only their own shares with a bounded
+      // ownerUid-filtered query. Everyone else needs the exact private token.
+      allow list: if request.auth != null
+        && request.auth.uid == resource.data.ownerUid
+        && request.query.limit <= 200;
+      allow create: if shareId.matches('^[0-9a-f]{32}$')
+        && request.auth != null && validShare(request.resource.data)
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.revision == 1
+        && request.resource.data.revoked == false
+        && request.resource.data.createdAt == request.time;
+      allow update: if shareId.matches('^[0-9a-f]{32}$')
+        && request.auth != null && resource.data.ownerUid == request.auth.uid
+        && validShare(request.resource.data)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.profileId == resource.data.profileId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.revision == resource.data.revision + 1
+        && (!resource.data.revoked || request.resource.data.revoked);
+      allow delete: if false;
+    }
     match /{document=**} { allow read, write: if false; }
   }
 }

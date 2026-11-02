@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "bc1a55ecb9419fbd",
+  "revision": "a5489929a12ca533",
   "resources": [
     {
       "path": "accessibility.css",
@@ -14,7 +14,7 @@
     },
     {
       "path": "amorce-song.js",
-      "sha256": "1e931e07c4972bfcb07a3977330dedebd2f73381594a3e072a4e4347e849adb6",
+      "sha256": "8ce54d637c8f1d617f47c0667e4b8c2e19c3d91cfeee8e554fe5b48fbddbeb9c",
       "text": true
     },
     {
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "af8c7bfc9092c46bba3ca51c2466ab6afb43f5e6ac8243ddc14cf88928c873df",
+      "sha256": "ba64e90914de87d3df653580d99829a1f5f03d310e3450da15a6cc215236a9ac",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "7420c6c66f422c89bcbc488800dfd9896178a2af20f68e72ce4a9a5a2190ae82",
+      "sha256": "e299a33f8b583788c6e0fb33828c04f5630006f4ee6258d727d27ba8e268fc05",
       "text": true
     },
     {
@@ -339,7 +339,7 @@
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "3753584224645952ae56fb93a9857ebdba3ecabd1281805f16426b6507fb0e3b",
+      "sha256": "7e770cc65de5a75a12bdfae7d5e9aff1ecf20d47d6ef906b26649b2c65540e52",
       "text": true
     },
     {
@@ -418,6 +418,16 @@
       "text": true
     },
     {
+      "path": "playlist-sharing-core.mjs",
+      "sha256": "ed8fce7b79a3f83cc11da41592a5b62d280bbc564c826f072e64250e4c3a8845",
+      "text": true
+    },
+    {
+      "path": "playlist-sharing.js",
+      "sha256": "c3f784e04936adaa0c6748accea3533f552e8c9e2d3c9dd34825b43b8f575a99",
+      "text": true
+    },
+    {
       "path": "pro-interface.css",
       "sha256": "58585adca440c15586546cc65a4148dcdfb29af677bf531bc8a733a33cdd1d9b",
       "text": true
@@ -444,7 +454,7 @@
     },
     {
       "path": "rhythm-score.css",
-      "sha256": "1952315176ed2f121e1b7469150a485ad895184b6a943294ccd95320ad5ab17e",
+      "sha256": "89af9ee153130c683b19c0207d293ac01c0d1693f7f3b5fe858d7599d3bcfe5b",
       "text": true
     },
     {
@@ -479,12 +489,12 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "3f73d2ce3e9ae298242b6d2e483462b5bf0d1ab38f2cee2bb8f71fcbb4767cb4",
+      "sha256": "4197b45900da98a4649b0f4069bb00c526baddde0c8a871d8641324a52a59e96",
       "text": true
     },
     {
       "path": "songs.css",
-      "sha256": "55644227b2fb09b3ef3bbf7a284bc6ee1051e306e554642acd1d29ed3d0cb223",
+      "sha256": "9ed52968ed47afac4f4533043366735991ec8120b8e482661f23523c217e6470",
       "text": true
     },
     {

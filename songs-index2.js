@@ -34,6 +34,7 @@
   let library,selectedSong=null,loaded=null,endTimer=null,songView='home',openSectionId=null,storageStatus='Enregistrement automatique';
   // Session-only preferences, not part of the saved library.
   let lastTrackSelection=null;
+  const preparedChainPlans=new Map();
   try { library=JSON.parse(RENAX_STORAGE.read())||defaultLibrary();validateLibrary(library); }
   catch (_error) { RENAX_STORAGE.markCorrupt();library=defaultLibrary();storageStatus='Sauvegarde locale illisible : la source a été conservée. Exportez vos données avant de continuer.'; }
   if(!library.profiles.some(p=>p.id===library.activeProfile))library.activeProfile=library.profiles[0].id;
@@ -194,6 +195,15 @@
   function status(message){storageStatus=message;const e=document.getElementById('songStatus');if(e)e.textContent=message;}
   function persist(){
     clearTimeout(persistTimer);persistTimer=null;
+    const saved=library.profiles.some(p=>p.id.startsWith('shared_'))?RENAX_STORAGE.state?.library:null;
+    if(saved&&library.profiles.some(current=>current.id.startsWith('shared_')&&
+      JSON.stringify(current)!==JSON.stringify(saved.profiles.find(p=>p.id===current.id)))){
+      // Defensive boundary: a shared subscription may only change via the
+      // verified remote-import path (which persists before replacing the UI).
+      library=clone(saved);persistFailed=false;render();
+      status('Cette playlist partagée est en lecture seule.');
+      return false;
+    }
     if(RENAX_STORAGE.matches(library)){persistFailed=false;return true;}
     try{RENAX_STORAGE.write(library);persistFailed=false;window.RENAX_EMERGENCY?.confirm(RENAX_STORAGE.scope,library);window.dispatchEvent(new Event('renax-library-edited'));status('Sauvegardé dans ce navigateur');return true;}
     catch(error){
@@ -217,9 +227,30 @@
       seconds:RENAX_SONG_TEMPO.stepDuration(section,bar,beat,subIndex,subdivisions),
       beatSeconds:RENAX_SONG_TEMPO.stepDuration(section,bar,beat,0,1)};
   };
+  // A song chain uses one continuous Web Audio timeline. Prepare all vocal
+  // material before starting so no asynchronous synthesis delays a boundary.
+  async function prepareChainedGuides(first){
+    preparedChainPlans.clear();
+    const owner=library.profiles.find(p=>p.songs.some(item=>item.id===first.id));
+    if(!owner)return;
+    let index=owner.songs.findIndex(item=>item.id===first.id);
+    while(index>=0 && owner.songs[index]?.chainNext===true && index+1<owner.songs.length){
+      const following=owner.songs[++index];
+      if(following.amorce){
+        // Fully prepare the next vocal count-in before entering the audio timeline.
+        await initAudio();
+        await prepareAllVoiceAudio();
+        const plan=await RENAX_AMORCE.prepare(following);
+        preparedChainPlans.set(following.id,{source:JSON.stringify(following),plan});
+      }
+    }
+  }
+  function chainMeasureProxy(){
+    return new Proxy([], {get(target,key){if(key==='length')return loaded.total;if(key==='indexOf')return m=>{if(locate(activeMeasureIndex)?.section.measure===m)return activeMeasureIndex;let n=0;for(const s of loaded.song.sections){if(s.measure===m)return n;n+=s.count;}return -1;};if(typeof key==='string'&&/^\d+$/.test(key))return locate(Number(key))?.section.measure;return Reflect.get(target,key);}});
+  }
   function loadSong(sectionId=null,amorcePlan=null){const s=song();if(!s||sectionId&&!s.sections.some(section=>section.id===sectionId))return;songReloadDepth++;try{unload();stopMetronome();endTraining();if(appMode!=='metronome')setAppMode('metronome');setSilentMode(false);resetCustomizationTimer();const previous=metronomeMeasures;const snapshot=clone(s);snapshot.sections=sectionId?snapshot.sections.filter(section=>section.id===sectionId):(amorcePlan?amorcePlan.sections:playbackSections(snapshot));loaded={song:snapshot,previous,guidePlan:amorcePlan,continuous:hasContinuous(snapshot),nextRequested:false,preview:!!sectionId,total:snapshot.sections.reduce((n,s)=>n+s.count,0)};
     // Repeat section templates lazily: no array of every bar and no eight-bar limit.
-    measures=new Proxy([], {get(target,key){if(key==='length')return loaded.total;if(key==='indexOf')return m=>{if(locate(activeMeasureIndex)?.section.measure===m)return activeMeasureIndex;let n=0;for(const s of loaded.song.sections){if(s.measure===m)return n;n+=s.count;}return -1;};if(typeof key==='string'&&/^\d+$/.test(key))return locate(Number(key))?.section.measure;return Reflect.get(target,key);}});
+    measures=chainMeasureProxy();
     metronomeMeasures=measures;activeMeasureIndex=0;playingMeasureIndex=0;currentStepInMeasure=0;renderSequencerList();renderActiveMeasure();updatePosition();
     }finally{songReloadDepth--;}
   }
@@ -249,14 +280,34 @@
     const index=owner?.songs.findIndex(item=>item.id===finishedId)??-1;
     const next=(!preview&&loaded.song.chainNext===true&&owner&&index>=0)?owner.songs[index+1]:null;
     clearTimeout(endTimer);
-    endTimer=setTimeout(async()=>{
+    if(next&&owner.songs.includes(next)&&!songsRoot.hidden&&library.activeProfile===owner.id){
+      const prepared=preparedChainPlans.get(next.id);
+      if(next.amorce && (!prepared || prepared.source!==JSON.stringify(next))){
+        // Never silently omit the vocal guide or restart the clock on a boundary.
+        status('Enchaînement interrompu : guide vocal du morceau suivant non préparé.');
+      }else{
+        const snapshot=clone(next),plan=next.amorce?prepared.plan:null;
+        snapshot.sections=plan?plan.sections:playbackSections(snapshot);
+        const previous=loaded.previous;
+        loaded={song:snapshot,previous,guidePlan:plan,continuous:hasContinuous(snapshot),nextRequested:false,preview:false,total:snapshot.sections.reduce((n,section)=>n+section.count,0)};
+        measures=chainMeasureProxy();metronomeMeasures=measures;
+        playingMeasureIndex=0;currentStepInMeasure=0;
+        scheduledMeasureLayouts=new WeakMap();
+        RENAX_AMORCE.stopAt(nextNoteTime);
+        if(plan){RENAX_AMORCE.install(plan);RENAX_AMORCE.begin(audioCtx,nextNoteTime,plan);}
+        selectedSong=next.id;lastTrackSelection={playlistId:owner.id,songId:next.id};openSectionId=null;songView='playlist';
+        // UI changes at the acoustic boundary, not at scheduler look-ahead time.
+        const boundaryId=next.id;
+        endTimer=setTimeout(()=>{
+          if(!isPlaying||loaded?.song.id!==boundaryId)return;
+          activeMeasureIndex=0;renderSequencerList();renderActiveMeasure();render();syncSongTransport();
+        },Math.max(0,(nextNoteTime-audioCtx.currentTime)*1000));
+        return false;
+      }
+    }
+    endTimer=setTimeout(()=>{
       if(!isPlaying||loaded?.song.id!==finishedId)return;
-      stopMetronome();
-      if(next&&owner.songs.includes(next)&&!songsRoot.hidden&&library.activeProfile===owner.id){
-        unload();selectedSong=next.id;lastTrackSelection={playlistId:owner.id,songId:next.id};openSectionId=null;songView='playlist';
-        render();
-        try{await startMetronome();}catch(error){status('Lecture impossible : '+error.message);}
-      }else status(preview?'Bloc terminé.':'Morceau terminé.');
+      stopMetronome();status(preview?'Bloc terminé.':'Morceau terminé.');
     },Math.max(0,(nextNoteTime-audioCtx.currentTime)*1000));
     return true;
   };
@@ -297,6 +348,17 @@
         if(!['playlist','detail'].includes(songView)){songView='playlist';render();panel.scrollTop=0;}
         else updatePosition();
       }
+    }
+    if(!isPlaying && target?.chainNext===true){
+      const epoch=++songStartEpoch;
+      preparingAmorce=true;playBtn.textContent='Préparation…';
+      try{
+        await prepareChainedGuides(target);
+        if(epoch!==songStartEpoch)return;
+      }catch(error){
+        status('Impossible de préparer l’enchaînement : '+error.message);
+        return;
+      }finally{if(epoch===songStartEpoch){preparingAmorce=false;updateTrainButton();syncSongTransport();}}
     }
     const current=loaded?.song?.amorce?song()||loaded.song:target;
     if(!isPlaying&&current?.amorce){
@@ -575,7 +637,7 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         const trigger=button('⋯',controls,()=>{const opening=menu.hidden;songPane.querySelectorAll('.song-more-menu').forEach(other=>other.hidden=true);songPane.querySelectorAll('.song-more').forEach(other=>other.setAttribute('aria-expanded','false'));menu.hidden=!opening;trigger.setAttribute('aria-expanded',String(opening));});
         trigger.className='song-more';labelWithValue(trigger,'Actions de la playlist {user}',item.name==='Mon profil'?'Tracks':item.name);trigger.setAttribute('aria-haspopup','menu');trigger.setAttribute('aria-expanded','false');
         const menu=el('div',undefined,controls,'song-more-menu');menu.hidden=true;menu.setAttribute('role','menu');menu.style.top='36px';menu.style.bottom='auto';
-        const rename=button('Renommer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=await askPlaylistName(item.name==='Mon profil'?'Tracks':item.name);if(name){const current=library.profiles.find(candidate=>candidate.id===item.id);if(!current)return;current.name=name;persist();render();}});rename.setAttribute('role','menuitem');
+        const rename=button('Renommer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');const name=await askPlaylistName(item.name==='Mon profil'?'Tracks':item.name);if(name){const current=library.profiles.find(candidate=>candidate.id===item.id);if(!current)return;current.name=name;persist();render();}});rename.setAttribute('role','menuitem');if(item.id.startsWith('shared_'))rename.disabled=true;
         const remove=button('Supprimer',menu,async()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(!await askSongConfirmation('Supprimer la playlist « '+(item.name==='Mon profil'?'Tracks':item.name)+' » et ses '+item.songs.length+' track(s) ?'))return;
           if(library.activeProfile===item.id)unload();library.profiles=library.profiles.filter(candidate=>candidate.id!==item.id);
           if(!library.profiles.length)library.profiles=defaultLibrary().profiles;
@@ -587,7 +649,16 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
     const localProfiles=el('section',undefined,songPane,'playlist-manager');localProfiles.hidden=songView!=='playlist';
     const playlistHeading=el('div',undefined,localProfiles,'playlist-heading');
     const playlistTitle=el('strong',p.name==='Mon profil'?'Tracks':p.name,playlistHeading,'playlist-heading-name');playlistTitle.dataset.noTranslate='';if(p.name==='Mon profil')playlistTitle.textContent='Tracks';
+    if(p.id.startsWith('shared_')&&songView==='playlist')el('p','Playlist partagée · lecture seule. Les mises à jour du créateur sont reçues automatiquement.',localProfiles,'song-note');
     if(songView==='playlist')playlistHeading.prepend(backSong);
+    if(songView==='playlist'&&!p.id.startsWith('shared_')){
+      const share=button('',playlistHeading,()=>window.RENAX_PLAYLIST_SHARING?.share(p.id));
+      share.className='btn playlist-share-button';share.setAttribute('aria-label','Partager la playlist '+p.name);
+      share.title='Partager la playlist';
+      
+      share.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.3"/><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="19" r="2.3"/><path d="m8.2 10.9 7.6-4.6M8.2 13.1l7.6 4.6"/></svg>';
+    }
+
     const actions=songView==='playlists'?null:el('div',undefined,songPane,'song-actions');
     const s=songView==='detail'?song():null;
     if(songView==='playlist'){
@@ -602,7 +673,14 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
         row.addEventListener('dblclick',e=>{if(!e.target.closest('.song-more-wrap'))openSong();});
         row.addEventListener('keydown',e=>{if(e.target===row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();if(e.key==='Enter')openSong();else selectPlaylistSong(item);}});
         const open=button('',row,()=>selectPlaylistSong(item));open.className='song-open measure-head';labelWithValue(open,'Sélectionner {user}',item.name);open.setAttribute('aria-pressed',String(selectedSong===item.id));
-        el('span',item.name,open,'measure-num').dataset.noTranslate='';open.append(document.createTextNode(' '));
+        const songName=el('span',item.name,open,'measure-num');songName.dataset.noTranslate='';
+        if(item.chainNext===true){
+          const chainIcon=el('span',undefined,open,'song-chain-indicator');
+          chainIcon.setAttribute('aria-hidden','true');
+          chainIcon.title='Enchaînement activé vers le morceau suivant';
+          chainIcon.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12M4 12h12M4 17h12"/><path d="m14 4 4 3-4 3M14 14l4 3-4 3"/></svg>';
+        }
+        open.append(document.createTextNode(' '));
         const meters=[...new Set(item.sections.map(s=>s.measure.numerator+'/'+s.measure.denominator))];
         const signature=el('span',meters.length===1?meters[0]:'Mixte',open,'measure-sig');signature.title=meters.join(' · ');labelWithValue(open,'Sélectionner {user} '+signature.textContent,item.name);
         const tempos=item.sections.flatMap(s=>RENAX_SONG_TEMPO.active(s)?[s.measure.tempo,s.tempoRamp.endTempo]:[s.measure.tempo]),min=Math.min(...tempos),max=Math.max(...tempos);
@@ -742,6 +820,15 @@ const p=profile();if(!p.songs.some(s=>s.id===selectedSong))selectedSong=null;
       el('p',durationSummary(s),songPane,'song-note').id='songDuration';
     }
     const labels=el('datalist',undefined,songPane);labels.id='songLabels';for(const name of ['Intro','Couplet 1','Couplet 2','Refrain 1','Refrain 2','Bridge','Solo','Outro'])el('option',name,labels).value=name;
+    if(p.id.startsWith('shared_')&&['playlist','detail'].includes(songView)){
+      // A received playlist is a read-only subscription. Navigating and playing
+      // remain available; editing controls cannot alter the shared snapshot.
+      songPane.querySelectorAll('input,select,textarea').forEach(field=>{field.disabled=true;});
+      songPane.querySelectorAll('button').forEach(control=>{
+        if(control.matches('.song-back,.song-open,.song-direct-play,.song-block-play,#songNextSection'))return;
+        control.disabled=true;
+      });
+    }
     const transferPane=el('section',undefined,profilePane,'backup-json');el('h3','Copie JSON',transferPane);
     const transfers=el('div',undefined,transferPane,'song-actions');button('Exporter',transfers,()=>{const blob=new Blob([JSON.stringify(library,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='renax-morceaux.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});const importer=el('input',undefined,transferPane);importer.type='file';importer.accept='.json,application/json';importer.hidden=true;button('Importer',transfers,()=>importer.click());importer.onchange=async()=>{try{if(importer.files[0].size>5000000)throw Error('Fichier JSON trop volumineux.');const data=JSON.parse(await importer.files[0].text());validateLibrary(data);if(!await askSongConfirmation('Importer '+data.profiles.length+' profils et '+data.profiles.reduce((n,p)=>n+p.songs.length,0)+' tracks ? Ils seront ajoutés sans remplacer les tracks existants.','Importer'))return;unload();for(const imported of data.profiles){const p=clone(imported);p.id=id();p.name+=' (importé)';p.songs.forEach(s=>s.id=id());library.profiles.push(p);}library.activeProfile=library.profiles.at(-1).id;selectedSong=null;persist();render();status('Bibliothèque importée sans remplacer les morceaux existants.');}catch(e){status('Import refusé : '+e.message);}};
     el('p','Gardez une copie indépendante. Effacer les données du navigateur peut supprimer la sauvegarde locale.',transferPane,'song-note');el('div',storageStatus,transferPane).id='songStatus';setSectionOpen(openSectionId);selectOpenBlock();updatePosition();syncSongTransport();

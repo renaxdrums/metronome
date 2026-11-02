@@ -1,6 +1,6 @@
 /* Live playlist sharing is independent of the metronome scheduler. */
 import {firebaseConfig,appCheckSiteKey,emulator} from './firebase-config.js';
-import {SHARE_ID_PATTERN,shareIdInLink,publicShareLink,sharedProfileId,
+import {SHARE_ID_PATTERN,shareIdInLink,publicShareLink,
   addOrUpdateSharedPlaylist,exportSharePayload} from './playlist-sharing-core.mjs';
 
 const api=window.RENAX_SONGS,storage=window.RENAX_STORAGE;

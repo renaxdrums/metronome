@@ -816,6 +816,9 @@ html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) .mul
 html#renaxApp[data-theme="avant"] body .multi-modal:has(input[type="text"]) input {caret-color:var(--ag-lime)}
 
 /* Approved Citron circular-only click states; other themes and the beat editor are unchanged. */
+html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step{border-radius:50%;}
+html#renaxApp[data-theme="avant"] body:not(.poly-mode) .visu-bottom .legend-color{border-radius:50%;}
+
 html#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer{
   --cyan:#d7f218;
   --yellow:#a8e848;

@@ -135,6 +135,7 @@
       const drawTime = (time - audioCtx.currentTime) * 1000 + (window.RENAX_PLAYBACK?.delayMs(audioCtx)||0);
       setTimeout(() => {
         if (!isPlaying || visualEpoch!==window.RENAX_PLAYBACK?.generation) return;
+         if (window.RENAX_SONGS?.loaded && measures[mIdx]!==visualModel) return;
         if(multiGeneration!==null&&(!window.RENAX_MULTI?.active||window.RENAX_MULTI.generation!==multiGeneration||measures[activeMeasureIndex]!==visualModel))return;
         if (activeMeasureIndex !== mIdx) {
           activeMeasureIndex = mIdx;

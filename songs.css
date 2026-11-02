@@ -151,3 +151,8 @@ html[data-theme="ivory"] #songPane .playlist-heading > .song-chain-toggle[aria-p
 @media(prefers-reduced-motion:reduce){
  #songPane .song-curve-select>summary.song-curve-changed{animation:none;outline:2px solid var(--ag-lime,var(--orange));outline-offset:2px}
 }
+
+/* Playlist chain: a small, passive marker alongside the song name. */
+#songPane .song-open .song-chain-indicator{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;flex:0 0 14px;margin-left:6px;color:var(--orange);pointer-events:none;}
+#songPane .song-open .song-chain-indicator svg{display:block;}
+#songPane .playlist-heading .playlist-share-button{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;min-height:36px;padding:0;}

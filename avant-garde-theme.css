@@ -744,6 +744,7 @@ html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,#beatEditor) .numbox-menu
   overscroll-behavior:contain;
   scrollbar-color:var(--ag-lime) var(--ag-header);
 }
+html#renaxApp[data-theme="avant"] body #beatEditor .numbox-menu {--ag-menu-border:var(--ag-lime);}
 html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,#beatEditor) .numbox-menu::-webkit-scrollbar-thumb {background:var(--ag-lime);}
 html#renaxApp[data-theme="avant"] :is(#mp3ExportDialog,#beatEditor) .numbox-menu::-webkit-scrollbar-track {background:var(--ag-header);}
 @media(max-width:359px){

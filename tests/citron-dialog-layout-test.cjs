@@ -41,6 +41,7 @@ const { start, newTrack, save } = require('./audio-harness.cjs');
                 return { height: b.height, clickable: option.contains(document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2)) };
               }),
               scrollbar: getComputedStyle(el).scrollbarColor,
+              borders: ['Top', 'Right', 'Bottom', 'Left'].map(side => ({ color: getComputedStyle(el)['border' + side + 'Color'], width: getComputedStyle(el)['border' + side + 'Width'] })),
             };
           });
           assert(report.topLayer, 'Menu remains in the browser top layer');
@@ -50,6 +51,8 @@ const { start, newTrack, save } = require('./audio-harness.cjs');
             assert(report.bounds.height <= 193, 'Bounded editor list');
             assert(report.rows.every(row => row.height >= 44), 'Touch-sized options');
             assert(report.scrollbar.includes('215, 242, 24'), 'Citron scrollbar');
+            if (id === 'beatEditorDivision')
+              assert(report.borders.every(border => border.color === 'rgb(215, 242, 24)' && border.width === '1px'), 'Fine Citron border on all four sides of the number list');
           }
           return menu;
         };

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "bc1a55ecb9419fbd",
+  "revision": "4ce81db4d7df5ad4",
   "resources": [
     {
       "path": "accessibility.css",
@@ -14,7 +14,7 @@
     },
     {
       "path": "amorce-song.js",
-      "sha256": "1e931e07c4972bfcb07a3977330dedebd2f73381594a3e072a4e4347e849adb6",
+      "sha256": "8ce54d637c8f1d617f47c0667e4b8c2e19c3d91cfeee8e554fe5b48fbddbeb9c",
       "text": true
     },
     {
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "af8c7bfc9092c46bba3ca51c2466ab6afb43f5e6ac8243ddc14cf88928c873df",
+      "sha256": "168ff64d3c993c1be229fba149b277d6514e154b0a2bdafabbc02fbfd19f9130",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "7420c6c66f422c89bcbc488800dfd9896178a2af20f68e72ce4a9a5a2190ae82",
+      "sha256": "37284148794a33a0cdbf5570212bbb8255b97924b0f2ae441e08aff4b11a39aa",
       "text": true
     },
     {
@@ -339,7 +339,7 @@
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "3753584224645952ae56fb93a9857ebdba3ecabd1281805f16426b6507fb0e3b",
+      "sha256": "7e770cc65de5a75a12bdfae7d5e9aff1ecf20d47d6ef906b26649b2c65540e52",
       "text": true
     },
     {
@@ -444,7 +444,7 @@
     },
     {
       "path": "rhythm-score.css",
-      "sha256": "1952315176ed2f121e1b7469150a485ad895184b6a943294ccd95320ad5ab17e",
+      "sha256": "89af9ee153130c683b19c0207d293ac01c0d1693f7f3b5fe858d7599d3bcfe5b",
       "text": true
     },
     {
@@ -479,12 +479,12 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "3f73d2ce3e9ae298242b6d2e483462b5bf0d1ab38f2cee2bb8f71fcbb4767cb4",
+      "sha256": "ef2f9e82ecde0b7ebc143838877c75dc920de3e74ae7139a644152d530bc966d",
       "text": true
     },
     {
       "path": "songs.css",
-      "sha256": "55644227b2fb09b3ef3bbf7a284bc6ee1051e306e554642acd1d29ed3d0cb223",
+      "sha256": "9a7341137eb882d12ec2ff909ae57f27ddb67bf7583ad8a9a266af87b8ab4f20",
       "text": true
     },
     {

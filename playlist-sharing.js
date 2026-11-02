@@ -73,7 +73,8 @@ async function discoverOwnedShares(uid) {
     sdk.firestore.where('ownerUid','==',uid),sdk.firestore.limit(200));
   const snapshot=await sdk.firestore.getDocsFromServer(query);
   if(window.RENAX_BACKUP?.status.account!==uid)throw Error('La session a changé.');
-  const map=outbound(uid);
+  // The server is authoritative: drop stale/revoked mappings from other devices.
+  const map={};
   for(const document of snapshot.docs){
     const share=document.data();
     if(!share.revoked && SHARE_ID_PATTERN.test(document.id)

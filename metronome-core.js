@@ -770,7 +770,7 @@
         repeatInput.spellcheck = false;
         repeatInput.className = 'measure-tempo-input measure-repeat-input';
         const storedRepeat = String(m.repeatCount ?? '1');
-        repeatInput.value = /^\\d+$/.test(storedRepeat) && /[1-9]/.test(storedRepeat) ? storedRepeat.replace(/^0+(?=\\d)/, '') : '1';
+        repeatInput.value = /^[0-9]+$/.test(storedRepeat) && /[1-9]/.test(storedRepeat) ? storedRepeat.replace(/^0+(?=[0-9])/, '') : '1';
         repeatInput.setAttribute('aria-label', 'Nombre de mesures répétées du bloc ' + (i + 1));
         repeatInput.title = 'Nombre entier positif de mesures, sans plafond prédéfini';
         repeatInput.addEventListener('click', e => e.stopPropagation());
@@ -778,8 +778,8 @@
         repeatInput.addEventListener('change', e => {
           e.stopPropagation();
           const text = repeatInput.value.trim();
-          if (/^\\d+$/.test(text) && /[1-9]/.test(text)) {
-            m.repeatCount = text.replace(/^0+(?=\\d)/, '');
+          if (/^[0-9]+$/.test(text) && /[1-9]/.test(text)) {
+            m.repeatCount = text.replace(/^0+(?=[0-9])/, '');
             repeatInput.value = m.repeatCount;
           } else {
             repeatInput.value = String(m.repeatCount ?? '1');

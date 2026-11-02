@@ -237,6 +237,9 @@
     while(index>=0 && owner.songs[index]?.chainNext===true && index+1<owner.songs.length){
       const following=owner.songs[++index];
       if(following.amorce){
+        // Fully prepare the next vocal count-in before entering the audio timeline.
+        await initAudio();
+        await prepareAllVoiceAudio();
         const plan=await RENAX_AMORCE.prepare(following);
         preparedChainPlans.set(following.id,{source:JSON.stringify(following),plan});
       }
@@ -290,7 +293,7 @@
         measures=chainMeasureProxy();metronomeMeasures=measures;
         playingMeasureIndex=0;currentStepInMeasure=0;
         scheduledMeasureLayouts=new WeakMap();
-        RENAX_AMORCE.stop();
+        RENAX_AMORCE.stopAt(nextNoteTime);
         if(plan){RENAX_AMORCE.install(plan);RENAX_AMORCE.begin(audioCtx,nextNoteTime,plan);}
         selectedSong=next.id;lastTrackSelection={playlistId:owner.id,songId:next.id};openSectionId=null;songView='playlist';
         // UI changes at the acoustic boundary, not at scheduler look-ahead time.

@@ -34,6 +34,7 @@
   let library,selectedSong=null,loaded=null,endTimer=null,songView='home',openSectionId=null,storageStatus='Enregistrement automatique';
   // Session-only preferences, not part of the saved library.
   let lastTrackSelection=null;
+  const preparedChainPlans=new Map();
   try { library=JSON.parse(RENAX_STORAGE.read())||defaultLibrary();validateLibrary(library); }
   catch (_error) { RENAX_STORAGE.markCorrupt();library=defaultLibrary();storageStatus='Sauvegarde locale illisible : la source a été conservée. Exportez vos données avant de continuer.'; }
   if(!library.profiles.some(p=>p.id===library.activeProfile))library.activeProfile=library.profiles[0].id;
@@ -226,9 +227,27 @@
       seconds:RENAX_SONG_TEMPO.stepDuration(section,bar,beat,subIndex,subdivisions),
       beatSeconds:RENAX_SONG_TEMPO.stepDuration(section,bar,beat,0,1)};
   };
+  // A song chain uses one continuous Web Audio timeline. Prepare all vocal
+  // material before starting so no asynchronous synthesis delays a boundary.
+  async function prepareChainedGuides(first){
+    preparedChainPlans.clear();
+    const owner=library.profiles.find(p=>p.songs.some(item=>item.id===first.id));
+    if(!owner)return;
+    let index=owner.songs.findIndex(item=>item.id===first.id);
+    while(index>=0 && owner.songs[index]?.chainNext===true && index+1<owner.songs.length){
+      const following=owner.songs[++index];
+      if(following.amorce){
+        const plan=await RENAX_AMORCE.prepare(following);
+        preparedChainPlans.set(following.id,{source:JSON.stringify(following),plan});
+      }
+    }
+  }
+  function chainMeasureProxy(){
+    return new Proxy([], {get(target,key){if(key==='length')return loaded.total;if(key==='indexOf')return m=>{if(locate(activeMeasureIndex)?.section.measure===m)return activeMeasureIndex;let n=0;for(const s of loaded.song.sections){if(s.measure===m)return n;n+=s.count;}return -1;};if(typeof key==='string'&&/^\\d+$/.test(key))return locate(Number(key))?.section.measure;return Reflect.get(target,key);}});
+  }
   function loadSong(sectionId=null,amorcePlan=null){const s=song();if(!s||sectionId&&!s.sections.some(section=>section.id===sectionId))return;songReloadDepth++;try{unload();stopMetronome();endTraining();if(appMode!=='metronome')setAppMode('metronome');setSilentMode(false);resetCustomizationTimer();const previous=metronomeMeasures;const snapshot=clone(s);snapshot.sections=sectionId?snapshot.sections.filter(section=>section.id===sectionId):(amorcePlan?amorcePlan.sections:playbackSections(snapshot));loaded={song:snapshot,previous,guidePlan:amorcePlan,continuous:hasContinuous(snapshot),nextRequested:false,preview:!!sectionId,total:snapshot.sections.reduce((n,s)=>n+s.count,0)};
     // Repeat section templates lazily: no array of every bar and no eight-bar limit.
-    measures=new Proxy([], {get(target,key){if(key==='length')return loaded.total;if(key==='indexOf')return m=>{if(locate(activeMeasureIndex)?.section.measure===m)return activeMeasureIndex;let n=0;for(const s of loaded.song.sections){if(s.measure===m)return n;n+=s.count;}return -1;};if(typeof key==='string'&&/^\d+$/.test(key))return locate(Number(key))?.section.measure;return Reflect.get(target,key);}});
+    measures=chainMeasureProxy();
     metronomeMeasures=measures;activeMeasureIndex=0;playingMeasureIndex=0;currentStepInMeasure=0;renderSequencerList();renderActiveMeasure();updatePosition();
     }finally{songReloadDepth--;}
   }
@@ -258,14 +277,34 @@
     const index=owner?.songs.findIndex(item=>item.id===finishedId)??-1;
     const next=(!preview&&loaded.song.chainNext===true&&owner&&index>=0)?owner.songs[index+1]:null;
     clearTimeout(endTimer);
-    endTimer=setTimeout(async()=>{
+    if(next&&owner.songs.includes(next)&&!songsRoot.hidden&&library.activeProfile===owner.id){
+      const prepared=preparedChainPlans.get(next.id);
+      if(next.amorce && (!prepared || prepared.source!==JSON.stringify(next))){
+        // Never silently omit the vocal guide or restart the clock on a boundary.
+        status('Enchaînement interrompu : guide vocal du morceau suivant non préparé.');
+      }else{
+        const snapshot=clone(next),plan=next.amorce?prepared.plan:null;
+        snapshot.sections=plan?plan.sections:playbackSections(snapshot);
+        const previous=loaded.previous;
+        loaded={song:snapshot,previous,guidePlan:plan,continuous:hasContinuous(snapshot),nextRequested:false,preview:false,total:snapshot.sections.reduce((n,section)=>n+section.count,0)};
+        measures=chainMeasureProxy();metronomeMeasures=measures;
+        playingMeasureIndex=0;currentStepInMeasure=0;
+        scheduledMeasureLayouts=new WeakMap();
+        RENAX_AMORCE.stop();
+        if(plan){RENAX_AMORCE.install(plan);RENAX_AMORCE.begin(audioCtx,nextNoteTime,plan);}
+        selectedSong=next.id;lastTrackSelection={playlistId:owner.id,songId:next.id};openSectionId=null;songView='playlist';
+        // UI changes at the acoustic boundary, not at scheduler look-ahead time.
+        const boundaryId=next.id;
+        endTimer=setTimeout(()=>{
+          if(!isPlaying||loaded?.song.id!==boundaryId)return;
+          activeMeasureIndex=0;render();syncSongTransport();
+        },Math.max(0,(nextNoteTime-audioCtx.currentTime)*1000));
+        return false;
+      }
+    }
+    endTimer=setTimeout(()=>{
       if(!isPlaying||loaded?.song.id!==finishedId)return;
-      stopMetronome();
-      if(next&&owner.songs.includes(next)&&!songsRoot.hidden&&library.activeProfile===owner.id){
-        unload();selectedSong=next.id;lastTrackSelection={playlistId:owner.id,songId:next.id};openSectionId=null;songView='playlist';
-        render();
-        try{await startMetronome();}catch(error){status('Lecture impossible : '+error.message);}
-      }else status(preview?'Bloc terminé.':'Morceau terminé.');
+      stopMetronome();status(preview?'Bloc terminé.':'Morceau terminé.');
     },Math.max(0,(nextNoteTime-audioCtx.currentTime)*1000));
     return true;
   };
@@ -306,6 +345,17 @@
         if(!['playlist','detail'].includes(songView)){songView='playlist';render();panel.scrollTop=0;}
         else updatePosition();
       }
+    }
+    if(!isPlaying && target?.chainNext===true){
+      const epoch=++songStartEpoch;
+      preparingAmorce=true;playBtn.textContent='Préparation…';
+      try{
+        await prepareChainedGuides(target);
+        if(epoch!==songStartEpoch)return;
+      }catch(error){
+        status('Impossible de préparer l’enchaînement : '+error.message);
+        return;
+      }finally{if(epoch===songStartEpoch){preparingAmorce=false;updateTrainButton();syncSongTransport();}}
     }
     const current=loaded?.song?.amorce?song()||loaded.song:target;
     if(!isPlaying&&current?.amorce){

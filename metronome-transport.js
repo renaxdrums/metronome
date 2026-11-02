@@ -73,11 +73,36 @@
       try { scheduler(); } catch(error) { reportAudioFailure(error); }
     }
 
+    // Count actual completed measures, rather than expanding patterns in memory.
+    // Strings allow arbitrarily large positive counts without numeric rounding.
+    let sequenceRepeatIndex = 0n;
+    function advanceScheduledMeasure() {
+      const model = measures[playingMeasureIndex];
+      currentStepInMeasure = 0;
+      if (appMode === 'metronome' && !loopedMeasure && !window.RENAX_SONGS?.loaded) {
+        const raw = model?.repeatCount;
+        const repetitions = typeof raw === 'string' && /^[0-9]+$/.test(raw) && /[1-9]/.test(raw)
+          ? BigInt(raw)
+          : Number.isSafeInteger(raw) && raw >= 1 ? BigInt(raw) : 1n;
+        if (sequenceRepeatIndex + 1n < repetitions) {
+          sequenceRepeatIndex++;
+          advanceSilentCycle();
+          return false;
+        }
+      }
+      sequenceRepeatIndex = 0n;
+      playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure)
+        ? measures.indexOf(loopedMeasure)
+        : (playingMeasureIndex + 1) % measures.length;
+      advanceSilentCycle();
+      return !loopedMeasure && typeof songAtEnd === 'function' && songAtEnd();
+    }
+
     function scheduler() {
       if (appMode === 'polyrhythm') { schedulerPolyrhythm(); return; }
       const voiceLead = SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active ? Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds || 0) : 0;
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime + voiceLead) {
-        if (playingMeasureIndex >= measures.length) { playingMeasureIndex = 0; currentStepInMeasure = 0; }
+        if (playingMeasureIndex >= measures.length) { playingMeasureIndex = 0; currentStepInMeasure = 0; sequenceRepeatIndex = 0n; }
         const mIdx = playingMeasureIndex;
         const sIdx = currentStepInMeasure;
         const model = measures[mIdx];
@@ -86,10 +111,7 @@
 
         if (sIdx >= measureTotalSteps(m)) {
           scheduledMeasureLayouts.delete(model);
-          currentStepInMeasure = 0;
-          playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : (playingMeasureIndex + 1) % measures.length;
-          advanceSilentCycle();
-          if(!loopedMeasure && typeof songAtEnd==='function' && songAtEnd())return;
+          if (advanceScheduledMeasure()) return;
           continue;
         }
 
@@ -120,10 +142,7 @@
         currentStepInMeasure++;
         if (currentStepInMeasure >= measureTotalSteps(m)) {
           scheduledMeasureLayouts.delete(model);
-          currentStepInMeasure = 0;
-          playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : (playingMeasureIndex + 1) % measures.length;
-          advanceSilentCycle();
-          if(!loopedMeasure && typeof songAtEnd==='function' && songAtEnd())return;
+          if (advanceScheduledMeasure()) return;
         }
       }
       timerID = setTimeout(schedulerSafely, lookahead);
@@ -404,6 +423,7 @@
       isPlaying = true;
       window.RENAX_PLAYBACK?.start();
       playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : 0;
+      sequenceRepeatIndex = 0n;
       currentStepInMeasure = 0;
       polyEventIndex = 0;
       activeMeasureIndex = playingMeasureIndex;
@@ -434,6 +454,7 @@
       window.RENAX_PLAYBACK?.stop();
       if(window.RENAX_MULTI?.active)return window.RENAX_MULTI.stop();
       loopedMeasure = null;
+      sequenceRepeatIndex = 0n;
       if (!isPlaying) return;
       isPlaying = false;
       updateTrainButton();

@@ -754,6 +754,39 @@
         tempoRow.appendChild(tempoInput);
         tempoRow.appendChild(tempoUnit);
 
+        // A sequencer block can repeat its pattern for any positive whole number of measures.
+        // Keep the count as decimal text: JSON persists it exactly, even beyond Number.MAX_SAFE_INTEGER.
+        const repeatRow = document.createElement('div');
+        repeatRow.className = 'measure-tempo-row measure-repeat-row';
+        const repeatLabel = document.createElement('label');
+        repeatLabel.className = 'measure-tempo-label';
+        repeatLabel.textContent = 'MESURES';
+        const repeatInput = document.createElement('input');
+        repeatInput.id = 'sequenceRepeatCount-' + i;
+        repeatLabel.htmlFor = repeatInput.id;
+        repeatInput.type = 'text';
+        repeatInput.inputMode = 'numeric';
+        repeatInput.autocomplete = 'off';
+        repeatInput.spellcheck = false;
+        repeatInput.className = 'measure-tempo-input measure-repeat-input';
+        const storedRepeat = String(m.repeatCount ?? '1');
+        repeatInput.value = /^[0-9]+$/.test(storedRepeat) && /[1-9]/.test(storedRepeat) ? storedRepeat.replace(/^0+(?=[0-9])/, '') : '1';
+        repeatInput.setAttribute('aria-label', 'Nombre de mesures répétées du bloc ' + (i + 1));
+        repeatInput.title = 'Nombre entier positif de mesures, sans plafond prédéfini';
+        repeatInput.addEventListener('click', e => e.stopPropagation());
+        repeatInput.addEventListener('keydown', e => e.stopPropagation());
+        repeatInput.addEventListener('change', e => {
+          e.stopPropagation();
+          const text = repeatInput.value.trim();
+          if (/^[0-9]+$/.test(text) && /[1-9]/.test(text)) {
+            m.repeatCount = text.replace(/^0+(?=[0-9])/, '');
+            repeatInput.value = m.repeatCount;
+          } else {
+            repeatInput.value = String(m.repeatCount ?? '1');
+          }
+        });
+        repeatRow.append(repeatLabel, repeatInput);
+
         const preview = document.createElement('div');
         preview.className = 'measure-preview';
         for (let b = 0; b < m.numerator; b++) {
@@ -771,6 +804,7 @@
         card.appendChild(head);
         card.appendChild(ratio);
         card.appendChild(tempoRow);
+        card.appendChild(repeatRow);
         card.appendChild(preview);
         const selectMeasure = () => {
           if(collapsedSequenceMeasures.has(m))collapsedSequenceMeasures.delete(m);else collapsedSequenceMeasures.add(m);

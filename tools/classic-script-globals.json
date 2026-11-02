@@ -243,6 +243,8 @@
       "renderSubdivisionDots",
       "buildCircularSequencer",
       "schedulerSafely",
+      "sequenceRepeatIndex",
+      "advanceScheduledMeasure",
       "scheduler",
       "scheduleVisualUpdate",
       "createPolyMeasure",
@@ -539,7 +541,9 @@
     "RENAX_TRAINING": "readonly",
     "RENAX_FEEDBACK": "readonly",
     "RENAX_WORKSPACE": "readonly",
-    "songAtEnd": "writable"
+    "songAtEnd": "writable",
+    "sequenceRepeatIndex": "writable",
+    "advanceScheduledMeasure": "writable"
   },
   "testGlobals": {
     "AudioContext": "writable",

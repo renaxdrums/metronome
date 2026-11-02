@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('node:assert/strict');
-const { start, save } = require('./audio-harness.cjs');
+const { start, save, showMeasures } = require('./audio-harness.cjs');
 
 (async () => {
   const runtime = await start();
@@ -11,6 +11,7 @@ const { start, save } = require('./audio-harness.cjs');
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(runtime.url);
+      await showMeasures(page);
       await page.waitForFunction(() => typeof createMeasure === 'function' && !!window.RENAX_SONGS);
       await page.evaluate(() => {
         if (isPlaying) stopMetronome();

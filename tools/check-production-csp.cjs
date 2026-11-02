@@ -46,6 +46,28 @@ const { start, save } = require('../tests/audio-harness.cjs');
     assert(preview.peak > 0.001);
     assert.equal(preview.samples, 48000);
     assert.deepEqual(await p.evaluate(() => window.__policyViolations), []);
+    // Firebase Auth loads GAPI for its popup/iframe transport. Exercise the
+    // built page's policy without opening an account or using credentials.
+    const googleAuthScript = 'https://apis.google.com/js/api.js?renax-csp-probe';
+    await p.route(googleAuthScript, (route) =>
+      route.fulfill({
+        contentType: 'text/javascript',
+        body: 'window.__googleAuthTransportLoaded = true;',
+      }),
+    );
+    const googleAuthTransport = await p.evaluate(
+      (url) =>
+        new Promise((resolve) => {
+          const script = document.createElement('script');
+          script.onload = () => resolve(window.__googleAuthTransportLoaded === true);
+          script.onerror = () => resolve(false);
+          script.src = url;
+          document.head.append(script);
+        }),
+      googleAuthScript,
+    );
+    assert.equal(googleAuthTransport, true, 'Production CSP blocks Firebase Google Auth transport');
+    assert.deepEqual(await p.evaluate(() => window.__policyViolations), []);
     const cdnProbe = await p.evaluate(async () => {
       const bad = 'https://cdn.jsdelivr.net/npm/unapproved-renax-csp-probe@1.0.0/index.js';
       const script = document.createElement('script');
@@ -81,6 +103,7 @@ const { start, save } = require('../tests/audio-harness.cjs');
     assert.deepEqual(errors, []);
     save('production-csp-results.json', {
       preview,
+      googleAuthTransport,
       blockedInline: true,
       unapprovedCdnBlocked: true,
       errors,

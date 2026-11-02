@@ -218,7 +218,17 @@ function flushPending(){
 }
 window.RENAX_PLAYLIST_SHARING={share(profileId){share(profileId).catch(showError);}};
 window.addEventListener('renax-library-edited',()=>{schedulePublish();refreshSubscriptions().catch(console.warn);});
-window.addEventListener('renax-storage',()=>refreshSubscriptions().catch(console.warn));
+window.addEventListener('renax-storage',()=>{
+  refreshSubscriptions().catch(console.warn);
+  if(storage.scope.startsWith('user:')&&!importing){
+    let queued=null;
+    try{queued=sessionStorage.getItem('renax-share-pending-v1');}catch{}
+    if(queued&&SHARE_ID_PATTERN.test(queued)){
+      try{sessionStorage.removeItem('renax-share-pending-v1');}catch{}
+      setTimeout(()=>importLink(queued).catch(showError),500);
+    }
+  }
+});
 window.addEventListener('online',()=>{refreshSubscriptions().catch(console.warn);publishUpdates().catch(console.warn);});
 setInterval(flushPending,1200);
 await storage.ready;

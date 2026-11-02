@@ -297,7 +297,7 @@
         const boundaryId=next.id;
         endTimer=setTimeout(()=>{
           if(!isPlaying||loaded?.song.id!==boundaryId)return;
-          activeMeasureIndex=0;render();syncSongTransport();
+          activeMeasureIndex=0;renderSequencerList();renderActiveMeasure();render();syncSongTransport();
         },Math.max(0,(nextNoteTime-audioCtx.currentTime)*1000));
         return false;
       }

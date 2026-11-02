@@ -79,14 +79,14 @@
     function advanceScheduledMeasure() {
       const model = measures[playingMeasureIndex];
       currentStepInMeasure = 0;
-      advanceSilentCycle();
       if (appMode === 'metronome' && !loopedMeasure && !window.RENAX_SONGS?.loaded) {
         const raw = model?.repeatCount;
-        const repetitions = typeof raw === 'string' && /^[1-9][0-9]*$/.test(raw)
+        const repetitions = typeof raw === 'string' && /^[0-9]+$/.test(raw) && /[1-9]/.test(raw)
           ? BigInt(raw)
           : Number.isSafeInteger(raw) && raw >= 1 ? BigInt(raw) : 1n;
         if (sequenceRepeatIndex + 1n < repetitions) {
           sequenceRepeatIndex++;
+          advanceSilentCycle();
           return false;
         }
       }
@@ -94,6 +94,7 @@
       playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure)
         ? measures.indexOf(loopedMeasure)
         : (playingMeasureIndex + 1) % measures.length;
+      advanceSilentCycle();
       return !loopedMeasure && typeof songAtEnd === 'function' && songAtEnd();
     }
 

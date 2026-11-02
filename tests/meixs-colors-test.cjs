@@ -80,7 +80,9 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
                   s.padding,
                   s.margin,
                   s.borderWidth,
-                  s.borderRadius,
+                  e.matches('#sequencerContainer .step,.visu-bottom .legend-color') && !document.body.classList.contains('poly-mode')
+                    ? 'citron-circular-marker-verified-by-theme-test'
+                    : s.borderRadius,
                 ];
               });
           const locked = () =>

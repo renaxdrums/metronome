@@ -221,7 +221,14 @@ async function importLink(id) {
   importing=true;
   try{
     const document=await pullLink(id);
-    if(storage.scope==='guest') {
+    const localSession=storage.scope==='guest' &&
+      api.library.profiles.some(profile=>profile.songs.length>0 || profile.name!=='Mon profil');
+    if(localSession){
+      const changed=await apply(document,id,true);
+      history.replaceState(null,'',location.pathname+location.search);
+      if(!changed)message('Cette playlist est déjà présente dans tes playlists.');
+      await refreshSubscriptions();
+    }else if(storage.scope==='guest') {
       message('Comment veux-tu recevoir cette playlist ?',[
         ['Utiliser en local',()=>apply(document,id,true).then(()=>{history.replaceState(null,'',location.pathname+location.search);refreshSubscriptions();}).catch(showError)],
         ['Se connecter',()=>{sessionStorage.setItem('renax-share-pending-v1',id);window.RENAX_BACKUP?.openChoices();}]

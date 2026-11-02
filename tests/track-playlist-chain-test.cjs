@@ -14,7 +14,7 @@ const {start,save}=require('./audio-harness.cjs');
       await page.goto(runner.url);
       await page.waitForFunction(()=>window.RENAX_SONGS&&typeof createMeasure==='function');
       await page.evaluate(()=>{
-        const make=id=>({id,name:id,sections:[{id:'section-'+id,label:'Intro',count:1,measure:createMeasure(4,4,120)}]});
+        const make=id=>({id,name:id,sections:[{id:'section-'+id,label:'Intro',count:1,measure:createMeasure(4,4,id==='Track B'?180:120)}]});
         RENAX_SONGS.replaceLibrary({version:1,activeProfile:'empty',profiles:[
           {id:'empty',name:'Empty',songs:[]},
           {id:'set1',name:'Set 1',songs:[make('Track A'),make('Track B')]},
@@ -38,9 +38,25 @@ const {start,save}=require('./audio-harness.cjs');
       assert.equal(await toggle.getAttribute('aria-pressed'),'true');
       let saved=await page.evaluate(()=>RENAX_SONGS.library.profiles.find(p=>p.id==='set1').songs.map(s=>s.chainNext===true));
       assert.deepEqual(saved,[true,false],'Only Track A chains');
-      await page.locator('#playBtn').click();
-      await page.waitForFunction(()=>RENAX_SONGS.navigation.view==='playlist'&&RENAX_SONGS.navigation.song==='Track B'&&isPlaying,{timeout:12000});
-      await page.waitForFunction(()=>!isPlaying,{timeout:9000});
+      await page.evaluate(()=>{
+         window.__chainEvents=[];
+         const original=playClick;
+         playClick=function(state,time,first,context){
+           window.__chainEvents.push({song:RENAX_SONGS.loaded?.song.id,time,state});
+           return original.apply(this,arguments);
+         };
+       });
+       await page.locator('#playBtn').click();
+       await page.waitForFunction(()=>RENAX_SONGS.navigation.view==='playlist'&&RENAX_SONGS.navigation.song==='Track B'&&isPlaying,{timeout:12000});
+       assert.equal(await page.locator('.song-playlist-card').first().locator('.song-chain-indicator').count(),1,'Enabled song shows a passive arrow');
+       assert.equal(await page.locator('.song-playlist-card').nth(1).locator('.song-chain-indicator').count(),0,'Disabled song stays unmarked');
+       await page.waitForFunction(()=>!isPlaying,{timeout:9000});
+       const events=await page.evaluate(()=>window.__chainEvents);
+       assert.equal(events.length,8,'Two 4/4 songs should schedule eight beats without stopping between songs');
+       assert.deepEqual(events.map(x=>x.song),[...Array(4).fill('Track A'),...Array(4).fill('Track B')]);
+       const intervals=events.slice(1).map((e,i)=>e.time-events[i].time);
+       for(let i=0;i<4;i++)assert(Math.abs(intervals[i]-.5)<1e-6,'First tempo and transition must remain at 120 BPM');
+       for(let i=4;i<7;i++)assert(Math.abs(intervals[i]-1/3)<1e-6,'Second song must begin at 180 BPM with no gap');
       assert.equal((await page.evaluate(()=>RENAX_SONGS.navigation)).profile,'set1','No cross-playlist jump');
       await page.locator('.song-playlist-card').nth(1).dblclick();
       await page.waitForFunction(()=>RENAX_SONGS.navigation.view==='detail');

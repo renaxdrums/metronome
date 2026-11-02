@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "8501e570c8f48b08",
+  "revision": "6d43df9307360bbb",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "728bdb053ffd49e1329474dd9a4e1e20dd316ca79b168483d7eb67e0bebd7c20",
+      "sha256": "d153af0580ff8649e74cb1b15eb37c05ba0afe1fef8db93d9f8e872a0641bdeb",
       "text": true
     },
     {
@@ -339,7 +339,7 @@
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "3753584224645952ae56fb93a9857ebdba3ecabd1281805f16426b6507fb0e3b",
+      "sha256": "7e770cc65de5a75a12bdfae7d5e9aff1ecf20d47d6ef906b26649b2c65540e52",
       "text": true
     },
     {
@@ -489,7 +489,7 @@
     },
     {
       "path": "songs-index2.js",
-      "sha256": "59e7ac7599db201fec8dfeec4440d30877034eacbd0afbe01199bbe6e02863d5",
+      "sha256": "2fd40ea3308954f1099492bc286ceb66f2b45e3bcba8e3ebbaa5bda638f0e7f5",
       "text": true
     },
     {

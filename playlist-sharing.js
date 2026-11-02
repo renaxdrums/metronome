@@ -118,7 +118,21 @@ function schedulePublish(){
   publishTimer=setTimeout(()=>{if(navigator.onLine)publishUpdates().catch(console.warn);},1600);
 }
 
-function linkDialog(url,name) {
+async function revokeShare(profileId,shareId,uid) {
+  const {sdk,db,uid:live}=await owner();
+  if(uid!==live)throw Error('Le compte a changé.');
+  const ref=shareRef(sdk,db,shareId);
+  await sdk.firestore.runTransaction(db,async transaction=>{
+    const snapshot=await transaction.get(ref);
+    if(!snapshot.exists())throw Error('Lien déjà désactivé ou introuvable.');
+    const old=snapshot.data();
+    if(old.ownerUid!==uid||old.profileId!==profileId||old.revoked)throw Error('Ce lien ne peut pas être désactivé.');
+    transaction.update(ref,{revoked:true,revision:old.revision+1,updatedAt:sdk.firestore.serverTimestamp()});
+  });
+  const map=outbound(uid);
+  if(map[profileId]===shareId){delete map[profileId];putOutbound(uid,map);}
+}
+function linkDialog(url,name,profileId,shareId,uid) {
   const dialog=message('Lien créé. Tu peux le partager par SMS, e-mail, WhatsApp ou une autre application.',[]);
   const input=document.createElement('input');input.type='text';input.readOnly=true;
   input.className='song-name-input';input.value=url;input.setAttribute('aria-label','Lien de la playlist');
@@ -135,6 +149,14 @@ function linkDialog(url,name) {
   linkButton('Copier le lien',async()=>{
     try{await navigator.clipboard.writeText(url);dialog.querySelector('.song-confirm-message').textContent='Lien copié.';}
     catch{input.focus();input.select();dialog.querySelector('.song-confirm-message').textContent='Sélectionne et copie le lien.';}
+  });
+  linkButton('Désactiver ce lien',()=>{
+    message('Ce lien ne pourra plus être ouvert et les abonnés ne recevront plus de mises à jour. Leurs copies locales resteront intactes.',[
+      ['Désactiver',()=>revokeShare(profileId,shareId,uid)
+        .then(()=>{dialog.close();dialog.remove();message('Lien désactivé.');})
+        .catch(showError)],
+      ['Annuler',()=>{}]
+    ]);
   });
   linkButton('Fermer',()=>{dialog.close();dialog.remove();});
 }
@@ -164,7 +186,7 @@ async function share(profileId) {
     map[profileId]=shareId;
     putOutbound(uid,map);
   }
-  linkDialog(publicShareLink(location.href,shareId),profile.name);
+  linkDialog(publicShareLink(location.href,shareId),profile.name,profileId,shareId,uid);
 }
 
 async function apply(document,id,navigate=false) {

@@ -53,6 +53,7 @@ jobs:
           node tests/resilience-test.cjs
           node tests/numbox-accessibility-test.cjs
           node tests/numbox-foreground-test.cjs
+          node tests/citron-dialog-layout-test.cjs
           node tests/tempo-fader-test.cjs
           node tests/intro-lifecycle-test.cjs
           node tests/pro-sound-context-test.cjs

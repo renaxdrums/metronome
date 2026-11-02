@@ -1,5 +1,6 @@
 {
   "nightly": [
+    "tests/citron-dialog-layout-test.cjs",
     "tests/numbox-foreground-test.cjs",
     "tests/theme-navigation-test.cjs",
     "tests/track-tempo-curves-test.cjs",

@@ -41,7 +41,7 @@ const {start,save}=require('./audio-harness.cjs');
       await page.evaluate(()=>{
          window.__chainEvents=[];
          const original=playClick;
-         playClick=function(state,time,first,context){
+         playClick=function(state,time,_first,_context){
            window.__chainEvents.push({song:RENAX_SONGS.loaded?.song.id,time,state});
            return original.apply(this,arguments);
          };

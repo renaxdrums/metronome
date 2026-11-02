@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
 import {SHARE_ID_PATTERN,sharedProfileId,shareIdInLink,publicShareLink,
   parseSharedProfile,addOrUpdateSharedPlaylist,exportSharePayload} from '../playlist-sharing-core.mjs';
 
@@ -46,3 +48,33 @@ assert.throws(()=>addOrUpdateSharedPlaylist(base,{...published,payload:'{invalid
 assert.throws(()=>addOrUpdateSharedPlaylist(base,published,'bad',validate));
 assert.throws(()=>exportSharePayload({...source,name:'X'.repeat(800001)},validate));
 console.log('Playlist sharing core PASS: exact structure, deduplication, isolated update, malicious input');
+
+// Exercise the actual receive controller with storage/DOM boundaries isolated.
+// A remote snapshot must never shadow the real focused field during an edit.
+const client=fs.readFileSync(new URL('../playlist-sharing.js',import.meta.url),'utf8');
+const receiveSource=client.slice(client.indexOf('async function apply('),client.indexOf('async function pullLink('));
+assert(receiveSource.startsWith('async function apply('));
+let focused=true,running=false,writes=0,replacements=0;
+const queued=new Map();
+const controllerStorage={readOnly:false,ready:Promise.resolve(),scope:'guest',rawToken:'local',write(){writes++;}};
+const controllerApi={library:base,validateLibrary:validate,flushPending:()=>true,replaceLibrary(){replacements++;}};
+const applyReceived=vm.runInNewContext(receiveSource+'\napply',{
+  document:{get activeElement(){return focused?{closest:()=>true,matches:()=>true}:null;}},
+  storage:controllerStorage,api:controllerApi,pending:queued,playing:()=>running,
+  addOrUpdateSharedPlaylist,openReceivedPlaylists(){},
+  window:{dispatchEvent(){}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail;}}
+});
+await applyReceived(published,id);
+assert(queued.has(id),'Incoming update is deferred while a field is focused');
+assert.equal(writes,0);assert.equal(replacements,0);
+focused=false;running=true;queued.clear();
+await applyReceived(published,id);
+assert(queued.has(id),'Incoming update is deferred while audio is playing');
+assert.equal(writes,0);assert.equal(replacements,0);
+running=false;
+await applyReceived(published,id);
+assert.equal(writes,1);assert.equal(replacements,1);
+controllerStorage.write=()=>{throw Error('Storage unavailable');};
+await assert.rejects(applyReceived(published,id),/Storage unavailable/);
+assert.equal(replacements,1,'Failed durable write must not replace the displayed library');
+console.log('Playlist receive PASS: editing/audio deferral and durable-write failure preserve local data');

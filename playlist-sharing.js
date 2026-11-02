@@ -194,15 +194,15 @@ function openReceivedPlaylists() {
   window.RENAX_WORKSPACE?.go('tracks');
   api.restoreNavigation({pane:'songs',view:'playlists',profile:api.library.activeProfile});
 }
-async function apply(document,id,navigate=false) {
+async function apply(shareDocument,id,navigate=false) {
   if(storage.readOnly)throw Error('Sauvegarde locale en lecture seule.');
   const editing=document.activeElement?.closest?.('#songPane') &&
     document.activeElement?.matches?.('input,textarea,select,[contenteditable="true"]');
-  if(playing()||editing){pending.set(id,{document,navigate});return;}
+  if(playing()||editing){pending.set(id,{document:shareDocument,navigate});return;}
   if(!api.flushPending())throw Error('Une sauvegarde locale est en attente. Mise à jour différée.');
   await storage.ready;
   const scope=storage.scope,token=storage.rawToken;
-  const result=addOrUpdateSharedPlaylist(api.library,document,id,api.validateLibrary);
+  const result=addOrUpdateSharedPlaylist(api.library,shareDocument,id,api.validateLibrary);
   if(!result.changed){
     if(navigate)openReceivedPlaylists();
     return false;

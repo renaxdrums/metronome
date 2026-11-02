@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "c9e9c68e0a63251e",
+  "revision": "a5489929a12ca533",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "6fe5edbd198f28c32fb23108eba7244419fbc51e13f160bf10560a39a90c8a65",
+      "sha256": "ba64e90914de87d3df653580d99829a1f5f03d310e3450da15a6cc215236a9ac",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "8f8ed64d86bc1b4af72128041346979f539cf8ffac6410e3852728cfd2865071",
+      "sha256": "e299a33f8b583788c6e0fb33828c04f5630006f4ee6258d727d27ba8e268fc05",
       "text": true
     },
     {
@@ -424,7 +424,7 @@
     },
     {
       "path": "playlist-sharing.js",
-      "sha256": "100f913ff4f3f72e529ac0736cb6db26c6e0919cdbc9a736e106a0c534cbd6f8",
+      "sha256": "c3f784e04936adaa0c6748accea3533f552e8c9e2d3c9dd34825b43b8f575a99",
       "text": true
     },
     {

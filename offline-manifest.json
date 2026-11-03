@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "f82bb3f79f611aa6",
+  "revision": "812d990b70f65882",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,12 +129,12 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "ba64e90914de87d3df653580d99829a1f5f03d310e3450da15a6cc215236a9ac",
+      "sha256": "8d3ae3cc815fcedb8a4029c8d5a3849ae169b2caa4422d7d52b504307818068e",
       "text": true
     },
     {
       "path": "backup-index2.css",
-      "sha256": "125aa2c15eecc2f2dbf789b2f0c296b786a057b35c2e736629f1e63d3bca8e47",
+      "sha256": "bba65634db68e92da067750e5a2195fc04e493304791906f1ffc2c1a847e2149",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "8741c18f105d97feb65dbbfa989cb66a5514c25478a858feb6aeabd306dbb81d",
+      "sha256": "7d7bb4555b24bd345fa870238ee951cc7302ce0d114eb8945a511031ed2e7347",
       "text": true
     },
     {
@@ -439,7 +439,7 @@
     },
     {
       "path": "renax-pulse-ivory.css",
-      "sha256": "e876601b52fb0ff9b509a8e566b6cf594ecf5b19787a9ec2946605fdece3393b",
+      "sha256": "404f0e45aa1cc20ce0efd4d1ccd1ab188ac75a9d9f2bffb825f5c73c02a32101",
       "text": true
     },
     {

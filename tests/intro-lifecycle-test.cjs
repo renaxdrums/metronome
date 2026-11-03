@@ -20,6 +20,27 @@ const { start, save } = require('./audio-harness.cjs');
       await page.waitForFunction(() => document.getElementById('renaxArrival').dataset.introReady === 'true');
       // An opaque opening must not keep redrawing the covered application.
       await page.evaluate(() => {
+        // Observe short transition phases in the page, before playback/resize.
+        // The runner can resume after finish() has removed the presentation.
+        // Keep the exact visual requirements; a missing phase still times out.
+        window.qaIntroFrames = {};
+        const overlay = document.getElementById('renaxArrival');
+        const observer = new MutationObserver(() => {
+          const scene = overlay.querySelector('.kern-intro-presentation');
+          if (scene) {
+            const frame = {
+              overlay: Number(getComputedStyle(overlay).opacity),
+              scene: Number(getComputedStyle(scene).opacity),
+              background: getComputedStyle(overlay).backgroundColor,
+            };
+            if (overlay.dataset.introPhase === 'black' && frame.overlay === 1 && frame.scene === 0)
+              window.qaIntroFrames.black = frame;
+            if (overlay.dataset.introPhase === 'fade-in' && frame.overlay > .1 && frame.overlay < .9 && frame.scene === 0)
+              window.qaIntroFrames.fadeIn = frame;
+          }
+          if (overlay.hidden) observer.disconnect();
+        });
+        observer.observe(overlay, { attributes: true, childList: true, subtree: true });
         window.qaCoveredDraws = { particleCanvas: 0, renaxHeaderWave: 0 };
         const clear = CanvasRenderingContext2D.prototype.clearRect;
         CanvasRenderingContext2D.prototype.clearRect = function (...args) {
@@ -40,16 +61,8 @@ const { start, save } = require('./audio-harness.cjs');
       await page.waitForFunction(() => isPlaying);
       await page.evaluate(() => { window.qaIntroAudio = audioCtx; });
       await page.setViewportSize({ width: height, height: width });
-      // Capture the black hold in one frame, before the fade-in can begin.
-      const blackFrame = await page.waitForFunction(() => {
-        const node = document.getElementById('renaxArrival');
-        const state = {
-          overlay: Number(getComputedStyle(node).opacity),
-          scene: Number(getComputedStyle(node.querySelector('.kern-intro-presentation')).opacity),
-          background: getComputedStyle(node).backgroundColor,
-        };
-        return node.dataset.introPhase === 'black' && state.overlay === 1 && state.scene === 0 && state;
-      }, null, { polling: 20, timeout: 15000 });
+      const blackFrame = await page.waitForFunction(() => window.qaIntroFrames.black,
+        null, { polling: 20, timeout: 15000 });
       const black = await blackFrame.jsonValue();
       await blackFrame.dispose();
       assert.equal(black.overlay, 1);
@@ -59,12 +72,8 @@ const { start, save } = require('./audio-harness.cjs');
       assert.equal(typography['R E N A X  D R U M S'], '#ffffff');
       assert.equal(typography['MÉTRO'], '#ffffff');
       assert.equal(typography.NOME, '#ff7900');
-      await page.waitForFunction(() => {
-        const node = document.getElementById('renaxArrival');
-        const opacity = Number(getComputedStyle(node).opacity);
-        return node.dataset.introPhase === 'fade-in' && opacity > .1 && opacity < .9;
-      }, null, { polling: 20 });
-      assert.equal(await page.locator('.kern-intro-presentation').evaluate(node => Number(getComputedStyle(node).opacity)), 0);
+      await page.waitForFunction(() => window.qaIntroFrames.fadeIn, null, { polling: 20 });
+      assert.equal(await page.evaluate(() => window.qaIntroFrames.fadeIn.scene), 0);
       await page.waitForFunction(() => document.getElementById('renaxArrival').hidden);
       await page.waitForTimeout(100);
       assert(await page.evaluate(() => window.qaCoveredDraws.particleCanvas > 0 && window.qaCoveredDraws.renaxHeaderWave > 0), 'Covered visuals resume after the intro');

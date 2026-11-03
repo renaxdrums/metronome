@@ -98,10 +98,51 @@
       return !loopedMeasure && typeof songAtEnd === 'function' && songAtEnd();
     }
 
+    // The block duration stays fixed. Only scheduled events move to the right.
+    // Exact rational comparison drops tail events that would cross the block boundary,
+    // including when the block has an arbitrarily large repetition count.
+    function sequencePhaseEvent(model, m, beat, subIndex, subdiv, bpm, referenceTime) {
+      const steps = model?.phaseSteps, division = model?.phaseDivision;
+      if (appMode !== 'metronome' || document.body.dataset.workspace !== 'sequence' ||
+          training.engaged || window.RENAX_SONGS?.loaded ||
+          !Number.isSafeInteger(steps) || steps <= 0 ||
+          !Number.isSafeInteger(division) || division <= 0) {
+        return { time:referenceTime, audible:true };
+      }
+      if (!loopedMeasure) {
+        const raw = model?.repeatCount;
+        const repetitions = typeof raw === 'string' && /^[0-9]+$/.test(raw) && /[1-9]/.test(raw)
+          ? BigInt(raw) : Number.isSafeInteger(raw) && raw >= 1 ? BigInt(raw) : 1n;
+        const remaining = repetitions - sequenceRepeatIndex;
+        if (remaining <= 0n) return { time:referenceTime, audible:false };
+        const unit = BigInt(division), subdivisions = BigInt(subdiv);
+        const room = (BigInt(m.numerator) * remaining - BigInt(beat)) * unit * subdivisions -
+          BigInt(subIndex) * unit;
+        const shift = BigInt(steps) * BigInt(m.denominator) * subdivisions;
+        if (shift >= room) return { time:referenceTime, audible:false };
+      }
+      const seconds = (60 / bpm) * 4 * (steps / division);
+      return { time:referenceTime + seconds, audible:Number.isFinite(seconds) };
+    }
+
+    // Do not create Web Audio nodes far in advance when a phase spans many beats:
+    // queue the event and only commit it within the normal scheduling horizon.
+    let pendingSequencePhaseEvents = [];
+    function flushSequencePhaseEvents(horizon) {
+      if (!pendingSequencePhaseEvents.length) return;
+      pendingSequencePhaseEvents.sort((a,b)=>a.time-b.time);
+      let count = 0;
+      while (count < pendingSequencePhaseEvents.length && pendingSequencePhaseEvents[count].time < horizon) {
+        pendingSequencePhaseEvents[count++].play();
+      }
+      if (count) pendingSequencePhaseEvents.splice(0,count);
+    }
     function scheduler() {
       if (appMode === 'polyrhythm') { schedulerPolyrhythm(); return; }
       const voiceLead = SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active ? Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds || 0) : 0;
-      while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime + voiceLead) {
+      const horizon = audioCtx.currentTime + scheduleAheadTime + voiceLead;
+      flushSequencePhaseEvents(horizon);
+      while (nextNoteTime < horizon) {
         if (playingMeasureIndex >= measures.length) { playingMeasureIndex = 0; currentStepInMeasure = 0; sequenceRepeatIndex = 0n; }
         const mIdx = playingMeasureIndex;
         const sIdx = currentStepInMeasure;
@@ -122,20 +163,28 @@
         const effectiveTempo = rampStep?.tempo ?? getEffectiveTempo(m);
         const beatDurationSec = rampStep?.beatSeconds ?? getStepDurationMs(effectiveTempo, m.denominator, 1) / 1000;
         const voiceGroupSize = getVoiceGroupSize(m);
-        if (!window.RENAX_AMORCE?.step(nextNoteTime,state,isFirst,subIndex,beat) && state > 0 && isSilentCycleAudible()) {
-          if(model.countIn)playCountIn(nextNoteTime,isFirst);else playClick(state, nextNoteTime, isFirst, {
-            mode: 'metronome',
-            isMainBeat: subIndex === 0,
-            isOtherStrongBeat: isOtherStrongBeat(m, beat, subIndex),
-            beatNumber: beat % voiceGroupSize === 0 ? Math.floor(beat / voiceGroupSize) + 1 : 0,
-            subIndex,
-            beatDurationSec: beatDurationSec * voiceGroupSize
-          });
-        }
         const subdiv = m.beatSubdivisions[beat] || 1;
         const stepSeconds = rampStep?.seconds ?? getStepDurationMs(effectiveTempo, m.denominator, subdiv) / 1000;
-        if(subIndex===0)window.RENAX_PLAYBACK?.recordBeat(audioCtx,nextNoteTime);
-        scheduleVisualUpdate(mIdx, sIdx, nextNoteTime, { beat, subIndex, voiceGroupSize, subdivisions: m.beatSubdivisions[beat], durationMs: stepSeconds * 1000 });
+        const phase = sequencePhaseEvent(model,m,beat,subIndex,subdiv,effectiveTempo,nextNoteTime);
+        if (phase.audible) {
+          const soundAllowed = isSilentCycleAudible();
+          const dispatch = () => {
+            if (!window.RENAX_AMORCE?.step(phase.time,state,isFirst,subIndex,beat) && state > 0 && soundAllowed) {
+              if(model.countIn)playCountIn(phase.time,isFirst);else playClick(state, phase.time, isFirst, {
+                mode: 'metronome',
+                isMainBeat: subIndex === 0,
+                isOtherStrongBeat: isOtherStrongBeat(m, beat, subIndex),
+                beatNumber: beat % voiceGroupSize === 0 ? Math.floor(beat / voiceGroupSize) + 1 : 0,
+                subIndex,
+                beatDurationSec: beatDurationSec * voiceGroupSize
+              });
+            }
+            if(subIndex===0)window.RENAX_PLAYBACK?.recordBeat(audioCtx,phase.time);
+            scheduleVisualUpdate(mIdx, sIdx, phase.time, { beat, subIndex, voiceGroupSize, subdivisions: m.beatSubdivisions[beat], durationMs: stepSeconds * 1000 });
+          };
+          if (phase.time > horizon) pendingSequencePhaseEvents.push({time:phase.time,play:dispatch});
+          else dispatch();
+        }
 
         nextNoteTime += stepSeconds;
 
@@ -424,6 +473,7 @@
       window.RENAX_PLAYBACK?.start();
       playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : 0;
       sequenceRepeatIndex = 0n;
+      pendingSequencePhaseEvents = [];
       currentStepInMeasure = 0;
       polyEventIndex = 0;
       activeMeasureIndex = playingMeasureIndex;
@@ -455,6 +505,7 @@
       if(window.RENAX_MULTI?.active)return window.RENAX_MULTI.stop();
       loopedMeasure = null;
       sequenceRepeatIndex = 0n;
+      pendingSequencePhaseEvents = [];
       if (!isPlaying) return;
       isPlaying = false;
       updateTrainButton();

@@ -11,6 +11,7 @@ const { start, save, showMeasures } = require('./audio-harness.cjs');
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(runtime.url);
+      await page.getByRole('tab', { name: 'Séquenceur', exact: true }).click();
       await showMeasures(page);
       await page.waitForFunction(() => typeof createMeasure === 'function' && !!window.RENAX_SONGS);
       await page.evaluate(() => {

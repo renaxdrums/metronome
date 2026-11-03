@@ -344,14 +344,19 @@ async function baselineRoute(page, url) {
                 }, module);
               }
               await p.getByRole('tab', { name: module, exact: true }).click();
-              if (!i && !referenceAgainstItself && module === 'Séquenceur') {
+              if (
+                !i &&
+                !referenceAgainstItself &&
+                module === 'Séquenceur' &&
+                (await p.locator('#measureList .measure-repeat-row').count()) === 0
+              ) {
                 // The new count field is approved. Reproduce only its initial
                 // DOM and scoped CSS in the historical baseline, preserving
                 // strict pixel and computed-style checks for everything else.
                 await p.addStyleTag({
                   content:
                     '#measureList .measure-repeat-row{max-width:100%;cursor:default;}' +
-                    '#measureList .measure-repeat-input{width:120px;min-width:80px;max-width:100%;box-sizing:border-box;}',
+                    '#measureList .measure-repeat-input{width:120px!important;min-width:80px;max-width:100%;box-sizing:border-box;}',
                 });
                 await p.evaluate(() => {
                   const cards = [...document.querySelectorAll('#measureList .measure-card')];
@@ -384,6 +389,8 @@ async function baselineRoute(page, url) {
                   });
                 });
               }
+              if (!i && !referenceAgainstItself && module === 'Séquenceur')
+                await require('./sequence-phase-reference.cjs')(p);
               if ((!i || referenceAgainstItself) && module === 'Track')
                 await p.evaluate(() => {
                   playBtn.dataset.songTransport = 'true';

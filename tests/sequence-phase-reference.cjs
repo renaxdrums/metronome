@@ -16,8 +16,9 @@ module.exports = async function applySequencePhaseReference(p) {
                   if (!cards.length) throw Error('Missing reference sequencer cards');
                   cards.forEach((card,index) => {
                     const tempo = card.querySelector('.measure-tempo-row:not(.measure-repeat-row)');
-                    if (!tempo || card.querySelector('.sequence-phase-button'))
-                      throw Error('Unexpected reference phase markup');
+                    if (!tempo) throw Error('Missing reference phase tempo row');
+                    // The baseline may already include the phase button: avoid duplicate markup.
+                    if (card.querySelector('.sequence-phase-button')) return;
                     const button = document.createElement('button');
                     button.type = 'button';
                     button.className = 'sequence-phase-button';

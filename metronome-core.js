@@ -684,6 +684,114 @@
       });
     }
 
+    // A right-shifted click stays inside its original sequencer block.
+    // The reference bar never moves: only the click, its subdivisions and accents do.
+    const SEQUENCE_PHASE_ICON = '<svg aria-hidden="true" viewBox="0 0 38 20" fill="none"><path d="M4 3v14" stroke="currentColor" stroke-dasharray="2 2" stroke-width="2"/><path d="M11 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M30 3v14" stroke="currentColor" stroke-width="3"/></svg>';
+    const sequencePhaseChoices = [
+      [4,'Noire (1/4)'],[8,'Croche (1/8)'],[12,'Croche ternaire (1/12)'],
+      [16,'Double croche (1/16)'],[24,'Double croche ternaire (1/24)'],
+      [32,'Triple croche (1/32)'],[48,'Triple croche ternaire (1/48)'],
+      [64,'Quadruple croche (1/64)'],[96,'Quadruple croche ternaire (1/96)'],
+      [128,'1/128 de ronde']
+    ];
+    function sequencePhaseConfig(m) {
+      const steps = m && Number.isSafeInteger(m.phaseSteps) && m.phaseSteps > 0 ? m.phaseSteps : 0;
+      const denominator = m && Number.isSafeInteger(m.phaseDivision) && m.phaseDivision > 0 ? m.phaseDivision : 16;
+      return { steps, denominator };
+    }
+    function openSequencePhaseDialog(m, index) {
+      if (appMode !== 'metronome' || playbackStarting || isPlaying || !measures.includes(m)) return;
+      const previous = document.querySelector('.sequence-phase-dialog');
+      if (previous) previous.close();
+      const phase = sequencePhaseConfig(m);
+      const dialog = document.createElement('dialog');
+      dialog.className = 'sequence-phase-dialog';
+      dialog.setAttribute('aria-label', 'Déphasage de la mesure ' + (index + 1));
+      const title = document.createElement('h2');
+      title.textContent = 'Déphasage du clic';
+      const description = document.createElement('p');
+      description.textContent = 'Décaler vers la droite tous les clics, subdivisions et accents. Le nombre de mesures et le tempo ne changent pas. Les sons dépassant la fin du bloc ne sont pas joués.';
+      const unitLabel = document.createElement('label');
+      unitLabel.textContent = 'Valeur d’un pas';
+      const unit = document.createElement('select');
+      unit.setAttribute('aria-label', 'Valeur rythmique du déphasage');
+      sequencePhaseChoices.forEach(([value, name]) => {
+        const option = document.createElement('option'); option.value = String(value); option.textContent = name;
+        unit.appendChild(option);
+      });
+      const custom = document.createElement('option');custom.value='custom';custom.textContent='Personnalisé (1/N de ronde)';unit.appendChild(custom);
+      const customInput = document.createElement('input');
+      customInput.type='text';customInput.inputMode='numeric';customInput.setAttribute('aria-label','Dénominateur personnalisé N');
+      customInput.placeholder = 'N';customInput.value=String(phase.denominator);customInput.hidden=true;
+      unit.value=sequencePhaseChoices.some(([n])=>n===phase.denominator) ? String(phase.denominator) : 'custom';
+      customInput.hidden=unit.value!=='custom';
+      unitLabel.append(unit,customInput);
+      const stepLabel = document.createElement('label');
+      stepLabel.textContent = 'Nombre de pas à droite';
+      const steps = document.createElement('input');
+      steps.type='text';steps.inputMode='numeric';steps.autocomplete='off';steps.spellcheck=false;
+      steps.value=String(phase.steps || 1);
+      steps.setAttribute('aria-label','Nombre de pas de déphasage');
+      stepLabel.appendChild(steps);
+      const illustration = document.createElement('div');
+      illustration.className='sequence-phase-illustration';
+      illustration.setAttribute('aria-label','Animation du clic de référence et du clic déplacé vers la droite');
+      const caption = document.createElement('div');
+      caption.className='sequence-phase-caption';
+      caption.textContent='Référence fixe  ·  Clic déplacé →';
+      const lane = document.createElement('div');
+      lane.className='sequence-phase-lane';
+      const origin = document.createElement('span');
+      origin.className='sequence-phase-origin';
+      const moving = document.createElement('span');
+      moving.className='sequence-phase-moving';
+      lane.append(origin,moving);
+      const offset = document.createElement('p');
+      offset.className='sequence-phase-offset';
+      const notice = document.createElement('p');
+      notice.className='sequence-phase-notice';notice.setAttribute('role','status');
+      const buttons=document.createElement('div');buttons.className='sequence-phase-actions';
+      const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Annuler';
+      const reset=document.createElement('button');reset.type='button';reset.textContent='Désactiver';
+      const apply=document.createElement('button');apply.type='button';apply.textContent='Appliquer';apply.className='sequence-phase-apply';
+      buttons.append(cancel,reset,apply);
+      illustration.append(caption,lane,offset);
+      dialog.append(title,description,unitLabel,stepLabel,illustration,notice,buttons);
+      document.body.appendChild(dialog);
+      let animation=null;
+      const parse = input => /^[0-9]+$/.test(input.trim()) && Number.isSafeInteger(Number(input.trim())) ? Number(input.trim()) : NaN;
+      const refresh = () => {
+        const count=parse(steps.value);
+        const division=parse(unit.value==='custom'?customInput.value:unit.value);
+        const valid=count>0 && division>0;
+        apply.disabled=!valid;
+        notice.textContent=valid?'':'Saisis deux entiers strictement positifs.';
+        offset.textContent=valid?count+' pas de 1/'+division+' de ronde vers la droite':'Déphasage indisponible';
+        animation?.cancel();animation=null;
+        if(!valid)return;
+        const visualShift=Math.max(5,Math.min(220,(4*count/division)*45));
+        if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          animation=moving.animate([{transform:'translateX(0px)'},{transform:'translateX('+visualShift+'px)'}],
+            {duration:1200,direction:'alternate',iterations:Infinity,easing:'ease-in-out'});
+        } else moving.style.transform='translateX('+visualShift+'px)';
+      };
+      unit.addEventListener('change',()=>{customInput.hidden=unit.value!=='custom';refresh();});
+      steps.addEventListener('input',refresh);customInput.addEventListener('input',refresh);
+      cancel.addEventListener('click',()=>dialog.close());
+      reset.addEventListener('click',()=>{m.phaseSteps=0;m.phaseDivision=phase.denominator;dialog.close();renderSequencerList();});
+      apply.addEventListener('click',()=>{
+        const count=parse(steps.value),division=parse(unit.value==='custom'?customInput.value:unit.value);
+        if(!(count>0&&division>0))return;
+        m.phaseSteps=count;m.phaseDivision=division;
+        dialog.close();renderSequencerList();
+      });
+      dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
+      dialog.addEventListener('close',()=>{animation?.cancel();dialog.remove();});
+      dialog.showModal();
+      refresh();
+      steps.focus();
+    }
+
     function blockNumberMenu(values,value,label){
       const select=document.createElement('select');select.setAttribute('aria-label',label);
       const fill=list=>{const fragment=document.createDocumentFragment();for(const v of list){const option=document.createElement('option');option.value=String(v);option.textContent=String(v);fragment.append(option);}select.replaceChildren(fragment);select.value=String(value);};
@@ -753,6 +861,20 @@
         tempoRow.appendChild(tempoLabel);
         tempoRow.appendChild(tempoInput);
         tempoRow.appendChild(tempoUnit);
+        const phaseButton = document.createElement('button');
+        phaseButton.type = 'button';
+        phaseButton.className = 'sequence-phase-button';
+        phaseButton.innerHTML = SEQUENCE_PHASE_ICON;
+        const phaseEnabled = sequencePhaseConfig(m).steps > 0;
+        phaseButton.classList.toggle('active',phaseEnabled);
+        phaseButton.setAttribute('aria-pressed',String(phaseEnabled));
+        phaseButton.setAttribute('aria-label','Déphasage du clic, mesure '+(i+1));
+        phaseButton.title = phaseEnabled ? 'Déphasage vers la droite actif' : 'Configurer le déphasage vers la droite';
+        phaseButton.disabled = playbackStarting || isPlaying;
+        phaseButton.addEventListener('click',event=>{
+          event.stopPropagation();openSequencePhaseDialog(m,i);
+        });
+        tempoRow.appendChild(phaseButton);
 
         // A sequencer block can repeat its pattern for any positive whole number of measures.
         // Keep the count as decimal text: JSON persists it exactly, even beyond Number.MAX_SAFE_INTEGER.

@@ -3,6 +3,31 @@
 #measureList .measure-repeat-row{max-width:100%;cursor:default;}
 #measureList .measure-repeat-input{width:120px;min-width:80px;max-width:100%;box-sizing:border-box;}
 
+#measureList .sequence-phase-button{width:36px;height:32px;min-width:36px;flex:none;display:grid;place-items:center;padding:4px;border:1px solid var(--border);border-radius:7px;background:var(--panel);color:var(--orange);cursor:pointer;}
+#measureList .sequence-phase-button svg{display:block;width:28px;height:18px;}
+#measureList .sequence-phase-button.active{border-color:var(--orange);background:color-mix(in srgb,var(--orange) 16%,var(--panel));}
+#measureList .sequence-phase-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+#measureList .sequence-phase-button:disabled{opacity:.55;cursor:not-allowed;}
+.sequence-phase-dialog{box-sizing:border-box;width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow-y:auto;margin:auto;padding:20px;border-radius:14px;border:1px solid var(--orange);background:var(--panel);color:var(--text);box-shadow:0 20px 70px #0009;font:13px/1.55 var(--font);}
+.sequence-phase-dialog::backdrop{background:#080b14b8;}
+.sequence-phase-dialog h2{margin:0 0 8px;font:700 17px/1.3 var(--font);color:var(--orange);}
+.sequence-phase-dialog p{margin:0 0 15px;color:var(--text-muted);}
+.sequence-phase-dialog label{display:grid;gap:6px;margin:12px 0;font-weight:700;}
+.sequence-phase-dialog select,.sequence-phase-dialog input{box-sizing:border-box;width:100%;min-height:44px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);padding:8px 10px;font:600 14px var(--font);}
+.sequence-phase-dialog [hidden]{display:none!important;}
+.sequence-phase-illustration{border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:16px;background:var(--bg);}
+.sequence-phase-caption{font-size:12px;color:var(--text);font-weight:700;}
+.sequence-phase-lane{position:relative;height:49px;margin-top:6px;border-bottom:1px dashed var(--text-muted);overflow:hidden;}
+.sequence-phase-origin,.sequence-phase-moving{position:absolute;top:7px;left:20px;height:30px;width:3px;border-radius:2px;background:var(--text-muted);}
+.sequence-phase-origin{opacity:.7;}
+.sequence-phase-moving{background:var(--orange);width:4px;}
+.sequence-phase-dialog .sequence-phase-offset{font-size:11px;margin:8px 0 0;color:var(--text-muted);}
+.sequence-phase-dialog .sequence-phase-notice{min-height:15px;margin:10px 0 0;color:var(--orange);}
+.sequence-phase-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;}
+.sequence-phase-actions button{min-height:44px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);color:var(--text);background:var(--bg);font:700 12px var(--font);cursor:pointer;}
+.sequence-phase-actions .sequence-phase-apply{background:var(--orange);color:#141414;border-color:var(--orange);}
+.sequence-phase-actions button:disabled{opacity:.5;cursor:not-allowed;}
+@media(max-width:1100px){#measureList .sequence-phase-button{width:44px;height:44px;min-width:44px;}}
 .sequence-card-tools{position:absolute;right:8px;top:7px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:5px;}
 .sequence-card-tools button,.sequence-more summary{display:grid;place-items:center;width:30px;height:28px;padding:0;background:#191a21;border:1px solid #353641;border-radius:7px;color:var(--orange);cursor:pointer;}
 .sequence-card-tools button:focus-visible,.sequence-more summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}

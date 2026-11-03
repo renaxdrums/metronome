@@ -103,7 +103,8 @@
     // including when the block has an arbitrarily large repetition count.
     function sequencePhaseEvent(model, m, beat, subIndex, subdiv, bpm, referenceTime) {
       const steps = model?.phaseSteps, division = model?.phaseDivision;
-      if (appMode !== 'metronome' || window.RENAX_SONGS?.loaded ||
+      if (appMode !== 'metronome' || document.body.dataset.workspace !== 'sequence' ||
+          training.engaged || window.RENAX_SONGS?.loaded ||
           !Number.isSafeInteger(steps) || steps <= 0 ||
           !Number.isSafeInteger(division) || division <= 0) {
         return { time:referenceTime, audible:true };

@@ -4,6 +4,7 @@
 #measureList .measure-repeat-input{width:120px;min-width:80px;max-width:100%;box-sizing:border-box;}
 
 #measureList .sequence-phase-button{width:36px;height:32px;min-width:36px;flex:none;display:grid;place-items:center;padding:4px;border:1px solid var(--border);border-radius:7px;background:var(--panel);color:var(--orange);cursor:pointer;}
+body:not([data-workspace=sequence]) #measureList .sequence-phase-button{display:none;}
 #measureList .sequence-phase-button svg{display:block;width:28px;height:18px;}
 #measureList .sequence-phase-button.active{border-color:var(--orange);background:color-mix(in srgb,var(--orange) 16%,var(--panel));}
 #measureList .sequence-phase-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}

@@ -344,7 +344,12 @@ async function baselineRoute(page, url) {
                 }, module);
               }
               await p.getByRole('tab', { name: module, exact: true }).click();
-              if (!i && !referenceAgainstItself && module === 'Séquenceur') {
+              if (
+                !i &&
+                !referenceAgainstItself &&
+                module === 'Séquenceur' &&
+                (await p.locator('#measureList .measure-repeat-row').count()) === 0
+              ) {
                 // The new count field is approved. Reproduce only its initial
                 // DOM and scoped CSS in the historical baseline, preserving
                 // strict pixel and computed-style checks for everything else.

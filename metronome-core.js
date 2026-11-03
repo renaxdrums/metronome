@@ -700,7 +700,7 @@
       return { steps, denominator };
     }
     function openSequencePhaseDialog(m, index) {
-      if (appMode !== 'metronome' || playbackStarting || isPlaying || !measures.includes(m)) return;
+      if (appMode !== 'metronome' || document.body.dataset.workspace !== 'sequence' || playbackStarting || isPlaying || !measures.includes(m)) return;
       const previous = document.querySelector('.sequence-phase-dialog');
       if (previous) previous.close();
       const phase = sequencePhaseConfig(m);

@@ -250,6 +250,8 @@
       "sequenceRepeatIndex",
       "advanceScheduledMeasure",
       "sequencePhaseEvent",
+      "pendingSequencePhaseEvents",
+      "flushSequencePhaseEvents",
       "scheduler",
       "scheduleVisualUpdate",
       "createPolyMeasure",
@@ -553,7 +555,9 @@
     "sequencePhaseChoices": "readonly",
     "sequencePhaseConfig": "writable",
     "openSequencePhaseDialog": "writable",
-    "sequencePhaseEvent": "writable"
+    "sequencePhaseEvent": "writable",
+    "pendingSequencePhaseEvents": "writable",
+    "flushSequencePhaseEvents": "writable"
   },
   "testGlobals": {
     "AudioContext": "writable",

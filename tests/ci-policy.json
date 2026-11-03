@@ -81,6 +81,7 @@
     "tests/robustness-boundaries-test.cjs",
     "tests/security-text-test.cjs",
     "tests/sequence-measure-repeats-test.cjs",
+    "tests/sequence-phase-test.cjs",
     "tests/settings-resize-test.cjs",
     "tests/song-back-regression-test.cjs",
     "tests/song-block-area-toggle-test.cjs",

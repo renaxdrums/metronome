@@ -140,6 +140,41 @@ const { start, save, showMeasures } = require('./audio-harness.cjs');
       assert(Math.abs(math.double-(.1+.25))<1e-8);
       assert.equal(math.untouched,.1,'Polyrhythm is never phase shifted');
 
+      const deferred = await page.evaluate(() => {
+        const saved={audioCtx,playClick,scheduleVisualUpdate,timeout:window.setTimeout,
+          measures,metronomeMeasures,appMode,currentBank,isPlaying,playbackStarting,loopedMeasure,
+          playingMeasureIndex,currentStepInMeasure,nextNoteTime,
+          repeatIndex:sequenceRepeatIndex,pending:pendingSequencePhaseEvents};
+        try {
+          let clock=0, played=0;
+          window.setTimeout=()=>0;scheduleVisualUpdate=()=>{};
+          audioCtx={get currentTime(){return clock}};
+          playClick=()=>{played++;};
+          currentBank='clic';appMode='metronome';isPlaying=false;
+          playbackStarting=false;loopedMeasure=null;
+          measures=[createMeasure(4,4,120)];measures[0].phaseSteps=1;
+          measures[0].phaseDivision=4;measures[0].repeatCount='4';
+          metronomeMeasures=measures;playingMeasureIndex=0;currentStepInMeasure=0;
+          sequenceRepeatIndex=0n;pendingSequencePhaseEvents=[];nextNoteTime=.01;
+          scheduler();
+          const queued=pendingSequencePhaseEvents.length;
+          const premature=played;
+          stopMetronome();
+          return {queued,premature,afterStop:pendingSequencePhaseEvents.length};
+        } finally {
+          window.setTimeout=saved.timeout;audioCtx=saved.audioCtx;playClick=saved.playClick;
+          scheduleVisualUpdate=saved.scheduleVisualUpdate;measures=saved.measures;
+          metronomeMeasures=saved.metronomeMeasures;appMode=saved.appMode;currentBank=saved.currentBank;
+          isPlaying=saved.isPlaying;playbackStarting=saved.playbackStarting;loopedMeasure=saved.loopedMeasure;
+          playingMeasureIndex=saved.playingMeasureIndex;currentStepInMeasure=saved.currentStepInMeasure;
+          nextNoteTime=saved.nextNoteTime;sequenceRepeatIndex=saved.repeatIndex;
+          pendingSequencePhaseEvents=saved.pending;
+        }
+      });
+      assert.equal(deferred.queued,1,'Phase ahead of the audio horizon must be deferred');
+      assert.equal(deferred.premature,0,'No instrument source is created early for delayed phases');
+      assert.equal(deferred.afterStop,0,'Stop cancels deferred phase events');
+
       const overflow=await page.locator('#measureList').evaluate(el=>el.scrollWidth-el.clientWidth);
       assert(overflow<=1,'No horizontal overflow on desktop/mobile: '+overflow);
       assert.deepEqual(errors,[],'No uncaught browser exceptions');

@@ -11,6 +11,7 @@ const { start, save, showMeasures } = require('./audio-harness.cjs');
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(runtime.url);
+      await page.getByRole('tab', { name: 'Séquenceur', exact: true }).click();
       await showMeasures(page);
       await page.waitForFunction(() => typeof createMeasure === 'function' && !!window.RENAX_SONGS);
       await page.evaluate(() => {
@@ -134,11 +135,16 @@ const { start, save, showMeasures } = require('./audio-harness.cjs');
         appMode='polyrhythm';
         const untouched=sequencePhaseEvent(m,m,0,0,4,120,.1);
         appMode='metronome';
-        return {triplet:triplet.time,double:double.time,untouched:untouched.time};
+        const previousWorkspace=document.body.dataset.workspace;
+        document.body.dataset.workspace='training';
+        const trainingUnchanged=sequencePhaseEvent(m,m,0,0,4,120,.1);
+        document.body.dataset.workspace=previousWorkspace;
+        return {triplet:triplet.time,double:double.time,untouched:untouched.time,trainingUnchanged:trainingUnchanged.time};
       });
       assert(Math.abs(math.triplet-(.1+1/12))<1e-8);
       assert(Math.abs(math.double-(.1+.25))<1e-8);
       assert.equal(math.untouched,.1,'Polyrhythm is never phase shifted');
+      assert.equal(math.trainingUnchanged,.1,'Training workspace is never phase shifted');
 
       const deferred = await page.evaluate(() => {
         const saved={audioCtx,playClick,scheduleVisualUpdate,timeout:window.setTimeout,

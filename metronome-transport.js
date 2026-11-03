@@ -124,10 +124,24 @@
       return { time:referenceTime + seconds, audible:Number.isFinite(seconds) };
     }
 
+    // Do not create Web Audio nodes far in advance when a phase spans many beats:
+    // queue the event and only commit it within the normal scheduling horizon.
+    let pendingSequencePhaseEvents = [];
+    function flushSequencePhaseEvents(horizon) {
+      if (!pendingSequencePhaseEvents.length) return;
+      pendingSequencePhaseEvents.sort((a,b)=>a.time-b.time);
+      let count = 0;
+      while (count < pendingSequencePhaseEvents.length && pendingSequencePhaseEvents[count].time < horizon) {
+        pendingSequencePhaseEvents[count++].play();
+      }
+      if (count) pendingSequencePhaseEvents.splice(0,count);
+    }
     function scheduler() {
       if (appMode === 'polyrhythm') { schedulerPolyrhythm(); return; }
       const voiceLead = SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active ? Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds || 0) : 0;
-      while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime + voiceLead) {
+      const horizon = audioCtx.currentTime + scheduleAheadTime + voiceLead;
+      flushSequencePhaseEvents(horizon);
+      while (nextNoteTime < horizon) {
         if (playingMeasureIndex >= measures.length) { playingMeasureIndex = 0; currentStepInMeasure = 0; sequenceRepeatIndex = 0n; }
         const mIdx = playingMeasureIndex;
         const sIdx = currentStepInMeasure;
@@ -152,18 +166,23 @@
         const stepSeconds = rampStep?.seconds ?? getStepDurationMs(effectiveTempo, m.denominator, subdiv) / 1000;
         const phase = sequencePhaseEvent(model,m,beat,subIndex,subdiv,effectiveTempo,nextNoteTime);
         if (phase.audible) {
-          if (!window.RENAX_AMORCE?.step(phase.time,state,isFirst,subIndex,beat) && state > 0 && isSilentCycleAudible()) {
-            if(model.countIn)playCountIn(phase.time,isFirst);else playClick(state, phase.time, isFirst, {
-              mode: 'metronome',
-              isMainBeat: subIndex === 0,
-              isOtherStrongBeat: isOtherStrongBeat(m, beat, subIndex),
-              beatNumber: beat % voiceGroupSize === 0 ? Math.floor(beat / voiceGroupSize) + 1 : 0,
-              subIndex,
-              beatDurationSec: beatDurationSec * voiceGroupSize
-            });
-          }
-          if(subIndex===0)window.RENAX_PLAYBACK?.recordBeat(audioCtx,phase.time);
-          scheduleVisualUpdate(mIdx, sIdx, phase.time, { beat, subIndex, voiceGroupSize, subdivisions: m.beatSubdivisions[beat], durationMs: stepSeconds * 1000 });
+          const soundAllowed = isSilentCycleAudible();
+          const dispatch = () => {
+            if (!window.RENAX_AMORCE?.step(phase.time,state,isFirst,subIndex,beat) && state > 0 && soundAllowed) {
+              if(model.countIn)playCountIn(phase.time,isFirst);else playClick(state, phase.time, isFirst, {
+                mode: 'metronome',
+                isMainBeat: subIndex === 0,
+                isOtherStrongBeat: isOtherStrongBeat(m, beat, subIndex),
+                beatNumber: beat % voiceGroupSize === 0 ? Math.floor(beat / voiceGroupSize) + 1 : 0,
+                subIndex,
+                beatDurationSec: beatDurationSec * voiceGroupSize
+              });
+            }
+            if(subIndex===0)window.RENAX_PLAYBACK?.recordBeat(audioCtx,phase.time);
+            scheduleVisualUpdate(mIdx, sIdx, phase.time, { beat, subIndex, voiceGroupSize, subdivisions: m.beatSubdivisions[beat], durationMs: stepSeconds * 1000 });
+          };
+          if (phase.time > horizon) pendingSequencePhaseEvents.push({time:phase.time,play:dispatch});
+          else dispatch();
         }
 
         nextNoteTime += stepSeconds;
@@ -453,6 +472,7 @@
       window.RENAX_PLAYBACK?.start();
       playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : 0;
       sequenceRepeatIndex = 0n;
+      pendingSequencePhaseEvents = [];
       currentStepInMeasure = 0;
       polyEventIndex = 0;
       activeMeasureIndex = playingMeasureIndex;
@@ -484,6 +504,7 @@
       if(window.RENAX_MULTI?.active)return window.RENAX_MULTI.stop();
       loopedMeasure = null;
       sequenceRepeatIndex = 0n;
+      pendingSequencePhaseEvents = [];
       if (!isPlaying) return;
       isPlaying = false;
       updateTrainButton();

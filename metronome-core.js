@@ -773,7 +773,7 @@
         if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           animation=moving.animate([{transform:'translateX(0px)'},{transform:'translateX('+visualShift+'px)'}],
             {duration:1200,direction:'alternate',iterations:Infinity,easing:'ease-in-out'});
-        } else moving.style.transform='translateX('+visualShift+'px)';
+        } else moving.style.setProperty('transform','translateX('+visualShift+'px)');
       };
       unit.addEventListener('change',()=>{customInput.hidden=unit.value!=='custom';refresh();});
       steps.addEventListener('input',refresh);customInput.addEventListener('input',refresh);

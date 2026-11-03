@@ -351,7 +351,7 @@ async function baselineRoute(page, url) {
                 await p.addStyleTag({
                   content:
                     '#measureList .measure-repeat-row{max-width:100%;cursor:default;}' +
-                    '#measureList .measure-repeat-input{width:120px;min-width:80px;max-width:100%;box-sizing:border-box;flex-shrink:0;}',
+                    '#measureList .measure-repeat-input{width:120px!important;min-width:80px;max-width:100%;box-sizing:border-box;}',
                 });
                 await p.evaluate(() => {
                   const cards = [...document.querySelectorAll('#measureList .measure-card')];

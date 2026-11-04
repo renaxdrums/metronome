@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "812d990b70f65882",
+  "revision": "834e06afe0d99cef",
   "resources": [
     {
       "path": "accessibility.css",
@@ -144,7 +144,7 @@
     },
     {
       "path": "compact-controls.js",
-      "sha256": "ac80d0dcb37899479ba2e548abcfd9079cd253940033fcbdf6df6928be30a738",
+      "sha256": "24ce2f42ed2a5a900aba81180ff3a9cdbd3a4d7634b609ce15c1a277129c0883",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "7d7bb4555b24bd345fa870238ee951cc7302ce0d114eb8945a511031ed2e7347",
+      "sha256": "30d21dd76d088af729db9c9dc7fb7c2c71533882c1335e15251988e2df4ef522",
       "text": true
     },
     {
@@ -309,7 +309,7 @@
     },
     {
       "path": "kern-intro-scene.js",
-      "sha256": "741a360ed0d4f556d282d31c0149f9811c364fc544a06ae47caeeaa98554ef47",
+      "sha256": "854c3da071179115f741b8825c211cda1a08810c873dd30aedec7afefb2f631a",
       "text": true
     },
     {
@@ -329,12 +329,12 @@
     },
     {
       "path": "metronome-audio.js",
-      "sha256": "62456b1e7541d9484adca8066621c86652ba2e0ef422dc81fd6d93568a891525",
+      "sha256": "aeb485c3d328a4f6fb6c91c9aa55dde345a0cbfa5a766ef805204c35d446d3f6",
       "text": true
     },
     {
       "path": "metronome-core.js",
-      "sha256": "cc8cd4e913f40be0a9252216515f7148abb0f7b99737a73b07683384eea78fec",
+      "sha256": "348ce81e1f2e3cc3eef4bf21e779581f0d67356544f13d8a6a91cec5030c3b5d",
       "text": true
     },
     {
@@ -399,7 +399,7 @@
     },
     {
       "path": "numbox-controls.js",
-      "sha256": "1e80ca2d03e66ffd288dc391d3e85d501fabb56691e158819740f32d7c4cde82",
+      "sha256": "913403aa577f7fb50fa4af175affe581c01263b7fef577f0bd80121a95231fe5",
       "text": true
     },
     {

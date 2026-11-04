@@ -69,6 +69,8 @@ const { start, save } = require('./audio-harness.cjs');
       assert.equal(black.scene, 0);
       assert.equal(black.background, 'rgb(0, 0, 0)');
       const typography = await page.evaluate(() => window.qaIntroText);
+      assert.equal(await page.evaluate(() => window.RENAX_KERN.DURATION), 10.5);
+      assert.equal(Object.hasOwn(typography, 'David Arens'), false);
       assert.equal(typography['R E N A X  D R U M S'], '#ffffff');
       assert.equal(typography['MÉTRO'], '#ffffff');
       assert.equal(typography.NOME, '#ff7900');

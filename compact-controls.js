@@ -71,6 +71,7 @@
     menu.style.top=(down?rect.bottom+4:Math.max(8,rect.top-height-4))+'px';
     menu.style.maxHeight=height+'px';
   }
+  document.addEventListener('renax-position-numbox',event=>{if(event.detail?.button)positionMenu(event.detail.button);});
   document.addEventListener('click',event=>{const button=event.target.closest('.numbox-button');if(button)setTimeout(()=>positionMenu(button),0);},true);
   // Metric controls are enhanced before this module. Position them in the
   // opening microtask, before active-option scrolling can move their panel.

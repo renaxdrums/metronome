@@ -502,7 +502,7 @@ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .sequencer-wrapper{
  padding:0!important;gap:12px!important;
 }
 html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel{
- position:relative!important;inset:auto!important;order:0!important;
+ position:var(--ivory-dial-tools-position,relative)!important;inset:var(--ivory-dial-tools-inset,auto)!important;order:0!important;
  width:100%!important;box-sizing:border-box!important;
  min-height:44px!important;height:44px!important;max-height:44px!important;
  flex:0 0 44px!important;margin:0!important;padding-right:48px!important;
@@ -510,10 +510,29 @@ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel{
 html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) #sequencerContainer{
  order:1!important;position:relative!important;inset:auto!important;
  flex:0 0 auto!important;box-sizing:border-box!important;
- width:max(0px,min(calc(100cqw - 24px),calc(100cqh - 72px),var(--seq-size)))!important;
+ width:max(0px,min(calc(100cqw - 24px),calc(100cqh - var(--ivory-dial-clearance,72px)),var(--seq-size)))!important;
  height:auto!important;min-width:0!important;min-height:0!important;
  max-width:100%!important;max-height:none!important;aspect-ratio:1!important;
  margin:auto!important;align-self:center!important;
+}
+
+/* On a wide desktop Multitrack canvas, the controls fit beside the top
+   beat marker. Keep their positions and let the dial use that spare row. */
+@media(min-width:1101px) {
+ @container (min-width:720px) {
+  html#renaxApp[data-theme=ivory] body[data-workspace=multi] .panel-visu:not(.score-view) .score-tools-panel {
+   --ivory-dial-tools-position:absolute;
+   --ivory-dial-tools-inset:0 0 auto;
+  }
+  html#renaxApp[data-theme=ivory] body[data-workspace=multi] .panel-visu:not(.score-view) #sequencerContainer {
+   --ivory-dial-clearance:24px;
+  }
+ }
+ html#renaxApp[data-theme=ivory] body:not(.poly-mode) .panel-visu:not(.score-view) #beatDisplay {
+  text-box-trim:trim-both;
+  text-box-edge:cap alphabetic;
+  padding-inline-end:.06em;
+ }
 }
 
 /* Expanded phone controls must not collapse the interactive dial to zero.

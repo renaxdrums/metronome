@@ -998,6 +998,8 @@
       beatEditor.style.right='auto';
       beatEditor.style.left=Math.max(8,Math.min(x,window.innerWidth-rect.width-8))+'px';
       beatEditor.style.top=Math.max(8,Math.min(y,window.innerHeight-rect.height-8))+'px';
+      const button=beatEditor.querySelector('.beat-editor-division-label .numbox-custom.open .numbox-button');
+      if(button)document.dispatchEvent(new CustomEvent('renax-position-numbox',{detail:{button}}));
     }
     beatEditor.addEventListener('pointerdown',e=>{
       if(e.button!==0 || !e.target.closest('.beat-editor-handle') || e.target.closest('button'))return;
@@ -1021,7 +1023,7 @@
     }
     window.addEventListener('resize',keepBeatEditorInView);
     new ResizeObserver(keepBeatEditorInView).observe(beatEditor);
-    function closeBeatEditor() { beatEditor.hidden = true; beatEditorSelection = null; sequencerContainer.querySelectorAll('.step.editing').forEach(el=>el.classList.remove('editing')); }
+    function closeBeatEditor() { window.RENAX_NUMBOX?.closeAll(); beatEditor.hidden = true; beatEditorSelection = null; sequencerContainer.querySelectorAll('.step.editing').forEach(el=>el.classList.remove('editing')); }
     function openBeatEditor(m, beat) {
       beatEditorSelection = { m, beat };
       beatEditor.hidden = false;
@@ -1033,6 +1035,8 @@
       const measureIndex = measures.indexOf(m);
       if (appMode !== 'metronome' || measureIndex < 0 || beat >= m.numerator) { closeBeatEditor(); return; }
       sequencerContainer.querySelectorAll('.step').forEach(el=>el.classList.toggle('editing',measures[activeMeasureIndex]===m&&Number(el.dataset.beat)===beat));
+      // Close the top-layer list before removing its owner, avoiding an orphaned flash.
+      window.RENAX_NUMBOX?.closeAll();
       beatEditor.replaceChildren();
       const header = document.createElement('div');
       header.className='beat-editor-handle';

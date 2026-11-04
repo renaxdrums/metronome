@@ -9,7 +9,10 @@ const approvedCSS = process.env.MEIXS_BASE_REF
     }) +
     '\n@media(max-width:1100px){html#renaxApp[data-theme="avant"] body #workspaceNav{gap:5px!important}}' +
     // The approved Citron markers are circular; keep every other geometry check.
-    '\nhtml#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step,html#renaxApp[data-theme="avant"] body:not(.poly-mode) .visu-bottom .legend-color{border-radius:50%;}'
+    '\nhtml#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step,html#renaxApp[data-theme="avant"] body:not(.poly-mode) .visu-bottom .legend-color{border-radius:50%;}' +
+    // The desktop Citron beat counter alignment is explicitly approved in this PR.
+    // Mirror that one rule in the reference; keep all other geometry checks exact.
+    '\n@media(min-width:1101px){html#renaxApp[data-theme="avant"] body:not(.poly-mode) .panel-visu:not(.score-view) #beatDisplay{text-box-trim:trim-both;text-box-edge:cap alphabetic;padding-inline-end:.05em;}}'
   : null;
 const { start, showMeasures, openControls, newTrack } = require('./audio-harness.cjs');
 (async () => {

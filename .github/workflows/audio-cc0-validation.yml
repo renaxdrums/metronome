@@ -54,6 +54,7 @@ jobs:
           node tests/numbox-accessibility-test.cjs
           node tests/numbox-foreground-test.cjs
           node tests/citron-dialog-layout-test.cjs
+          node tests/popup-drag-test.cjs
           node tests/tempo-fader-test.cjs
           node tests/intro-lifecycle-test.cjs
           node tests/pro-sound-context-test.cjs
@@ -68,6 +69,7 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/instrument-samples-test.cjs
+          node tests/audio-headroom-test.cjs
           node tests/bell-resonance-test.cjs
           node tests/track-beat-corrections-test.cjs
           node tests/track-last-block-test.cjs

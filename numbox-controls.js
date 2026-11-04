@@ -7,6 +7,8 @@
 
   /** @param {Element} wrap @param {boolean} [restoreFocus] */
   function close(wrap, restoreFocus = false) {
+    const menu = wrap.querySelector('.numbox-menu');
+    if (menu instanceof HTMLElement && menu.matches(':popover-open')) menu.hidePopover();
     wrap.classList.remove('open');
     const trigger = /** @type {HTMLButtonElement | null} */ (wrap.querySelector('.numbox-button'));
     trigger?.setAttribute('aria-expanded', 'false');
@@ -113,6 +115,9 @@
       select.dispatchEvent(new Event('renax-options-request'));
       closeAll(wrap);
       wrap.classList.add('open');
+      document.dispatchEvent(
+        new CustomEvent('renax-position-numbox', { detail: { button: trigger } }),
+      );
       trigger.setAttribute('aria-expanded', 'true');
       requestAnimationFrame(() =>
         menu.querySelector('.active')?.scrollIntoView({ block: 'nearest' }),

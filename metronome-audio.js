@@ -531,7 +531,7 @@
 
     // The limiter is a safety net. Bank gains keep the incoming mix below -0.5 dBFS.
     const audioMixers = new WeakMap();
-    const BANK_GAINS = { clic: 0.36, cloche: 0.36, claves: 0.36, clic808: 0.36, beep: 0.36, voiceMale: 1, voiceFemale: 1 };
+    const BANK_GAINS = { clic: 0.42, cloche: 0.42, claves: 0.42, clic808: 0.42, beep: 0.42, voiceMale: 1, voiceFemale: 1 };
     function getAudioMixDestination(context) {
       let mixer = audioMixers.get(context);
       if (!mixer) {
@@ -558,7 +558,7 @@
       let mixer = voiceMixers.get(context);
       if (!mixer) {
         mixer = context.createGain();
-        mixer.gain.value = 0.25;
+        mixer.gain.value = 0.80;
         mixer.connect(getAudioMixDestination(context));
         voiceMixers.set(context, mixer);
       }

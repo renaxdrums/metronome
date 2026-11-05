@@ -63,6 +63,32 @@ const { start, showMeasures } = require('./audio-harness.cjs');
         });
         const buttons = page.locator('#measureList .sequence-parallel-button');
         assert.equal(await buttons.count(), 3, 'One Tempo parallèle button per block');
+        // Independent geometry, not normalized in this test: verify both
+        // controls are genuinely adjacent, visible and inside every card.
+        const geometry = await page.evaluate(() =>
+          [...document.querySelectorAll('#measureList .measure-card')].map(card => {
+            const phase = card.querySelector('.sequence-phase-button');
+            const parallel = card.querySelector('.sequence-parallel-button');
+            const row = card.querySelector('.measure-tempo-row:not(.measure-repeat-row)');
+            if (!phase || !parallel || !row) return { present: false };
+            const a = phase.getBoundingClientRect(), b = parallel.getBoundingClientRect();
+            const c = card.getBoundingClientRect();
+            return {
+              present: true,
+              adjacent: phase.nextElementSibling === parallel,
+              sameRow: phase.parentElement === row && parallel.parentElement === row,
+              leftToRight: b.left >= a.right - 1,
+              vertical: Math.abs((a.top + a.height / 2) - (b.top + b.height / 2)),
+              width: b.width,
+              withinCard: b.left >= c.left - 1 && b.right <= c.right + 1,
+            };
+          }),
+        );
+        for (const g of geometry) {
+          assert(g.present && g.adjacent && g.sameRow && g.leftToRight && g.vertical <= 2 &&
+            g.width >= (viewport.width <= 1100 ? 43 : 35) && g.withinCard,
+          'Tempo parallèle must remain adjacent to Déphasage without overlap or overflow: ' + JSON.stringify(g));
+        }
         assert.equal(await buttons.nth(1).getAttribute('aria-pressed'), 'false');
         await buttons.nth(1).click();
         const dialog = page.locator('.sequence-parallel-dialog');

@@ -1,6 +1,108 @@
 /* Offline interface catalogs. Musical voice language and user content are independent. */
 (() => {
-  const rows = `Acceleration / deceleration|Aceleración / desaceleración|Beschleunigung / Verlangsamung|Accelerazione / rallentamento
+  const rows = `Play one note at a time near the microphone. Analysis stays on this device. The microphone stops when you leave this workspace.|Toca una nota a la vez cerca del micrófono. El análisis permanece en este dispositivo. El micrófono se detiene al salir de este espacio.|Einen Ton nach dem anderen nahe am Mikrofon spielen. Die Analyse bleibt auf diesem Gerät. Beim Verlassen dieses Bereichs wird das Mikrofon gestoppt.|Suona una nota alla volta vicino al microfono. L’analisi resta su questo dispositivo. Il microfono si ferma quando esci da questo spazio.
+Transposition changes the written note name; the target frequency remains at concert pitch.|La transposición cambia el nombre escrito; la frecuencia objetivo sigue siendo la del sonido real.|Die Transposition ändert den notierten Namen; die Zielfrequenz bleibt beim klingenden Ton.|La trasposizione cambia il nome scritto; la frequenza di riferimento resta quella del suono reale.
+Adjust only using an externally calibrated source. Displayed decimal places do not guarantee microphone accuracy.|Ajusta solo con una fuente externa calibrada. Los decimales mostrados no garantizan la precisión del micrófono.|Nur mit einer extern kalibrierten Quelle einstellen. Angezeigte Dezimalstellen garantieren keine Mikrofonpräzision.|Regola solo con una sorgente esterna calibrata. I decimali visualizzati non garantiscono la precisione del microfono.
+E.g. E2 A2 D3 G3 B3 E4. From 1 to 12 strings, C0 to C8.|Ej. E2 A2 D3 G3 B3 E4. De 1 a 12 cuerdas, de Do0 a Do8.|Z. B. E2 A2 D3 G3 B3 E4. 1 bis 12 Saiten, C0 bis C8.|Es. E2 A2 D3 G3 B3 E4. Da 1 a 12 corde, da Do0 a Do8.
+Offsets from equal temperament, −50 to +50 cents. Active in Custom mode.|Desvíos del temperamento igual, de −50 a +50 cents. Activos en modo Personalizado.|Abweichungen von der gleichstufigen Stimmung, −50 bis +50 Cent. Im benutzerdefinierten Modus aktiv.|Scarti dal temperamento equabile, da −50 a +50 cent. Attivi in modalità Personalizzato.
+A4 stays fixed in preset temperaments. In Custom mode, each offset applies to its note, including A.|La referencia La4 es fija en los temperamentos predefinidos. En modo Personalizado, cada desvío se aplica a su nota, incluido La.|A4 bleibt in vorgegebenen Stimmungen fest. Im benutzerdefinierten Modus gilt jede Abweichung für ihren Ton, auch A.|Il riferimento La4 resta fisso nei temperamenti predefiniti. In modalità Personalizzato ogni scarto si applica alla propria nota, incluso La.
+Invalid tuning: enter 1 to 12 notes, e.g. E2 A2 D3 G3 B3 E4.|Afinación inválida: indica de 1 a 12 notas, por ejemplo E2 A2 D3 G3 B3 E4.|Ungültige Stimmung: 1 bis 12 Töne eingeben, z. B. E2 A2 D3 G3 B3 E4.|Accordatura non valida: indica da 1 a 12 note, ad esempio E2 A2 D3 G3 B3 E4.
+Microphone unavailable: open the HTTPS site in a compatible browser.|Micrófono no disponible: abre el sitio HTTPS en un navegador compatible.|Mikrofon nicht verfügbar: HTTPS-Seite in einem kompatiblen Browser öffnen.|Microfono non disponibile: apri il sito HTTPS in un browser compatibile.
+Deviation from minus 50 to plus 50 cents|Desvío de menos 50 a más 50 cents|Abweichung von minus 50 bis plus 50 Cent|Scarto da meno 50 a più 50 cent
+Pitch drift indicator|Indicador de deriva de altura|Tonhöhendrift-Anzeige|Indicatore della deriva d’intonazione
+Target strings|Cuerdas objetivo|Zielsaiten|Corde di riferimento
+Home|Inicio|Startseite|Home
+Tuner|Afinador|Stimmgerät|Accordatore
+RENAX · TOOLS FOR MUSICIANS|RENAX · HERRAMIENTAS PARA MÚSICOS|RENAX · WERKZEUGE FÜR MUSIKER|RENAX · STRUMENTI PER MUSICISTI
+Rhythm. In tune.|Ritmo. Afinación.|Rhythmus. Stimmung.|Ritmo. Intonazione.
+Choose your workspace.|Elige tu espacio de trabajo.|Arbeitsbereich auswählen.|Scegli il tuo spazio di lavoro.
+Tempo, polyrhythm, practice, sequencer, multitrack and tracks.|Tempo, polirritmia, práctica, secuenciador, multipista y temas.|Tempo, Polyrhythmik, Training, Sequenzer, Mehrspur und Tracks.|Tempo, poliritmia, esercizi, sequencer, multitraccia e brani.
+Chromatic tuning, instruments, reference pitch and temperaments.|Afinación cromática, instrumentos, diapasón y temperamentos.|Chromatische Stimmung, Instrumente, Kammerton und Stimmungen.|Accordatura cromatica, strumenti, diapason e temperamenti.
+Open Metronome|Abrir Metrónomo|Metronom öffnen|Apri Metronomo
+Open Tuner|Abrir Afinador|Stimmgerät öffnen|Apri Accordatore
+Enable microphone|Activar micrófono|Mikrofon aktivieren|Attiva microfono
+Stop microphone|Detener micrófono|Mikrofon stoppen|Ferma microfono
+Detected note|Nota detectada|Erkannter Ton|Nota rilevata
+Measured frequency|Frecuencia medida|Gemessene Frequenz|Frequenza misurata
+Deviation from target note|Desviación de la nota objetivo|Abweichung vom Zielton|Scarto dalla nota di riferimento
+Tuning measurement|Medición de afinación|Stimmungsmessung|Misura dell’intonazione
+Enable the microphone, then play one note.|Activa el micrófono y toca una sola nota.|Mikrofon aktivieren und einen einzelnen Ton spielen.|Attiva il microfono e suona una sola nota.
+Microphone stopped|Micrófono detenido|Mikrofon gestoppt|Microfono fermo
+Lower|Más grave|Tiefer|Più grave
+Higher|Más agudo|Höher|Più acuto
+Target note|Nota objetivo|Zielton|Nota di riferimento
+Automatic detection|Detección automática|Automatische Erkennung|Rilevamento automatico
+Play reference tone|Reproducir referencia|Referenzton abspielen|Ascolta riferimento
+Stop reference tone|Detener referencia|Referenzton stoppen|Ferma riferimento
+Tuner settings|Ajustes del afinador|Stimmgerät-Einstellungen|Impostazioni accordatore
+Instrument / tuning|Instrumento / afinación|Instrument / Stimmung|Strumento / accordatura
+Reference pitch · A4 (Hz)|Diapasón · La4 (Hz)|Kammerton · A4 (Hz)|Diapason · La4 (Hz)
+A4 reference pitch in hertz|Diapasón La4 en hercios|Kammerton A4 in Hertz|Diapason La4 in hertz
+Temperament|Temperamento|Stimmungssystem|Temperamento
+Temperament tonic|Tónica del temperamento|Grundton der Stimmung|Tonica del temperamento
+Advanced settings|Ajustes avanzados|Erweiterte Einstellungen|Impostazioni avanzate
+Instrument transposition|Transposición del instrumento|Instrumententransposition|Trasposizione dello strumento
+C · concert pitch|Do · sonido real|C · klingender Ton|Do · suono reale
+B♭ · written +2 semitones|Si♭ · escrito +2 semitonos|B · notiert +2 Halbtöne|Si♭ · scritto +2 semitoni
+E♭ · written +9 semitones|Mi♭ · escrito +9 semitonos|Es · notiert +9 Halbtöne|Mi♭ · scritto +9 semitoni
+F · written +7 semitones|Fa · escrito +7 semitonos|F · notiert +7 Halbtöne|Fa · scritto +7 semitoni
+Octave · written +12 semitones|Octava · escrito +12 semitonos|Oktave · notiert +12 Halbtöne|Ottava · scritto +12 semitoni
+Note names|Nombres de notas|Notennamen|Nomi delle note
+Accidentals|Alteraciones|Vorzeichen|Alterazioni
+Sharps ♯|Sostenidos ♯|Kreuze ♯|Diesis ♯
+Flats ♭|Bemoles ♭|B-Vorzeichen ♭|Bemolli ♭
+Tuning tolerance (cents)|Tolerancia de afinación (cents)|Stimmtoleranz (Cent)|Tolleranza d’intonazione (cent)
+Fine · ±1 cent|Fina · ±1 cent|Fein · ±1 Cent|Fine · ±1 cent
+Precise · ±2 cents|Precisa · ±2 cents|Präzise · ±2 Cent|Precisa · ±2 cent
+Wide · ±5 cents|Amplia · ±5 cents|Weit · ±5 Cent|Ampia · ±5 cent
+Detection threshold|Umbral de detección|Erkennungsschwelle|Soglia di rilevamento
+Sensitive · quiet room|Sensible · sala tranquila|Empfindlich · ruhiger Raum|Sensibile · stanza silenziosa
+Background noise|Ruido ambiental|Umgebungsgeräusche|Rumore ambientale
+Microphone / audio input|Micrófono / entrada de audio|Mikrofon / Audioeingang|Microfono / ingresso audio
+Default microphone|Micrófono predeterminado|Standardmikrofon|Microfono predefinito
+Calibration correction (cents)|Corrección de calibración (cents)|Kalibrierkorrektur (Cent)|Correzione di calibrazione (cent)
+Custom tuning · concert notes|Afinación personalizada · notas reales|Eigene Stimmung · klingende Töne|Accordatura personalizzata · note reali
+Custom temperament · offsets in cents|Temperamento personalizado · desvíos en cents|Eigene Stimmung · Abweichungen in Cent|Temperamento personalizzato · scarti in cent
+Chromatic|Cromático|Chromatisch|Cromatico
+Guitar — standard|Guitarra — estándar|Gitarre — Standard|Chitarra — standard
+Guitar — Drop D|Guitarra — Drop D|Gitarre — Drop D|Chitarra — Drop D
+Guitar — DADGAD|Guitarra — DADGAD|Gitarre — DADGAD|Chitarra — DADGAD
+Guitar — Open G|Guitarra — Open G|Gitarre — Open G|Chitarra — Open G
+Bass — 4 strings|Bajo — 4 cuerdas|Bass — 4 Saiten|Basso — 4 corde
+Bass — 5 strings|Bajo — 5 cuerdas|Bass — 5 Saiten|Basso — 5 corde
+Bass — 6 strings|Bajo — 6 cuerdas|Bass — 6 Saiten|Basso — 6 corde
+Violin / mandolin|Violín / mandolina|Violine / Mandoline|Violino / mandolino
+Viola|Viola|Bratsche|Viola
+Cello|Violonchelo|Cello|Violoncello
+Ukulele — high G|Ukelele — Sol agudo|Ukulele — hohes G|Ukulele — Sol acuto
+Custom tuning|Afinación personalizada|Eigene Stimmung|Accordatura personalizzata
+Equal temperament|Temperamento igual|Gleichstufige Stimmung|Temperamento equabile
+Just intonation (5-limit)|Entonación justa (límite 5)|Reine Stimmung (5-Limit)|Intonazione giusta (limite 5)
+Pythagorean|Pitagórico|Pythagoreisch|Pitagorico
+Quarter-comma meantone|Mesotónico — ¼ de coma|Viertelkomma-mitteltönig|Mesotonico — ¼ di comma
+Custom|Personalizado|Benutzerdefiniert|Personalizzato
+String|Cuerda|Saite|Corda
+In tune|Afinado|Gestimmt|Accordato
+Stabilizing note…|Estabilizando nota…|Ton stabilisiert sich…|Stabilizzazione della nota…
+Flat — raise the pitch|Grave — sube la nota|Zu tief — Ton erhöhen|Calante — alza la nota
+Sharp — lower the pitch|Agudo — baja la nota|Zu hoch — Ton senken|Crescente — abbassa la nota
+Signal detected|Señal detectada|Signal erkannt|Segnale rilevato
+Listening|Escuchando|Hört zu|In ascolto
+Allow microphone access in your browser.|Permite el micrófono en el navegador.|Mikrofonzugriff im Browser erlauben.|Consenti il microfono nel browser.
+Play a clear, sustained note.|Toca una nota clara y sostenida.|Einen klaren, gehaltenen Ton spielen.|Suona una nota chiara e sostenuta.
+Microphone access denied. Allow it in browser settings.|Acceso al micrófono denegado. Permítelo en los ajustes del navegador.|Mikrofonzugriff verweigert. In den Browsereinstellungen erlauben.|Accesso al microfono negato. Consentilo nelle impostazioni del browser.
+No microphone detected.|No se detectó ningún micrófono.|Kein Mikrofon erkannt.|Nessun microfono rilevato.
+Microphone busy or unavailable.|Micrófono ocupado o no disponible.|Mikrofon belegt oder nicht verfügbar.|Microfono occupato o non disponibile.
+This audio input is no longer available.|Esta entrada de audio ya no está disponible.|Dieser Audioeingang ist nicht mehr verfügbar.|Questo ingresso audio non è più disponibile.
+Unable to start the microphone. Try again.|No se pudo iniciar el micrófono. Reinténtalo.|Mikrofon konnte nicht gestartet werden. Erneut versuchen.|Impossibile avviare il microfono. Riprova.
+Analysis unavailable. Try again.|Análisis no disponible. Reinténtalo.|Analyse nicht verfügbar. Erneut versuchen.|Analisi non disponibile. Riprova.
+Analysis too slow. Try again.|Análisis demasiado lento. Reinténtalo.|Analyse zu langsam. Erneut versuchen.|Analisi troppo lenta. Riprova.
+Microphone disconnected. Start listening again.|Micrófono desconectado. Reactiva la escucha.|Mikrofon getrennt. Erkennung erneut starten.|Microfono scollegato. Riattiva l’ascolto.
+Listening interrupted. Enable the microphone again.|Escucha interrumpida. Reactiva el micrófono.|Erkennung unterbrochen. Mikrofon erneut aktivieren.|Ascolto interrotto. Riattiva il microfono.
+Reference tone stopped.|Referencia detenida.|Referenzton gestoppt.|Riferimento fermato.
+Reference tone · microphone listening stopped.|Referencia · escucha del micrófono detenida.|Referenzton · Mikrofonerkennung gestoppt.|Riferimento · ascolto microfono fermato.
+Audio output unavailable.|Salida de audio no disponible.|Audioausgang nicht verfügbar.|Uscita audio non disponibile.
+Acceleration / deceleration|Aceleración / desaceleración|Beschleunigung / Verlangsamung|Accelerazione / rallentamento
 Peak|Máximo|Höchstwert|Massimo
 Minimum|Mínimo|Minimum|Minimo
 Peak (BPM)|Máximo (BPM)|Höchstwert (BPM)|Massimo (BPM)

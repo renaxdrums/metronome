@@ -154,14 +154,24 @@ const { start, showMeasures } = require('./audio-harness.cjs');
               const s = getComputedStyle(btn), r = btn.getBoundingClientRect();
               return [s.width, s.height, s.borderRadius, s.backgroundColor, s.color, r.top + r.height / 2];
             };
-            const original = parallel.classList.contains('active');
-            parallel.classList.remove('active');
+            const original = [phase, parallel].map(btn => ({
+              active: btn.classList.contains('active'),
+              pressed: btn.getAttribute('aria-pressed')
+            }));
+            const setState = (btn, enabled) => {
+              btn.classList.toggle('active', enabled);
+              btn.setAttribute('aria-pressed', String(enabled));
+            };
+            setState(phase, false);
+            setState(parallel, false);
             const off = [snap(phase), snap(parallel)];
-            phase.classList.add('active');
-            parallel.classList.add('active');
+            setState(phase, true);
+            setState(parallel, true);
             const on = [snap(phase), snap(parallel)];
-            phase.classList.remove('active');
-            parallel.classList.toggle('active', original);
+            [phase, parallel].forEach((btn, index) => {
+              btn.classList.toggle('active', original[index].active);
+              btn.setAttribute('aria-pressed', original[index].pressed);
+            });
             return { off, on, overflow: card.scrollWidth - card.clientWidth };
           });
           for (const state of [appearance.off, appearance.on]) {

@@ -116,15 +116,14 @@ const { start, showMeasures } = require('./audio-harness.cjs');
           'No extra BPM indicator for an ordinary block');
         assert.equal(await cards.nth(2).locator('.sequence-parallel-summary').count(), 0);
         assert.match(await cards.nth(1).locator('.sequence-parallel-summary').innerText(),
-          /Tempo parallèle\\s+Croche pointée · 160 BPM/i);
+          /Tempo parallèle\s+Croche pointée · 160 BPM/i);
         assert.equal(await page.evaluate(() => measures[1].tempo), 120,
           'Parallel illusion must never overwrite reference BPM');
         await page.evaluate(() => {
-          const input = document.querySelectorAll('#measureList .measure-tempo-input')[1];
           // Use the actual block's tempo field rather than modifying the audio engine.
           const blockInput = document.querySelectorAll('#measureList .measure-card')[1]
             .querySelector('.measure-tempo-row:not(.measure-repeat-row) select.measure-tempo-input');
-          if (!blockInput || !input) throw Error('Missing reference BPM field');
+          if (!blockInput) throw Error('Missing reference BPM field');
           blockInput.value = '90';
           blockInput.dispatchEvent(new Event('change', { bubbles: true }));
         });

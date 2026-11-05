@@ -1,0 +1,686 @@
+/* The tool shell inherits the four approved palettes. Existing workspaces are
+   kept in place and inert while hidden, preserving their in-memory models. */
+html#renaxApp[data-tool='home']
+  body
+  > :is(#workspaceNav, #workspaceMobileViews, #mobileTabs, .main-grid, footer),
+html#renaxApp[data-tool='tuner']
+  body
+  > :is(#workspaceNav, #workspaceMobileViews, #mobileTabs, .main-grid, footer) {
+  visibility: hidden;
+  position: fixed;
+  pointer-events: none;
+  contain: strict;
+}
+html#renaxApp[data-tool='metronome'] #toolHome,
+html#renaxApp[data-tool='metronome'] #tunerRoot,
+html#renaxApp[data-tool='home'] #tunerRoot,
+html#renaxApp[data-tool='tuner'] #toolHome {
+  display: none;
+}
+.musician-tool {
+  --tool-muted: #b9c0c8;
+  --tool-accent: var(--orange);
+  --tool-surface: var(--panel);
+  --tool-ink: var(--text);
+  --tool-line: var(--border);
+  --tool-good: #72d69b;
+  min-height: 0;
+  min-width: 0;
+  color: var(--tool-ink);
+  font: 14px/1.5 var(--font);
+  overflow: auto;
+  scrollbar-gutter: stable;
+  flex: 1;
+}
+html[data-theme='light'] .musician-tool {
+  --tool-muted: #526170;
+  --tool-good: #146c3a;
+}
+html[data-theme='ivory'] .musician-tool {
+  --tool-muted: #505c64;
+  --tool-good: #236644;
+}
+html[data-theme='avant'] .musician-tool {
+  --tool-surface: var(--ag-header);
+  --tool-ink: var(--ag-lime);
+  --tool-muted: #d3d4c2;
+  --tool-accent: var(--ag-lime);
+  --tool-line: #60645b;
+  --tool-good: var(--ag-lime);
+}
+.tool-nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  background: var(--panel);
+  text-decoration: none;
+  font: 600 12px var(--font);
+  white-space: nowrap;
+}
+.tool-nav-link svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tool-nav-link[hidden] {
+  display: none;
+}
+html#renaxApp[data-theme='avant'] .tool-nav-link {
+  background: var(--ag-header);
+  border-color: var(--ag-header-border);
+  color: var(--ag-lime);
+}
+html#renaxApp[data-theme='avant'] .tool-nav-link svg {
+  stroke: var(--ag-lime);
+}
+#toolHome {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 36px;
+  padding: 32px max(16px, calc((100% - 1056px) / 2));
+}
+.tool-home-heading > p:first-child {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.tool-home-heading h2 {
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.tool-home-heading > p:last-child {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+.tool-home-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.tool-choice {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  min-height: 240px;
+  padding: 28px;
+  background: var(--tool-surface);
+  color: var(--tool-ink);
+  border: 1px solid var(--tool-line);
+  border-radius: 10px;
+  text-decoration: none;
+}
+.tool-choice > svg {
+  width: 100%;
+  fill: none;
+  stroke: var(--tool-accent);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tool-choice h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.tool-choice p {
+  color: var(--tool-muted);
+  min-height: 64px;
+  max-width: 300px;
+}
+.tool-choice div > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--tool-accent);
+  padding-bottom: 4px;
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.tool-choice:hover {
+  border-color: var(--tool-accent);
+}
+#tunerRoot {
+  padding: 24px max(8px, calc((100% - 1180px) / 2)) 16px;
+}
+.tuner-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.tuner-heading h2 {
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+.tuner-heading p {
+  font-size: 12px;
+  color: var(--tool-muted);
+  margin-top: 5px;
+}
+#tunerRoot :is(button, input, select, summary) {
+  font: inherit;
+  min-height: 44px;
+  max-width: 100%;
+  color: var(--tool-ink);
+  border: 1px solid var(--tool-line);
+  border-radius: 6px;
+  background: var(--tool-surface);
+  padding: 8px 12px;
+}
+#tunerRoot :is(button, summary) {
+  cursor: pointer;
+}
+#tunerRoot :is(button, input, select, summary):focus-visible,
+.tool-choice:focus-visible,
+.tool-nav-link:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+#tunerRoot button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+#tunerRoot .tuner-primary {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+  font-weight: 600;
+  min-width: 210px;
+}
+#tunerRoot .tuner-primary[aria-pressed='true'] {
+  background: var(--tool-surface);
+  color: var(--tool-ink);
+  border-color: var(--tool-accent);
+}
+.tuner-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 24px;
+  align-items: start;
+}
+.tuner-measurement {
+  min-width: 0;
+  padding: 32px;
+  background: var(--tool-surface);
+  border: 1px solid var(--tool-line);
+  border-radius: 10px;
+}
+.tuner-note-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  min-height: 148px;
+  font-variant-numeric: tabular-nums;
+}
+#tunerNote {
+  font-size: clamp(48px, 6vw, 86px);
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.tuner-note-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+#tunerFrequency {
+  font-size: 18px;
+  color: var(--tool-muted);
+}
+#tunerCents {
+  font-size: 28px;
+  font-weight: 500;
+  min-width: 155px;
+}
+#tunerStatus {
+  min-height: 48px;
+  text-align: center;
+  color: var(--tool-muted);
+  font-size: 14px;
+  padding: 8px 0;
+}
+.tuner-measurement[data-tuned='true'] #tunerStatus {
+  color: var(--tool-good);
+}
+.tuner-meter {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 12px 0;
+}
+.tuner-meter-axis {
+  stroke: var(--tool-muted);
+  fill: none;
+  stroke-width: 1;
+}
+.tuner-meter-labels {
+  fill: var(--tool-muted);
+  text-anchor: middle;
+  font-size: 13px;
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
+}
+.tuner-center-zone {
+  fill: var(--tool-accent);
+  opacity: 0.12;
+}
+#tunerNeedle {
+  stroke: var(--tool-accent);
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.tuner-strobe {
+  height: 36px;
+  overflow: hidden;
+  position: relative;
+  border-block: 1px solid var(--tool-line);
+  opacity: 0.25;
+  isolation: isolate;
+}
+.tuner-strobe div {
+  position: absolute;
+  inset: 5px -40px;
+  display: flex;
+  align-items: stretch;
+  gap: 18px;
+  will-change: transform;
+}
+.tuner-strobe span {
+  display: block;
+  flex: 0 0 2px;
+  background: var(--tool-ink);
+}
+.tuner-strobe[data-active='true'] {
+  opacity: 1;
+}
+.tuner-direction {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--tool-muted);
+  margin: 8px 0 26px;
+}
+#tunerSignal {
+  text-align: center;
+}
+.tuner-target {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  align-items: center;
+}
+.tuner-target label {
+  grid-column: 1/-1;
+  font-size: 12px;
+  color: var(--tool-muted);
+}
+.tuner-strings {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+#tunerRoot .tuner-strings button {
+  min-width: 48px;
+  padding: 8px;
+}
+#tunerRoot button[aria-pressed='true'] {
+  border-color: var(--tool-accent);
+  box-shadow: inset 0 -1px var(--tool-accent);
+}
+.tuner-help {
+  color: var(--tool-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 16px;
+}
+.tuner-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding-bottom: 24px;
+}
+.tuner-settings > label {
+  font-size: 12px;
+  color: var(--tool-muted);
+  margin-top: 8px;
+}
+.tuner-settings :is(input, select) {
+  width: 100%;
+  min-width: 0;
+}
+.tuner-a4 {
+  display: grid;
+  grid-template-columns: 1fr 108px;
+  gap: 10px;
+  align-items: center;
+  margin: 16px 0 8px;
+}
+.tuner-a4 label {
+  font-size: 12px;
+}
+#tunerRoot #tunerA4Slider {
+  grid-column: 1/-1;
+  accent-color: var(--tool-accent);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  height: 28px;
+  min-height: 28px;
+}
+.tuner-a4 > div {
+  grid-column: 1/-1;
+  display: flex;
+  gap: 8px;
+}
+#tunerRoot .tuner-a4 button {
+  flex: 1;
+  min-height: 36px;
+  font-size: 12px;
+}
+#tunerAdvanced {
+  margin-top: 16px;
+  border-top: 1px solid var(--tool-line);
+  padding-top: 16px;
+}
+#tunerRoot #tunerAdvanced > summary {
+  border: 0;
+  border-radius: 0;
+  padding-inline: 0;
+  background: transparent;
+  font-weight: 600;
+}
+.tuner-advanced-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+}
+.tuner-advanced-fields > label {
+  font-size: 12px;
+  color: var(--tool-muted);
+  margin-top: 10px;
+}
+.tuner-advanced-fields .tuner-help {
+  margin-top: 0;
+}
+#tunerOffsets {
+  border: 0;
+  padding: 8px 0 0;
+  margin-top: 12px;
+  min-width: 0;
+}
+#tunerOffsets legend {
+  font-size: 12px;
+}
+#tunerOffsets > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+#tunerOffsets label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  gap: 5px;
+}
+#tunerRoot #tunerOffsets input {
+  padding: 6px;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 1100px) {
+  .tool-nav-link {
+    min-height: 36px;
+    padding: 6px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  #toolHome {
+    gap: 24px;
+    padding: 24px 12px;
+    justify-content: flex-start;
+  }
+  .tool-home-choices {
+    gap: 12px;
+  }
+  .tool-choice {
+    grid-template-columns: 60px minmax(0, 1fr);
+    min-height: 210px;
+    gap: 16px;
+    padding: 20px;
+  }
+  .tool-choice h3 {
+    font-size: 20px;
+  }
+  #tunerRoot {
+    padding: 20px 4px 16px;
+  }
+  .tuner-layout {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 20px;
+  }
+  .tuner-measurement {
+    padding: 24px 20px;
+  }
+  .tuner-note-row {
+    gap: 20px;
+  }
+}
+@media (max-width: 700px) {
+  .tool-home-choices {
+    grid-template-columns: 1fr;
+  }
+  .tool-choice {
+    min-height: 160px;
+    grid-template-columns: 64px minmax(0, 1fr);
+    padding: 20px;
+  }
+  .tool-choice p {
+    min-height: 0;
+    max-width: none;
+  }
+  .tool-choice div > span {
+    margin-top: 14px;
+  }
+  .tuner-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  #tunerListen {
+    width: 100%;
+  }
+  .tuner-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .tuner-measurement {
+    padding: 20px 16px;
+  }
+  .tuner-note-row {
+    min-height: 100px;
+    gap: 20px;
+  }
+  #tunerNote {
+    font-size: 56px;
+  }
+  #tunerFrequency {
+    font-size: 15px;
+  }
+  #tunerCents {
+    font-size: 24px;
+    min-width: 130px;
+  }
+  .tuner-target {
+    grid-template-columns: 1fr;
+  }
+  .tuner-direction {
+    margin-bottom: 18px;
+  }
+  .tuner-settings {
+    border-top: 1px solid var(--tool-line);
+    padding-top: 8px;
+  }
+  .tuner-settings > label {
+    font-size: 14px;
+  }
+  #tunerOffsets > div {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 360px) {
+  .tool-nav-link {
+    padding-inline: 5px;
+    font-size: 10px;
+  }
+  .tool-nav-link svg {
+    display: none;
+  }
+  .tuner-note-row {
+    gap: 12px;
+  }
+  #tunerNote {
+    font-size: 48px;
+  }
+  #tunerCents {
+    min-width: 120px;
+    font-size: 22px;
+  }
+  #tunerOffsets > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tuner-strobe div {
+    will-change: auto;
+  }
+}
+/* Shared numboxes retain the established top-layer behavior at tool-field width. */
+#tunerRoot .numbox-custom {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+#tunerRoot .numbox-button {
+  width: 100%;
+  height: auto;
+  text-align: left;
+  font: inherit;
+}
+#tunerRoot .numbox-option {
+  font: inherit;
+  white-space: normal;
+  text-align: left;
+}
+html[data-theme='ivory'] .tuner-heading,
+html[data-theme='ivory'] .tuner-settings {
+  --tool-ink: var(--ivory-ink);
+  --tool-muted: #47635e;
+  --tool-line: #b7c8bd;
+  --tool-surface: #e9e6da;
+}
+html[data-theme='ivory'] .tool-home-heading :is(h2, p) {
+  color: var(--ivory-ink);
+}
+@media (max-width: 700px) {
+  html#renaxApp body > header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  html#renaxApp body > header .index2-header-actions {
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 5px;
+  }
+  html#renaxApp body > header .tool-nav-link {
+    padding: 6px;
+    min-width: 0;
+    font-size: 11px;
+  }
+  html#renaxApp body > header .tool-nav-link svg {
+    display: none;
+  }
+}
+
+/* Citron keeps ink on paper; its measurement surface uses the approved
+   anthracite/lime pair. Ivory keeps dark green on its ivory surface. */
+html[data-theme='avant'] .musician-tool {
+  --tool-ink: var(--ag-ink);
+  --tool-muted: var(--ag-muted);
+  --tool-surface: var(--ag-paper);
+  --tool-line: var(--ag-line);
+  --tool-good: #3d5d16;
+}
+html[data-theme='avant'] :is(.tuner-measurement, .tool-choice) {
+  --tool-ink: var(--ag-lime);
+  --tool-muted: var(--ag-white);
+  --tool-surface: var(--ag-header);
+  --tool-line: var(--ag-header-border);
+  --tool-good: var(--ag-lime);
+}
+html[data-theme='ivory'] .musician-tool {
+  --tool-accent: var(--ivory-green);
+}
+.tuner-measurement {
+  color: var(--tool-ink);
+}
+@media (max-width: 700px) {
+  /* Reserve the navigation row before delayed header controls are attached. */
+  html#renaxApp body > header .index2-header-actions {
+    flex: 0 0 100%;
+    min-height: 36px;
+  }
+  html#renaxApp body > header {
+    min-height: 88px;
+  }
+}
+@media (orientation: landscape) and (pointer: coarse) and (max-width: 1100px) and (max-height: 600px) {
+  html#renaxApp body > header {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  html#renaxApp body > header .index2-header-actions {
+    flex: 0 1 auto;
+    min-height: 26px;
+    flex-wrap: nowrap;
+  }
+  html#renaxApp body > header .tool-nav-link {
+    min-height: 26px;
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+  html#renaxApp body > header .tool-nav-link svg {
+    display: none;
+  }
+}

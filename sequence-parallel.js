@@ -69,7 +69,7 @@
   function button(m, index, disabled, rerender) {
     const node = document.createElement('button');
     node.type = 'button'; node.className = 'sequence-parallel-button';
-    node.innerHTML = '<svg viewBox="0 0 38 20" aria-hidden="true" fill="none"><path d="M6 3v14M32 3v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><text x="19" y="14.5" font-size="14" font-weight="700" text-anchor="middle" fill="currentColor">3</text></svg>';
+    node.innerHTML = '<svg viewBox="0 0 38 20" aria-hidden="true" fill="none"><path d="M7 3v14M31 3v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><text x="19" y="14" font-size="13" font-weight="800" text-anchor="middle" fill="currentColor">3</text></svg>';
     node.disabled = disabled;
     node.classList.toggle('active', !!config(m));
     node.setAttribute('aria-label', '3 · Tempo parallèle du bloc ' + (index + 1));

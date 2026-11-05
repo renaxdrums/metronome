@@ -37,3 +37,119 @@ assert.match(transport,/nextNoteTime\s*\+\s*phaseShift\s*<\s*parallelBlock\.endT
 const core = fs.readFileSync(path.join(root,'metronome-core.js'),'utf8');
 assert.match(core,/RENAX_SEQUENCE_PARALLEL\.button/);
 console.log('PASS Tempo parallèle ratios, modes de durée, coupures, exclusions et intégration.');
+
+
+/* Browser contract: UI on desktop and smartphone; exact click grid and block transitions. */
+const { start, showMeasures } = require('./audio-harness.cjs');
+(async () => {
+  const runtime = await start();
+  try {
+    for (const viewport of [{ width: 1280, height: 850 }, { width: 390, height: 740 }]) {
+      const page = await runtime.browser.newPage({ viewport });
+      const errors = [];
+      page.on('pageerror', error => errors.push(error.message));
+      try {
+        await page.goto(runtime.url);
+        await page.getByRole('tab', { name: 'Séquenceur', exact: true }).click();
+        await showMeasures(page);
+        await page.waitForFunction(() => typeof createMeasure === 'function' && !!window.RENAX_SEQUENCE_PARALLEL);
+        await page.evaluate(() => {
+          if (isPlaying) stopMetronome();
+          setAppMode('metronome');
+          measures = [createMeasure(4, 4, 120), createMeasure(4, 4, 120), createMeasure(4, 4, 90)];
+          metronomeMeasures = measures;
+          activeMeasureIndex = 0;
+          renderSequencerList();
+        });
+        const buttons = page.locator('#measureList .sequence-parallel-button');
+        assert.equal(await buttons.count(), 3, 'One Tempo parallèle button per block');
+        assert.equal(await buttons.nth(1).getAttribute('aria-pressed'), 'false');
+        await buttons.nth(1).click();
+        const dialog = page.locator('.sequence-parallel-dialog');
+        assert(await dialog.isVisible(), 'Configuration visible on desktop and smartphone');
+        const rhythm = dialog.getByRole('combobox', { name: 'Valeur rythmique de la pulsation parallèle' });
+        const mode = dialog.getByRole('combobox', { name: 'Mode de durée parallèle' });
+        const count = dialog.getByRole('textbox', { name: 'Nombre de mesures de référence' });
+        await rhythm.selectOption('quarterTriplet');
+        assert.match(await dialog.locator('.sequence-parallel-result').innerText(), /180 BPM/);
+        await rhythm.selectOption('dottedQuarter');
+        assert.match(await dialog.locator('.sequence-parallel-result').innerText(), /80 BPM/);
+        await rhythm.selectOption('dottedEighth');
+        await mode.selectOption('cycle');
+        assert.equal(await count.inputValue(), '3', 'Complete cycle is suggested, not enforced');
+        await mode.selectOption('free');
+        await count.fill('2');
+        assert.match(await dialog.locator('.sequence-parallel-result').innerText(), /160 BPM/);
+        assert.match(await dialog.locator('.sequence-parallel-result').innerText(), /Coupure/);
+        await dialog.getByRole('button', { name: 'Appliquer' }).click();
+        assert.equal(await buttons.nth(1).getAttribute('aria-pressed'), 'true');
+        const stored = await page.evaluate(() => [measures[1].parallelTempo.unit, measures[1].parallelTempo.mode, measures[1].repeatCount]);
+        assert.deepEqual(stored, ['dottedEighth', 'free', '2']);
+        const actual = await page.evaluate(() => {
+          const previous = {
+            audioCtx, playClick, scheduleVisualUpdate, timeout:window.setTimeout,
+            measures, metronomeMeasures, appMode, currentBank, isPlaying, playbackStarting,
+            loopedMeasure, playingMeasureIndex, currentStepInMeasure, nextNoteTime,
+            sequenceRepeatIndex, parallelBlock, pendingSequencePhaseEvents,
+            silentModeEnabled, engaged:training.engaged, active:training.active, timerID
+          };
+          try {
+            let clock = 0;
+            const events = [];
+            window.setTimeout = () => 0;
+            scheduleVisualUpdate = () => {};
+            audioCtx = { get currentTime() { return clock; } };
+            currentBank = 'clic'; appMode = 'metronome'; isPlaying = false;
+            playbackStarting = false; loopedMeasure = null; training.engaged = false;
+            training.active = false; silentModeEnabled = false;
+            measures = [createMeasure(4,4,120), createMeasure(4,4,120), createMeasure(4,4,90)];
+            metronomeMeasures = measures;
+            for(const m of measures) {
+              m.beatSubdivisions = [1,1,1,1];
+              m.beatStates = [[1],[1],[1],[1]];
+            }
+            measures[1].parallelTempo = {unit:'dottedEighth',mode:'free'};
+            measures[1].repeatCount = '2';
+            playingMeasureIndex = 0;currentStepInMeasure = 0;
+            sequenceRepeatIndex = 0n;parallelBlock=null;pendingSequencePhaseEvents=[];
+            nextNoteTime=.1;
+            playClick = (_, time, __, details) => {
+              if (details.subIndex === 0) events.push({ block:playingMeasureIndex,time });
+            };
+            for(let tick=0;tick<300 && events.length<19;tick++){
+              scheduler();clock+=.1;
+            }
+            return events.slice(0,19);
+          } finally {
+            window.setTimeout = previous.timeout;
+            audioCtx = previous.audioCtx; playClick = previous.playClick;
+            scheduleVisualUpdate = previous.scheduleVisualUpdate;
+            measures = previous.measures; metronomeMeasures = previous.metronomeMeasures;
+            appMode = previous.appMode; currentBank = previous.currentBank;
+            isPlaying = previous.isPlaying; playbackStarting = previous.playbackStarting;
+            loopedMeasure = previous.loopedMeasure;playingMeasureIndex = previous.playingMeasureIndex;
+            currentStepInMeasure = previous.currentStepInMeasure;nextNoteTime = previous.nextNoteTime;
+            sequenceRepeatIndex = previous.sequenceRepeatIndex;parallelBlock = previous.parallelBlock;
+            pendingSequencePhaseEvents = previous.pendingSequencePhaseEvents;
+            silentModeEnabled = previous.silentModeEnabled;training.engaged = previous.engaged;
+            training.active = previous.active;timerID = previous.timerID;
+          }
+        });
+        assert.equal(actual.length, 19, '4 reference beats + 11 parallel beats + 4 next-block beats');
+        assert.deepEqual(actual.map(e => e.block), [...Array(4).fill(0),...Array(11).fill(1),...Array(4).fill(2)]);
+        for(let i=0;i<4;i++)assert(Math.abs(actual[i].time-(.1+i*.5))<1e-8);
+        for(let i=0;i<11;i++)assert(Math.abs(actual[4+i].time-(2.1+i*.375))<1e-8);
+        for(let i=0;i<4;i++)assert(Math.abs(actual[15+i].time-(6.1+i*(2/3)))<1e-8,
+          'The next ordinary block starts exactly at the reference boundary, without waiting for another parallel beat');
+        const overflow = await page.locator('#measureList').evaluate(el => el.scrollWidth - el.clientWidth);
+        assert(overflow <= 1, 'No horizontal overflow at ' + viewport.width + 'px: ' + overflow);
+        assert.deepEqual(errors, [], 'No unhandled browser exceptions at ' + viewport.width + 'px');
+      } finally {
+        await page.close();
+      }
+    }
+  } finally {
+    await runtime.browser.close();runtime.server?.close();
+  }
+  console.log('PASS navigateur PC + smartphone : UI, durée, BPM, coupure, passage bloc suivant et largeur.');
+})().catch(error => { console.error(error); process.exitCode = 1; });

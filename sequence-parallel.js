@@ -127,8 +127,8 @@
           ' mesure(s) de référence = ' + cycles + ' mesure(s) parallèles. ' +
           (isComplete(ratio, n) ? 'Cycle complet.' : 'Coupure du cycle en fin de bloc.');
       }
-      animation.querySelector('[data-reference]').style.animationDuration = (60 / Number(m.tempo)) + 's';
-      animation.querySelector('[data-parallel]').style.animationDuration = ratio ? (60 / ratio.bpm) + 's' : '1s';
+      animation.querySelector('[data-reference]').style.setProperty('animation-duration', (60 / Number(m.tempo)) + 's');
+      animation.querySelector('[data-parallel]').style.setProperty('animation-duration', ratio ? (60 / ratio.bpm) + 's' : '1s');
     }
     select.addEventListener('change', () => refresh(true));
     num.addEventListener('input', () => refresh(true)); den.addEventListener('input', () => refresh(true));

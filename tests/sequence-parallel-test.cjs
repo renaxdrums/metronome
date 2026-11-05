@@ -111,6 +111,62 @@ const { start, showMeasures } = require('./audio-harness.cjs');
         assert.match(await dialog.locator('.sequence-parallel-result').innerText(), /Coupure/);
         await dialog.getByRole('button', { name: 'Appliquer' }).click();
         assert.equal(await buttons.nth(1).getAttribute('aria-pressed'), 'true');
+        const cards = page.locator('#measureList .measure-card');
+        assert.equal(await cards.nth(0).locator('.sequence-parallel-summary').count(), 0,
+          'No extra BPM indicator for an ordinary block');
+        assert.equal(await cards.nth(2).locator('.sequence-parallel-summary').count(), 0);
+        assert.match(await cards.nth(1).locator('.sequence-parallel-summary').innerText(),
+          /Tempo parallèle\\s+Croche pointée · 160 BPM/i);
+        assert.equal(await page.evaluate(() => measures[1].tempo), 120,
+          'Parallel illusion must never overwrite reference BPM');
+        await page.evaluate(() => {
+          const input = document.querySelectorAll('#measureList .measure-tempo-input')[1];
+          // Use the actual block's tempo field rather than modifying the audio engine.
+          const blockInput = document.querySelectorAll('#measureList .measure-card')[1]
+            .querySelector('.measure-tempo-row:not(.measure-repeat-row) select.measure-tempo-input');
+          if (!blockInput || !input) throw Error('Missing reference BPM field');
+          blockInput.value = '90';
+          blockInput.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        assert.match(await cards.nth(1).locator('.sequence-parallel-summary').innerText(), /120 BPM/);
+        assert.equal(await page.evaluate(() => measures[1].tempo), 90);
+        await page.evaluate(() => {
+          const field = document.querySelectorAll('#measureList .measure-card')[1]
+            .querySelector('.measure-tempo-row:not(.measure-repeat-row) select.measure-tempo-input');
+          field.value = '120';
+          field.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        assert.match(await cards.nth(1).locator('.sequence-parallel-summary').innerText(), /160 BPM/);
+        for (const theme of ['dark', 'light', 'ivory', 'avant']) {
+          await page.locator('#index2SettingsBtn').click();
+          await page.locator('[data-appearance=' + theme + ']').click();
+          await page.locator('#index2SettingsClose').click();
+          const appearance = await cards.nth(1).evaluate(card => {
+            const phase = card.querySelector('.sequence-phase-button');
+            const parallel = card.querySelector('.sequence-parallel-button');
+            const snap = btn => {
+              const s = getComputedStyle(btn), r = btn.getBoundingClientRect();
+              return [s.width, s.height, s.borderRadius, s.backgroundColor, s.color, r.top + r.height / 2];
+            };
+            const original = parallel.classList.contains('active');
+            parallel.classList.remove('active');
+            const off = [snap(phase), snap(parallel)];
+            phase.classList.add('active');
+            parallel.classList.add('active');
+            const on = [snap(phase), snap(parallel)];
+            phase.classList.remove('active');
+            parallel.classList.toggle('active', original);
+            return { off, on, overflow: card.scrollWidth - card.clientWidth };
+          });
+          for (const state of [appearance.off, appearance.on]) {
+            assert.deepEqual(state[0].slice(0, 5), state[1].slice(0, 5),
+              theme + ': block actions must share dimensions, radius and state palette');
+            assert(Math.abs(state[0][5] - state[1][5]) <= 2,
+              theme + ': adjacent icons must stay vertically aligned');
+          }
+          assert(appearance.overflow <= 1, theme + ': card must not overflow');
+          assert(await cards.nth(1).locator('.sequence-parallel-summary').isVisible());
+        }
         const stored = await page.evaluate(() => [measures[1].parallelTempo.unit, measures[1].parallelTempo.mode, measures[1].repeatCount]);
         assert.deepEqual(stored, ['dottedEighth', 'free', '2']);
         const actual = await page.evaluate(() => {
@@ -169,6 +225,11 @@ const { start, showMeasures } = require('./audio-harness.cjs');
         for(let i=0;i<11;i++)assert(Math.abs(actual[4+i].time-(2.1+i*.375))<1e-8);
         for(let i=0;i<4;i++)assert(Math.abs(actual[15+i].time-(6.1+i*(2/3)))<1e-8,
           'The next ordinary block starts exactly at the reference boundary, without waiting for another parallel beat');
+        await buttons.nth(1).click();
+        await page.locator('.sequence-parallel-dialog').getByRole('button', { name: 'Désactiver' }).click();
+        assert.equal(await cards.nth(1).locator('.sequence-parallel-summary').count(), 0,
+          'Disabling Tempo parallèle removes only its indicator');
+        assert.equal(await page.evaluate(() => measures[1].tempo), 120);
         const overflow = await page.locator('#measureList').evaluate(el => el.scrollWidth - el.clientWidth);
         assert(overflow <= 1, 'No horizontal overflow at ' + viewport.width + 'px: ' + overflow);
         assert.deepEqual(errors, [], 'No unhandled browser exceptions at ' + viewport.width + 'px');

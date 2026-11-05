@@ -1,21 +1,18 @@
 'use strict';
-// Visual baseline: restore ONLY the approved Tempo parallèle toolbar button.
-// Everything else retains pixel-perfect and computed-style comparison to main.
-// The independent sequence-parallel browser test checks the real control's geometry.
+// Only the two approved block-action icons are normalized against historical
+// screenshots. Other UI stays under strict pixel/computed-style comparison.
+// The independent sequencer browser test checks geometry, states and themes.
+const fs = require('node:fs');
+const path = require('node:path');
 module.exports = async function applySequenceParallelReference(page) {
-  await page.addStyleTag({
-    content:
-      '#measureList .sequence-parallel-button{width:36px;height:32px;min-width:36px;flex:none;display:grid;place-items:center;padding:3px;border:1px solid var(--border);border-radius:7px;background:var(--orange);cursor:pointer;}' +
-      '#measureList .sequence-parallel-button svg{width:30px;height:22px;display:block;}' +
-      '#measureList .sequence-parallel-button.active{outline:2px solid var(--cyan);outline-offset:1px;}' +
-      '#measureList .sequence-parallel-button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;}' +
-      '#measureList .sequence-parallel-button:disabled{opacity:.55;cursor:not-allowed;}' +
-      '@media(max-width:1100px){#measureList .sequence-parallel-button{width:44px;height:44px;min-width:44px;}}',
-  });
-  await page.evaluate(() => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'sequence-parallel.css'), 'utf8');
+  const controlsOnly = css.slice(0, css.indexOf('.sequence-parallel-dialog{'));
+  if (!controlsOnly.includes('#measureList :is(.sequence-phase-button,.sequence-parallel-button)'))
+    throw Error('Missing scoped icon reference rules');
+  await page.addStyleTag({ content: controlsOnly });
+  await page.evaluate(icon => {
     const cards = [...document.querySelectorAll('#measureList .measure-card')];
     if (!cards.length) throw Error('Missing reference sequencer cards');
-    const icon = '<svg viewBox="0 0 42 24" aria-hidden="true"><path d="M5 19h8V6h3v13h8m3-3h7m-3-3 3 3-3 3" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><text x="20" y="10" font-size="10" font-weight="900" fill="#111">3</text></svg>';
     cards.forEach((card, index) => {
       const row = card.querySelector('.measure-tempo-row:not(.measure-repeat-row)');
       const phase = row?.querySelector(':scope > .sequence-phase-button');
@@ -30,5 +27,5 @@ module.exports = async function applySequenceParallelReference(page) {
       button.title = 'Configurer Tempo parallèle';
       phase.after(button);
     });
-  });
+  }, '<svg viewBox="0 0 38 20" aria-hidden="true" fill="none"><path d="M6 3v14M32 3v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><text x="19" y="14.5" font-size="14" font-weight="700" text-anchor="middle" fill="currentColor">3</text></svg>');
 };

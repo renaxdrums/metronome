@@ -300,6 +300,8 @@ async function baselineRoute(page, url) {
           if (before || referenceAgainstItself) await baselineRoute(p, h.url);
 
           await p.goto(h.url);
+          if (before && !referenceAgainstItself)
+            await require('./tool-navigation-reference.cjs')(p);
           // User-approved global header adjustment: align only these two header
           // selectors in the historical comparison. All remaining pixels and
           // computed properties must still match the original three themes.
@@ -486,14 +488,16 @@ async function baselineRoute(page, url) {
                         current = e;
                       while (current && current !== document.body) {
                         parts.unshift(
-                          current.id
+                          current.id && !/^numbox-options-\d+-trigger$/.test(current.id)
                             ? '#' + current.id
                             : current.tagName.toLowerCase() +
                                 ':nth-child(' +
                                 ([...current.parentElement.children].indexOf(current) + 1) +
                                 ')',
                         );
-                        if (current.id) break;
+                        // Generated numbox IDs depend on unrelated controls elsewhere.
+                        // Keep the exact structural path and all computed properties.
+                        if (current.id && !/^numbox-options-\d+-trigger$/.test(current.id)) break;
                         current = current.parentElement;
                       }
                       out[parts.join(' > ')] = Object.fromEntries(

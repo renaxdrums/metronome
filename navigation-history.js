@@ -6,6 +6,7 @@
   const backdrop=document.getElementById('index2SettingsBackdrop');
   function capture(){return {
     workspace:document.body.dataset.workspace||'metronome',
+    tool:window.RENAX_TOOLS?.current||document.documentElement.dataset.tool||'metronome',
     tab:document.body.dataset.mobilePane||document.querySelector('#mobileTabs button.active')?.dataset.tab||'visu',
     settings:settings.classList.contains('open')||document.body.dataset.mobilePane==='settings',
     songs:window.RENAX_SONGS.navigation
@@ -13,6 +14,7 @@
   let current=capture();
   function restore(state){
     restoring=true;clearTimeout(pending);
+    window.RENAX_TOOLS?.show(state.tool||'metronome',{notify:false});
     if(window.RENAX_WORKSPACE)window.RENAX_WORKSPACE.go(state.workspace||(state.songs?.pane==='songs'?'tracks':'metronome'));
     else document.body.dataset.workspace=state.workspace||(state.songs?.pane==='songs'?'tracks':'metronome');
     window.RENAX_SONGS.restoreNavigation(state.songs);
@@ -35,13 +37,13 @@
     if(JSON.stringify(next)===JSON.stringify(current))return;
     // Editing or duplicating a song changes its identity, not the screen.
     // Keep the playlist as the preceding entry instead of adding another detail entry.
-    const sameScreen=next.workspace===current.workspace&&next.tab===current.tab&&next.settings===current.settings&&
+    const sameScreen=next.tool===current.tool&&next.workspace===current.workspace&&next.tab===current.tab&&next.settings===current.settings&&
       next.songs.pane===current.songs.pane&&next.songs.view===current.songs.view;
     const replace=sameScreen||semanticBack;semanticBack=false;
     const entry=history.state?.[key];
     const depth=(entry?.depth||0)+(replace?0:1);
     const parent=replace?entry?.parent:current;
-    history[replace?'replaceState':'pushState']({...history.state,[key]:{version:2,screen:next,depth,parent}},'');current=next;
+    history[replace?'replaceState':'pushState']({...history.state,[key]:{version:2,screen:next,depth,parent}},'',next.tool!==current.tool?window.RENAX_TOOLS?.url(next.tool):undefined);current=next;
   }
   document.addEventListener('click',event=>{
     const back=event.target.closest('.song-back,#index2SettingsClose,#index2SettingsBackdrop');
@@ -60,5 +62,6 @@
   document.addEventListener('keyup',event=>{
     if(event.key==='Enter'||event.key===' '){clearTimeout(pending);pending=setTimeout(record,0);}
   },true);
+  window.addEventListener('renax-tool-changed',record);
   window.addEventListener('popstate',event=>{const state=event.state?.[key];if(state?.screen)restore(state.screen);});
 })();

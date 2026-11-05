@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0bcde49b51288251",
+  "revision": "6d468f81da4d6418",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "3012f58c1d8a061c88cb06deff879b70019f998b34769fbb9fb0f95c5e481229",
+      "sha256": "30bb09d56e46a3d646d98150f33d4d42ef821513163b289f9096c1d4dd113d5e",
       "text": true
     },
     {
@@ -294,12 +294,12 @@
     },
     {
       "path": "interface-locales.js",
-      "sha256": "4be91f8924cca9ab122748a16320cd21b6de3290925b0fb4fa7dee16adfd6235",
+      "sha256": "329b1aacceb389cbaadb5c5eb11d70ac7d3c0e87f6a73104f62eea33958dba64",
       "text": true
     },
     {
       "path": "interface-translations.js",
-      "sha256": "73b8028afd0e3029c2e2b0c1677f6e7ab6f745d4c83df907c6d0088769af784a",
+      "sha256": "9d19ef53e2a3867810fde1326e76abcac3c0cb4940d7c5a0144c5f64da284c3d",
       "text": true
     },
     {
@@ -383,8 +383,18 @@
       "text": true
     },
     {
+      "path": "musician-tools.css",
+      "sha256": "5a29d7dd513a8198b869de5d35bde641d927c635b4d99e1a9e42ab2c71e93106",
+      "text": true
+    },
+    {
+      "path": "musician-tools.mjs",
+      "sha256": "cf0f725e3ff1827f053d27913852a1688bb05d8e75ee7249f8ee364882dfaa1f",
+      "text": true
+    },
+    {
       "path": "navigation-history.js",
-      "sha256": "9d13af2c9b5e8be95e1c753adc146360df552d070fe4eac4cacf5d2625d4cfd0",
+      "sha256": "157c31114aa090baa7b516508dc55fe4b810e0bd5d142fec9d271030431d5ef2",
       "text": true
     },
     {
@@ -530,6 +540,21 @@
     {
       "path": "training-numbox.js",
       "sha256": "5464fb23be6c18ac2fa9e93d7a4133ebb8d7e1a94159dba4013bb255e96e038a",
+      "text": true
+    },
+    {
+      "path": "tuner-core.mjs",
+      "sha256": "c91ebe6321c3251bd0a8dd01eb858217a7c680d51bf87341b7caa8f0ec2f6529",
+      "text": true
+    },
+    {
+      "path": "tuner-ui.mjs",
+      "sha256": "d24b25fea10bcc1a27f3bb7743ceb78ebe4ec37f6f1e43da58fa56702456e05a",
+      "text": true
+    },
+    {
+      "path": "tuner-worker.mjs",
+      "sha256": "0b35966964d3d168ee118b4ab1da5252f6120084bd513a0ad7784f91a97affe9",
       "text": true
     },
     {

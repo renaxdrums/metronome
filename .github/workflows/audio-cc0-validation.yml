@@ -64,7 +64,7 @@ jobs:
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
             sudo timeout 120 apt-get update -qq
-            sudo timeout 540 apt-get install -y --no-install-recommends ffmpeg
+            sudo timeout 900 apt-get install -y --no-install-recommends ffmpeg
           fi
           ffmpeg -version
           ffprobe -version

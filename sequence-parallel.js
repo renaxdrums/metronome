@@ -5,6 +5,7 @@
     ['dottedEighth', 'Croche pointée', 3, 16],
     ['quarterTriplet', 'Noire de triolet', 1, 6],
     ['dottedQuarter', 'Noire pointée', 3, 8],
+    ['inverseFourThree', 'Rapport inverse 3:4', 0, 0],
     ['eighthTriplet', 'Croche de triolet', 1, 12],
     ['quarter', 'Noire', 1, 4],
     ['custom', 'Rapport libre (avancé)', 0, 0]
@@ -16,7 +17,9 @@
     const note = notes.find(item => item[0] === stored?.unit);
     if (!note) return null;
     let num, den;
-    if (note[0] === 'custom') {
+    if (note[0] === 'inverseFourThree') {
+      num = 3; den = 4;
+    } else if (note[0] === 'custom') {
       if (!positive(stored.numerator) || !positive(stored.denominator)) return null;
       num = Number(stored.numerator); den = Number(stored.denominator);
     } else {

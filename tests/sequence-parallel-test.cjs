@@ -10,7 +10,7 @@ const base = { numerator: 4, denominator: 4, tempo: 120, repeatCount: '2' };
 const model = (unit, count = '2') => ({ ...base, repeatCount: count, parallelTempo: { unit, mode: 'free' } });
 for (const [note, num, den, bpm] of [
   ['dottedEighth', 4, 3, 160], ['quarterTriplet', 3, 2, 180],
-  ['dottedQuarter', 2, 3, 80], ['eighthTriplet', 3, 1, 360]
+  ['dottedQuarter', 2, 3, 80], ['inverseFourThree', 3, 4, 90], ['eighthTriplet', 3, 1, 360]
 ]) {
   const ratio = api.config(model(note));
   assert.equal(ratio.numerator, num);
@@ -74,6 +74,8 @@ const { start, showMeasures } = require('./audio-harness.cjs');
         assert.match(await dialog.locator('.sequence-parallel-result').innerText(), /180 BPM/);
         await rhythm.selectOption('dottedQuarter');
         assert.match(await dialog.locator('.sequence-parallel-result').innerText(), /80 BPM/);
+        await rhythm.selectOption('inverseFourThree');
+        assert.match(await dialog.locator('.sequence-parallel-result').innerText(), /90 BPM/);
         await rhythm.selectOption('dottedEighth');
         await mode.selectOption('cycle');
         assert.equal(await count.inputValue(), '3', 'Complete cycle is suggested, not enforced');

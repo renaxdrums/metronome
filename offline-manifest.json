@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "9ab04f6b7971412c",
+  "revision": "55f25cc0d9882cf3",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "99e50ffa2f3769b7c0bcf163fb9bb8547440f0edc02cf79bdb920cec4bb9ac38",
+      "sha256": "e8f41bfda118ff62f17e28d7364610f8539ca01e7cd603d8fc56190ae068746f",
       "text": true
     },
     {
@@ -469,7 +469,7 @@
     },
     {
       "path": "sequence-parallel.js",
-      "sha256": "eac6903aa430dbba24cc86c8ef0f91cb997ef78728b2f6d20b89bf9ea87fdc87",
+      "sha256": "763f054393c82ba2a5270ca0986905ce733705cbb5d3c349f5999895030f05d4",
       "text": true
     },
     {

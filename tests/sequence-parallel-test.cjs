@@ -45,7 +45,7 @@ const { start, showMeasures } = require('./audio-harness.cjs');
   const runtime = await start();
   try {
     for (const viewport of [{ width: 1280, height: 850 }, { width: 390, height: 740 }]) {
-      const page = await runtime.browser.newPage({ viewport });
+      const page = await runtime.browser.newPage({ viewport, reducedMotion: 'reduce' });
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       try {

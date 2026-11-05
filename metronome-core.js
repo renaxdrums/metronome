@@ -688,7 +688,7 @@
 
     // A right-shifted click stays inside its original sequencer block.
     // The reference bar never moves: only the click, its subdivisions and accents do.
-    const SEQUENCE_PHASE_ICON = '<svg aria-hidden="true" viewBox="0 0 38 20" fill="none"><path d="M4 3v14" stroke="currentColor" stroke-dasharray="2 2" stroke-width="2"/><path d="M11 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M30 3v14" stroke="currentColor" stroke-width="3"/></svg>';
+    const SEQUENCE_PHASE_ICON = '<svg aria-hidden="true" viewBox="0 0 38 20" fill="none"><path d="M8 3v10M17 7v10M23 10h10m-4-4 4 4-4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const sequencePhaseChoices = [
       [4,'Noire (1/4)'],[8,'Croche (1/8)'],[12,'Croche ternaire (1/12)'],
       [16,'Double croche (1/16)'],[24,'Double croche ternaire (1/24)'],

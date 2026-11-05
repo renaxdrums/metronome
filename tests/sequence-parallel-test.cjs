@@ -36,6 +36,8 @@ assert.match(transport,/advanceScheduledMeasure\(true\)/);
 assert.match(transport,/nextNoteTime\s*\+\s*phaseShift\s*<\s*parallelBlock\.endTime/);
 const core = fs.readFileSync(path.join(root,'metronome-core.js'),'utf8');
 assert.match(core,/RENAX_SEQUENCE_PARALLEL\.button/);
+assert.match(core,/M8 3v10M17 7v10M23 10h10/,'Déphasage icon must use unified rhythm glyph');
+assert.match(fs.readFileSync(path.join(root,'sequence-parallel.js'),'utf8'),/M7 3v14M31 3v14/,'Parallel tempo icon must use matching rhythm glyph');
 console.log('PASS Tempo parallèle ratios, modes de durée, coupures, exclusions et intégration.');
 
 

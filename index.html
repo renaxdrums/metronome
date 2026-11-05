@@ -58,6 +58,7 @@
 <link rel="stylesheet" href="entry-07.css?v=463aca5615bf">
 
 <link id="sequence-edit-transport" rel="stylesheet" href="entry-sequence-edit-transport.css?v=0006ed9c829d">
+<link rel="stylesheet" href="sequence-parallel.css?v=5fc317e22923">
 <link rel="stylesheet" href="entry-09.css?v=a66a57940143"><link id="circular-view-legend" rel="stylesheet" href="entry-circular-view-legend.css?v=b7784e722d76"><link rel="stylesheet" href="entry-11.css?v=a9bea4c245c7">
 <link rel="stylesheet" href="entry-12.css?v=5956b2c2f6c4">
 <link rel="stylesheet" href="multi-metronome.css?v=f6354c473f35">
@@ -374,10 +375,11 @@
   <script src="ui-feedback.js?v=eae7d41e1fb6"></script>
 <script src="numbox-controls.js?v=913403aa577f"></script>
   <script src="metronome-audio.js?v=aeb485c3d328"></script>
-  <script src="metronome-core.js?v=348ce81e1f2e"></script>
+  <script src="sequence-parallel.js?v=6ab47af9cc82"></script>
+  <script src="metronome-core.js?v=0554402794a3"></script>
   <link rel="stylesheet" href="playback-support.css?v=be7d47c55905">
   <script src="playback-support.js?v=906fd4c12e7e"></script>
-  <script src="metronome-transport.js?v=0d547317911a"></script>
+  <script src="metronome-transport.js?v=2031fc79216f"></script>
   <script src="pro-sound-bank.js?v=5a4ad356541f"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();

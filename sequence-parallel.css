@@ -1,0 +1,29 @@
+/* Scope: only the new Tempo parallèle control and dialog. */
+#measureList .sequence-parallel-button{width:36px;height:32px;min-width:36px;flex:none;display:grid;place-items:center;padding:3px;border:1px solid var(--border);border-radius:7px;background:var(--orange);cursor:pointer;}
+body:not([data-workspace=sequence]) #measureList .sequence-parallel-button{display:none;}
+#measureList .sequence-parallel-button svg{width:30px;height:22px;display:block;}
+#measureList .sequence-parallel-button.active{outline:2px solid var(--cyan);outline-offset:1px;}
+#measureList .sequence-parallel-button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;}
+#measureList .sequence-parallel-button:disabled{opacity:.55;cursor:not-allowed;}
+.sequence-parallel-dialog{box-sizing:border-box;width:min(470px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow-y:auto;margin:auto;padding:20px;border-radius:14px;border:1px solid var(--orange);background:var(--panel);color:var(--text);box-shadow:0 20px 70px #0009;font:13px/1.55 var(--font);}
+.sequence-parallel-dialog::backdrop{background:#080b14b8;}
+.sequence-parallel-dialog h2{margin:0 0 8px;font:700 18px/1.3 var(--font);color:var(--orange);}
+.sequence-parallel-dialog p{margin:8px 0;color:var(--text-muted);}
+.sequence-parallel-dialog label{display:grid;gap:6px;margin:12px 0;font-weight:700;}
+.sequence-parallel-dialog input,.sequence-parallel-dialog select{box-sizing:border-box;width:100%;min-height:44px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);padding:8px 10px;font:600 14px var(--font);}
+.sequence-parallel-dialog [hidden]{display:none;}
+.sequence-parallel-ratio{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.sequence-parallel-dialog .sequence-parallel-result{min-height:36px;color:var(--text);font-weight:600;}
+.sequence-parallel-animation{border:1px solid var(--border);border-radius:10px;background:var(--bg);padding:12px;margin:12px 0;}
+.sequence-parallel-animation>div{display:flex;align-items:center;gap:12px;height:33px;border-bottom:1px dashed var(--border);font-weight:600;}
+.sequence-parallel-animation>div>span{width:80px;flex:none;}
+.sequence-parallel-animation i{display:block;width:14px;height:14px;border-radius:50%;background:var(--orange);animation:sequence-parallel-pulse 1s ease-in-out infinite;}
+.sequence-parallel-animation [data-reference]{background:var(--cyan);}
+.sequence-parallel-animation small{display:block;margin-top:9px;color:var(--text-muted);}
+@keyframes sequence-parallel-pulse{0%{transform:scale(1);opacity:1}50%{transform:scale(.4);opacity:.25}100%{transform:scale(1);opacity:1}}
+.sequence-parallel-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:14px;}
+.sequence-parallel-actions button{min-height:44px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);color:var(--text);background:var(--bg);font:700 12px var(--font);cursor:pointer;}
+.sequence-parallel-actions .sequence-parallel-apply{background:var(--orange);color:#141414;border-color:var(--orange);}
+.sequence-parallel-actions button:disabled{opacity:.5;cursor:not-allowed;}
+@media(max-width:1100px){#measureList .sequence-parallel-button{width:44px;height:44px;min-width:44px;}}
+@media(prefers-reduced-motion:reduce){.sequence-parallel-animation i{animation:none;}}

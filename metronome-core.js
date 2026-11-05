@@ -875,6 +875,8 @@
           event.stopPropagation();openSequencePhaseDialog(m,i);
         });
         tempoRow.appendChild(phaseButton);
+        const parallelButton = window.RENAX_SEQUENCE_PARALLEL.button(m, i, playbackStarting || isPlaying, () => renderSequencerList());
+        tempoRow.appendChild(parallelButton);
 
         // A sequencer block can repeat its pattern for any positive whole number of measures.
         // Keep the count as decimal text: JSON persists it exactly, even beyond Number.MAX_SAFE_INTEGER.

@@ -46,7 +46,7 @@
     node.innerHTML = '<svg viewBox="0 0 42 24" aria-hidden="true"><path d="M5 19h8V6h3v13h8m3-3h7m-3-3 3 3-3 3" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><text x="20" y="10" font-size="10" font-weight="900" fill="#111">3</text></svg>';
     node.disabled = disabled;
     node.classList.toggle('active', !!config(m));
-    node.setAttribute('aria-label', 'Tempo parallèle du bloc ' + (index + 1));
+    node.setAttribute('aria-label', '3 · Tempo parallèle du bloc ' + (index + 1));
     node.setAttribute('aria-pressed', String(!!config(m)));
     node.title = config(m) ? 'Tempo parallèle actif' : 'Configurer Tempo parallèle';
     node.addEventListener('click', e => { e.stopPropagation(); if (!disabled) open(m, index, rerender); });

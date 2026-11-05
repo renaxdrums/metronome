@@ -56,6 +56,7 @@
     if (!config(model)) return null;
     const node = document.createElement('div');
     node.className = 'sequence-parallel-summary';
+    node.setAttribute('role', 'status');
     const label = document.createElement('span');
     label.className = 'sequence-parallel-summary-label';
     label.textContent = 'Tempo parallèle';

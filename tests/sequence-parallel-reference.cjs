@@ -16,8 +16,15 @@ module.exports = async function applySequenceParallelReference(page) {
     cards.forEach((card, index) => {
       const row = card.querySelector('.measure-tempo-row:not(.measure-repeat-row)');
       const phase = row?.querySelector(':scope > .sequence-phase-button');
-      if (!phase || row.querySelector('.sequence-parallel-button'))
-        throw Error('Unexpected historical Tempo parallèle reference markup');
+      if (!phase) throw Error('Missing historical Déphasage button');
+      // PR #74 already introduced the parallel action on main. Normalize only
+      // its approved pictogram and styling; do not duplicate or hide controls.
+      const existing = row.querySelector('.sequence-parallel-button');
+      if (existing) {
+        existing.innerHTML = icon;
+        existing.setAttribute('aria-label', '3 · Tempo parallèle du bloc ' + (index + 1));
+        return;
+      }
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'sequence-parallel-button';

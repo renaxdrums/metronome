@@ -40,10 +40,36 @@
   const suggested = ratio => ratio.denominator;
   const isComplete = (ratio, count) =>
     (BigInt(count) * BigInt(ratio.numerator)) % BigInt(ratio.denominator) === 0n;
+  // Display-only indicator: the block's reference tempo and scheduler remain unchanged.
+  const bpmText = value => Number(value.toFixed(3)).toLocaleString('fr-BE', { maximumFractionDigits: 3 });
+  function updateSummary(node, model) {
+    const ratio = config(model);
+    if (!ratio) { node.hidden = true; return; }
+    node.hidden = false;
+    const unit = notes.find(item => item[0] === model.parallelTempo.unit);
+    const detail = unit[1] + ' · ' + bpmText(ratio.bpm) + ' BPM';
+    node.querySelector('.sequence-parallel-summary-value').textContent = detail;
+    node.setAttribute('aria-label', 'Tempo parallèle : ' + unit[1] + ', ' + bpmText(ratio.bpm) +
+      ' battements par minute. Tempo de base : ' + model.tempo + ' battements par minute.');
+  }
+  function summary(model) {
+    if (!config(model)) return null;
+    const node = document.createElement('div');
+    node.className = 'sequence-parallel-summary';
+    node.setAttribute('role', 'status');
+    const label = document.createElement('span');
+    label.className = 'sequence-parallel-summary-label';
+    label.textContent = 'Tempo parallèle';
+    const value = document.createElement('span');
+    value.className = 'sequence-parallel-summary-value';
+    node.append(label, value);
+    updateSummary(node, model);
+    return node;
+  }
   function button(m, index, disabled, rerender) {
     const node = document.createElement('button');
     node.type = 'button'; node.className = 'sequence-parallel-button';
-    node.innerHTML = '<svg viewBox="0 0 42 24" aria-hidden="true"><path d="M5 19h8V6h3v13h8m3-3h7m-3-3 3 3-3 3" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><text x="20" y="10" font-size="10" font-weight="900" fill="#111">3</text></svg>';
+    node.innerHTML = '<svg viewBox="0 0 38 20" aria-hidden="true" fill="none"><path d="M6 3v14M32 3v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><text x="19" y="14.5" font-size="14" font-weight="700" text-anchor="middle" fill="currentColor">3</text></svg>';
     node.disabled = disabled;
     node.classList.toggle('active', !!config(m));
     node.setAttribute('aria-label', '3 · Tempo parallèle du bloc ' + (index + 1));
@@ -153,5 +179,5 @@
     dialog.addEventListener('close', () => dialog.remove(), { once: true });
     dialog.showModal(); refresh(); select.focus();
   }
-  window.RENAX_SEQUENCE_PARALLEL = Object.freeze({ config, repetitions, suggested, isComplete, button, open });
+  window.RENAX_SEQUENCE_PARALLEL = Object.freeze({ config, repetitions, suggested, isComplete, button, open, summary, updateSummary });
 })();

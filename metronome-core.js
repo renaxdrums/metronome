@@ -223,6 +223,8 @@
       measureListEl.querySelectorAll('.measure-card').forEach((card, i) => {
         const input = card.querySelector('.measure-tempo-input');
         if (input && measures[i]) {const value=String(measures[i].tempo);if(![...input.options].some(option=>option.value===value)){const option=document.createElement('option');option.value=value;option.textContent=value;input.append(option);}input.value=value;syncNumbox(input);}
+        const summary = card.querySelector('.sequence-parallel-summary');
+        if (summary && measures[i]) window.RENAX_SEQUENCE_PARALLEL.updateSummary(summary, measures[i]);
       });
     }
 
@@ -845,6 +847,8 @@
           if (!Number.isFinite(parsed)) return;
           const v = Math.max(2, Math.min(999, parsed));
           m.tempo = v;
+          const summary = card.querySelector('.sequence-parallel-summary');
+          if (summary) window.RENAX_SEQUENCE_PARALLEL.updateSummary(summary, m);
           if (normalizeField) tempoInput.value = String(v);
           if (i === activeMeasureIndex && !training.engaged) syncTempoUI(m);
         };
@@ -928,6 +932,8 @@
         card.appendChild(head);
         card.appendChild(ratio);
         card.appendChild(tempoRow);
+        const parallelSummary = window.RENAX_SEQUENCE_PARALLEL.summary(m);
+        if (parallelSummary) card.appendChild(parallelSummary);
         card.appendChild(repeatRow);
         card.appendChild(preview);
         const selectMeasure = () => {

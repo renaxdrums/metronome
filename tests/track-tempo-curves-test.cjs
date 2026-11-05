@@ -107,7 +107,7 @@ function midiTimes(bytes){
       const s=RENAX_SONGS.library.profiles[0].songs[0],before=JSON.stringify(s);
       const expected=[],section=s.sections[0];let time=0;
       for(let bar=0;bar<5;bar++)for(let beat=0;beat<3;beat++)for(let sub=0;sub<section.measure.beatSubdivisions[beat];sub++){expected.push(time);time+=RENAX_SONG_TEMPO.stepDuration(section,bar,beat,sub,section.measure.beatSubdivisions[beat]);}
-      const frame=document.createElement('iframe');frame.hidden=true;frame.src=location.href+'?mp3-render=1';
+      const frame=document.createElement('iframe');frame.hidden=true;const url=new URL(location.href);url.searchParams.set('mp3-render','1');frame.src=url.href;
       await new Promise((resolve,reject)=>{frame.onload=resolve;frame.onerror=reject;document.body.append(frame);});
       try{
        const w=frame.contentWindow,click=w.playClick,events=[];w.playClick=function(state,time){events.push(time);return click.apply(this,arguments);};

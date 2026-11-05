@@ -665,10 +665,11 @@ html[data-theme='ivory'] .musician-tool {
     min-height: 88px;
   }
 }
-@media (orientation: landscape) and (pointer: coarse) and (max-width: 1100px) and (max-height: 600px) {
+@media (orientation: landscape) and (max-width: 1100px) and (max-height: 600px) {
   html#renaxApp body > header {
     flex-wrap: nowrap;
     gap: 8px;
+    min-height: 52px;
   }
   html#renaxApp body > header .index2-header-actions {
     flex: 0 1 auto;

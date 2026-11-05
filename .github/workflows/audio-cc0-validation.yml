@@ -163,7 +163,7 @@ jobs:
 
   production:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -180,7 +180,7 @@ jobs:
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1; then
             sudo timeout 120 apt-get update -qq
-            sudo timeout 540 apt-get install -y --no-install-recommends ffmpeg
+            sudo timeout 900 apt-get install -y --no-install-recommends ffmpeg
           fi
           ffmpeg -version
       - name: Build and verify actual release
@@ -247,4 +247,3 @@ jobs:
       - name: Publish verified production artifact
         id: deployment
         uses: actions/deploy-pages@v4
-

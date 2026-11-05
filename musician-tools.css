@@ -300,6 +300,7 @@ html#renaxApp[data-theme='avant'] .tool-nav-link svg {
   border-block: 1px solid var(--tool-line);
   opacity: 0.25;
   isolation: isolate;
+  contain: paint;
 }
 .tuner-strobe div {
   position: absolute;

@@ -124,6 +124,13 @@ const { start, showMeasures } = require('./audio-harness.cjs');
           const blockInput = document.querySelectorAll('#measureList .measure-card')[1]
             .querySelector('.measure-tempo-row:not(.measure-repeat-row) select.measure-tempo-input');
           if (!blockInput) throw Error('Missing reference BPM field');
+          // This field loads its 998 options lazily; include the chosen option.
+          if (![...blockInput.options].some(option => option.value === '90')) {
+            const option = document.createElement('option');
+            option.value = '90';
+            option.textContent = '90';
+            blockInput.append(option);
+          }
           blockInput.value = '90';
           blockInput.dispatchEvent(new Event('change', { bubbles: true }));
         });

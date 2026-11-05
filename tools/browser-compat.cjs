@@ -48,7 +48,7 @@ const { start } = require('../tests/audio-harness.cjs');
               return attempt;
             };
         });
-        await native.goto(h.url);
+        await native.goto(h.url + '/?tool=metronome');
         await native.waitForFunction(() => window.RENAX_SONGS && window.RENAX_I18N);
         await native.locator('#index2SettingsBtn').click();
         await native.evaluate(async () => {
@@ -86,7 +86,7 @@ const { start } = require('../tests/audio-harness.cjs');
                   ),
                 );
           });
-          await p.goto(h.url);
+          await p.goto(h.url + '/?tool=metronome');
           await p.waitForFunction(() => window.RENAX_SONGS && window.RENAX_I18N);
           assert.equal(await p.evaluate(() => innerWidth), width);
           for (const theme of ['dark', 'light', 'ivory']) {
@@ -223,6 +223,27 @@ const { start } = require('../tests/audio-harness.cjs');
           await p.close();
           console.log('PASS compatibility ' + name + ' ' + width);
         }
+        const tunerPage = await browser.newPage({
+          viewport: { width: 390, height: 900 },
+          serviceWorkers: 'block',
+        });
+        const tunerErrors = [];
+        tunerPage.on('pageerror', (error) => tunerErrors.push(error.message));
+        await tunerPage.addInitScript(() =>
+          localStorage.setItem('renax.arrival.enabled.v1', 'false'),
+        );
+        await tunerPage.goto(h.url + '/?tool=tuner');
+        await tunerPage.waitForFunction(() => window.RENAX_TOOLS?.current === 'tuner');
+        await tunerPage.locator('#tunerA4').fill('442.5');
+        await tunerPage.locator('#tunerA4').press('Tab');
+        assert.equal(await tunerPage.locator('#tunerA4Slider').inputValue(), '442.5');
+        await tunerPage.locator('#tunerTemperament').selectOption('pythagorean', { force: true });
+        await tunerPage.locator('#toolSwitchLink').click();
+        await tunerPage.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
+        assert.equal(await tunerPage.locator('#workspaceNav [role=tab]').count(), 6);
+        assert.deepEqual(tunerErrors, []);
+        await tunerPage.close();
+        console.log('PASS tuner navigation/settings ' + name);
       } finally {
         await browser.close();
       }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "834e06afe0d99cef",
+  "revision": "9e18fba6d3e86930",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "30d21dd76d088af729db9c9dc7fb7c2c71533882c1335e15251988e2df4ef522",
+      "sha256": "09a4430cf5586ea71c75ac4ab80731bbba8faac42d696a0b9d519eeae4c42b54",
       "text": true
     },
     {
@@ -334,12 +334,12 @@
     },
     {
       "path": "metronome-core.js",
-      "sha256": "348ce81e1f2e3cc3eef4bf21e779581f0d67356544f13d8a6a91cec5030c3b5d",
+      "sha256": "0554402794a3f1030e192276469b46893d98b20b3f67f742533f92589263bd30",
       "text": true
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "0d547317911abcb2936da03b5250df26e61be8cd8000637cf5e4231572bbd217",
+      "sha256": "2031fc79216fb37daef2968ab54b86d13350372aeae41dd824bc84fac275520e",
       "text": true
     },
     {
@@ -460,6 +460,16 @@
     {
       "path": "rhythm-score.js",
       "sha256": "e058a752abacc54686d99d6c50c308ec350a87f95801f7eee4bbcc5c291ae920",
+      "text": true
+    },
+    {
+      "path": "sequence-parallel.css",
+      "sha256": "5fc317e22923763891633fdaf81e18aad8010901b1cda0778f6b85aa337822a2",
+      "text": true
+    },
+    {
+      "path": "sequence-parallel.js",
+      "sha256": "e3454a292361d1f5fd0b17e799a88244a4e0cedf1807cfc0e63b21a26ce8b1c1",
       "text": true
     },
     {

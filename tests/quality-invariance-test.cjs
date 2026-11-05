@@ -397,8 +397,12 @@ async function baselineRoute(page, url) {
                   });
                 });
               }
-              if (!i && !referenceAgainstItself && module === 'Séquenceur')
+              if (!i && !referenceAgainstItself && module === 'Séquenceur') {
                 await require('./sequence-phase-reference.cjs')(p);
+                // New approved control only: compare its precise geometry and
+                // styling while keeping strict reference checks for all other UI.
+                await require('./sequence-parallel-reference.cjs')(p);
+              }
               if ((!i || referenceAgainstItself) && module === 'Track')
                 await p.evaluate(() => {
                   playBtn.dataset.songTransport = 'true';

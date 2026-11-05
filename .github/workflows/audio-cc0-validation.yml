@@ -44,6 +44,7 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/song-tempo-ramp-test.cjs
+          node tests/sequence-parallel-test.cjs
           node tests/track-tempo-curves-test.cjs
           node tests/theme-navigation-test.cjs
           node tests/track-continuous-test.cjs

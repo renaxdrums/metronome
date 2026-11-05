@@ -3,6 +3,7 @@
     "ui-feedback.js",
     "numbox-controls.js",
     "metronome-audio.js",
+    "sequence-parallel.js",
     "metronome-core.js",
     "playback-support.js",
     "metronome-transport.js",
@@ -248,6 +249,7 @@
       "buildCircularSequencer",
       "schedulerSafely",
       "sequenceRepeatIndex",
+      "parallelBlock",
       "advanceScheduledMeasure",
       "sequencePhaseEvent",
       "pendingSequencePhaseEvents",
@@ -557,7 +559,8 @@
     "openSequencePhaseDialog": "writable",
     "sequencePhaseEvent": "writable",
     "pendingSequencePhaseEvents": "writable",
-    "flushSequencePhaseEvents": "writable"
+    "flushSequencePhaseEvents": "writable",
+    "parallelBlock": "writable"
   },
   "testGlobals": {
     "AudioContext": "writable",

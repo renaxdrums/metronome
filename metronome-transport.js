@@ -76,10 +76,11 @@
     // Count actual completed measures, rather than expanding patterns in memory.
     // Strings allow arbitrarily large positive counts without numeric rounding.
     let sequenceRepeatIndex = 0n;
-    function advanceScheduledMeasure() {
+    let parallelBlock = null;
+    function advanceScheduledMeasure(skipRepeatCount = false) {
       const model = measures[playingMeasureIndex];
       currentStepInMeasure = 0;
-      if (appMode === 'metronome' && !loopedMeasure && !window.RENAX_SONGS?.loaded) {
+      if (appMode === 'metronome' && !loopedMeasure && !window.RENAX_SONGS?.loaded && !skipRepeatCount) {
         const raw = model?.repeatCount;
         const repetitions = typeof raw === 'string' && /^[0-9]+$/.test(raw) && /[1-9]/.test(raw)
           ? BigInt(raw)
@@ -149,8 +150,17 @@
         const model = measures[mIdx];
         if (!model) { timerID = setTimeout(schedulerSafely, lookahead); return; }
         const m = getSchedulingMeasure(model);
+        const parallel = appMode === 'metronome' && document.body.dataset.workspace === 'sequence' &&
+          !training.engaged && !window.RENAX_SONGS?.loaded
+          ? window.RENAX_SEQUENCE_PARALLEL.config(model) : null;
+        if (parallel && (!parallelBlock || parallelBlock.model !== model)) {
+          const repeats = loopedMeasure ? 1n : window.RENAX_SEQUENCE_PARALLEL.repetitions(model);
+          const seconds = m.numerator * getStepDurationMs(getEffectiveTempo(m), m.denominator, 1) / 1000;
+          parallelBlock = { model, endTime: nextNoteTime + seconds * Number(repeats) };
+        } else if (!parallel) parallelBlock = null;
 
         if (sIdx >= measureTotalSteps(m)) {
+          if (parallel) { currentStepInMeasure = 0; continue; }
           scheduledMeasureLayouts.delete(model);
           if (advanceScheduledMeasure()) return;
           continue;
@@ -160,12 +170,21 @@
         const state = m.beatStates[beat] ? m.beatStates[beat][subIndex] : 0;
         const isFirst = (sIdx === 0);
         const rampStep = !training.engaged ? window.RENAX_SONG_TEMPO?.liveStep?.(mIdx,beat,subIndex,m.beatSubdivisions[beat]||1) : null;
-        const effectiveTempo = rampStep?.tempo ?? getEffectiveTempo(m);
-        const beatDurationSec = rampStep?.beatSeconds ?? getStepDurationMs(effectiveTempo, m.denominator, 1) / 1000;
+        const effectiveTempo = parallel ? getEffectiveTempo(m) * parallel.numerator / parallel.denominator :
+          (rampStep?.tempo ?? getEffectiveTempo(m));
+        const beatDurationSec = parallel ? getStepDurationMs(effectiveTempo, m.denominator, 1) / 1000 :
+          (rampStep?.beatSeconds ?? getStepDurationMs(effectiveTempo, m.denominator, 1) / 1000);
         const voiceGroupSize = getVoiceGroupSize(m);
         const subdiv = m.beatSubdivisions[beat] || 1;
-        const stepSeconds = rampStep?.seconds ?? getStepDurationMs(effectiveTempo, m.denominator, subdiv) / 1000;
-        const phase = sequencePhaseEvent(model,m,beat,subIndex,subdiv,effectiveTempo,nextNoteTime);
+        const stepSeconds = parallel ? getStepDurationMs(effectiveTempo, m.denominator, subdiv) / 1000 :
+          (rampStep?.seconds ?? getStepDurationMs(effectiveTempo, m.denominator, subdiv) / 1000);
+        const phaseShift = parallel && Number.isSafeInteger(model.phaseSteps) && model.phaseSteps > 0 &&
+          Number.isSafeInteger(model.phaseDivision) && model.phaseDivision > 0
+          ? (60 / effectiveTempo) * 4 * model.phaseSteps / model.phaseDivision : 0;
+        const phase = parallel ? {
+          time: nextNoteTime + phaseShift,
+          audible: nextNoteTime + phaseShift < parallelBlock.endTime - 1e-9
+        } : sequencePhaseEvent(model,m,beat,subIndex,subdiv,effectiveTempo,nextNoteTime);
         if (phase.audible) {
           const soundAllowed = isSilentCycleAudible();
           const dispatch = () => {
@@ -186,10 +205,20 @@
           else dispatch();
         }
 
-        nextNoteTime += stepSeconds;
+        nextNoteTime = parallel ? Math.min(parallelBlock.endTime, nextNoteTime + stepSeconds) :
+          nextNoteTime + stepSeconds;
 
         currentStepInMeasure++;
-        if (currentStepInMeasure >= measureTotalSteps(m)) {
+        if (parallel) {
+          if (nextNoteTime >= parallelBlock.endTime - 1e-9) {
+            nextNoteTime = parallelBlock.endTime;
+            parallelBlock = null;
+            scheduledMeasureLayouts.delete(model);
+            if (advanceScheduledMeasure(true)) return;
+          } else if (currentStepInMeasure >= measureTotalSteps(m)) {
+            currentStepInMeasure = 0;
+          }
+        } else if (currentStepInMeasure >= measureTotalSteps(m)) {
           scheduledMeasureLayouts.delete(model);
           if (advanceScheduledMeasure()) return;
         }
@@ -473,6 +502,7 @@
       window.RENAX_PLAYBACK?.start();
       playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : 0;
       sequenceRepeatIndex = 0n;
+      parallelBlock = null;
       pendingSequencePhaseEvents = [];
       currentStepInMeasure = 0;
       polyEventIndex = 0;
@@ -505,6 +535,7 @@
       if(window.RENAX_MULTI?.active)return window.RENAX_MULTI.stop();
       loopedMeasure = null;
       sequenceRepeatIndex = 0n;
+      parallelBlock = null;
       pendingSequencePhaseEvents = [];
       if (!isPlaying) return;
       isPlaying = false;

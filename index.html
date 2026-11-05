@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
 <script>
+/* General entry opens the tool chooser. index.html remains a direct metronome link.
+   Incoming playlist links retain their existing import destination. */
+(()=>{const url=new URL(location.href),tool=url.searchParams.get('tool');document.documentElement.dataset.tool=['home','metronome','tuner'].includes(tool)?tool:location.pathname.endsWith('/')&&!location.hash?'home':'metronome';})();
+</script>
+<script>
 /* Apply before first paint. A system light preference never overrides the default. */
 (()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory','avant'].includes(saved))theme=saved;}catch{}document.documentElement.dataset.theme=theme;})();
 </script>
@@ -77,6 +82,7 @@
 <link id="beat-hover45" rel="stylesheet" href="entry-beat-hover45.css?v=b5cd61a9099f"><link rel="stylesheet" href="accessibility.css?v=0d0e695a10ba">
 <link rel="stylesheet" href="kern-intro.css?v=5e2e8530cd7c">
 <link rel="stylesheet" href="avant-garde-theme.css?v=8d3ae3cc815f">
+<link rel="stylesheet" href="musician-tools.css?v=5a29d7dd513a">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -100,9 +106,12 @@
     </div>
 
     <div class="index2-header-actions" aria-label="Navigation rapide">
+      <a class="tool-nav-link" id="toolHomeLink" href="?tool=home" data-tool-link="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8"/></svg><span>Accueil</span></a>
+      <a class="tool-nav-link" id="toolSwitchLink" href="?tool=tuner" data-tool-link="tuner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v7a4 4 0 0 0 8 0V3M12 14v7M5 5h3m8 0h3"/></svg><span>Accordeur</span></a>
       <button class="index2-header-btn" id="index2SettingsBtn" type="button" aria-label="Paramètres" title="Paramètres">⚙</button>
     </div>
   </header>
+
 
   <nav class="mobile-tabs" id="mobileTabs">
     <button data-tab="visu" class="active"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17V7M7 17v-4M11 17V9M15 17v-7M19 17V5M3 17h18"/></svg>Visualisation</button>
@@ -372,6 +381,50 @@
     <div class="footer-right"><span>V3.0.1</span><span class="author-credit">David Arens</span></div>
   </footer>
 
+  <main id="toolHome" class="musician-tool" aria-labelledby="toolHomeTitle">
+    <div class="tool-home-heading"><p>RENAX · OUTILS POUR MUSICIENS</p><h2 id="toolHomeTitle">Le rythme. La justesse.</h2><p>Choisissez votre espace de travail.</p></div>
+    <div class="tool-home-choices">
+      <a href="?tool=metronome" data-tool-link="metronome" class="tool-choice"><svg viewBox="0 0 120 100" aria-hidden="true"><path d="M35 85h50L73 15H47L35 85ZM60 68 92 25M46 85V74h28v11"/><circle cx="60" cy="68" r="3"/></svg><div><h3>Métronome</h3><p>Tempo, polyrythmie, entraînement, séquenceur, multipiste et tracks.</p><span>Ouvrir le Métronome <span aria-hidden="true">↗</span></span></div></a>
+      <a href="?tool=tuner" data-tool-link="tuner" class="tool-choice"><svg viewBox="0 0 120 100" aria-hidden="true"><path d="M42 15v29a18 18 0 0 0 36 0V15M60 62v24M33 23h9m36 0h9M25 74v9m10-14v14m50-14v14m10-9v9"/></svg><div><h3>Accordeur</h3><p>Accordage chromatique, instruments, diapason et tempéraments.</p><span>Ouvrir l’Accordeur <span aria-hidden="true">↗</span></span></div></a>
+    </div>
+  </main>
+  <main id="tunerRoot" class="musician-tool" aria-labelledby="tunerTitle">
+    <div class="tuner-heading"><div><h2 id="tunerTitle">Accordeur</h2><p id="tunerSummary">Chromatique · La4 = 440,0 Hz · Tempérament égal</p></div><button type="button" id="tunerListen" class="tuner-primary" aria-pressed="false">Activer le microphone</button></div>
+    <div class="tuner-layout">
+      <section class="tuner-measurement" aria-label="Mesure de la justesse">
+        <div class="tuner-note-row"><output id="tunerNote" aria-live="off" data-no-translate aria-label="Note détectée">—</output><div><output id="tunerFrequency" aria-live="off" data-no-translate aria-label="Fréquence mesurée">— Hz</output><output id="tunerCents" aria-live="off" data-no-translate aria-label="Écart à la note cible">— cents</output></div></div>
+        <p id="tunerStatus" role="status">Activez le microphone, puis jouez une seule note.</p>
+        <svg class="tuner-meter" viewBox="0 0 600 108" role="img" aria-labelledby="tunerMeterTitle"><title id="tunerMeterTitle">Écart de moins 50 à plus 50 cents</title><path class="tuner-meter-axis" d="M30 55h540M30 48v14m54-10v6m54-10v10m54-7v7m54-10v10M300 36v34m54-18v6m54-10v10m54-7v7m54-10v10M570 48v14"/><rect class="tuner-center-zone" x="289.2" y="37" width="21.6" height="32" rx="3"/><g class="tuner-meter-labels"><text x="30" y="93">−50</text><text x="165" y="93">−25</text><text x="300" y="93">0</text><text x="435" y="93">+25</text><text x="570" y="93">+50</text></g><path id="tunerNeedle" d="M300 17v53m-6-53 6 8 6-8" visibility="hidden"/></svg>
+        <div id="tunerStrobe" class="tuner-strobe" role="img" aria-label="Indicateur de dérive de hauteur"><div></div></div>
+        <div class="tuner-direction"><span>Plus grave</span><span id="tunerSignal">Microphone arrêté</span><span>Plus aigu</span></div>
+        <div class="tuner-target"><label for="tunerTarget">Note cible</label><select id="tunerTarget"><option value="auto">Détection automatique</option></select><button id="tunerTone" type="button" aria-pressed="false">Écouter la référence</button></div>
+        <div id="tunerStrings" class="tuner-strings" role="group" aria-label="Cordes cibles"></div>
+        <p class="tuner-help">Jouez une note à la fois, près du microphone. L’analyse reste sur cet appareil. Le microphone est coupé en quittant cet espace.</p>
+      </section>
+      <aside class="tuner-settings" aria-label="Réglages de l’accordeur">
+        <label for="tunerInstrument">Instrument / accordage</label><select id="tunerInstrument"></select>
+        <div class="tuner-a4"><label for="tunerA4">Diapason · La4 (Hz)</label><input id="tunerA4" type="number" min="340" max="540" step="0.1" value="440" inputmode="decimal"><input id="tunerA4Slider" type="range" min="340" max="540" step="0.1" value="440" aria-label="Diapason La4 en hertz"><div><button type="button" data-tuner-a4="440">440 Hz</button><button type="button" data-tuner-a4="442">442 Hz</button></div></div>
+        <label for="tunerTemperament">Tempérament</label><select id="tunerTemperament"></select>
+        <label for="tunerTonic">Tonique du tempérament</label><select id="tunerTonic"></select>
+        <details id="tunerAdvanced"><summary>Réglages avancés</summary><div class="tuner-advanced-fields">
+          <label for="tunerTranspose">Transposition de l’instrument</label><select id="tunerTranspose"><option value="0">Ut · son réel</option><option value="2">Si♭ · +2 demi-tons écrits</option><option value="9">Mi♭ · +9 demi-tons écrits</option><option value="7">Fa · +7 demi-tons écrits</option><option value="12">Octave · +12 demi-tons écrits</option></select>
+          <p class="tuner-help">La transposition change le nom écrit ; la fréquence cible reste celle du son réel.</p>
+          <label for="tunerNotation">Noms des notes</label><select id="tunerNotation"><option value="solfege">Do Ré Mi</option><option value="letters">C D E</option></select>
+          <label for="tunerAccidentals">Altérations</label><select id="tunerAccidentals"><option value="sharps">Dièses ♯</option><option value="flats">Bémols ♭</option></select>
+          <label for="tunerTolerance">Tolérance de justesse (cents)</label><select id="tunerTolerance"><option value="1">Fine · ±1 cent</option><option value="2" selected>Précise · ±2 cents</option><option value="5">Large · ±5 cents</option></select>
+          <label for="tunerNoise">Seuil de détection</label><select id="tunerNoise"><option value="0.0015">Sensible · pièce calme</option><option value="0.005">Normal</option><option value="0.015">Bruit ambiant</option></select>
+          <label for="tunerInput">Microphone / entrée audio</label><select id="tunerInput"><option value="">Microphone par défaut</option></select>
+          <label for="tunerCalibration">Correction d’étalonnage (cents)</label><input id="tunerCalibration" type="number" min="-50" max="50" step="0.1" value="0"><p class="tuner-help">À régler uniquement avec une source externe étalonnée. Le nombre de décimales affichées ne garantit pas la précision du microphone.</p>
+          <label for="tunerCustomNotes">Accordage personnalisé · notes réelles</label><input id="tunerCustomNotes" type="text" value="E2 A2 D3 G3 B3 E4" aria-describedby="tunerCustomHelp"><p id="tunerCustomHelp" class="tuner-help">Ex. E2 A2 D3 G3 B3 E4. De 1 à 12 cordes, de Do0 à Do8.</p>
+          <fieldset id="tunerOffsets"><legend>Tempérament personnalisé · écarts en cents</legend><p class="tuner-help">Écarts par rapport au tempérament égal, de −50 à +50 cents. Actifs en mode Personnalisé.</p><div></div></fieldset>
+          <p class="tuner-help">La référence La4 reste fixe dans les tempéraments prédéfinis. En mode personnalisé, chaque écart s’applique à sa note, y compris le La.</p>
+        </div></details>
+      </aside>
+    </div>
+  </main>
+
+
+
   <script src="ui-feedback.js?v=eae7d41e1fb6"></script>
 <script src="numbox-controls.js?v=913403aa577f"></script>
   <script src="metronome-audio.js?v=aeb485c3d328"></script>
@@ -465,7 +518,7 @@
 <script src="training-modes.js?v=91fe5f5a5615"></script>
   <script src="training-numbox.js?v=5464fb23be6c"></script>
   <script src="compact-controls.js?v=24ce2f42ed2a"></script>
-  <script src="navigation-history.js?v=9d13af2c9b5e"></script>
+  <script src="navigation-history.js?v=157c31114aa0"></script>
   <script src="rhythm-score.js?v=e058a752abac"></script>
   <script src="edit-history.js?v=0e5a27a29b3b"></script>
 <script>
@@ -496,12 +549,13 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="multi-clock.js?v=200171f7f4fd"></script>
 <script src="multi-metronome.js?v=287ba922f2cf"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
-<script src="interface-translations.js?v=73b8028afd0e"></script>
+<script src="interface-translations.js?v=9d19ef53e2a3"></script>
 <script src="vendor/i18next-25.6.0.js?v=6077ce0b0640"></script>
-<script src="interface-locales.js?v=4be91f8924cc"></script>
+<script src="interface-locales.js?v=329b1aacceb3"></script>
 <link rel="stylesheet" href="interface-language.css?v=3995c298df9e">
 <script src="interface-language.js?v=291439ae445e"></script>
 <script src="workspace-layout.js?v=59c5930f2b6d"></script>
+<script type="module" src="musician-tools.mjs?v=cf0f725e3ff1"></script>
 <script src="avant-garde-motion.js?v=502d1d826916"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=798a129a814c"></script>

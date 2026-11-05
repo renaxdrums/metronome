@@ -1,5 +1,7 @@
 {
   "nightly": [
+    "tests/tuner-core-test.mjs",
+    "tests/tuner-interface-test.cjs",
     "tests/playlist-sharing-test.mjs",
     "tests/citron-dialog-layout-test.cjs",
     "tests/numbox-foreground-test.cjs",

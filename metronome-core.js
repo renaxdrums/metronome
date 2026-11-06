@@ -376,7 +376,6 @@
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.round(size * dpr); canvas.height = Math.round(size * dpr);
       particles.length = 0; pulses.length = 0;
-      canvas.style.width = size + 'px'; canvas.style.height = size + 'px';
       pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     new ResizeObserver(() => {

@@ -41,7 +41,8 @@ function show(tool, { notify = true } = {}) {
   }
   current = tool;
   root.dataset.tool = tool;
-  window.RENAX_APPEARANCE_SYNC?.();
+  // History restoration may revisit the same tool; do not reset its active palette.
+  if (changed) window.RENAX_APPEARANCE_SYNC?.();
   document.title =
     tool === 'metronome'
       ? originalTitle

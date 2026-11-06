@@ -87,6 +87,7 @@ export function createTuner(root) {
     toneTimer = 0,
     frame = 0,
     strobeOffset = 0,
+    orbitAngle = 0,
     lastFrame = 0;
   let current = null,
     locked = settings.locked;
@@ -319,7 +320,16 @@ export function createTuner(root) {
     render();
     updateTone();
   });
+  const orbit = root.querySelector('.renax-orbit-motion');
+  const toleranceBand = el('ToleranceBand');
   function render() {
+    const gap = 50 - settings.tolerance;
+    const zone = `0 ${gap} ${settings.tolerance * 2} ${gap}`;
+    if (toleranceBand.getAttribute('stroke-dasharray') !== zone)
+      toleranceBand.setAttribute('stroke-dasharray', zone);
+    el('Idle').hidden = Boolean(current);
+    el('Reading').hidden = !current;
+    el('Cents').hidden = !current;
     if (!current) {
       text(el('Note'), '—');
       text(el('Frequency'), '— Hz');
@@ -335,7 +345,7 @@ export function createTuner(root) {
     text(el('Frequency'), format(frequency, 2) + ' Hz');
     text(el('Cents'), (target.cents >= 0 ? '+' : '−') + format(Math.abs(target.cents)) + ' cents');
     const cents = Math.max(-50, Math.min(50, target.cents));
-    el('Needle').setAttribute('transform', 'translate(' + (cents * 5.4).toFixed(2) + ' 0)');
+    el('Needle').setAttribute('transform', `rotate(${(cents * 1.8).toFixed(2)} 180 164)`);
     el('Needle').setAttribute('visibility', 'visible');
     const stable = current.spread <= Math.max(settings.tolerance * 2, 4),
       tuned = stable && Math.abs(target.cents) <= settings.tolerance;
@@ -351,15 +361,16 @@ export function createTuner(root) {
             : 'Trop aigu — baissez la note',
     );
     text(el('Signal'), t('Signal détecté') + ' · ' + Math.round(current.clarity * 100) + ' %');
-    current.cents = target.cents;
+    current.cents = tuned ? 0 : cents;
   }
   function animate(now) {
     if (!active) return;
     const dt = Math.min(100, now - lastFrame);
     lastFrame = now;
-    if (current && !reduce.matches) {
-      strobeOffset =
-        (strobeOffset + Math.max(-50, Math.min(50, current.cents || 0)) * dt * 0.008) % 20;
+    if (current?.cents && !reduce.matches) {
+      strobeOffset = (strobeOffset + current.cents * dt * 0.008) % 20;
+      orbitAngle = (orbitAngle + current.cents * dt * 0.0018) % 360;
+      orbit.style.setProperty('--tuner-orbit-angle', orbitAngle.toFixed(2) + 'deg');
       el('Strobe').firstElementChild.setAttribute(
         'style',
         'transform:translateX(' + strobeOffset.toFixed(2) + 'px)',
@@ -424,8 +435,8 @@ export function createTuner(root) {
     render();
     el('Listen').setAttribute('aria-pressed', 'false');
     text(el('Listen'), t('Activer le microphone'));
-    text(el('Signal'), t(message));
-    status(message);
+    text(el('Signal'), t('Microphone arrêté'));
+    status(message === 'Microphone arrêté' ? '' : message);
     if (tone) stopTone();
   }
   async function listInputs() {

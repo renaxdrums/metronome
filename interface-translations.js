@@ -91,6 +91,8 @@ window.RENAX_TRANSLATIONS = Object.freeze({
 "Trop aigu — baissez la note":"Sharp — lower the pitch",
 "Signal détecté":"Signal detected",
 "En écoute":"Listening",
+"Prêt à accorder":"Ready to tune",
+"L’analyse reste sur cet appareil. Le microphone se coupe quand vous quittez l’accordeur.":"Pitch analysis stays on this device. The microphone turns off when you leave the tuner.",
 "Autorisez le microphone dans le navigateur.":"Allow microphone access in your browser.",
 "Jouez une note claire et tenue.":"Play a clear, sustained note.",
 "Accès au microphone refusé. Autorisez-le dans les paramètres du navigateur.":"Microphone access denied. Allow it in browser settings.",

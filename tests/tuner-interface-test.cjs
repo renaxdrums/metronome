@@ -44,8 +44,71 @@ fs.writeFileSync(wav, data);
     assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'home');
     assert(await p.locator('#toolHome').isVisible());
     assert.equal(await p.locator('#workspaceNav').isVisible(), false);
+    // The landing view is deliberately fixed to the approved dark appearance.
+    // The chosen theme attribute is preserved for the metronome and tuner.
+    for (const viewport of [
+      { width: 1440, height: 1000 },
+      { width: 390, height: 844 },
+    ]) {
+      await p.setViewportSize(viewport);
+      let reference;
+      for (const theme of ['dark', 'light', 'ivory', 'avant']) {
+        await p.evaluate(
+          (value) => document.querySelector('[data-appearance="' + value + '"]').click(),
+          theme,
+        );
+        assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
+        assert.equal(await p.evaluate(() => document.documentElement.dataset.selectedTheme), theme);
+        assert.equal(await p.evaluate(() => localStorage.getItem('renax-appearance')), theme);
+        const screenshot = await p.screenshot({ animations: 'disabled' });
+        if (!reference) reference = screenshot;
+        else
+          assert(
+            screenshot.equals(reference),
+            'The approved dark chooser must be identical for theme ' +
+              theme +
+              ' at ' +
+              viewport.width +
+              'px',
+          );
+      }
+    }
+    await p.setViewportSize({ width: 1440, height: 1000 });
+    await p.evaluate(() => document.querySelector('[data-appearance="avant"]').click());
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
+    const homeLogo = p.locator('#toolHome .renax-orbit-mark').first();
+    assert.equal(
+      await homeLogo.evaluate((el) => getComputedStyle(el).backgroundColor),
+      'rgb(255, 121, 0)',
+    );
+    await p.locator('#toolHome [data-tool-link=tuner]').click();
+    await p.waitForFunction(() => window.RENAX_TOOLS.current === 'tuner');
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'avant');
+    const tunerLogo = p.locator('#tunerRoot .renax-orbit-mark').first();
+    assert.equal(
+      await tunerLogo.evaluate((el) => getComputedStyle(el).backgroundColor),
+      'rgb(215, 242, 24)',
+    );
+    assert.match(
+      await tunerLogo.evaluate((el) => getComputedStyle(el).maskImage),
+      /renax-logo-approved\.svg/,
+    );
+    await p.locator('#toolHomeLink').click();
+    await p.waitForFunction(() => window.RENAX_TOOLS.current === 'home');
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
+    await p.evaluate(() => document.querySelector('[data-appearance="dark"]').click());
     await p.locator('#toolHome [data-tool-link=metronome]').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
+    // Browser Back / Track history may restore the same tool without changing
+    // the selected appearance. A same-tool restore must not repaint its theme.
+    await p.evaluate(() => {
+      document.documentElement.dataset.theme = 'avant';
+      window.RENAX_TOOLS.show('metronome', { notify: false });
+    });
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'avant');
+    await p.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
+    const switchIcon = p.locator('#toolSwitchLink svg path');
+    const tunerIcon = await switchIcon.getAttribute('d');
     assert.equal(await p.locator('#workspaceNav [role=tab]').count(), 6);
     await p.evaluate(() => {
       bpmSlider.value = '137';
@@ -54,6 +117,11 @@ fs.writeFileSync(wav, data);
     });
     await p.locator('#toolSwitchLink').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'tuner');
+    assert.equal(
+      await switchIcon.getAttribute('d'),
+      await p.locator('#workspaceNav [data-workspace="metronome"] svg path').getAttribute('d'),
+    );
+    assert.notEqual(await switchIcon.getAttribute('d'), tunerIcon);
     assert(await p.locator('#tunerRoot').isVisible());
     assert.equal(await p.locator('#playBtn').isVisible(), false);
     await p.keyboard.press('Space');
@@ -77,6 +145,8 @@ fs.writeFileSync(wav, data);
         ) < 0.2,
     );
     assert.equal(await p.locator('.tuner-measurement').getAttribute('data-tuned'), 'true');
+    const orbit = p.locator('.tuner-orbit .renax-orbit-motion');
+    const tunedOrbit = await orbit.getAttribute('style');
     const measured = await p.locator('#tunerFrequency').textContent();
     await p.locator('[data-tuner-a4="442"]').click();
     assert.equal(await p.locator('#tunerA4').inputValue(), '442');
@@ -88,6 +158,11 @@ fs.writeFileSync(wav, data);
             document.getElementById('tunerCents').textContent.replace('−', '-').replace(',', '.'),
           ) + 7.85,
         ) < 0.2,
+    );
+    assert.match(await p.locator('#tunerNeedle').getAttribute('transform'), /^rotate\(-/);
+    await p.waitForFunction(
+      (previous) => document.querySelector('.tuner-orbit .renax-orbit-motion').getAttribute('style') !== previous,
+      tunedOrbit,
     );
     await p.locator('#tunerA4').fill('');
     await p.locator('#tunerA4').pressSequentially('432.5');
@@ -159,6 +234,23 @@ fs.writeFileSync(wav, data);
         const b = await p.locator('#tunerRoot').boundingBox();
         assert(b.height > 100);
         assert(b.y + b.height <= viewport.height + 1, JSON.stringify({ viewport, theme, b }));
+        if (theme === 'avant' && [390, 1440].includes(viewport.width)) {
+          const target = p.locator('.numbox-custom:has(#tunerTarget)');
+          const trigger = target.locator('.numbox-button');
+          const menu = target.locator('.numbox-menu');
+          await trigger.click();
+          await menu.waitFor({ state: 'visible' });
+          const selected = menu.locator('.numbox-option[aria-selected="true"]');
+          const option = menu.locator('.numbox-option[aria-selected="false"]').first();
+          for (const row of [selected, option]) {
+            assert.equal(await row.evaluate((el) => getComputedStyle(el).color), 'rgb(215, 242, 24)');
+          }
+          await option.hover();
+          assert.equal(await option.evaluate((el) => getComputedStyle(el).color), 'rgb(215, 242, 24)');
+          await p.keyboard.press('Escape');
+          await menu.waitFor({ state: 'hidden' });
+          assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+        }
         if (viewport.width === 390 || viewport.width === 1440) {
           const scan = await new AxeBuilder({ page: p })
             .include('#tunerRoot')

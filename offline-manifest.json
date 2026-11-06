@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "5fc3e938d2b85658",
+  "revision": "0265103ef97ec1f3",
   "resources": [
     {
       "path": "accessibility.css",
@@ -24,7 +24,7 @@
     },
     {
       "path": "appearance-theme.css",
-      "sha256": "412b5e252b903884bb7c5d730eec2b3c0ac520a3ba1a3150fa4873ef6947d56b",
+      "sha256": "b519ea612c4be513d14174bf4c7f1edab303e0349ac054fb0c4fd8db3ebe3d2f",
       "text": true
     },
     {
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "8d3ae3cc815fcedb8a4029c8d5a3849ae169b2caa4422d7d52b504307818068e",
+      "sha256": "6590b57300aa3b03bdb697203b6ff87873b019bf948263f21ef3f224e9fee039",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "b193574ceb07698b3863c7db02a3943254e1b15a59cb45e28b3664d15476e1a1",
+      "sha256": "b9bb669c316638a2cc71f0d76453fcb850b35ba557348b3db59276a4de513dfb",
       "text": true
     },
     {
@@ -294,12 +294,12 @@
     },
     {
       "path": "interface-locales.js",
-      "sha256": "22926d1e40c91b3b715f3da37f2b25af3af9e604ad8e5b2e05c3e0ccaecdc770",
+      "sha256": "d94f599e851186c44c5e3a6b1dde3c90f6642bce5d00465a220d5e75961fc053",
       "text": true
     },
     {
       "path": "interface-translations.js",
-      "sha256": "9d19ef53e2a3867810fde1326e76abcac3c0cb4940d7c5a0144c5f64da284c3d",
+      "sha256": "c4b4483175a0dcb2675aa9bf07ff24e3a55ac9c06c96549ac2632ce4a312a8fa",
       "text": true
     },
     {
@@ -384,12 +384,12 @@
     },
     {
       "path": "musician-tools.css",
-      "sha256": "751debc98e8fe7e3fc8a40874c5bcd01144521a656974a87836d729d00ff6366",
+      "sha256": "c6121f299000df3f98bc124959ef92f56cd2be0fd9b8e137992187621723add9",
       "text": true
     },
     {
       "path": "musician-tools.mjs",
-      "sha256": "cf0f725e3ff1827f053d27913852a1688bb05d8e75ee7249f8ee364882dfaa1f",
+      "sha256": "88057bc2391c2c91303a7079687180c7e2596dd1352db40340ba041d08f8f1cb",
       "text": true
     },
     {
@@ -409,7 +409,7 @@
     },
     {
       "path": "numbox-controls.js",
-      "sha256": "913403aa577f7fb50fa4af175affe581c01263b7fef577f0bd80121a95231fe5",
+      "sha256": "f2ba76d7a0e08bbcdd9fe5251e8eaa2e8acabdcfe6b3457511ad28627e0b2859",
       "text": true
     },
     {
@@ -449,7 +449,7 @@
     },
     {
       "path": "renax-pulse-ivory.css",
-      "sha256": "404f0e45aa1cc20ce0efd4d1ccd1ab188ac75a9d9f2bffb825f5c73c02a32101",
+      "sha256": "fe7d8572ec104f813352988540db5581b3eaaea1ca608c1ddf1ee71c5cc8bbd5",
       "text": true
     },
     {
@@ -549,7 +549,7 @@
     },
     {
       "path": "tuner-ui.mjs",
-      "sha256": "d24b25fea10bcc1a27f3bb7743ceb78ebe4ec37f6f1e43da58fa56702456e05a",
+      "sha256": "02132208210866ed0c7c2a433634c5ea465af25104202cf3bb4deab411bd06d5",
       "text": true
     },
     {

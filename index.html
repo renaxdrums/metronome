@@ -82,7 +82,7 @@
 <link id="beat-hover45" rel="stylesheet" href="entry-beat-hover45.css?v=b5cd61a9099f"><link rel="stylesheet" href="accessibility.css?v=0d0e695a10ba">
 <link rel="stylesheet" href="kern-intro.css?v=5e2e8530cd7c">
 <link rel="stylesheet" href="avant-garde-theme.css?v=8d3ae3cc815f">
-<link rel="stylesheet" href="musician-tools.css?v=245ade62dffc">
+<link rel="stylesheet" href="musician-tools.css?v=dea840c7b333">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -97,12 +97,12 @@
     <div class="header-left">
       <img class="brand-logo" src="assets/renax-logo-approved.svg?v=67d3e5dbff6a" alt="Logo RENAX DRUMS">
       <div class="brand notranslate" translate="no" data-no-translate>
-        <h1><span class="brand-desktop">RENAX DRUMS</span><span class="brand-mobile">Métro<span class="title-orange">nome</span></span></h1>
+        <h1><span class="brand-desktop">RENAX DRUMS</span><span class="brand-mobile">Métro<span class="title-orange">nome</span></span><span class="brand-tuner">Accordeur</span></h1>
         <p><span style="color:#fff">Métro</span><span style="color:var(--orange)">nome</span></p>
       </div>
     </div>
     <div class="header-center notranslate" translate="no" data-no-translate>
-      <h2>MÉTRO<span class="title-orange">NOME</span></h2>
+      <h2><span class="header-tool-metronome">MÉTRO<span class="title-orange">NOME</span></span><span class="header-tool-tuner">ACCORDEUR</span></h2>
     </div>
 
     <div class="index2-header-actions" aria-label="Navigation rapide">
@@ -411,6 +411,7 @@
     <div class="tuner-heading"><div><h2 id="tunerTitle">Accordeur</h2><p id="tunerSummary">Chromatique · La4 = 440,0 Hz · Tempérament égal</p></div><button type="button" id="tunerListen" class="tuner-primary" aria-pressed="false">Activer le microphone</button></div>
     <div class="tuner-layout">
       <section class="tuner-measurement" aria-label="Mesure de la justesse">
+        <div class="tuner-panel-heading"><h3>Écoute et justesse</h3><span>Analyse en temps réel</span></div>
         <div class="tuner-note-row"><output id="tunerNote" aria-live="off" data-no-translate aria-label="Note détectée">—</output><div><output id="tunerFrequency" aria-live="off" data-no-translate aria-label="Fréquence mesurée">— Hz</output><output id="tunerCents" aria-live="off" data-no-translate aria-label="Écart à la note cible">— cents</output></div></div>
         <p id="tunerStatus" role="status">Activez le microphone, puis jouez une seule note.</p>
         <svg class="tuner-meter" viewBox="0 0 600 108" role="img" aria-labelledby="tunerMeterTitle"><title id="tunerMeterTitle">Écart de moins 50 à plus 50 cents</title><path class="tuner-meter-axis" d="M30 55h540M30 48v14m54-10v6m54-10v10m54-7v7m54-10v10M300 36v34m54-18v6m54-10v10m54-7v7m54-10v10M570 48v14"/><rect class="tuner-center-zone" x="289.2" y="37" width="21.6" height="32" rx="3"/><g class="tuner-meter-labels"><text x="30" y="93">−50</text><text x="165" y="93">−25</text><text x="300" y="93">0</text><text x="435" y="93">+25</text><text x="570" y="93">+50</text></g><path id="tunerNeedle" d="M300 17v53m-6-53 6 8 6-8" visibility="hidden"/></svg>
@@ -421,6 +422,7 @@
         <p class="tuner-help">Jouez une note à la fois, près du microphone. L’analyse reste sur cet appareil. Le microphone est coupé en quittant cet espace.</p>
       </section>
       <aside class="tuner-settings" aria-label="Réglages de l’accordeur">
+        <div class="tuner-settings-heading"><h3>Réglages</h3><p>Adaptez l’écoute à votre instrument.</p></div>
         <label for="tunerInstrument">Instrument / accordage</label><select id="tunerInstrument"></select>
         <div class="tuner-a4"><label for="tunerA4">Diapason · La4 (Hz)</label><input id="tunerA4" type="number" min="340" max="540" step="0.1" value="440" inputmode="decimal"><input id="tunerA4Slider" type="range" min="340" max="540" step="0.1" value="440" aria-label="Diapason La4 en hertz"><div><button type="button" data-tuner-a4="440">440 Hz</button><button type="button" data-tuner-a4="442">442 Hz</button></div></div>
         <label for="tunerTemperament">Tempérament</label><select id="tunerTemperament"></select>

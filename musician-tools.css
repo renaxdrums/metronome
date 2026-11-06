@@ -835,13 +835,15 @@ html[data-theme='avant'] #toolHome .tool-choice { --home-surface: var(--ag-heade
 html[data-theme='ivory'] #tunerRoot .tuner-heading { color: var(--ivory-ink); }
 html[data-theme='ivory'] #tunerRoot .tuner-measurement { --tool-accent: var(--yellow); }
 html[data-theme='light'] #tunerRoot .tuner-primary { color: #f6f7f8; background: #202d38; border-color: #202d38; }
-.header-tool-tuner, .brand-tuner { display: none; }
-html#renaxApp[data-tool='tuner'] .header-tool-metronome,
+html#renaxApp[data-tool='tuner'] .header-center h2,
 html#renaxApp[data-tool='tuner'] .brand-mobile,
 html#renaxApp[data-tool='tuner'] .brand p { display: none; }
-html#renaxApp[data-tool='tuner'] .header-tool-tuner { display: inline; }
-@media (max-width: 700px) {
-  html#renaxApp[data-tool='tuner'] .brand-tuner { display: inline; }
+html#renaxApp[data-tool='tuner'] .header-center::after {
+  content: 'ACCORDEUR';
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .17em;
 }
 
 /* Keep both daily tool choices visible in the first phone viewport. */
@@ -876,5 +878,4 @@ html#renaxApp[data-tool='tuner'] .header-tool-tuner { display: inline; }
 @media (max-width: 620px) {
   #tunerRoot { padding-top: 65px; }
   html#renaxApp[data-tool='tuner'] .brand-desktop { display: inline; }
-  html#renaxApp[data-tool='tuner'] .brand-tuner { display: none; }
 }

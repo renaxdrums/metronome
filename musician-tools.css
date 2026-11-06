@@ -88,7 +88,6 @@ html#renaxApp[data-theme='avant'] .tool-nav-link svg {
   --renax-mark: #ff7900;
   --renax-warm: var(--tool-accent);
   --renax-cool: var(--cyan);
-  --renax-glass: color-mix(in srgb, var(--tool-surface) 95%, var(--bg));
 }
 html[data-theme='ivory'] :is(#toolHome, #tunerRoot) {
   --renax-mark: var(--ivory-green);
@@ -727,25 +726,37 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
 }
 
 #toolHome {
-  display: block;
-  padding: clamp(30px, 6vw, 96px) clamp(18px, 6vw, 92px) 32px;
-  background: var(--bg);
+  display: grid;
+  padding: 0;
+  background:
+    radial-gradient(ellipse at 78% 18%, color-mix(in srgb, var(--renax-cool) 17%, transparent), transparent 64%),
+    radial-gradient(ellipse at 26% 76%, color-mix(in srgb, var(--renax-warm) 20%, transparent), transparent 64%);
 }
 .practice-console {
   position: relative;
   isolation: isolate;
   display: grid;
   place-items: center;
-  min-height: clamp(300px, 47vw, 560px);
-  width: min(100%, 1160px);
-  margin-inline: auto;
-  padding: clamp(18px, 5vw, 68px);
-  border: 1px solid var(--tool-line);
-  border-radius: 24px;
+  min-height: 280px;
+  padding: clamp(18px, 5vw, 60px);
+}
+.practice-console::before,
+.practice-console::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms ease-out;
+}
+.practice-console::before {
   background:
-    radial-gradient(ellipse at 87% 20%, color-mix(in srgb, var(--renax-cool) 14%, transparent), transparent 62%),
-    radial-gradient(ellipse at 65% 87%, color-mix(in srgb, var(--renax-warm) 12%, transparent), transparent 57%),
-    var(--renax-glass);
+    radial-gradient(ellipse at 28% 50%, color-mix(in srgb, var(--renax-warm) 19%, transparent), transparent 54%);
+}
+.practice-console::after {
+  background:
+    radial-gradient(ellipse at 72% 50%, color-mix(in srgb, var(--renax-cool) 19%, transparent), transparent 54%);
 }
 .practice-tools {
   position: relative;
@@ -839,7 +850,7 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
 }
 .practice-orbit {
   position: absolute;
-  width: min(82%, 500px);
+  width: min(76vw, 620px, 74dvh);
   opacity: .36;
   pointer-events: none;
 }
@@ -856,6 +867,8 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
   }
   .practice-console:has(.practice-rhythm:hover) .renax-orbit-motion { transform: rotate(54deg); }
   .practice-console:has(.practice-pitch:hover) .renax-orbit-motion { transform: rotate(-6deg); }
+  .practice-console:has(.practice-rhythm:hover)::before,
+  .practice-console:has(.practice-pitch:hover)::after { opacity: 1; }
 }
 .practice-tool:active { opacity: .83; }
 html[data-theme='ivory'] #toolHome {
@@ -1121,9 +1134,12 @@ html#renaxApp[data-theme='avant'] body #tunerRoot .numbox-menu {
   #tunerRoot .tuner-meter { width: min(100%, 310px); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .practice-tool, .practice-orbit .renax-orbit-motion { transition: none; }
+  .practice-tool, .practice-orbit .renax-orbit-motion,
+  .practice-console::before, .practice-console::after { transition: none; }
 }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  .practice-console { background: var(--tool-surface); }
+  #toolHome { background: var(--bg); }
+  .practice-console::before, .practice-console::after { display: none; }
+  .practice-tool { background: var(--practice-surface); }
   #tunerRoot .tuner-measurement { background: var(--tool-surface); }
 }

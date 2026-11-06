@@ -843,3 +843,38 @@ html#renaxApp[data-tool='tuner'] .header-tool-tuner { display: inline; }
 @media (max-width: 700px) {
   html#renaxApp[data-tool='tuner'] .brand-tuner { display: inline; }
 }
+
+/* Keep both daily tool choices visible in the first phone viewport. */
+@media (max-width: 700px) {
+  #toolHome { padding-top: 18px; }
+  .tool-home-brand { display: none; }
+  .tool-home-intro { margin-bottom: 22px; }
+  .tool-home-intro h2 { font-size: clamp(38px, 10vw, 52px); }
+  .tool-home-intro > p { margin-top: 13px; line-height: 1.45; }
+  #toolHome .tool-choice { min-height: 160px; padding: 18px 20px; }
+  .tool-choice-mark { width: 38px; height: 38px; }
+  .tool-choice-mark svg { width: 22px; height: 22px; }
+  .tool-choice-content { margin-top: 10px; gap: 2px; }
+  .tool-choice-content strong { font-size: 25px; }
+  .tool-choice-content > span { font-size: 13px; }
+  .tool-choice-detail, .tool-choice-beats, .tool-choice-wave { display: none; }
+  .tool-choice-action { margin-top: 0; padding-top: 11px; }
+}
+
+/* The ivory metronome uses a sidebar grid; tools occupy its full content row. */
+@media (min-width: 1101px) {
+  html#renaxApp[data-theme='ivory'][data-tool='home'] body > #toolHome,
+  html#renaxApp[data-theme='ivory'][data-tool='tuner'] body > #tunerRoot {
+    grid-column: 1 / -1;
+    grid-row: 2 / 4;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+}
+#tunerRoot { padding-top: clamp(76px, 6vw, 90px); }
+@media (max-width: 620px) {
+  #tunerRoot { padding-top: 65px; }
+  html#renaxApp[data-tool='tuner'] .brand-desktop { display: inline; }
+  html#renaxApp[data-tool='tuner'] .brand-tuner { display: none; }
+}

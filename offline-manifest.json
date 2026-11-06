@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "a6ae608620fb4c6e",
+  "revision": "0265103ef97ec1f3",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "8a038ca5e195bb9d9c00d483c7d868f3eaa09f768c3a200bc70b2cf2fd1b2646",
+      "sha256": "b9bb669c316638a2cc71f0d76453fcb850b35ba557348b3db59276a4de513dfb",
       "text": true
     },
     {
@@ -389,7 +389,7 @@
     },
     {
       "path": "musician-tools.mjs",
-      "sha256": "4b8c1ef3ae2d0b9230d970301a573ae026a895f8770697c30cc8f338820e1794",
+      "sha256": "88057bc2391c2c91303a7079687180c7e2596dd1352db40340ba041d08f8f1cb",
       "text": true
     },
     {

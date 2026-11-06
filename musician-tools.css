@@ -83,6 +83,22 @@ html#renaxApp[data-theme='avant'] .tool-nav-link {
 html#renaxApp[data-theme='avant'] .tool-nav-link svg {
   stroke: var(--ag-lime);
 }
+#toolHome,
+#tunerRoot {
+  --renax-mark: #ff7900;
+  --renax-warm: var(--tool-accent);
+  --renax-cool: var(--cyan);
+  --renax-glass: color-mix(in srgb, var(--tool-surface) 95%, var(--bg));
+}
+html[data-theme='ivory'] :is(#toolHome, #tunerRoot) {
+  --renax-mark: var(--ivory-green);
+  --renax-warm: var(--ivory-green);
+}
+html[data-theme='avant'] :is(#toolHome, #tunerRoot) {
+  --renax-mark: var(--ag-lime);
+  --renax-warm: var(--ag-lime);
+}
+
 #toolHome {
   display: flex;
   flex-direction: column;
@@ -717,16 +733,22 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
 }
 .practice-console {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   align-items: center;
-  gap: clamp(30px, 7vw, 110px);
+  gap: clamp(24px, 6vw, 88px);
   width: min(100%, 1160px);
   margin-inline: auto;
-  min-height: 90%;
+  padding: clamp(18px, 5vw, 68px);
+  border: 1px solid var(--tool-line);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 87% 20%, color-mix(in srgb, var(--renax-cool) 14%, transparent), transparent 62%),
+    radial-gradient(ellipse at 65% 87%, color-mix(in srgb, var(--renax-warm) 12%, transparent), transparent 57%),
+    var(--renax-glass);
 }
 .practice-intro h2 {
   margin: 0;
-  font-size: clamp(54px, 8vw, 108px);
+  font-size: clamp(46px, 6.4vw, 90px);
   font-weight: 800;
   line-height: .94;
   letter-spacing: -.04em;
@@ -739,6 +761,7 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
   font-size: clamp(15px, 1.5vw, 19px);
 }
 .practice-tools {
+  margin-top: clamp(18px, 3vw, 32px);
   border-block: 1px solid var(--tool-line);
 }
 .practice-tool {
@@ -749,9 +772,9 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 36px;
   align-items: start;
-  gap: 18px;
-  padding: clamp(18px, 3vw, 36px);
-  background: var(--practice-surface);
+  gap: 12px;
+  padding: 14px 8px;
+  background: transparent;
   color: var(--practice-ink);
   text-decoration: none;
   transition: background-color 160ms ease;
@@ -784,19 +807,54 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
   stroke-linejoin: round;
   transition: transform 160ms ease-out;
 }
-.practice-score {
-  grid-column: 1 / -1;
-  width: 100%;
-  height: auto;
-  max-height: 84px;
-  overflow: visible;
-  fill: none;
-  stroke-linecap: round;
+.renax-orbit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  isolation: isolate;
+  border: 1px solid var(--tool-line);
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--renax-mark) 13%, transparent), transparent 67%);
 }
-.practice-guides { stroke: var(--practice-muted); opacity: .24; }
-.practice-ticks { stroke: var(--practice-muted); stroke-width: 1.4; }
-.practice-accents { stroke: var(--practice-accent); stroke-width: 2.4; }
-.practice-dot { fill: var(--practice-accent); }
+.renax-orbit::before,
+.renax-orbit-motion,
+.renax-orbit-motion::before {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.renax-orbit::before {
+  content: '';
+  inset: 18%;
+  border: 1px dashed color-mix(in srgb, var(--tool-muted) 45%, transparent);
+}
+.renax-orbit-motion {
+  inset: 5%;
+  border: 1px solid transparent;
+  border-block-start-color: var(--renax-mark);
+  transform: rotate(24deg);
+}
+.renax-orbit-motion::before {
+  content: '';
+  inset: 8%;
+  border: 1px solid transparent;
+  border-block-end-color: var(--renax-cool);
+}
+.renax-orbit-mark {
+  width: 55%;
+  height: 68%;
+  background: var(--renax-mark);
+  mask: url('assets/renax-logo-approved.svg') center / contain no-repeat;
+}
+.practice-orbit {
+  justify-self: center;
+  width: min(100%, 390px);
+}
+.practice-orbit .renax-orbit-motion {
+  transition: transform 260ms cubic-bezier(.23, 1, .32, 1);
+}
 .practice-tool:focus-visible {
   outline: 2px solid var(--practice-ink);
   outline-offset: -4px;
@@ -806,7 +864,10 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
     background: color-mix(in srgb, var(--practice-surface), var(--practice-accent) 7%);
   }
   .practice-tool:hover .practice-arrow { transform: translateX(4px); }
+  .practice-console:has(.practice-rhythm:hover) .renax-orbit-motion { transform: rotate(54deg); }
+  .practice-console:has(.practice-pitch:hover) .renax-orbit-motion { transform: rotate(-6deg); }
 }
+.practice-tool:active { opacity: .83; }
 html[data-theme='ivory'] #toolHome {
   --tool-ink: var(--ivory-ink);
   --tool-muted: #47635e;
@@ -815,12 +876,19 @@ html[data-theme='ivory'] #toolHome {
   color: var(--tool-ink);
 }
 html[data-theme='avant'] .practice-tool {
-  --practice-surface: var(--ag-header);
-  --practice-ink: var(--ag-white);
-  --practice-muted: var(--ag-white);
-  --practice-accent: var(--ag-lime);
+  --practice-surface: var(--ag-paper);
+  --practice-ink: var(--ag-ink);
+  --practice-muted: var(--ag-muted);
+  --practice-accent: var(--ag-ink);
 }
 html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
+html[data-theme='avant'] .practice-orbit {
+  --tool-muted: var(--ag-white);
+  border-color: var(--ag-header-border);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--ag-lime) 11%, transparent), transparent 68%),
+    var(--ag-header);
+}
 
 #tunerRoot {
   padding: clamp(20px, 3vw, 44px) clamp(12px, 5vw, 64px) 36px;
@@ -847,7 +915,11 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
   --dial-accent: var(--tool-accent);
   --dial-detail: var(--tool-muted);
   padding: clamp(16px, 2.4vw, 32px);
-  border-radius: 14px;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 80% 16%, color-mix(in srgb, var(--renax-cool) 12%, transparent), transparent 64%),
+    radial-gradient(ellipse at 13% 52%, color-mix(in srgb, var(--renax-warm) 8%, transparent), transparent 62%),
+    var(--tool-surface);
 }
 .tuner-transport {
   display: flex;
@@ -876,15 +948,20 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
   border-color: var(--dial-accent);
 }
 .tuner-dial {
-  position: relative;
-  width: min(100%, 560px);
-  margin: 12px auto 0;
-  border-radius: 48% 48% 18% 18%;
-  background: radial-gradient(ellipse at 50% 42%, color-mix(in srgb, var(--dial-accent) 8%, transparent), transparent 69%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+  align-items: center;
+  gap: clamp(12px, 2.5vw, 30px);
+  margin-block: 18px 6px;
 }
-.tuner-dial :is(.tuner-note-row, .tuner-dial-idle) {
-  position: absolute;
-  inset: 41% 16% auto;
+.tuner-identity {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.tuner-orbit { width: min(100%, 124px); }
+#tunerRoot .tuner-note-row {
   margin: 0;
   min-height: 0;
   text-align: center;
@@ -902,12 +979,6 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
   line-height: 1;
   letter-spacing: -.04em;
 }
-#tunerRoot .tuner-note-details {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  gap: 0 .8em;
-}
 #tunerRoot :is(#tunerCents, #tunerFrequency) {
   min-width: 0;
   color: var(--dial-detail);
@@ -917,49 +988,73 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
 }
 #tunerRoot #tunerCents { color: var(--tool-ink); }
 .tuner-dial-idle {
-  padding-top: clamp(6px, 2vw, 24px);
   color: var(--tool-ink);
   font-size: clamp(16px, 2.5vw, 28px);
   font-weight: 650;
   letter-spacing: -.025em;
+  text-align: center;
 }
 .tuner-dial-listening,
 .tuner-measurement:has(#tunerListen[aria-pressed='true']) .tuner-dial-ready { display: none; }
 .tuner-measurement:has(#tunerListen[aria-pressed='true']) .tuner-dial-listening { display: inline; }
 #tunerRoot .tuner-meter {
-  width: 100%;
-  margin: 0;
+  width: min(100%, 400px);
+  margin: 0 auto;
 }
 .tuner-dial-track {
   fill: none;
-  stroke: color-mix(in srgb, var(--tool-line), var(--dial-accent) 20%);
-  stroke-width: 11;
+  stroke: var(--tool-line);
+  stroke-width: 1.5;
   stroke-linecap: round;
 }
+.tuner-dial-grave, .tuner-dial-aigu {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.tuner-dial-grave { stroke: var(--renax-cool); }
+.tuner-dial-aigu { stroke: var(--dial-accent); }
 #tunerRoot .tuner-meter-axis { stroke-width: 1.5; }
 #tunerRoot .tuner-center-zone {
-  stroke: var(--dial-accent);
-  stroke-width: 3;
+  fill: none;
+  stroke: var(--tool-good);
+  stroke-width: 4;
   opacity: 1;
 }
-#tunerRoot #tunerNeedle {
-  fill: var(--dial-accent);
-  stroke: none;
+#tunerRoot :is(.tuner-needle-trail, .tuner-needle-line) {
+  fill: none;
+  stroke: var(--dial-accent);
+  stroke-linecap: round;
 }
-#tunerRoot .tuner-measurement[data-tuned='true'] #tunerNeedle {
-  fill: var(--tool-good);
+#tunerRoot .tuner-needle-trail { stroke-width: 7; opacity: .21; }
+#tunerRoot .tuner-needle-line { stroke-width: 2.5; }
+#tunerRoot .tuner-measurement[data-tuned='true'] :is(.tuner-needle-trail, .tuner-needle-line) {
+  stroke: var(--tool-good);
 }
+.tuner-pivot { fill: var(--tool-surface); stroke: var(--tool-muted); }
+.tuner-pivot-core { fill: var(--dial-accent); }
 #tunerRoot .tuner-direction {
-  margin: -10px 4% 10px;
+  margin: 0 12% 8px;
   font-size: 12px;
+}
+.tuner-result {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
 }
 #tunerRoot #tunerStatus {
   min-height: 0;
-  padding: 8px 0;
+  padding: 4px 12px;
   font-size: 13px;
 }
 #tunerRoot #tunerStatus:empty { padding: 0; }
-#tunerRoot .tuner-strobe { height: 22px; }
+#tunerRoot .tuner-measurement[data-tuned='true'] #tunerStatus {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tool-good) 10%, transparent);
+}
+#tunerRoot .tuner-strobe { height: 19px; margin: 0 12%; }
 #tunerRoot .tuner-strobe[data-active='false'] { display: none; }
 #tunerRoot .tuner-target {
   margin-top: 4px;
@@ -1030,14 +1125,24 @@ html#renaxApp[data-theme='avant'] body #tunerRoot .numbox-menu {
   }
   .practice-intro h2 { font-size: clamp(45px, 12vw, 67px); }
   .practice-intro p { max-width: none; margin-top: 12px; }
-  .practice-tool { gap: 9px; padding: 16px; }
-  .practice-score { max-height: 51px; }
+  .practice-tool { gap: 9px; padding: 12px 4px; }
+  .practice-orbit { width: min(48vw, 220px); grid-row: 1; }
   #tunerRoot .tuner-layout { grid-template-columns: 1fr; }
   #tunerRoot .tuner-settings {
     border-inline-start: 0;
     border-top: 1px solid var(--tool-line);
   }
 }
+@media (max-width: 520px) {
+  .tuner-dial { grid-template-columns: 1fr; }
+  .tuner-identity { display: flex; justify-content: center; }
+  .tuner-orbit { width: 64px; flex: 0 0 64px; }
+  #tunerRoot .tuner-meter { width: min(100%, 310px); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .practice-tool, .practice-arrow { transition: none; }
+  .practice-tool, .practice-arrow, .practice-orbit .renax-orbit-motion { transition: none; }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .practice-console { background: var(--tool-surface); }
+  #tunerRoot .tuner-measurement { background: var(--tool-surface); }
 }

@@ -44,6 +44,13 @@ fs.writeFileSync(wav, data);
     assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'home');
     assert(await p.locator('#toolHome').isVisible());
     assert.equal(await p.locator('#workspaceNav').isVisible(), false);
+    await p.evaluate(() => (document.documentElement.dataset.theme = 'avant'));
+    for (const tool of ['toolHome', 'tunerRoot']) {
+      const logo = p.locator(`#${tool} .renax-orbit-mark`);
+      assert.equal(await logo.evaluate((el) => getComputedStyle(el).backgroundColor), 'rgb(215, 242, 24)');
+      assert.match(await logo.evaluate((el) => getComputedStyle(el).maskImage), /renax-logo-approved\.svg/);
+    }
+    await p.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
     await p.locator('#toolHome [data-tool-link=metronome]').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
     const switchIcon = p.locator('#toolSwitchLink svg path');
@@ -84,6 +91,8 @@ fs.writeFileSync(wav, data);
         ) < 0.2,
     );
     assert.equal(await p.locator('.tuner-measurement').getAttribute('data-tuned'), 'true');
+    const orbit = p.locator('.tuner-orbit .renax-orbit-motion');
+    const tunedOrbit = await orbit.getAttribute('style');
     const measured = await p.locator('#tunerFrequency').textContent();
     await p.locator('[data-tuner-a4="442"]').click();
     assert.equal(await p.locator('#tunerA4').inputValue(), '442');
@@ -95,6 +104,11 @@ fs.writeFileSync(wav, data);
             document.getElementById('tunerCents').textContent.replace('−', '-').replace(',', '.'),
           ) + 7.85,
         ) < 0.2,
+    );
+    assert.match(await p.locator('#tunerNeedle').getAttribute('transform'), /^rotate\(-/);
+    await p.waitForFunction(
+      (previous) => document.querySelector('.tuner-orbit .renax-orbit-motion').getAttribute('style') !== previous,
+      tunedOrbit,
     );
     await p.locator('#tunerA4').fill('');
     await p.locator('#tunerA4').pressSequentially('432.5');

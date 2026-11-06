@@ -320,6 +320,8 @@ export function createTuner(root) {
     updateTone();
   });
   function render() {
+    el('Idle').hidden = Boolean(current);
+    el('Reading').hidden = !current;
     if (!current) {
       text(el('Note'), '—');
       text(el('Frequency'), '— Hz');
@@ -425,7 +427,7 @@ export function createTuner(root) {
     el('Listen').setAttribute('aria-pressed', 'false');
     text(el('Listen'), t('Activer le microphone'));
     text(el('Signal'), t('Microphone arrêté'));
-    status(message === 'Microphone arrêté' ? 'Jouez une note claire et tenue.' : message);
+    status(message === 'Microphone arrêté' ? '' : message);
     if (tone) stopTone();
   }
   async function listInputs() {

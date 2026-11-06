@@ -82,7 +82,7 @@
 <link id="beat-hover45" rel="stylesheet" href="entry-beat-hover45.css?v=b5cd61a9099f"><link rel="stylesheet" href="accessibility.css?v=0d0e695a10ba">
 <link rel="stylesheet" href="kern-intro.css?v=5e2e8530cd7c">
 <link rel="stylesheet" href="avant-garde-theme.css?v=8d3ae3cc815f">
-<link rel="stylesheet" href="musician-tools.css?v=24ecb7d1445d">
+<link rel="stylesheet" href="musician-tools.css?v=fb6da51d549b">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -415,24 +415,36 @@
     <div class="tuner-layout">
       <section class="tuner-measurement" aria-label="Mesure de la justesse">
         <div class="tuner-transport">
-          <span id="tunerSignal">Microphone arrêté</span>
           <button type="button" id="tunerListen" class="tuner-primary" aria-pressed="false">Activer le microphone</button>
+          <span id="tunerSignal">Microphone arrêté</span>
         </div>
-        <div class="tuner-note-row"><output id="tunerNote" aria-live="off" data-no-translate aria-label="Note détectée">—</output><div><output id="tunerFrequency" aria-live="off" data-no-translate aria-label="Fréquence mesurée">— Hz</output><output id="tunerCents" aria-live="off" data-no-translate aria-label="Écart à la note cible">— cents</output></div></div>
-        <svg class="tuner-meter" viewBox="0 0 420 116" role="img" aria-labelledby="tunerMeterTitle">
-          <title id="tunerMeterTitle">Écart de moins 50 à plus 50 cents</title>
-          <path class="tuner-dial-track" d="M75.9 89.5A175 175 0 0 1 344.1 89.5"/>
-          <path class="tuner-meter-axis" d="M85.1 97.2L74.4 88.2 M90.5 82.5L84.8 76.8 M101.4 72.5L96.2 66.4 M113.1 63.6L108.5 57.0 M125.5 55.6L121.5 48.7 M141.1 54.3L135.2 41.6 M152.2 43.2L149.5 35.7 M166.3 38.8L164.2 31.0 M180.7 35.6L179.3 27.7 M195.3 33.6L194.6 25.7 M210.0 39.0L210.0 25.0 M224.7 33.6L225.4 25.7 M239.3 35.6L240.7 27.7 M253.7 38.8L255.8 31.0 M267.8 43.2L270.5 35.7 M278.9 54.3L284.8 41.6 M294.5 55.6L298.5 48.7 M306.9 63.6L311.5 57.0 M318.6 72.5L323.8 66.4 M329.5 82.5L335.2 76.8 M334.9 97.2L345.6 88.2"/>
-          <path class="tuner-center-zone" d="M210 22v22"/>
-          <g class="tuner-meter-labels"><text x="66" y="108">−50</text><text x="210" y="65">0</text><text x="354" y="108">+50</text></g>
-          <path id="tunerNeedle" d="M204 15h12l-6 15Z" visibility="hidden"/>
-        </svg>
-        <div class="tuner-direction"><span>Plus grave</span><span>Plus aigu</span></div>
-        <p id="tunerStatus" role="status">Activez le microphone, puis jouez une seule note.</p>
+        <div class="tuner-dial">
+          <svg class="tuner-meter" viewBox="50 0 320 144" role="img" aria-labelledby="tunerMeterTitle">
+            <title id="tunerMeterTitle">Écart de moins 50 à plus 50 cents</title>
+            <path class="tuner-dial-track" d="M75.9 89.5A175 175 0 0 1 344.1 89.5"/>
+            <path class="tuner-meter-axis" d="M85.1 97.2L74.4 88.2 M90.5 82.5L84.8 76.8 M101.4 72.5L96.2 66.4 M113.1 63.6L108.5 57.0 M125.5 55.6L121.5 48.7 M141.1 54.3L135.2 41.6 M152.2 43.2L149.5 35.7 M166.3 38.8L164.2 31.0 M180.7 35.6L179.3 27.7 M195.3 33.6L194.6 25.7 M210.0 39.0L210.0 25.0 M224.7 33.6L225.4 25.7 M239.3 35.6L240.7 27.7 M253.7 38.8L255.8 31.0 M267.8 43.2L270.5 35.7 M278.9 54.3L284.8 41.6 M294.5 55.6L298.5 48.7 M306.9 63.6L311.5 57.0 M318.6 72.5L323.8 66.4 M329.5 82.5L335.2 76.8 M334.9 97.2L345.6 88.2"/>
+            <path class="tuner-center-zone" d="M210 22v22"/>
+            <g class="tuner-meter-labels"><text x="76" y="112">−50</text><text x="210" y="53">0</text><text x="344" y="112">+50</text></g>
+            <path id="tunerNeedle" d="M204 15h12l-6 15Z" visibility="hidden"/>
+          </svg>
+          <div id="tunerIdle" class="tuner-dial-idle">
+            <span class="tuner-dial-ready">Prêt à accorder</span>
+            <span class="tuner-dial-listening">En écoute</span>
+          </div>
+          <div id="tunerReading" class="tuner-note-row" hidden>
+            <output id="tunerNote" aria-live="off" data-no-translate aria-label="Note détectée">—</output>
+            <div class="tuner-note-details">
+              <output id="tunerCents" aria-live="off" data-no-translate aria-label="Écart à la note cible">— cents</output>
+              <output id="tunerFrequency" aria-live="off" data-no-translate aria-label="Fréquence mesurée">— Hz</output>
+            </div>
+          </div>
+          <div class="tuner-direction"><span>Plus grave</span><span>Plus aigu</span></div>
+        </div>
+        <p id="tunerStatus" role="status"></p>
         <div id="tunerStrobe" class="tuner-strobe" role="img" aria-label="Indicateur de dérive de hauteur"><div></div></div>
         <div class="tuner-target"><label for="tunerTarget">Note cible</label><select id="tunerTarget"><option value="auto">Détection automatique</option></select><button id="tunerTone" type="button" aria-pressed="false">Écouter la référence</button></div>
         <div id="tunerStrings" class="tuner-strings" role="group" aria-label="Cordes cibles"></div>
-        <p class="tuner-help">Jouez une note à la fois, près du microphone. L’analyse reste sur cet appareil. Le microphone est coupé en quittant cet espace.</p>
+        <p class="tuner-help">L’analyse reste sur cet appareil. Le microphone se coupe quand vous quittez l’accordeur.</p>
       </section>
       <aside class="tuner-settings" aria-label="Réglages de l’accordeur">
         <div class="tuner-settings-heading"><h3>Réglages</h3><p>Adaptez l’écoute à votre instrument.</p></div>
@@ -583,7 +595,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="multi-clock.js?v=200171f7f4fd"></script>
 <script src="multi-metronome.js?v=287ba922f2cf"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
-<script src="interface-translations.js?v=9d19ef53e2a3"></script>
+<script src="interface-translations.js?v=c4b4483175a0"></script>
 <script src="vendor/i18next-25.6.0.js?v=6077ce0b0640"></script>
 <script src="interface-locales.js?v=22926d1e40c9"></script>
 <link rel="stylesheet" href="interface-language.css?v=3995c298df9e">

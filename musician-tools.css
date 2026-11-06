@@ -840,11 +840,12 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
 }
 #tunerRoot .tuner-heading p { font-size: 13px; }
 #tunerRoot .tuner-layout {
-  grid-template-columns: minmax(0, 1.7fr) minmax(275px, 1fr);
+  grid-template-columns: minmax(0, 2.2fr) minmax(270px, 1fr);
   align-items: start;
 }
 #tunerRoot .tuner-measurement {
   --dial-accent: var(--tool-accent);
+  --dial-detail: var(--tool-muted);
   padding: clamp(16px, 2.4vw, 32px);
   border-radius: 14px;
 }
@@ -854,14 +855,15 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
   justify-content: space-between;
   align-items: center;
   gap: 8px 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--tool-line);
+  min-height: 44px;
 }
 #tunerSignal {
+  display: none;
   color: var(--tool-muted);
   font-size: 12px;
   text-align: start;
 }
+.tuner-transport:has([aria-pressed='true']) #tunerSignal { display: block; }
 #tunerRoot .tuner-primary {
   min-width: 0;
   background: var(--tool-ink);
@@ -873,37 +875,65 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
   color: var(--tool-ink);
   border-color: var(--dial-accent);
 }
-#tunerRoot .tuner-note-row {
+.tuner-dial {
+  position: relative;
+  width: min(100%, 560px);
+  margin: 12px auto 0;
+  border-radius: 48% 48% 18% 18%;
+  background: radial-gradient(ellipse at 50% 42%, color-mix(in srgb, var(--dial-accent) 8%, transparent), transparent 69%);
+}
+.tuner-dial :is(.tuner-note-row, .tuner-dial-idle) {
+  position: absolute;
+  inset: 41% 16% auto;
+  margin: 0;
   min-height: 0;
-  margin: 22px auto 6px;
-  gap: clamp(14px, 4vw, 42px);
+  text-align: center;
+}
+#tunerRoot .tuner-note-row:not([hidden]) {
+  display: grid;
+  gap: 3px;
   font-variant-numeric: tabular-nums;
 }
+#tunerRoot .tuner-note-row[hidden] { display: none; }
 #tunerRoot #tunerNote {
-  color: var(--dial-accent);
-  font-size: clamp(44px, 8vw, 82px);
-  font-weight: 750;
-  line-height: 1.02;
-  white-space: nowrap;
+  color: var(--tool-ink);
+  font-size: clamp(28px, 6vw, 68px);
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -.04em;
 }
-#tunerRoot #tunerCents {
+#tunerRoot .tuner-note-details {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  gap: 0 .8em;
+}
+#tunerRoot :is(#tunerCents, #tunerFrequency) {
   min-width: 0;
-  font-size: clamp(16px, 2.7vw, 24px);
+  color: var(--dial-detail);
+  font-size: clamp(12px, 1.45vw, 16px);
+  font-weight: 600;
   white-space: nowrap;
 }
-#tunerRoot #tunerFrequency { font-size: 13px; }
-#tunerRoot .tuner-measurement:has(#tunerStrobe[data-active='false']) #tunerNote {
-  color: var(--tool-muted);
-  font-size: clamp(33px, 6vw, 52px);
+#tunerRoot #tunerCents { color: var(--tool-ink); }
+.tuner-dial-idle {
+  padding-top: clamp(6px, 2vw, 24px);
+  color: var(--tool-ink);
+  font-size: clamp(16px, 2.5vw, 28px);
+  font-weight: 650;
+  letter-spacing: -.025em;
 }
+.tuner-dial-listening,
+.tuner-measurement:has(#tunerListen[aria-pressed='true']) .tuner-dial-ready { display: none; }
+.tuner-measurement:has(#tunerListen[aria-pressed='true']) .tuner-dial-listening { display: inline; }
 #tunerRoot .tuner-meter {
-  width: min(100%, 470px);
-  margin: 8px auto 0;
+  width: 100%;
+  margin: 0;
 }
 .tuner-dial-track {
   fill: none;
-  stroke: var(--tool-line);
-  stroke-width: 6;
+  stroke: color-mix(in srgb, var(--tool-line), var(--dial-accent) 20%);
+  stroke-width: 11;
   stroke-linecap: round;
 }
 #tunerRoot .tuner-meter-axis { stroke-width: 1.5; }
@@ -920,8 +950,7 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
   fill: var(--tool-good);
 }
 #tunerRoot .tuner-direction {
-  max-width: 420px;
-  margin: 0 auto 10px;
+  margin: -10px 4% 10px;
   font-size: 12px;
 }
 #tunerRoot #tunerStatus {
@@ -929,6 +958,7 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
   padding: 8px 0;
   font-size: 13px;
 }
+#tunerRoot #tunerStatus:empty { padding: 0; }
 #tunerRoot .tuner-strobe { height: 22px; }
 #tunerRoot .tuner-strobe[data-active='false'] { display: none; }
 #tunerRoot .tuner-target {
@@ -944,9 +974,8 @@ html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
 #tunerRoot .tuner-settings {
   display: flex;
   padding: 18px;
-  border: 1px solid var(--tool-line);
-  border-radius: 14px;
-  background: var(--tool-surface);
+  border: 0;
+  border-inline-start: 1px solid var(--tool-line);
   color: var(--tool-ink);
 }
 .tuner-settings-heading h3 { font-size: 18px; }
@@ -1004,6 +1033,10 @@ html#renaxApp[data-theme='avant'] body #tunerRoot .numbox-menu {
   .practice-tool { gap: 9px; padding: 16px; }
   .practice-score { max-height: 51px; }
   #tunerRoot .tuner-layout { grid-template-columns: 1fr; }
+  #tunerRoot .tuner-settings {
+    border-inline-start: 0;
+    border-top: 1px solid var(--tool-line);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .practice-tool, .practice-arrow { transition: none; }

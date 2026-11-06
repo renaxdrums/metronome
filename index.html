@@ -82,7 +82,7 @@
 <link id="beat-hover45" rel="stylesheet" href="entry-beat-hover45.css?v=b5cd61a9099f"><link rel="stylesheet" href="accessibility.css?v=0d0e695a10ba">
 <link rel="stylesheet" href="kern-intro.css?v=5e2e8530cd7c">
 <link rel="stylesheet" href="avant-garde-theme.css?v=8d3ae3cc815f">
-<link rel="stylesheet" href="musician-tools.css?v=751debc98e8f">
+<link rel="stylesheet" href="musician-tools.css?v=245ade62dffc">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -382,10 +382,29 @@
   </footer>
 
   <main id="toolHome" class="musician-tool" aria-labelledby="toolHomeTitle">
-    <div class="tool-home-heading"><p>RENAX · OUTILS POUR MUSICIENS</p><h2 id="toolHomeTitle">Le rythme. La justesse.</h2><p>Choisissez votre espace de travail.</p></div>
-    <div class="tool-home-choices">
-      <a href="?tool=metronome" data-tool-link="metronome" class="tool-choice"><svg viewBox="0 0 120 100" aria-hidden="true"><path d="M35 85h50L73 15H47L35 85ZM60 68 92 25M46 85V74h28v11"/><circle cx="60" cy="68" r="3"/></svg><div><h3>Métronome</h3><p>Tempo, polyrythmie, entraînement, séquenceur, multipiste et tracks.</p><span>Ouvrir le Métronome <span aria-hidden="true">↗</span></span></div></a>
-      <a href="?tool=tuner" data-tool-link="tuner" class="tool-choice"><svg viewBox="0 0 120 100" aria-hidden="true"><path d="M42 15v29a18 18 0 0 0 36 0V15M60 62v24M33 23h9m36 0h9M25 74v9m10-14v14m50-14v14m10-9v9"/></svg><div><h3>Accordeur</h3><p>Accordage chromatique, instruments, diapason et tempéraments.</p><span>Ouvrir l’Accordeur <span aria-hidden="true">↗</span></span></div></a>
+    <div class="tool-home-layout">
+      <div class="tool-home-intro">
+        <div class="tool-home-brand"><img src="assets/renax-logo-approved.svg?v=67d3e5dbff6a" alt=""><span>RENAX DRUMS</span></div>
+        <h2 id="toolHomeTitle">Votre espace<br>de pratique.</h2>
+        <p>Le bon outil, au bon moment. Travaillez votre rythme ou accordez votre instrument, puis revenez à votre musique.</p>
+      </div>
+      <nav class="tool-home-choices" aria-label="Choisir un outil">
+        <a href="?tool=metronome" data-tool-link="metronome" class="tool-choice tool-choice--metronome">
+          <span class="tool-choice-top"><span class="tool-choice-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 27h14L19 5h-6L9 27ZM16 21 27 7M13 27v-4h6v4"/></svg></span><span class="tool-choice-arrow" aria-hidden="true">↗</span></span>
+          <span class="tool-choice-content"><strong>Métronome</strong><span>Votre rythme, à votre mesure.</span></span>
+          <span class="tool-choice-detail">Tempo · polyrythmie · entraînement · séquenceur</span>
+          <span class="tool-choice-action">Ouvrir le métronome <span aria-hidden="true">→</span></span>
+          <span class="tool-choice-beats" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        </a>
+        <a href="?tool=tuner" data-tool-link="tuner" class="tool-choice tool-choice--tuner">
+          <span class="tool-choice-top"><span class="tool-choice-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M11 5v10a5 5 0 0 0 10 0V5M16 20v8M7 7h4m10 0h4"/></svg></span><span class="tool-choice-arrow" aria-hidden="true">↗</span></span>
+          <span class="tool-choice-content"><strong>Accordeur</strong><span>La justesse, sans détour.</span></span>
+          <span class="tool-choice-detail">Chromatique · instruments · diapason · tempéraments</span>
+          <span class="tool-choice-action">Ouvrir l’accordeur <span aria-hidden="true">→</span></span>
+          <span class="tool-choice-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        </a>
+      </nav>
+      <p class="tool-home-footnote">Deux outils. Un seul espace pour avancer, jour après jour.</p>
     </div>
   </main>
   <main id="tunerRoot" class="musician-tool" aria-labelledby="tunerTitle">

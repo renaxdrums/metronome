@@ -686,3 +686,72 @@ html[data-theme='ivory'] .musician-tool {
     display: none;
   }
 }
+
+/* Home: a fast, focused daily entry to the two instruments. */
+#toolHome {
+  --home-accent: var(--tool-accent);
+  --home-surface: var(--tool-surface);
+  --home-ink: var(--tool-ink);
+  --home-muted: var(--tool-muted);
+  display: block;
+  padding: clamp(28px, 4vw, 64px) clamp(20px, 5vw, 72px) 32px;
+  background: var(--bg);
+  color: var(--home-ink);
+  scrollbar-color: var(--tool-line) transparent;
+}
+#toolHome ::selection { background: var(--home-accent); color: var(--bg); }
+.tool-home-layout { width: min(100%, 1360px); min-height: 100%; margin: auto; display: flex; flex-direction: column; justify-content: center; }
+.tool-home-intro { margin-bottom: clamp(28px, 4vw, 54px); }
+.tool-home-brand { display: inline-flex; align-items: center; gap: 11px; margin-bottom: 28px; color: var(--home-accent); font-size: 12px; font-weight: 800; letter-spacing: .19em; }
+.tool-home-brand img { width: 23px; height: 29px; object-fit: contain; }
+.tool-home-intro h2 { margin: 0; font-size: clamp(42px, 5.6vw, 78px); line-height: .98; font-weight: 750; letter-spacing: -.035em; text-wrap: balance; }
+.tool-home-intro > p { max-width: 510px; margin: 25px 0 0; color: var(--home-muted); font-size: clamp(15px, 1.4vw, 18px); line-height: 1.6; }
+#toolHome .tool-home-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 1.8vw, 26px); }
+#toolHome .tool-choice { position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: stretch; min-width: 0; min-height: clamp(340px, 30vw, 420px); padding: clamp(24px, 2.4vw, 36px); overflow: hidden; border: 1px solid var(--tool-line); border-radius: 16px; background: var(--home-surface); color: var(--home-ink); text-decoration: none; box-shadow: 0 18px 42px -34px #0008; transition: border-color 180ms cubic-bezier(.23,1,.32,1), transform 160ms cubic-bezier(.23,1,.32,1), box-shadow 180ms cubic-bezier(.23,1,.32,1); }
+#toolHome .tool-choice::before { content: ''; position: absolute; inset: auto 0 0; height: 38%; background: linear-gradient(0deg, color-mix(in srgb, var(--home-accent) 10%, transparent), transparent); opacity: .6; pointer-events: none; z-index: -1; }
+#toolHome .tool-choice:active { transform: scale(.985); }
+#toolHome .tool-choice:focus-visible { outline: 3px solid var(--home-accent); outline-offset: 4px; }
+.tool-choice-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.tool-choice-mark { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 13px; color: var(--home-accent); background: color-mix(in srgb, var(--home-accent) 13%, var(--home-surface)); }
+.tool-choice-mark svg { width: 29px; height: 29px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.tool-choice-arrow { font-size: 25px; line-height: 1; color: var(--home-muted); }
+.tool-choice-content { display: flex; flex-direction: column; gap: 8px; margin-top: clamp(42px, 5vw, 76px); }
+.tool-choice-content strong { font-size: clamp(30px, 3vw, 42px); line-height: 1.04; letter-spacing: -.03em; }
+.tool-choice-content > span { font-size: 17px; line-height: 1.4; }
+.tool-choice-detail { margin-top: 20px; color: var(--home-muted); font-size: 13px; line-height: 1.5; }
+.tool-choice-action { display: inline-flex; align-items: center; gap: 14px; align-self: flex-start; margin-top: auto; padding-top: 26px; color: var(--home-accent); font-weight: 700; font-size: 14px; }
+.tool-choice-action span { font-size: 22px; line-height: .8; transition: transform 180ms cubic-bezier(.23,1,.32,1); }
+.tool-choice-beats, .tool-choice-wave { position: absolute; right: 27px; bottom: 28px; display: flex; align-items: center; height: 36px; gap: 5px; opacity: .68; pointer-events: none; }
+.tool-choice-beats i { width: 5px; height: 5px; border-radius: 50%; background: var(--home-accent); }
+.tool-choice-beats i:nth-child(4n + 1) { width: 8px; height: 8px; }
+.tool-choice-wave i { width: 3px; height: 8px; border-radius: 2px; background: var(--home-accent); }
+.tool-choice-wave i:nth-child(3n) { height: 23px; }
+.tool-choice-wave i:nth-child(4n) { height: 33px; }
+.tool-home-footnote { margin: 26px 0 0; color: var(--home-muted); font-size: 12px; letter-spacing: .04em; }
+html#renaxApp[data-tool='home'] .header-center { visibility: hidden; }
+html#renaxApp[data-tool='home'] .brand-mobile { display: none; }
+html#renaxApp[data-tool='home'] .brand-desktop { display: inline; }
+@media (hover: hover) and (pointer: fine) {
+  #toolHome .tool-choice:hover { border-color: var(--home-accent); transform: translateY(-3px); box-shadow: 0 22px 48px -34px #000a; }
+  #toolHome .tool-choice:hover .tool-choice-action span { transform: translateX(4px); }
+}
+@media (max-width: 700px) {
+  #toolHome { padding: 30px 18px 28px; }
+  .tool-home-brand { margin-bottom: 22px; }
+  .tool-home-intro { margin-bottom: 30px; }
+  .tool-home-intro h2 { font-size: clamp(42px, 11vw, 62px); }
+  .tool-home-intro > p { margin-top: 19px; font-size: 15px; }
+  #toolHome .tool-home-choices { grid-template-columns: 1fr; gap: 12px; }
+  #toolHome .tool-choice { min-height: 210px; padding: 22px; }
+  .tool-choice-mark { width: 44px; height: 44px; border-radius: 11px; }
+  .tool-choice-mark svg { width: 24px; height: 24px; }
+  .tool-choice-content { margin-top: 23px; gap: 5px; }
+  .tool-choice-content strong { font-size: 28px; }
+  .tool-choice-content > span { font-size: 14px; }
+  .tool-choice-detail { margin-top: 9px; font-size: 12px; }
+  .tool-choice-action { padding-top: 16px; font-size: 13px; }
+  .tool-choice-beats, .tool-choice-wave { right: 20px; bottom: 25px; }
+  .tool-home-footnote { margin-top: 21px; }
+}
+@media (max-width: 370px) { .tool-choice-beats, .tool-choice-wave { display: none; } }
+@media (prefers-reduced-motion: reduce) { #toolHome .tool-choice, .tool-choice-action span { transition: none; } #toolHome .tool-choice:hover { transform: none; } }

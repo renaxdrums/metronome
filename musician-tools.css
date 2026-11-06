@@ -732,10 +732,11 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
   background: var(--bg);
 }
 .practice-console {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(24px, 6vw, 88px);
+  place-items: center;
+  min-height: clamp(300px, 47vw, 560px);
   width: min(100%, 1160px);
   margin-inline: auto;
   padding: clamp(18px, 5vw, 68px);
@@ -746,66 +747,54 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
     radial-gradient(ellipse at 65% 87%, color-mix(in srgb, var(--renax-warm) 12%, transparent), transparent 57%),
     var(--renax-glass);
 }
-.practice-intro h2 {
-  margin: 0;
-  font-size: clamp(30px, 4.2vw, 54px);
-  font-weight: 750;
-  line-height: 1.05;
-  letter-spacing: -.035em;
-}
 .practice-tools {
-  margin-top: clamp(18px, 3vw, 32px);
-  border-block: 1px solid var(--tool-line);
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 4vw, 56px);
+  width: min(100%, 720px);
 }
 .practice-tool {
   --practice-ink: var(--tool-ink);
   --practice-surface: var(--tool-surface);
   --practice-accent: var(--tool-accent);
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 32px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: clamp(12px, 2vw, 24px);
+  min-height: clamp(158px, 24vw, 260px);
   padding: 14px 8px;
-  background: transparent;
+  border: 1px solid var(--tool-line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--practice-surface) 84%, transparent);
   color: var(--practice-ink);
+  text-align: center;
   text-decoration: none;
   transition: background-color 160ms ease;
 }
-.practice-tool + .practice-tool { border-top: 1px solid var(--tool-line); }
 .practice-tool-icon {
-  width: 44px;
-  height: 44px;
+  width: clamp(66px, 12vw, 132px);
+  height: clamp(66px, 12vw, 132px);
   display: grid;
   place-items: center;
-  border-radius: 10px;
+  border-radius: clamp(14px, 2vw, 24px);
   color: var(--practice-accent);
   background: color-mix(in srgb, var(--practice-accent) 10%, var(--practice-surface));
 }
 .practice-tool-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 67%;
+  height: 67%;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.7;
+  stroke-width: 1.4;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .practice-tool strong {
-  font-size: clamp(19px, 2.6vw, 30px);
+  font-size: clamp(16px, 2.8vw, 32px);
   line-height: 1.1;
   letter-spacing: -.03em;
-}
-.practice-arrow {
-  width: 32px;
-  height: 32px;
-  padding: 5px;
-  justify-self: end;
-  fill: none;
-  stroke: var(--practice-accent);
-  stroke-width: 1.7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: transform 160ms ease-out;
 }
 .renax-orbit {
   position: relative;
@@ -849,8 +838,10 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
   mask: url('assets/renax-logo-approved.svg') center / contain no-repeat;
 }
 .practice-orbit {
-  justify-self: center;
-  width: min(100%, 390px);
+  position: absolute;
+  width: min(82%, 500px);
+  opacity: .36;
+  pointer-events: none;
 }
 .practice-orbit .renax-orbit-motion {
   transition: transform 260ms cubic-bezier(.23, 1, .32, 1);
@@ -863,7 +854,6 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
   .practice-tool:hover {
     background: color-mix(in srgb, var(--practice-surface), var(--practice-accent) 7%);
   }
-  .practice-tool:hover .practice-arrow { transform: translateX(4px); }
   .practice-console:has(.practice-rhythm:hover) .renax-orbit-motion { transform: rotate(54deg); }
   .practice-console:has(.practice-pitch:hover) .renax-orbit-motion { transform: rotate(-6deg); }
 }
@@ -886,10 +876,8 @@ html[data-theme='avant'] .practice-tool-icon {
 }
 html[data-theme='avant'] .practice-orbit {
   --tool-muted: var(--ag-white);
-  border-color: var(--ag-header-border);
   background:
-    radial-gradient(circle, color-mix(in srgb, var(--ag-lime) 11%, transparent), transparent 68%),
-    var(--ag-header);
+    radial-gradient(circle, color-mix(in srgb, var(--ag-header) 36%, transparent), transparent 72%);
 }
 
 #tunerRoot {
@@ -1120,13 +1108,6 @@ html#renaxApp[data-theme='avant'] body #tunerRoot .numbox-menu {
   }
 }
 @media (max-width: 760px) {
-  .practice-console {
-    grid-template-columns: 1fr;
-    align-content: start;
-    gap: 22px;
-  }
-  .practice-tool { gap: 9px; padding: 12px 4px; }
-  .practice-orbit { width: min(48vw, 220px); grid-row: 1; }
   #tunerRoot .tuner-layout { grid-template-columns: 1fr; }
   #tunerRoot .tuner-settings {
     border-inline-start: 0;
@@ -1140,7 +1121,7 @@ html#renaxApp[data-theme='avant'] body #tunerRoot .numbox-menu {
   #tunerRoot .tuner-meter { width: min(100%, 310px); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .practice-tool, .practice-arrow, .practice-orbit .renax-orbit-motion { transition: none; }
+  .practice-tool, .practice-orbit .renax-orbit-motion { transition: none; }
 }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
   .practice-console { background: var(--tool-surface); }

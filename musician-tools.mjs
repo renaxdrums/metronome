@@ -67,7 +67,7 @@ function show(tool, { notify = true } = {}) {
   if (changed && notify) {
     window.dispatchEvent(new Event('renax-tool-changed'));
     (tool === 'home'
-      ? document.getElementById('toolHomeTitle')
+      ? home
       : tool === 'tuner'
         ? document.getElementById('tunerTitle')
         : document.getElementById('workspaceNav').querySelector('[aria-selected=true]')
@@ -75,7 +75,7 @@ function show(tool, { notify = true } = {}) {
   }
 }
 for (const title of [
-  document.getElementById('toolHomeTitle'),
+  home,
   document.getElementById('tunerTitle'),
 ])
   title.tabIndex = -1;

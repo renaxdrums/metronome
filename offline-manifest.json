@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "ed3b6cb510a8c13a",
+  "revision": "1a11fbb38e63efdb",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "dc2f7c4a4cf7c8466b23c5c28487ab09f607d9ef421ad7c92005575e2f93dce5",
+      "sha256": "ae7022a1bdca3da0e3b72a25184ed0639930fe3de6b982f699801205e6020e5a",
       "text": true
     },
     {
@@ -299,7 +299,7 @@
     },
     {
       "path": "interface-translations.js",
-      "sha256": "d148a5175548f814012ec6d2cf5e12434c573d05e69724d366c4c554ca38b602",
+      "sha256": "c4b4483175a0dcb2675aa9bf07ff24e3a55ac9c06c96549ac2632ce4a312a8fa",
       "text": true
     },
     {
@@ -384,12 +384,12 @@
     },
     {
       "path": "musician-tools.css",
-      "sha256": "e309b1f30767da6fa87002a614f622543d0a68a44c5f3e21e98c1e3ad176b606",
+      "sha256": "8d5e69f29a6c3b8348eb52773a3ca7619c403e77afbe52ef2d847c6d49a6b184",
       "text": true
     },
     {
       "path": "musician-tools.mjs",
-      "sha256": "a2b1cf2b8a7c754a32ab27cfa8567666e16f623f76769369dd8c6d820dc5d4c2",
+      "sha256": "955079f737d72a5e1087936c81706aef5ba819ae66275c8aacf4ef9054ee5ecb",
       "text": true
     },
     {

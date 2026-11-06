@@ -9,7 +9,7 @@
 </script>
 <script>
 /* Apply before first paint. A system light preference never overrides the default. */
-(()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory','avant'].includes(saved))theme=saved;}catch{}document.documentElement.dataset.theme=theme;})();
+(()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory','avant'].includes(saved))theme=saved;}catch{}const root=document.documentElement;root.dataset.selectedTheme=theme;root.dataset.theme=root.dataset.tool==='home'?'dark':theme;})();
 </script>
   <link rel="stylesheet" href="entry-01.css?v=210963e43dd8">
   <script>
@@ -628,13 +628,19 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 </script>
 <script>
 (()=>{const root=document.documentElement,buttons=document.querySelectorAll('[data-appearance]');
-function apply(theme){root.dataset.theme=['light','ivory','avant'].includes(theme)?theme:'dark';
-document.querySelector('meta[name="theme-color"]')?.setAttribute('content',root.dataset.theme==='ivory'?'#f3efe4':root.dataset.theme==='light'?'#e4e8eb':root.dataset.theme==='avant'?'#eae9df':'#1c2127');
-buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.appearance===root.dataset.theme)));
+const valid=theme=>['light','ivory','avant'].includes(theme)?theme:'dark';
+function sync(){
+const selected=valid(root.dataset.selectedTheme);
+const shown=root.dataset.tool==='home'?'dark':selected;
+root.dataset.theme=shown;
+document.querySelector('meta[name="theme-color"]')?.setAttribute('content',shown==='ivory'?'#f3efe4':shown==='light'?'#e4e8eb':shown==='avant'?'#eae9df':'#1c2127');
+buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.appearance===selected)));
 }
-buttons.forEach(b=>b.addEventListener('click',()=>{apply(b.dataset.appearance);try{localStorage.setItem('renax-appearance',root.dataset.theme);}catch{}}));
+function apply(theme){root.dataset.selectedTheme=valid(theme);sync();}
+window.RENAX_APPEARANCE_SYNC=sync;
+buttons.forEach(b=>b.addEventListener('click',()=>{apply(b.dataset.appearance);try{localStorage.setItem('renax-appearance',root.dataset.selectedTheme);}catch{}}));
 window.addEventListener('storage',e=>{if(e.key==='renax-appearance')apply(e.newValue)});
-apply(root.dataset.theme);
+apply(root.dataset.selectedTheme||root.dataset.theme);
 })();
 </script>
 </body>

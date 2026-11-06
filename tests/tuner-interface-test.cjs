@@ -99,6 +99,14 @@ fs.writeFileSync(wav, data);
     await p.evaluate(() => document.querySelector('[data-appearance="dark"]').click());
     await p.locator('#toolHome [data-tool-link=metronome]').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
+    // Browser Back / Track history may restore the same tool without changing
+    // the selected appearance. A same-tool restore must not repaint its theme.
+    await p.evaluate(() => {
+      document.documentElement.dataset.theme = 'avant';
+      window.RENAX_TOOLS.show('metronome', { notify: false });
+    });
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'avant');
+    await p.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
     const switchIcon = p.locator('#toolSwitchLink svg path');
     const tunerIcon = await switchIcon.getAttribute('d');
     assert.equal(await p.locator('#workspaceNav [role=tab]').count(), 6);

@@ -41,6 +41,7 @@ function show(tool, { notify = true } = {}) {
   }
   current = tool;
   root.dataset.tool = tool;
+  window.RENAX_APPEARANCE_SYNC?.();
   document.title =
     tool === 'metronome'
       ? originalTitle

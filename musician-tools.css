@@ -748,17 +748,10 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
 }
 .practice-intro h2 {
   margin: 0;
-  font-size: clamp(46px, 6.4vw, 90px);
-  font-weight: 800;
-  line-height: .94;
-  letter-spacing: -.04em;
-}
-.practice-intro h2 span { color: var(--tool-accent); }
-.practice-intro p {
-  margin-top: 22px;
-  max-width: 24ch;
-  color: var(--tool-muted);
-  font-size: clamp(15px, 1.5vw, 19px);
+  font-size: clamp(30px, 4.2vw, 54px);
+  font-weight: 750;
+  line-height: 1.05;
+  letter-spacing: -.035em;
 }
 .practice-tools {
   margin-top: clamp(18px, 3vw, 32px);
@@ -766,12 +759,11 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
 }
 .practice-tool {
   --practice-ink: var(--tool-ink);
-  --practice-muted: var(--tool-muted);
   --practice-surface: var(--tool-surface);
   --practice-accent: var(--tool-accent);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 36px;
-  align-items: start;
+  grid-template-columns: 44px minmax(0, 1fr) 32px;
+  align-items: center;
   gap: 12px;
   padding: 14px 8px;
   background: transparent;
@@ -780,20 +772,28 @@ html#renaxApp[data-tool='tuner'] .header-center::after {
   transition: background-color 160ms ease;
 }
 .practice-tool + .practice-tool { border-top: 1px solid var(--tool-line); }
-.practice-tool-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.practice-tool-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--practice-accent);
+  background: color-mix(in srgb, var(--practice-accent) 10%, var(--practice-surface));
+}
+.practice-tool-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .practice-tool strong {
-  font-size: clamp(23px, 3vw, 37px);
+  font-size: clamp(19px, 2.6vw, 30px);
   line-height: 1.1;
   letter-spacing: -.03em;
-}
-.practice-tool-copy > span {
-  color: var(--practice-muted);
-  font-size: 13px;
-  line-height: 1.45;
 }
 .practice-arrow {
   width: 32px;
@@ -878,10 +878,12 @@ html[data-theme='ivory'] #toolHome {
 html[data-theme='avant'] .practice-tool {
   --practice-surface: var(--ag-paper);
   --practice-ink: var(--ag-ink);
-  --practice-muted: var(--ag-muted);
   --practice-accent: var(--ag-ink);
 }
-html[data-theme='avant'] .practice-intro h2 span { color: var(--ag-ink); }
+html[data-theme='avant'] .practice-tool-icon {
+  color: var(--ag-lime);
+  background: var(--ag-header);
+}
 html[data-theme='avant'] .practice-orbit {
   --tool-muted: var(--ag-white);
   border-color: var(--ag-header-border);
@@ -1123,8 +1125,6 @@ html#renaxApp[data-theme='avant'] body #tunerRoot .numbox-menu {
     align-content: start;
     gap: 22px;
   }
-  .practice-intro h2 { font-size: clamp(45px, 12vw, 67px); }
-  .practice-intro p { max-width: none; margin-top: 12px; }
   .practice-tool { gap: 9px; padding: 12px 4px; }
   .practice-orbit { width: min(48vw, 220px); grid-row: 1; }
   #tunerRoot .tuner-layout { grid-template-columns: 1fr; }

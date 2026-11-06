@@ -16,6 +16,7 @@ window.RENAX_TRANSLATIONS = Object.freeze({
 
 "Accueil":"Home",
 "Accordeur":"Tuner",
+"Outils":"Tools",
 "RENAX · OUTILS POUR MUSICIENS":"RENAX · TOOLS FOR MUSICIANS",
 "Le rythme. La justesse.":"Rhythm. In tune.",
 "Choisissez votre espace de travail.":"Choose your workspace.",

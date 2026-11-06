@@ -53,8 +53,13 @@ fs.writeFileSync(wav, data);
       await p.setViewportSize(viewport);
       let reference;
       for (const theme of ['dark', 'light', 'ivory', 'avant']) {
-        await p.evaluate((value) => (document.documentElement.dataset.theme = value), theme);
-        assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), theme);
+        await p.evaluate(
+          (value) => document.querySelector('[data-appearance="' + value + '"]').click(),
+          theme,
+        );
+        assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
+        assert.equal(await p.evaluate(() => document.documentElement.dataset.selectedTheme), theme);
+        assert.equal(await p.evaluate(() => localStorage.getItem('renax-appearance')), theme);
         const screenshot = await p.screenshot({ animations: 'disabled' });
         if (!reference) reference = screenshot;
         else
@@ -69,13 +74,29 @@ fs.writeFileSync(wav, data);
       }
     }
     await p.setViewportSize({ width: 1440, height: 1000 });
-    await p.evaluate(() => (document.documentElement.dataset.theme = 'avant'));
-    for (const tool of ['toolHome', 'tunerRoot']) {
-      const logo = p.locator(`#${tool} .renax-orbit-mark`);
-      assert.equal(await logo.evaluate((el) => getComputedStyle(el).backgroundColor), 'rgb(215, 242, 24)');
-      assert.match(await logo.evaluate((el) => getComputedStyle(el).maskImage), /renax-logo-approved\.svg/);
-    }
-    await p.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
+    await p.evaluate(() => document.querySelector('[data-appearance="avant"]').click());
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
+    const homeLogo = p.locator('#toolHome .renax-orbit-mark').first();
+    assert.equal(
+      await homeLogo.evaluate((el) => getComputedStyle(el).backgroundColor),
+      'rgb(255, 121, 0)',
+    );
+    await p.locator('#toolHome [data-tool-link=tuner]').click();
+    await p.waitForFunction(() => window.RENAX_TOOLS.current === 'tuner');
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'avant');
+    const tunerLogo = p.locator('#tunerRoot .renax-orbit-mark').first();
+    assert.equal(
+      await tunerLogo.evaluate((el) => getComputedStyle(el).backgroundColor),
+      'rgb(215, 242, 24)',
+    );
+    assert.match(
+      await tunerLogo.evaluate((el) => getComputedStyle(el).maskImage),
+      /renax-logo-approved\.svg/,
+    );
+    await p.locator('#toolHomeLink').click();
+    await p.waitForFunction(() => window.RENAX_TOOLS.current === 'home');
+    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
+    await p.evaluate(() => document.querySelector('[data-appearance="dark"]').click());
     await p.locator('#toolHome [data-tool-link=metronome]').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
     const switchIcon = p.locator('#toolSwitchLink svg path');

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "9679541a9ea596f1",
+  "revision": "f76fe47bb111e46c",
   "resources": [
     {
       "path": "accessibility.css",
@@ -24,7 +24,7 @@
     },
     {
       "path": "appearance-theme.css",
-      "sha256": "412b5e252b903884bb7c5d730eec2b3c0ac520a3ba1a3150fa4873ef6947d56b",
+      "sha256": "b519ea612c4be513d14174bf4c7f1edab303e0349ac054fb0c4fd8db3ebe3d2f",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "81293d802e6585f977406a6e3aef1f6f89cb2885319edbb192bf842bc55cb6df",
+      "sha256": "d6217d18e7151a97363101d726daace5ccaacafcac686797c2092b911a17bb33",
       "text": true
     },
     {
@@ -384,12 +384,12 @@
     },
     {
       "path": "musician-tools.css",
-      "sha256": "60ca2e07a1222b7b573a5bfb69aea27470fc25f8e9c93615b30bde49c00d3bd5",
+      "sha256": "24ecb7d1445d39e246673eba1c785152fccf3862db5232f7b2a800291129b7bc",
       "text": true
     },
     {
       "path": "musician-tools.mjs",
-      "sha256": "cf0f725e3ff1827f053d27913852a1688bb05d8e75ee7249f8ee364882dfaa1f",
+      "sha256": "a2b1cf2b8a7c754a32ab27cfa8567666e16f623f76769369dd8c6d820dc5d4c2",
       "text": true
     },
     {
@@ -409,7 +409,7 @@
     },
     {
       "path": "numbox-controls.js",
-      "sha256": "913403aa577f7fb50fa4af175affe581c01263b7fef577f0bd80121a95231fe5",
+      "sha256": "f2ba76d7a0e08bbcdd9fe5251e8eaa2e8acabdcfe6b3457511ad28627e0b2859",
       "text": true
     },
     {
@@ -549,7 +549,7 @@
     },
     {
       "path": "tuner-ui.mjs",
-      "sha256": "d24b25fea10bcc1a27f3bb7743ceb78ebe4ec37f6f1e43da58fa56702456e05a",
+      "sha256": "a81a7b4ea5875d3d13e9672aeb2453c76fa3b38a9917e26a8cacefebffbf0f26",
       "text": true
     },
     {

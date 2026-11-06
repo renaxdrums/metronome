@@ -46,6 +46,8 @@ fs.writeFileSync(wav, data);
     assert.equal(await p.locator('#workspaceNav').isVisible(), false);
     await p.locator('#toolHome [data-tool-link=metronome]').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
+    const switchIcon = p.locator('#toolSwitchLink svg path');
+    const tunerIcon = await switchIcon.getAttribute('d');
     assert.equal(await p.locator('#workspaceNav [role=tab]').count(), 6);
     await p.evaluate(() => {
       bpmSlider.value = '137';
@@ -54,6 +56,11 @@ fs.writeFileSync(wav, data);
     });
     await p.locator('#toolSwitchLink').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'tuner');
+    assert.equal(
+      await switchIcon.getAttribute('d'),
+      await p.locator('#workspaceNav [data-workspace="metronome"] svg path').getAttribute('d'),
+    );
+    assert.notEqual(await switchIcon.getAttribute('d'), tunerIcon);
     assert(await p.locator('#tunerRoot').isVisible());
     assert.equal(await p.locator('#playBtn').isVisible(), false);
     await p.keyboard.press('Space');
@@ -159,6 +166,23 @@ fs.writeFileSync(wav, data);
         const b = await p.locator('#tunerRoot').boundingBox();
         assert(b.height > 100);
         assert(b.y + b.height <= viewport.height + 1, JSON.stringify({ viewport, theme, b }));
+        if (theme === 'avant' && [390, 1440].includes(viewport.width)) {
+          const target = p.locator('.numbox-custom:has(#tunerTarget)');
+          const trigger = target.locator('.numbox-button');
+          const menu = target.locator('.numbox-menu');
+          await trigger.click();
+          await menu.waitFor({ state: 'visible' });
+          const selected = menu.locator('.numbox-option[aria-selected="true"]');
+          const option = menu.locator('.numbox-option[aria-selected="false"]').first();
+          for (const row of [selected, option]) {
+            assert.equal(await row.evaluate((el) => getComputedStyle(el).color), 'rgb(215, 242, 24)');
+          }
+          await option.hover();
+          assert.equal(await option.evaluate((el) => getComputedStyle(el).color), 'rgb(215, 242, 24)');
+          await p.keyboard.press('Escape');
+          await menu.waitFor({ state: 'hidden' });
+          assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+        }
         if (viewport.width === 390 || viewport.width === 1440) {
           const scan = await new AxeBuilder({ page: p })
             .include('#tunerRoot')

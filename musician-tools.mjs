@@ -4,6 +4,13 @@ const home = document.getElementById('toolHome'),
   tuner = document.getElementById('tunerRoot');
 const homeLink = document.getElementById('toolHomeLink'),
   switchLink = document.getElementById('toolSwitchLink');
+const switchIcon = switchLink.querySelector('svg path');
+const switchIcons = {
+  tuner: switchIcon.getAttribute('d'),
+  metronome: document
+    .querySelector('#workspaceNav [data-workspace="metronome"] svg path')
+    .getAttribute('d'),
+};
 const metronomeNodes = [
   ...document.querySelectorAll(
     'body > #workspaceNav,body > #workspaceMobileViews,body > #mobileTabs,body > .main-grid,body > footer',
@@ -45,8 +52,11 @@ function show(tool, { notify = true } = {}) {
   for (const node of metronomeNodes) node.inert = tool !== 'metronome';
   homeLink.hidden = tool === 'home';
   switchLink.hidden = tool === 'home';
-  switchLink.dataset.toolLink = tool === 'tuner' ? 'metronome' : 'tuner';
-  switchLink.querySelector('span').textContent = tool === 'tuner' ? 'Métronome' : 'Accordeur';
+  const switchDestination = tool === 'tuner' ? 'metronome' : 'tuner';
+  switchLink.dataset.toolLink = switchDestination;
+  switchLink.querySelector('span').textContent =
+    switchDestination === 'metronome' ? 'Métronome' : 'Accordeur';
+  switchIcon.setAttribute('d', switchIcons[switchDestination]);
   for (const link of document.querySelectorAll('[data-tool-link]'))
     link.href = url(link.dataset.toolLink);
   heading.innerHTML =

@@ -10,7 +10,7 @@ html[data-theme=light] :is(.panel-visu .visu-toolbar,#workspaceControls){backgro
 html[data-theme=light] :is(input:not([type=range]):not([type=checkbox]),select,textarea,.numbox-button){background:#d5dee7!important;border-color:#b8c5d1!important;color:var(--text)!important}
 html[data-theme=light] :is(.numbox-menu,.numbox-dropdown,.sequence-more-actions,.multi-actions,dialog,#beatEditor,#index2SettingsPanel,#songsRoot #songPane .song-more-menu){background:#edf1f5!important;border-color:#aebdca!important;color:var(--text)!important;box-shadow:0 12px 28px #22334425}
 html[data-theme=light] :is(.numbox-option,.index2-setting-row,.index2-settings-title,.index2-settings-section h3,.workspace-timer-label,.measure-label,.control-group>label,.measure-sig,.legend){color:var(--text)!important}
-html[data-theme=light] :is(.numbox-option:hover,.numbox-option.active,.numbox-option[aria-selected=true]){background:#dceef2!important;color:var(--cyan)!important}
+html[data-theme=light] :is(.numbox-option:hover,.numbox-option.active,.numbox-option[aria-selected=true]){background:#dceef2!important;color:var(--numbox-active-ink,var(--cyan))!important}
 html[data-theme=light] #workspaceNav button{background:#edf1f5!important;border-color:var(--border)!important;color:var(--text-muted)!important}
 html[data-theme=light] #workspaceNav button[aria-selected=true]{background:#deedf1!important;border-color:var(--cyan)!important;color:var(--text)!important}
 html[data-theme=light] :is(.measure-card.active,.multi-track.active,.song-section.active,#songPane .song-playlist-card.active,#multiPresetLibrary .multi-preset-card.active){background:#e4f0f3!important;border-color:var(--cyan)!important}

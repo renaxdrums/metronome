@@ -335,7 +335,7 @@ export function createTuner(root) {
     text(el('Frequency'), format(frequency, 2) + ' Hz');
     text(el('Cents'), (target.cents >= 0 ? '+' : '−') + format(Math.abs(target.cents)) + ' cents');
     const cents = Math.max(-50, Math.min(50, target.cents));
-    el('Needle').setAttribute('transform', 'translate(' + (cents * 5.4).toFixed(2) + ' 0)');
+    el('Needle').setAttribute('transform', 'rotate(' + cents.toFixed(2) + ' 210 202)');
     el('Needle').setAttribute('visibility', 'visible');
     const stable = current.spread <= Math.max(settings.tolerance * 2, 4),
       tuned = stable && Math.abs(target.cents) <= settings.tolerance;
@@ -424,8 +424,8 @@ export function createTuner(root) {
     render();
     el('Listen').setAttribute('aria-pressed', 'false');
     text(el('Listen'), t('Activer le microphone'));
-    text(el('Signal'), t(message));
-    status(message);
+    text(el('Signal'), t('Microphone arrêté'));
+    status(message === 'Microphone arrêté' ? 'Jouez une note claire et tenue.' : message);
     if (tone) stopTone();
   }
   async function listInputs() {

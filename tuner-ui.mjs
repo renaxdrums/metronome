@@ -370,7 +370,7 @@ export function createTuner(root) {
     if (current?.cents && !reduce.matches) {
       strobeOffset = (strobeOffset + current.cents * dt * 0.008) % 20;
       orbitAngle = (orbitAngle + current.cents * dt * 0.0018) % 360;
-      orbit.style.transform = `rotate(${orbitAngle.toFixed(2)}deg)`;
+      orbit.style.setProperty('--tuner-orbit-angle', orbitAngle.toFixed(2) + 'deg');
       el('Strobe').firstElementChild.setAttribute(
         'style',
         'transform:translateX(' + strobeOffset.toFixed(2) + 'px)',

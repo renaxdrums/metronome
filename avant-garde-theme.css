@@ -30,9 +30,9 @@ html#renaxApp[data-theme="avant"] {
 html#renaxApp[data-theme="avant"] body {
   color: var(--ag-ink) !important;
   background-color: #eae9e0 !important;
-  background-image:
+  background-image: var(--practice-ambient,
     linear-gradient(117deg,transparent 0 62%,rgba(10,15,10,.028) 62.06% 62.16%,transparent 62.24%),
-    repeating-linear-gradient(0deg,transparent 0 54px,rgba(10,15,10,.017) 55px 56px) !important;
+    repeating-linear-gradient(0deg,transparent 0 54px,rgba(10,15,10,.017) 55px 56px)) !important;
   font-family: "Bahnschrift","Helvetica Neue",Arial,sans-serif;
 }
 html#renaxApp[data-theme="avant"] body :is(button,input,select,textarea){font-family:inherit}

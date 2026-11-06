@@ -44,6 +44,31 @@ fs.writeFileSync(wav, data);
     assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'home');
     assert(await p.locator('#toolHome').isVisible());
     assert.equal(await p.locator('#workspaceNav').isVisible(), false);
+    // The landing view is deliberately fixed to the approved dark appearance.
+    // The chosen theme attribute is preserved for the metronome and tuner.
+    for (const viewport of [
+      { width: 1440, height: 1000 },
+      { width: 390, height: 844 },
+    ]) {
+      await p.setViewportSize(viewport);
+      let reference;
+      for (const theme of ['dark', 'light', 'ivory', 'avant']) {
+        await p.evaluate((value) => (document.documentElement.dataset.theme = value), theme);
+        assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), theme);
+        const screenshot = await p.screenshot({ animations: 'disabled' });
+        if (!reference) reference = screenshot;
+        else
+          assert(
+            screenshot.equals(reference),
+            'The approved dark chooser must be identical for theme ' +
+              theme +
+              ' at ' +
+              viewport.width +
+              'px',
+          );
+      }
+    }
+    await p.setViewportSize({ width: 1440, height: 1000 });
     await p.evaluate(() => (document.documentElement.dataset.theme = 'avant'));
     for (const tool of ['toolHome', 'tunerRoot']) {
       const logo = p.locator(`#${tool} .renax-orbit-mark`);

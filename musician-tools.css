@@ -702,29 +702,6 @@ html[data-theme='ivory'] .musician-tool {
   }
 }
 
-/* The practice screens share the instrument palettes and leave the metronome shell alone. */
-html#renaxApp:is([data-tool='home'], [data-tool='tuner']) #renaxHeaderWave {
-  visibility: hidden;
-}
-html#renaxApp:is([data-tool='home'], [data-tool='tuner']) .renax-avant-halo {
-  display: none;
-}
-html#renaxApp[data-tool='home'] body > header .header-center,
-html#renaxApp[data-tool='tuner'] .header-center h2,
-html#renaxApp:is([data-tool='home'], [data-tool='tuner']) .brand-mobile,
-html#renaxApp:is([data-tool='home'], [data-tool='tuner']) .brand p {
-  display: none;
-}
-html#renaxApp:is([data-tool='home'], [data-tool='tuner']) .brand-desktop {
-  display: inline;
-}
-html#renaxApp[data-tool='tuner'] .header-center::after {
-  content: 'ACCORDEUR';
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: .14em;
-}
-
 html#renaxApp[data-tool='home'] {
   --practice-warm: var(--orange);
   --practice-cool: var(--cyan);

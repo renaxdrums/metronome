@@ -4,13 +4,16 @@
  * the real links, all four themes, history and retained models independently.
  */
 module.exports = async function toolNavigationReference(page) {
-  if (await page.locator('#toolHomeLink').count()) return;
+  // The chooser and its header link were explicitly removed. Normalize only
+  // that approved header change in the historical reference.
+  await page.evaluate(() => document.getElementById('toolHomeLink')?.remove());
+  if (await page.locator('#toolSwitchLink').count()) return;
   await page.evaluate(() => {
     const settings = document.getElementById('index2SettingsBtn');
     if (!settings) throw Error('Historical header is missing');
     settings.insertAdjacentHTML(
       'beforebegin',
-      '<a class="tool-nav-link" id="toolHomeLink" href="?tool=home" data-tool-link="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8"/></svg><span>Accueil</span></a><a class="tool-nav-link" id="toolSwitchLink" href="?tool=tuner" data-tool-link="tuner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v7a4 4 0 0 0 8 0V3M12 14v7M5 5h3m8 0h3"/></svg><span>Accordeur</span></a>',
+      '<a class="tool-nav-link" id="toolSwitchLink" href="?tool=tuner" data-tool-link="tuner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v7a4 4 0 0 0 8 0V3M12 14v7M5 5h3m8 0h3"/></svg><span>Accordeur</span></a>',
     );
   });
   await page.addStyleTag({

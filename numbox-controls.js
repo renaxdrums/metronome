@@ -129,6 +129,12 @@
       else open();
     });
     trigger.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && wrap.classList.contains('open')) {
+        event.preventDefault();
+        event.stopPropagation();
+        close(wrap, true);
+        return;
+      }
       if (!['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '].includes(event.key)) return;
       event.preventDefault();
       event.stopPropagation();

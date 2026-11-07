@@ -1,9 +1,14 @@
 import { createTuner } from './tuner-ui.mjs';
 const root = document.documentElement;
-const home = document.getElementById('toolHome'),
-  tuner = document.getElementById('tunerRoot');
-const homeLink = document.getElementById('toolHomeLink'),
-  switchLink = document.getElementById('toolSwitchLink');
+const tuner = document.getElementById('tunerRoot');
+const switchLink = document.getElementById('toolSwitchLink');
+const switchIcon = switchLink.querySelector('svg path');
+const switchIcons = {
+  tuner: switchIcon.getAttribute('d'),
+  metronome: document
+    .querySelector('#workspaceNav [data-workspace="metronome"] svg path')
+    .getAttribute('d'),
+};
 const metronomeNodes = [
   ...document.querySelectorAll(
     'body > #workspaceNav,body > #workspaceMobileViews,body > #mobileTabs,body > .main-grid,body > footer',
@@ -15,17 +20,18 @@ const originalHeading = heading.innerHTML,
   originalBrand = mobileBrand.innerHTML;
 const originalTitle = document.title;
 const controller = createTuner(tuner);
-let current = root.dataset.tool || 'home';
+let current = root.dataset.tool || 'metronome';
 function url(tool) {
   const result = new URL(location.href);
   result.searchParams.set('tool', tool);
   return result.pathname + result.search + result.hash;
 }
 function show(tool, { notify = true } = {}) {
-  if (!['home', 'metronome', 'tuner'].includes(tool)) tool = 'home';
+  if (!['metronome', 'tuner'].includes(tool)) tool = 'metronome';
   const changed = tool !== current;
   if (changed) {
     window.RENAX_NUMBOX?.closeAll();
+    controller.closeSettings();
     if (current === 'metronome') {
       stopMetronome();
       endTraining();
@@ -34,41 +40,32 @@ function show(tool, { notify = true } = {}) {
   }
   current = tool;
   root.dataset.tool = tool;
-  document.title =
-    tool === 'metronome'
-      ? originalTitle
-      : tool === 'tuner'
-        ? 'RENAX DRUMS — Accordeur'
-        : 'RENAX DRUMS — Outils pour musiciens';
-  home.hidden = tool !== 'home';
+  // History restoration may revisit the same tool; do not reset its active palette.
+  if (changed) window.RENAX_APPEARANCE_SYNC?.();
+  document.title = tool === 'metronome' ? originalTitle : 'RENAX DRUMS — Accordeur';
   tuner.hidden = tool !== 'tuner';
   for (const node of metronomeNodes) node.inert = tool !== 'metronome';
-  homeLink.hidden = tool === 'home';
-  switchLink.hidden = tool === 'home';
-  switchLink.dataset.toolLink = tool === 'tuner' ? 'metronome' : 'tuner';
-  switchLink.querySelector('span').textContent = tool === 'tuner' ? 'Métronome' : 'Accordeur';
+  const switchDestination = tool === 'tuner' ? 'metronome' : 'tuner';
+  switchLink.dataset.toolLink = switchDestination;
+  switchLink.querySelector('span').textContent =
+    switchDestination === 'metronome' ? 'Métronome' : 'Accordeur';
+  switchIcon.setAttribute('d', switchIcons[switchDestination]);
   for (const link of document.querySelectorAll('[data-tool-link]'))
     link.href = url(link.dataset.toolLink);
   heading.innerHTML =
-    tool === 'metronome' ? originalHeading : tool === 'tuner' ? 'ACCORDEUR' : 'RENAX';
+    tool === 'metronome' ? originalHeading : 'ACCOR<span class="title-orange">DEUR</span>';
   mobileBrand.innerHTML =
-    tool === 'metronome' ? originalBrand : tool === 'tuner' ? 'Accordeur' : 'RENAX';
-  if (tool === 'metronome') window.dispatchEvent(new Event('resize'));
+    tool === 'metronome' ? originalBrand : 'Accor<span class="title-orange">deur</span>';
+  window.dispatchEvent(new Event('resize'));
   if (changed && notify) {
     window.dispatchEvent(new Event('renax-tool-changed'));
-    (tool === 'home'
-      ? document.getElementById('toolHomeTitle')
-      : tool === 'tuner'
-        ? document.getElementById('tunerTitle')
-        : document.getElementById('workspaceNav').querySelector('[aria-selected=true]')
+    (tool === 'tuner'
+      ? document.getElementById('tunerTitle')
+      : document.getElementById('workspaceNav').querySelector('[aria-selected=true]')
     )?.focus({ preventScroll: true });
   }
 }
-for (const title of [
-  document.getElementById('toolHomeTitle'),
-  document.getElementById('tunerTitle'),
-])
-  title.tabIndex = -1;
+document.getElementById('tunerTitle').tabIndex = -1;
 document.addEventListener('click', (event) => {
   const link = event.target.closest('[data-tool-link]');
   if (

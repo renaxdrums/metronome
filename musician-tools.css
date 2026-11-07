@@ -83,6 +83,21 @@ html#renaxApp[data-theme='avant'] .tool-nav-link {
 html#renaxApp[data-theme='avant'] .tool-nav-link svg {
   stroke: var(--ag-lime);
 }
+#toolHome,
+#tunerRoot {
+  --renax-mark: #ff7900;
+  --renax-warm: var(--tool-accent);
+  --renax-cool: var(--cyan);
+}
+html[data-theme='ivory'] :is(#toolHome, #tunerRoot) {
+  --renax-mark: var(--ivory-green);
+  --renax-warm: var(--ivory-green);
+}
+html[data-theme='avant'] :is(#toolHome, #tunerRoot) {
+  --renax-mark: var(--ag-lime);
+  --renax-warm: var(--ag-lime);
+}
+
 #toolHome {
   display: flex;
   flex-direction: column;
@@ -685,4 +700,528 @@ html[data-theme='ivory'] .musician-tool {
   html#renaxApp body > header .tool-nav-link svg {
     display: none;
   }
+}
+
+html#renaxApp[data-tool='home'] {
+  --practice-warm: var(--orange);
+  --practice-cool: var(--cyan);
+  --practice-field: var(--bg);
+  --practice-reflection: color-mix(in srgb, var(--panel), white 9%);
+  --practice-ambient:
+    radial-gradient(ellipse 64% 54% at 48% 26%, var(--practice-reflection), transparent 83%),
+    radial-gradient(ellipse 63% 68% at 4% 93%, color-mix(in srgb, var(--practice-warm) 23%, transparent), transparent 86%),
+    radial-gradient(ellipse 56% 70% at 100% 0%, color-mix(in srgb, var(--practice-cool) 19%, transparent), transparent 92%);
+}
+html#renaxApp[data-tool='home']:not([data-theme='dark']) {
+  --practice-reflection: #ffffffad;
+}
+html#renaxApp[data-theme='ivory'][data-tool='home'] {
+  --practice-warm: var(--ivory-green);
+  --practice-field: #e4e0d1;
+}
+html#renaxApp[data-theme='avant'][data-tool='home'] {
+  --practice-warm: var(--ag-lime);
+}
+html#renaxApp[data-theme='avant'][data-tool='home'] body > header {
+  --orange: var(--ag-lime);
+}
+html#renaxApp[data-tool='home'] body > header .index2-header-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+html#renaxApp[data-tool='home'] body {
+  background-color: var(--practice-field);
+  background-image: var(--practice-ambient);
+}
+#toolHome {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0;
+  scrollbar-gutter: auto;
+}
+.practice-console {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  min-height: 280px;
+  padding: clamp(16px, 3vw, 40px);
+}
+.practice-tools {
+  display: grid;
+  grid-template-columns: 1fr minmax(33%, 360px) 1fr;
+  align-items: center;
+  width: min(100%, 1060px);
+}
+.practice-rhythm { grid-column: 1; --practice-light: var(--renax-warm); }
+.practice-pitch { grid-column: 3; --practice-light: var(--renax-cool); }
+.practice-tool {
+  --practice-ink: var(--tool-ink);
+  --practice-chassis: var(--tool-surface);
+  --practice-shade: color-mix(in srgb, var(--practice-chassis), #080b10 17%);
+  --practice-icon: var(--tool-accent);
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: clamp(14px, 2vw, 25px);
+  padding: 12px 6px;
+  border-radius: 18px;
+  color: var(--practice-ink);
+  text-align: center;
+  text-decoration: none;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.practice-tool-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(86px, 13vw, 184px);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--practice-chassis), var(--practice-icon) 27%);
+  border-radius: 50%;
+  color: var(--practice-icon);
+  background:
+    radial-gradient(ellipse 82% 72% at 32% 0%, color-mix(in srgb, var(--practice-light) 23%, transparent), transparent 88%),
+    linear-gradient(145deg, var(--practice-chassis) 27%, var(--practice-shade));
+  box-shadow:
+    0 12px 20px -12px #080b1088,
+    inset 0 0 0 4px color-mix(in srgb, var(--practice-chassis), transparent 24%),
+    inset 0 1px 0 4px #ffffff1f;
+  transition: transform 180ms cubic-bezier(.2, .75, .25, 1);
+}
+.practice-tool-icon::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(from 285deg, transparent, var(--practice-light) 68deg, transparent 114deg);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px), transparent 100%);
+  opacity: 0;
+  transition: opacity 240ms ease-out;
+}
+.practice-tool-icon svg {
+  width: 61%;
+  height: 61%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.practice-icon-detail {
+  opacity: .47;
+}
+.practice-tool strong {
+  font-size: clamp(18px, 2.4vw, 33px);
+  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -.035em;
+}
+.renax-orbit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  isolation: isolate;
+  border: 1px solid var(--tool-line);
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--renax-mark) 13%, transparent), transparent 67%);
+}
+.renax-orbit::before,
+.renax-orbit-motion,
+.renax-orbit-motion::before {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.renax-orbit::before {
+  content: '';
+  inset: 18%;
+  border: 1px dashed color-mix(in srgb, var(--tool-muted) 45%, transparent);
+}
+.renax-orbit-motion {
+  inset: 5%;
+  border: 1px solid transparent;
+  border-block-start-color: var(--renax-mark);
+  transform: rotate(24deg);
+}
+.renax-orbit-motion::before {
+  content: '';
+  inset: 8%;
+  border: 1px solid transparent;
+  border-block-end-color: var(--renax-cool);
+}
+.renax-orbit-mark {
+  width: 55%;
+  height: 68%;
+  background: var(--renax-mark);
+  mask: url('assets/renax-logo-approved.svg') center / contain no-repeat;
+}
+.practice-orbit {
+  position: absolute;
+  z-index: -1;
+  width: min(39vw, 464px, 66dvh);
+  pointer-events: none;
+  border-color: color-mix(in srgb, var(--text) 18%, transparent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--renax-mark) 12%, transparent), transparent 64%);
+}
+.practice-orbit::before { display: none; }
+.practice-orbit::after {
+  content: '';
+  position: absolute;
+  inset: 2%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -.35deg, currentColor 0 .7deg, transparent .7deg 6deg);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px) calc(100% - 1px), transparent 100%);
+  color: var(--text);
+  opacity: .24;
+}
+.practice-orbit .renax-orbit-mark {
+  opacity: .48;
+  width: 43%;
+  height: 50%;
+}
+.practice-orbit .renax-orbit-motion {
+  inset: 8%;
+  border-color: transparent;
+  transition: transform 360ms cubic-bezier(.2, .75, .25, 1);
+}
+.practice-orbit .renax-orbit-motion::before {
+  inset: 0;
+  animation: practice-light-on 1050ms cubic-bezier(.2, .75, .25, 1);
+  border: 0;
+  background: conic-gradient(from 10deg, transparent, var(--renax-mark) 67deg, transparent 69deg 183deg, var(--renax-cool) 247deg, transparent 249deg);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px) calc(100% - 1px), transparent 100%);
+}
+@keyframes practice-light-on {
+  from { opacity: .32; transform: rotate(-42deg); }
+  to { opacity: 1; transform: rotate(0deg); }
+}
+.practice-tool:focus-visible {
+  outline: 2px solid var(--practice-ink);
+  outline-offset: 2px;
+}
+.practice-tool:is(:focus-visible, :active) .practice-tool-icon::after { opacity: 1; }
+@media (hover: hover) {
+  .practice-tool:hover .practice-tool-icon { transform: translateY(-4px); }
+  .practice-tool:hover .practice-tool-icon::after { opacity: 1; }
+  .practice-console:has(.practice-rhythm:hover) .renax-orbit-motion { transform: rotate(57deg); }
+  .practice-console:has(.practice-pitch:hover) .renax-orbit-motion { transform: rotate(-13deg); }
+}
+.practice-tool:active .practice-tool-icon {
+  transform: scale(.96);
+  transition-duration: 90ms;
+}
+html[data-theme='ivory'] #toolHome {
+  --tool-ink: var(--ivory-ink);
+  --tool-muted: #47635e;
+  --tool-line: #b7c8bd;
+  --tool-surface: #e9e6da;
+  --tool-accent: var(--ivory-green);
+  color: var(--tool-ink);
+}
+html[data-theme='ivory'] .practice-tool {
+  --practice-chassis: #f3f0e4;
+  --practice-shade: #d4ddd0;
+}
+html[data-theme='light'] .practice-tool {
+  --practice-chassis: var(--panel);
+  --practice-shade: #ccd7de;
+}
+html[data-theme='avant'] .practice-tool {
+  --practice-ink: var(--ag-ink);
+  --practice-chassis: var(--ag-header);
+}
+html[data-theme='avant'] .practice-orbit {
+  --tool-muted: var(--ag-muted);
+}
+html[data-theme='avant'] .practice-orbit .renax-orbit-mark {
+  opacity: 1;
+  filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--ag-ink) 27%, transparent));
+}
+@media (max-width: 700px) and (orientation: portrait) {
+  html#renaxApp[data-tool='home'] body > header {
+    flex-wrap: nowrap;
+    min-height: 58px;
+  }
+  html#renaxApp[data-tool='home'] body > header .index2-header-actions {
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+  }
+  .practice-console {
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: clamp(12px, 3vh, 24px);
+    padding-block: 16px max(20px, 6dvh);
+  }
+  .practice-orbit {
+    position: relative;
+    width: min(59vw, 340px, 42dvh);
+  }
+  .practice-tool-icon { width: clamp(84px, 28vw, 130px); }
+  .practice-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 470px;
+  }
+  .practice-pitch { grid-column: 2; }
+}
+@media (max-height: 460px) and (orientation: landscape) {
+  .practice-console { min-height: 210px; }
+}
+
+#tunerRoot {
+  padding: clamp(20px, 3vw, 44px) clamp(12px, 5vw, 64px) 36px;
+  background: var(--bg);
+}
+#tunerRoot > * {
+  max-width: 1160px;
+  margin-inline: auto;
+}
+#tunerRoot .tuner-heading { margin-bottom: 16px; }
+#tunerRoot .tuner-heading h2 {
+  color: var(--tool-ink);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 750;
+  letter-spacing: -.035em;
+  line-height: 1.05;
+}
+#tunerRoot .tuner-heading p { font-size: 13px; }
+#tunerRoot .tuner-layout {
+  grid-template-columns: minmax(0, 2.2fr) minmax(270px, 1fr);
+  align-items: start;
+}
+#tunerRoot .tuner-measurement {
+  --dial-accent: var(--tool-accent);
+  --dial-detail: var(--tool-muted);
+  padding: clamp(16px, 2.4vw, 32px);
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 80% 16%, color-mix(in srgb, var(--renax-cool) 12%, transparent), transparent 64%),
+    radial-gradient(ellipse at 13% 52%, color-mix(in srgb, var(--renax-warm) 8%, transparent), transparent 62%),
+    var(--tool-surface);
+}
+.tuner-transport {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+  min-height: 44px;
+}
+#tunerSignal {
+  display: none;
+  color: var(--tool-muted);
+  font-size: 12px;
+  text-align: start;
+}
+.tuner-transport:has([aria-pressed='true']) #tunerSignal { display: block; }
+#tunerRoot .tuner-primary {
+  min-width: 0;
+  background: var(--tool-ink);
+  color: var(--tool-surface);
+  border-color: var(--tool-ink);
+}
+#tunerRoot .tuner-primary[aria-pressed='true'] {
+  background: var(--tool-surface);
+  color: var(--tool-ink);
+  border-color: var(--dial-accent);
+}
+.tuner-dial {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+  align-items: center;
+  gap: clamp(12px, 2.5vw, 30px);
+  margin-block: 18px 6px;
+}
+.tuner-identity {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.tuner-orbit { width: min(100%, 124px); }
+.tuner-orbit .renax-orbit-motion { transform: rotate(var(--tuner-orbit-angle, 24deg)); }
+#tunerRoot .tuner-note-row {
+  margin: 0;
+  min-height: 0;
+  text-align: center;
+}
+#tunerRoot .tuner-note-row:not([hidden]) {
+  display: grid;
+  gap: 3px;
+  font-variant-numeric: tabular-nums;
+}
+#tunerRoot .tuner-note-row[hidden] { display: none; }
+#tunerRoot #tunerNote {
+  color: var(--tool-ink);
+  font-size: clamp(28px, 6vw, 68px);
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+#tunerRoot :is(#tunerCents, #tunerFrequency) {
+  min-width: 0;
+  color: var(--dial-detail);
+  font-size: clamp(12px, 1.45vw, 16px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+#tunerRoot #tunerCents { color: var(--tool-ink); }
+.tuner-dial-idle {
+  color: var(--tool-ink);
+  font-size: clamp(16px, 2.5vw, 28px);
+  font-weight: 650;
+  letter-spacing: -.025em;
+  text-align: center;
+}
+.tuner-dial-listening,
+.tuner-measurement:has(#tunerListen[aria-pressed='true']) .tuner-dial-ready { display: none; }
+.tuner-measurement:has(#tunerListen[aria-pressed='true']) .tuner-dial-listening { display: inline; }
+#tunerRoot .tuner-meter {
+  width: min(100%, 400px);
+  margin: 0 auto;
+}
+.tuner-dial-track {
+  fill: none;
+  stroke: var(--tool-line);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.tuner-dial-grave, .tuner-dial-aigu {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.tuner-dial-grave { stroke: var(--renax-cool); }
+.tuner-dial-aigu { stroke: var(--dial-accent); }
+#tunerRoot .tuner-meter-axis { stroke-width: 1.5; }
+#tunerRoot .tuner-center-zone {
+  fill: none;
+  stroke: var(--tool-good);
+  stroke-width: 4;
+  opacity: 1;
+}
+#tunerRoot :is(.tuner-needle-trail, .tuner-needle-line) {
+  fill: none;
+  stroke: var(--dial-accent);
+  stroke-linecap: round;
+}
+#tunerRoot .tuner-needle-trail { stroke-width: 7; opacity: .21; }
+#tunerRoot .tuner-needle-line { stroke-width: 2.5; }
+#tunerRoot .tuner-measurement[data-tuned='true'] :is(.tuner-needle-trail, .tuner-needle-line) {
+  stroke: var(--tool-good);
+}
+.tuner-pivot { fill: var(--tool-surface); stroke: var(--tool-muted); }
+.tuner-pivot-core { fill: var(--dial-accent); }
+#tunerRoot .tuner-direction {
+  margin: 0 12% 8px;
+  font-size: 12px;
+}
+.tuner-result {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+#tunerRoot #tunerStatus {
+  min-height: 0;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+#tunerRoot #tunerStatus:empty { padding: 0; }
+#tunerRoot .tuner-measurement[data-tuned='true'] #tunerStatus {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tool-good) 10%, transparent);
+}
+#tunerRoot .tuner-strobe { height: 19px; margin: 0 12%; }
+#tunerRoot .tuner-strobe[data-active='false'] { display: none; }
+#tunerRoot .tuner-target {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--tool-line);
+}
+#tunerRoot .tuner-target label {
+  color: var(--tool-ink);
+  font-weight: 700;
+}
+#tunerRoot .tuner-strings:empty { display: none; }
+#tunerRoot .tuner-settings {
+  display: flex;
+  padding: 18px;
+  border: 0;
+  border-inline-start: 1px solid var(--tool-line);
+  color: var(--tool-ink);
+}
+.tuner-settings-heading h3 { font-size: 18px; }
+.tuner-settings-heading p { color: var(--tool-muted); }
+#tunerRoot .tuner-a4 button { min-height: 44px; }
+#tunerRoot :is(button, input, select, summary):focus-visible {
+  outline: 2px solid var(--tool-ink);
+  outline-offset: 2px;
+}
+#tunerRoot .numbox-menu .numbox-option[aria-selected='true'] {
+  box-shadow: inset 3px 0 var(--dial-accent, var(--tool-accent));
+}
+html[data-theme='light'] #tunerRoot .numbox-menu {
+  --numbox-active-ink: var(--text);
+}
+html[data-theme='ivory'] #tunerRoot .tuner-measurement {
+  --dial-accent: var(--ivory-green);
+}
+html[data-theme='avant'] #tunerRoot { background: var(--ag-paper); }
+
+/* Citron menus keep readable lime text on anthracite in every row state. */
+html#renaxApp[data-theme='avant'] body #tunerRoot .numbox-button {
+  --ag-field-text: var(--ag-lime);
+  --ag-field-bg: var(--ag-header);
+  --ag-field-border: var(--ag-header-border);
+}
+html#renaxApp[data-theme='avant'] body #tunerRoot .numbox-menu {
+  --tool-surface: var(--ag-header);
+  --tool-line: var(--ag-header-border);
+  --ag-menu-text: var(--ag-lime);
+  --ag-menu-bg: var(--ag-header);
+  --ag-menu-border: var(--ag-header-border);
+  --ag-selected-text: var(--ag-lime);
+  --ag-selected-bg: color-mix(in srgb, var(--ag-header), var(--ag-lime) 10%);
+  --ag-selected-border: var(--ag-lime);
+}
+
+@media (min-width: 1101px) {
+  html#renaxApp[data-theme='ivory'][data-tool='home'] body > #toolHome,
+  html#renaxApp[data-theme='ivory'][data-tool='tuner'] body > #tunerRoot {
+    grid-column: 1 / -1;
+    grid-row: 2 / 4;
+    min-width: 0;
+    min-height: 0;
+  }
+}
+@media (max-width: 760px) {
+  #tunerRoot .tuner-layout { grid-template-columns: 1fr; }
+  #tunerRoot .tuner-settings {
+    border-inline-start: 0;
+    border-top: 1px solid var(--tool-line);
+  }
+}
+@media (max-width: 520px) {
+  .tuner-dial { grid-template-columns: 1fr; }
+  .tuner-identity { display: flex; justify-content: center; }
+  .tuner-orbit { width: 64px; flex: 0 0 64px; }
+  #tunerRoot .tuner-meter { width: min(100%, 310px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .practice-tool-icon, .practice-tool-icon::after,
+  .practice-orbit .renax-orbit-motion { transition: none; }
+  .practice-orbit .renax-orbit-motion::before { animation: none; }
+  .practice-tool:is(:hover, :active) .practice-tool-icon { transform: none; }
+  .practice-console:has(.practice-tool:hover) .renax-orbit-motion { transform: rotate(24deg); }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  html#renaxApp[data-tool='home'] { --practice-ambient: none; }
+  .practice-tool-icon::after { display: none; }
+  #tunerRoot .tuner-measurement { background: var(--tool-surface); }
 }

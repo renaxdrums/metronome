@@ -9,7 +9,7 @@ html#renaxApp[data-theme=ivory]{
  --ivory-ink:#173e37;--ivory-green:#365e50;--ivory-lime:#d7ed56;
  color-scheme:light;
 }
-html#renaxApp[data-theme=ivory] body{background:radial-gradient(ellipse 60% 50% at 75% 0%,#efecdf 0%,transparent 90%),#e4e0d1!important;color:#173e37}
+html#renaxApp[data-theme=ivory] body{background:var(--practice-ambient,radial-gradient(ellipse 60% 50% at 75% 0%,#efecdf 0%,transparent 90%)) #e4e0d1!important;color:#173e37}
 html#renaxApp[data-theme=ivory] header{border-bottom:1px solid #d5dacb!important}
 html#renaxApp[data-theme=ivory] header .brand h1{letter-spacing:.11em!important;font-weight:800!important}
 html#renaxApp[data-theme=ivory] header .brand p span:last-child,html#renaxApp[data-theme=ivory] header .title-orange{color:#6d8741!important}
@@ -59,7 +59,7 @@ html#renaxApp[data-theme=ivory] :is(.numbox-dropdown,.numbox-menu,.numbox-option
 }
 html#renaxApp[data-theme=ivory] :is(.numbox-option,.training-curve-menu button,.song-more-menu button,.multi-actions button,.sequence-more-actions button){color:#173e37!important}
 html#renaxApp[data-theme=ivory] :is(.numbox-option:hover,.numbox-option[aria-selected=true],.training-curve-menu button[aria-pressed=true]){background:#e4efd1!important;color:#173e37!important}
-html#renaxApp[data-theme=ivory] :is(input[type=range],.tempo-fader){accent-color:#2c6156;background:#ccd6c8!important}
+html#renaxApp[data-theme=ivory] :is(input[type=range],.tempo-fader){accent-color:#2c6156;background:var(--tuner-range-bg,#ccd6c8)!important}
 html#renaxApp[data-theme=ivory] input[type=range]::-webkit-slider-thumb{background:#2e6b5b!important}
 html#renaxApp[data-theme=ivory] :is(#bpmDisplay,.tempo-display,#trainTimer,.volume-value){color:#173e37!important}
 html#renaxApp[data-theme=ivory] #workspaceTempoShortcut{background:#f2f2e5!important;border:1px solid #cdd6c5!important;color:#173e37!important}

@@ -83,7 +83,7 @@
 <link rel="stylesheet" href="kern-intro.css?v=5e2e8530cd7c">
 <link rel="stylesheet" href="avant-garde-theme.css?v=c4c3ac6ba954">
 <link rel="stylesheet" href="musician-tools.css?v=c6121f299000">
-<link rel="stylesheet" href="tuner-interface.css?v=983fbeeed40f">
+<link rel="stylesheet" href="tuner-interface.css?v=919156b2d8c2">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -430,10 +430,10 @@
         <div id="tunerStrobe" class="tuner-strobe" role="img" aria-label="Indicateur de dérive de hauteur"><div></div></div>
       </section>
       <aside class="tuner-controls" aria-label="Réglages de l’accordeur">
+        <div class="tuner-transport"><button type="button" id="tunerListen" class="tuner-primary" aria-pressed="false">Activer le microphone</button></div>
         <div class="tuner-instrument-control"><label for="tunerInstrument">Instrument / accordage</label><select id="tunerInstrument"></select></div>
         <div class="tuner-target"><label for="tunerTarget">Note cible</label><select id="tunerTarget"><option value="auto">Détection automatique</option></select><button id="tunerTone" type="button" aria-pressed="false">Écouter la référence</button></div>
         <div id="tunerStrings" class="tuner-strings" role="group" aria-label="Cordes cibles"></div>
-        <div class="tuner-transport"><button type="button" id="tunerListen" class="tuner-primary" aria-pressed="false">Activer le microphone</button></div>
         <p class="tuner-help">L’analyse reste sur cet appareil. Le microphone se coupe quand vous quittez l’accordeur.</p>
       </aside>
     </div>

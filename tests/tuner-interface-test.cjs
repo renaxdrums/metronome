@@ -266,6 +266,12 @@ fs.writeFileSync(wav, data);
         );
         await p.keyboard.press('Escape');
         assert.equal(await p.evaluate(() => document.activeElement.id), 'tunerSettingsOpen');
+        await p.keyboard.press('Tab');
+        assert.equal(
+          await p.evaluate(() => document.activeElement.id),
+          'tunerListen',
+          'Keyboard order must reach the primary control before the secondary fields',
+        );
         if (theme === 'avant' && [390, 1440].includes(viewport.width)) {
           const target = p.locator('.numbox-custom:has(#tunerTarget)');
           const trigger = target.locator('.numbox-button');

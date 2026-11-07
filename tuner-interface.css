@@ -331,7 +331,7 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
 }
 #tunerRoot .tuner-transport {
   display: block;
-  margin-top: auto;
+  margin-top: 0;
 }
 #tunerRoot .tuner-primary {
   width: 100%;
@@ -608,7 +608,6 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
     gap: 16px;
   }
   #tunerRoot .tuner-transport {
-    order: -1;
     margin-top: 0;
   }
   #tunerRoot :is(select, .numbox-button) {

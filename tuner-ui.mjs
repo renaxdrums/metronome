@@ -22,7 +22,12 @@ export function createTuner(root) {
   function openSettings(section) {
     window.RENAX_NUMBOX?.closeAll();
     if (section) el(section).open = true;
-    if (!settingsDialog.open) settingsDialog.showModal();
+    if (!settingsDialog.open) {
+      // Firefox does not always focus a button clicked with a pointer. Give
+      // the native dialog an explicit return target before it captures focus.
+      el('SettingsOpen').focus({ preventScroll: true });
+      settingsDialog.showModal();
+    }
     el('SettingsOpen').setAttribute('aria-expanded', 'true');
     if (section) el(section).scrollIntoView({ block: 'nearest' });
   }
@@ -31,7 +36,6 @@ export function createTuner(root) {
   settingsDialog.addEventListener('close', () => {
     window.RENAX_NUMBOX?.closeAll();
     el('SettingsOpen').setAttribute('aria-expanded', 'false');
-    if (document.documentElement.dataset.tool === 'tuner') el('SettingsOpen').focus();
   });
   settingsDialog.addEventListener('click', (event) => {
     if (event.target !== settingsDialog) return;

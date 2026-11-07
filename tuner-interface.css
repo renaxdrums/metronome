@@ -653,6 +653,9 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
 html#renaxApp[data-tool='tuner'] #renaxHeaderWave {
   max-width: 100%;
 }
+html#renaxApp[data-tool='tuner'] .renax-avant-halo {
+  display: none;
+}
 html#renaxApp[data-tool='tuner'] #tunerRoot {
   --tune-action-bg: #173f49;
   --tune-action-border: #327b89;

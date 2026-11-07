@@ -204,7 +204,7 @@ fs.writeFileSync(wav, data);
               document.documentElement,
               document.body,
               ...document.querySelectorAll(
-                'body>header,#renaxHeaderWave,#tunerRoot,.tuner-layout,.tuner-measurement,#tunerStrobe,#tunerStrobe>div',
+                'body>:not(script):not(style):not(link),#renaxHeaderWave,.tuner-layout,.tuner-measurement,#tunerStrobe,#tunerStrobe>div',
               ),
             ].map(box),
             overflow: [...document.querySelectorAll('body *')]

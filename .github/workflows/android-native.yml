@@ -33,7 +33,7 @@ jobs:
           java-version: '21'
       - name: Install isolated build dependencies
         run: npm install --prefix "$RUNNER_TEMP/renax-native-deps" --no-audit --no-fund esbuild@0.28.2 espree@11.2.0 html-minifier-terser@7.2.0
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
           log-accepted-android-sdk-licenses: false

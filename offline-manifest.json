@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "c6610eb57a9d4a7b",
+  "revision": "ddec616ed51c7048",
   "resources": [
     {
       "path": "accessibility.css",
@@ -158,8 +158,13 @@
       "text": true
     },
     {
+      "path": "custom-samples.js",
+      "sha256": "3551483675e329912e0990815aa6bdbd4d33a994578a464c8596a4769f1e616c",
+      "text": true
+    },
+    {
       "path": "edit-history.js",
-      "sha256": "0e5a27a29b3b49f4428096bb460002b09fc8051ba3a21f5a3ebd73723895363e",
+      "sha256": "db2e3869063ccfa7fb909188bd2d2c2714fd7907e142049be7dc073b8ee45f69",
       "text": true
     },
     {
@@ -279,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "132e6749340312a80a82ced4bfb8cfcac7a54d620f4df09ebfe35d7d58469a91",
+      "sha256": "f1e04c88decd51e8d5d544580210c0cfbd865fb57f22d3274f27e87eedbcaccf",
       "text": true
     },
     {
@@ -339,7 +344,7 @@
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "2031fc79216fb37daef2968ab54b86d13350372aeae41dd824bc84fac275520e",
+      "sha256": "69222625507b59fa60cd2fd954a8d24da0e9aa729db3af8656ead83a4df7b46f",
       "text": true
     },
     {
@@ -374,12 +379,12 @@
     },
     {
       "path": "multi-metronome.css",
-      "sha256": "f6354c473f35354364e1039435cedbac62801655ffdf31bc49585fb41c40a8bc",
+      "sha256": "6bf342538e6724e7e283c9e142f21b08ff37c87357872fbbaa542d0c534ca7a9",
       "text": true
     },
     {
       "path": "multi-metronome.js",
-      "sha256": "287ba922f2cf0cb75cd40b44f6f170ba8a4dbb55020fb1a8a8715018ff8ab597",
+      "sha256": "9e41c3a2ab8c89db4f3712b6d49b8e5ec5fa7f4e1eaf246a80af99642fa01fcc",
       "text": true
     },
     {
@@ -519,7 +524,7 @@
     },
     {
       "path": "sound-bank-menu.js",
-      "sha256": "743d19a77c104609cf8191273977f78cb955c0984d064e9989261fda8ab4adf3",
+      "sha256": "560cfe458902c1b35f4dcb5f1a7d6a938c1b0f991329ff0fc6dd86106242328c",
       "text": true
     },
     {
@@ -594,12 +599,12 @@
     },
     {
       "path": "workspace-layout.css",
-      "sha256": "17de0bda3dda3579768a73480e89aab34267a467f9a2a86c0ea6066175861505",
+      "sha256": "1e200a8a8bd76662413f63c6230c07f6514b12005dbef0874da57be58536e773",
       "text": true
     },
     {
       "path": "workspace-layout.js",
-      "sha256": "59c5930f2b6d1b54c30477c9f4af3f63270fc4781b92d94139b4cd934b50b4cd",
+      "sha256": "052cca0a54a5c83786076bc10605cac66dd989b361a51be680c8a3874c7344f5",
       "text": true
     }
   ]

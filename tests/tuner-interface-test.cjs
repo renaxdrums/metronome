@@ -175,27 +175,50 @@ fs.writeFileSync(wav, data);
       await p.setViewportSize(viewport);
       for (const theme of ['dark', 'light', 'ivory', 'avant']) {
         await p.evaluate((theme) => (document.documentElement.dataset.theme = theme), theme);
-        assert.equal(
-          await p.evaluate(() => document.documentElement.scrollWidth > innerWidth),
-          false,
-          JSON.stringify({
-            viewport,
-            theme,
-            overflow: await p.evaluate(() =>
-              [...document.querySelectorAll('body *')]
-                .map((e) => ({
-                  tag: e.tagName,
-                  id: e.id,
-                  cls: e.className?.baseVal ?? e.className,
-                  right: e.getBoundingClientRect().right,
-                  width: e.getBoundingClientRect().width,
-                  visibility: getComputedStyle(e).visibility,
-                }))
-                .filter((e) => e.width && e.right > innerWidth + 1)
-                .slice(0, 18),
-            ),
-          }),
-        );
+        const layout = await p.evaluate(() => {
+          const box = (node) => {
+            const r = node.getBoundingClientRect(),
+              c = getComputedStyle(node);
+            return {
+              tag: node.tagName,
+              id: node.id,
+              cls: node.className?.baseVal ?? node.className,
+              x: r.x,
+              y: r.y,
+              width: r.width,
+              height: r.height,
+              right: r.right,
+              scrollWidth: node.scrollWidth,
+              overflow: c.overflow,
+              contain: c.contain,
+              position: c.position,
+              visibility: c.visibility,
+            };
+          };
+          const width = document.documentElement.scrollWidth;
+          return {
+            width,
+            viewport: innerWidth,
+            fullscreen: document.fullscreenElement?.id,
+            anchors: [
+              document.documentElement,
+              document.body,
+              ...document.querySelectorAll(
+                'body>header,#renaxHeaderWave,#tunerRoot,.tuner-layout,.tuner-measurement,#tunerStrobe,#tunerStrobe>div',
+              ),
+            ].map(box),
+            overflow: [...document.querySelectorAll('body *')]
+              .map(box)
+              .filter((n) => n.width && n.right > innerWidth + 1)
+              .slice(0, 8),
+          };
+        });
+        if (layout.width > layout.viewport)
+          await p.screenshot({
+            path: path.join(out, 'overflow-' + viewport.width + '-' + theme + '.png'),
+            animations: 'disabled',
+          });
+        assert(layout.width <= layout.viewport, JSON.stringify({ viewport, theme, layout }));
         // Compare final theme tokens, not two differently timed frames of the
         // color transition. Functional strobe animations keep running.
         await p.evaluate(async () => {

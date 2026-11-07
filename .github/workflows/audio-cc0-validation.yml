@@ -18,26 +18,89 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Detect changes requiring audio validation
+        id: audio_impact
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          python3 - <<'PY'
+          import copy
+          import json
+          import os
+          import subprocess
+
+          def git(*args):
+              return subprocess.check_output(['git', *args])
+
+          def only_safe_tooling_bump(base, head):
+              old = json.loads(git('show', f'{base}:package.json'))
+              new = json.loads(git('show', f'{head}:package.json'))
+              allowed = {'eslint', 'globals', 'firebase-tools', '@firebase/rules-unit-testing'}
+              old_deps, new_deps = old.get('devDependencies', {}), new.get('devDependencies', {})
+              changes = {key for key in set(old_deps) | set(new_deps) if old_deps.get(key) != new_deps.get(key)}
+              if not changes or not changes <= allowed:
+                  return False
+              old_clean, new_clean = copy.deepcopy(old), copy.deepcopy(new)
+              for key in allowed:
+                  old_clean.get('devDependencies', {}).pop(key, None)
+                  new_clean.get('devDependencies', {}).pop(key, None)
+              return old_clean == new_clean
+
+          def has_no_audio_impact(paths, base, head):
+              if paths <= {'package.json', 'pnpm-lock.yaml'} and 'package.json' in paths:
+                  return only_safe_tooling_bump(base, head)
+              return all(path.endswith(('.md', '.mdx', '.css', '.scss', '.sass'))
+                         or path.startswith('docs/')
+                         or path in {'.gitignore', '.gitattributes', '.prettierignore', '.prettierrc.json'}
+                         for path in paths)
+
+          run_audio = True
+          why = 'Full validation is the safe default'
+          event = os.environ.get('GITHUB_EVENT_NAME', '')
+          base = os.environ.get('PR_BASE_SHA', '') if event == 'pull_request' else os.environ.get('PUSH_BEFORE_SHA', '')
+          head = os.environ.get('PR_HEAD_SHA', '') if event == 'pull_request' else os.environ.get('GITHUB_SHA', '')
+          if event in ('pull_request', 'push') and len(base) == 40 and len(head) == 40 and set(base) != {'0'}:
+              try:
+                  commit_range = f'{base}...{head}' if event == 'pull_request' else f'{base}..{head}'
+                  paths = {p.decode('utf-8') for p in git('diff', '--name-only', '-z', commit_range).split(b'\0') if p}
+                  if paths and has_no_audio_impact(paths, base, head):
+                      run_audio = False
+                      why = 'Only known non-audio files or explicitly approved dev-tool updates changed'
+                  print('Changed paths:', sorted(paths))
+              except (OSError, ValueError, subprocess.CalledProcessError, UnicodeDecodeError) as error:
+                  print('Audio impact could not be established; running full tests:', error)
+          print(f'run_audio={str(run_audio).lower()} ({why})')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as result:
+              result.write(f'run_audio={str(run_audio).lower()}\n')
+          PY
       - uses: actions/setup-node@v4
+        if: steps.audio_impact.outputs.run_audio == 'true'
         with:
           node-version: '22'
       - name: Check asset versions
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           node tools/stamp-assets.cjs --check
           node tools/check-test-coverage.cjs
       - uses: pnpm/action-setup@v6
+        if: steps.audio_impact.outputs.run_audio == 'true'
         with:
           version: '11.25.0'
       - name: Install locked test dependencies and Chromium
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm exec playwright install chromium --with-deps
       - name: Tuner layout and microphone regression
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/tuner-core-test.mjs
           node tests/tuner-interface-test.cjs
       - name: Lint and incremental formatting
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           pnpm lint
           pnpm format:check
@@ -46,6 +109,7 @@ jobs:
           pnpm test:coverage:core
           node tests/midi-resource-test.cjs
       - name: Continuous Track, real exports and device layouts
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/song-tempo-ramp-test.cjs
@@ -54,6 +118,7 @@ jobs:
           node tests/theme-navigation-test.cjs
           node tests/track-continuous-test.cjs
       - name: Library resilience and accessible controls
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/resilience-test.cjs
@@ -66,6 +131,7 @@ jobs:
           node tests/pro-sound-context-test.cjs
           MEIXS_BASE_REF=${{ github.event.pull_request.base.sha || github.sha }} node tests/meixs-colors-test.cjs
       - name: Install MP3 inspection tools
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
             sudo timeout 120 apt-get update -qq
@@ -74,10 +140,12 @@ jobs:
           ffmpeg -version
           ffprobe -version
       - name: Five confirmed robustness regressions
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/robustness-boundaries-test.cjs
       - name: Audio headroom and sample integration
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/instrument-samples-test.cjs
@@ -86,6 +154,7 @@ jobs:
           node tests/track-beat-corrections-test.cjs
           node tests/track-last-block-test.cjs
       - name: Timing at both device sample rates, with a negative control
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/timing-test.cjs
@@ -93,12 +162,13 @@ jobs:
           node tests/independent-voice-timing-test.cjs
           node tests/tooling-guards-test.cjs
       - name: Phase 2 playback ownership and unchanged PCM
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/playback-support-test.cjs
           PCM_ONLY=1 node tests/quality-invariance-test.cjs
       - name: Exact theme screenshots and computed styles against the PR base
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.audio_impact.outputs.run_audio == 'true'
         env:
           INVARIANCE_REF: ${{ github.event.pull_request.base.sha }}
           VISUAL_ONLY: '1'
@@ -106,14 +176,17 @@ jobs:
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/quality-invariance-test.cjs
       - name: MP3 export regression
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/mp3-export-test.cjs
       - name: MP3 output level and export dialog
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/mp3-output-level-test.cjs
       - name: Accessibility, emergency backup, offline mode and module boundaries
+        if: steps.audio_impact.outputs.run_audio == 'true'
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/accessibility-test.cjs
@@ -130,7 +203,7 @@ jobs:
           node tests/phone-rotation-test.cjs
 
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.audio_impact.outputs.run_audio == 'true'
         with:
           name: sound-menu-foreground
           path: |

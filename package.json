@@ -29,7 +29,7 @@
     "@firebase/rules-unit-testing": "5.0.2",
     "@huggingface/transformers": "3.8.1",
     "esbuild": "0.28.2",
-    "eslint": "10.13.0",
+    "eslint": "10.14.0",
     "espree": "11.2.0",
     "firebase": "12.16.0",
     "firebase-tools": "15.15.0",

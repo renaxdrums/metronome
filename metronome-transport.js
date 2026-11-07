@@ -442,7 +442,6 @@
       m.polyVoices.forEach((voice,vi)=>{
         const klass=vi===0?'outer':vi===1?'inner':'voice-'+(vi+1);
         const ring=document.createElement('div');ring.className='poly-ring '+klass;
-        if(vi>=2){ring.style.width='calc(2 * '+radii[vi]+')';ring.style.height=ring.style.width;}
         sequencerContainer.append(ring);
         for(let beat=0;beat<voice.count;beat++){
           const dot=document.createElement('div');dot.className='poly-dot '+klass;

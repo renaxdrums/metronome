@@ -67,12 +67,15 @@ function wavOneShot() {
         const layout = await page.evaluate(() => {
           const row = document.querySelector('#polyControls').getBoundingClientRect();
           const voice = document.querySelector('.poly-voice-count').getBoundingClientRect();
-          return { rowHeight: row.height, rowTop: row.top, voiceBottom: voice.bottom };
+          const caption = document.querySelector('#activeMeasureLabel').getBoundingClientRect();
+          return { rowHeight: row.height, rowTop: row.top, voiceBottom: voice.bottom, voiceLeft: voice.left, captionRight: caption.right };
         });
         assert.equal(Math.round(layout.rowHeight), 38,
           'Voice selector must not create a second row or shrink the circular sequencer');
         assert(layout.voiceBottom <= layout.rowTop + 1,
           'Voice selector must remain above the existing pulse controls');
+        assert(layout.voiceLeft >= layout.captionRight + 2,
+          'Voice selector must not overlap the measure caption');
       }
       assert.equal(await page.locator('#polyVoiceCount').inputValue(), '2');
       await page.locator('#polyVoiceCount').evaluate(select => {

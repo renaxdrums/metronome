@@ -125,8 +125,8 @@
  .visu-toolbar .measure-label{max-width:126px;overflow:hidden;text-overflow:ellipsis}
  .visu-toolbar .control-group>label svg{width:12px;height:12px;flex:0 0 12px;margin:0}
  .visu-toolbar .sig-group{display:flex;align-items:center;height:38px;gap:5px}
- .visu-toolbar .visu-measure-info .numbox-custom,.visu-toolbar .visu-measure-info .numbox-button{width:45px!important;min-width:45px!important;flex-basis:45px!important}
- .visu-toolbar .numbox-button{height:38px!important;min-height:38px!important;font-size:11px;padding:5px 9px;border-radius:6px}
+ .visu-toolbar .visu-measure-info .numbox-custom:not(.poly-voice-count .numbox-custom),.visu-toolbar .visu-measure-info .numbox-button:not(.poly-voice-count .numbox-button){width:45px!important;min-width:45px!important;flex-basis:45px!important}
+ .visu-toolbar .numbox-button:not(.poly-voice-count .numbox-button){height:38px!important;min-height:38px!important;font-size:11px;padding:5px 9px;border-radius:6px}
  .visu-toolbar .workspace-tempo-group{display:grid;grid-template-columns:auto minmax(54px,1fr) 98px;grid-template-rows:13px 38px;column-gap:8px!important;row-gap:7px!important;align-items:center;flex:none}
  .visu-toolbar .workspace-tempo-group>label{grid-column:1/-1;grid-row:1}
  .visu-toolbar .tempo-display{grid-row:2;grid-column:1;display:grid;grid-template-columns:3ch auto;align-items:baseline;gap:4px;font-size:24px;line-height:38px;white-space:nowrap}
@@ -151,7 +151,7 @@
  .visu-toolbar .workspace-tempo-group{grid-template-columns:auto minmax(48px,1fr) 76px;column-gap:5px!important}
  .visu-toolbar .tempo-display{font-size:20px;gap:2px}
  .visu-toolbar .tap-tempo-btn{width:76px;min-width:76px;font-size:8px;padding:4px!important}
- .visu-toolbar .visu-measure-info .numbox-custom,.visu-toolbar .visu-measure-info .numbox-button{width:38px!important;min-width:38px!important;flex-basis:38px!important}
+ .visu-toolbar .visu-measure-info .numbox-custom:not(.poly-voice-count .numbox-custom),.visu-toolbar .visu-measure-info .numbox-button:not(.poly-voice-count .numbox-button){width:38px!important;min-width:38px!important;flex-basis:38px!important}
  .visu-toolbar .control-group>label{font-size:8px!important;letter-spacing:0}
  .visu-toolbar .volume-row{gap:5px}
  .visu-toolbar #trainTimer{font-size:22px}
@@ -196,14 +196,14 @@ body .silent-section[hidden]{display:none}
  body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-controls{height:38px;min-height:38px;flex-wrap:nowrap;row-gap:0}
  body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{position:absolute;top:-6px;right:0;height:24px;gap:3px;min-width:0;flex:0 0 auto;font-size:9px;line-height:1}
  body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-custom,
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{width:34px!important;min-width:34px!important;flex-basis:34px!important}
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{height:24px!important;min-height:24px!important;padding:2px!important}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{width:34px;min-width:34px;flex-basis:34px}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{height:24px;min-height:24px;padding:2px}
 }
 @media(min-width:1101px) and (max-width:1250px){
  body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{font-size:0;gap:2px}
  body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count::before{content:"V";font:600 9px/1 var(--font)}
  body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-custom,
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{width:30px!important;min-width:30px!important;flex-basis:30px!important}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{width:30px;min-width:30px;flex-basis:30px}
 }
 
 /* Polyrythmie: additional concentric voices and per-beat editor. */

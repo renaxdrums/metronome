@@ -196,6 +196,18 @@ fs.writeFileSync(wav, data);
             ),
           }),
         );
+        // Compare final theme tokens, not two differently timed frames of the
+        // color transition. Functional strobe animations keep running.
+        await p.evaluate(async () => {
+          const transitions = ['playBtn', 'tunerListen'].flatMap((id) =>
+            document.getElementById(id).getAnimations(),
+          );
+          await Promise.all(
+            transitions
+              .filter((animation) => animation instanceof CSSTransition)
+              .map((animation) => animation.finished.catch(() => {})),
+          );
+        });
         const shared = await p.evaluate(() => {
           const style = (selector) => getComputedStyle(document.querySelector(selector));
           const primary = style('#playBtn'),

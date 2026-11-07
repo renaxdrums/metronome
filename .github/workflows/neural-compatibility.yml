@@ -1,0 +1,42 @@
+name: Neural runtime compatibility
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'prototypes/amorce/**'
+      - 'tests/amorce-neural*'
+      - 'tests/amorce-page-test.cjs'
+      - 'tests/voice-levels-test.mjs'
+      - 'tests/setup.mjs'
+      - '.github/workflows/neural-compatibility.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: neural-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  neural-compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v6
+        with:
+          version: '11.25.0'
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm exec playwright install chromium --with-deps
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Download pinned model fixtures
+        run: node tests/setup.mjs
+      - name: Real CPU and browser inference, levels and cache
+        run: node tests/run.cjs --only=amorce-neural-test.mjs,amorce-page-test.cjs,voice-levels-test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: neural-compatibility-results
+          path: tests/results/current

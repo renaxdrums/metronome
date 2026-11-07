@@ -566,7 +566,7 @@ function sync(){
  rangeButton.disabled=locked;
  rangeButton.setAttribute('aria-pressed',String(extended));
  rangeButton.textContent=extended?'Réduire à 250 BPM':'Étendre à 999 BPM';
- rangeButton.setAttribute('aria-label',extended?'Revenir à la plage de 2 à 250 BPM':'Étendre la plage du fader de 2 à 999 BPM');
+ rangeButton.setAttribute('aria-label',rangeButton.textContent);
  rangeButton.title=extended?'Plage étendue : 2 à 999 BPM. Revenir au mode normal ramène un tempo supérieur à 250 BPM à 250.':'Plage habituelle : 2 à 250 BPM';
  fader.setAttribute('aria-valuetext',bpm+' BPM');fader.title=bpm+' BPM';
 }

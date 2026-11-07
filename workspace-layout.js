@@ -82,7 +82,6 @@
   // Empty measures belong only to Sequencer, never to Training.
   if(silent.parentNode!==silentHome.parentNode)silentHome.after(silent);
   silent.hidden=page!=='sequence';
-  silent.style.display=page==='sequence'?'':'none';
  }
  function sync(){if(changing)return;if(window.RENAX_MULTI?.active)page='multi';else if(!document.getElementById('songsRoot').hidden)page='tracks';else if(appMode==='polyrhythm')page='polyrhythm';else if(!['metronome','sequence','training'].includes(page))page='sequence';document.body.dataset.workspace=page;
   const viewButton=mobileViews.querySelector('button:last-child');viewButton.dataset.pane=page==='training'?'training':'seq';const viewSource=page==='training'?'Paramètres':page==='multi'?'Pistes':page==='tracks'?'Playlist':'Mesures';const viewLabel=window.RENAX_I18N?.t(viewSource)??viewSource;if(viewButton.textContent!==viewLabel)viewButton.textContent=viewLabel;for(const b of mobileViews.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.pane===document.body.dataset.mobilePane));

@@ -77,7 +77,7 @@ jobs:
           } > android/build/native-qa/output/native-host-diagnostics.txt 2>&1
       - name: Preserve test results and tested application
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: native-android-${{ matrix.api }}
           path: |

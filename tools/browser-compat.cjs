@@ -234,10 +234,21 @@ const { start } = require('../tests/audio-harness.cjs');
         );
         await tunerPage.goto(h.url + '/?tool=tuner');
         await tunerPage.waitForFunction(() => window.RENAX_TOOLS?.current === 'tuner');
+        await tunerPage.locator('#tunerSettingsOpen').click();
+        assert.equal(
+          await tunerPage.locator('#tunerSettingsDialog').evaluate((node) => node.open),
+          true,
+        );
         await tunerPage.locator('#tunerA4').fill('442.5');
         await tunerPage.locator('#tunerA4').press('Tab');
         assert.equal(await tunerPage.locator('#tunerA4Slider').inputValue(), '442.5');
-        await tunerPage.locator('#tunerTemperament').selectOption('pythagorean', { force: true });
+        await tunerPage.locator('#tunerTemperamentSettings > summary').click();
+        await tunerPage.locator('#tunerTemperament').selectOption('pythagorean');
+        await tunerPage.keyboard.press('Escape');
+        assert.equal(
+          await tunerPage.evaluate(() => document.activeElement.id),
+          'tunerSettingsOpen',
+        );
         await tunerPage.locator('#toolSwitchLink').click();
         await tunerPage.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
         assert.equal(await tunerPage.locator('#workspaceNav [role=tab]').count(), 6);

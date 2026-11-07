@@ -582,6 +582,8 @@ rangeButton.addEventListener('click',()=>{
  extended=!extended;
  if(!extended&&Number(bpmSlider.value)>250)setTempo(250);
  sync();
+ // Keep keyboard tempo control on the fader after switching its range.
+ fader.focus({preventScroll:true});
 });
 fader.addEventListener('input',()=>setTempo(positionToTempo(fader.value)));
 // Preserve the native thumb position during drags, even between integer BPM values.

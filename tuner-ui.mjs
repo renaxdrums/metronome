@@ -31,6 +31,7 @@ export function createTuner(root) {
   settingsDialog.addEventListener('close', () => {
     window.RENAX_NUMBOX?.closeAll();
     el('SettingsOpen').setAttribute('aria-expanded', 'false');
+    if (document.documentElement.dataset.tool === 'tuner') el('SettingsOpen').focus();
   });
   settingsDialog.addEventListener('click', (event) => {
     if (event.target !== settingsDialog) return;

@@ -245,6 +245,7 @@ const { start } = require('../tests/audio-harness.cjs');
         await tunerPage.locator('#tunerTemperamentSettings > summary').click();
         await tunerPage.locator('#tunerTemperament').selectOption('pythagorean');
         await tunerPage.keyboard.press('Escape');
+        await tunerPage.waitForFunction(() => document.activeElement.id === 'tunerSettingsOpen');
         assert.equal(
           await tunerPage.evaluate(() => document.activeElement.id),
           'tunerSettingsOpen',

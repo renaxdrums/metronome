@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "ddec616ed51c7048",
+  "revision": "20e3b800e1de1334",
   "resources": [
     {
       "path": "accessibility.css",
@@ -284,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "f1e04c88decd51e8d5d544580210c0cfbd865fb57f22d3274f27e87eedbcaccf",
+      "sha256": "af44fd993531e30bd8cd56f79660d31142b6427f3164b5ad4dae6c63f1971712",
       "text": true
     },
     {
@@ -344,7 +344,7 @@
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "69222625507b59fa60cd2fd954a8d24da0e9aa729db3af8656ead83a4df7b46f",
+      "sha256": "ca001359a98acdb86d8620cd939d178a59dcc4c97afcac26c37c4364603efefb",
       "text": true
     },
     {
@@ -524,7 +524,7 @@
     },
     {
       "path": "sound-bank-menu.js",
-      "sha256": "560cfe458902c1b35f4dcb5f1a7d6a938c1b0f991329ff0fc6dd86106242328c",
+      "sha256": "4b24aaf8f0be53150111d142cb287c8efd7cc30f0b9639a24b460edc0a67d6f1",
       "text": true
     },
     {
@@ -599,12 +599,12 @@
     },
     {
       "path": "workspace-layout.css",
-      "sha256": "1e200a8a8bd76662413f63c6230c07f6514b12005dbef0874da57be58536e773",
+      "sha256": "983154311fc8237bb734b6b38d261e68bb25b290c0643fe4850a029efafa1673",
       "text": true
     },
     {
       "path": "workspace-layout.js",
-      "sha256": "052cca0a54a5c83786076bc10605cac66dd989b361a51be680c8a3874c7344f5",
+      "sha256": "94c5d56db48fb777d03e6948b729d9b284dbbc9d310051dc32e1858cfc293888",
       "text": true
     }
   ]

@@ -650,6 +650,9 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
 }
 
 /* Shared Métronome composition: control strip, instrument surface and transport. */
+html#renaxApp[data-tool='tuner'] #renaxHeaderWave {
+  max-width: 100%;
+}
 html#renaxApp[data-tool='tuner'] #tunerRoot {
   --tune-action-bg: #173f49;
   --tune-action-border: #327b89;

@@ -245,7 +245,26 @@ const { start } = require('../tests/audio-harness.cjs');
         await tunerPage.locator('#tunerTemperamentSettings > summary').click();
         await tunerPage.locator('#tunerTemperament').selectOption('pythagorean');
         await tunerPage.keyboard.press('Escape');
-        await tunerPage.waitForFunction(() => document.activeElement.id === 'tunerSettingsOpen');
+        await tunerPage
+          .waitForFunction(() => document.activeElement.id === 'tunerSettingsOpen', null, {
+            timeout: 5000,
+          })
+          .catch(async (error) => {
+            console.error(
+              'Tuner dialog focus diagnostic',
+              await tunerPage.evaluate(() => ({
+                open: document.getElementById('tunerSettingsDialog').open,
+                activeTag: document.activeElement?.tagName,
+                activeId: document.activeElement?.id,
+                activeClass: document.activeElement?.className,
+                activeText: document.activeElement?.textContent?.slice(0, 100),
+                expanded: [
+                  ...document.querySelectorAll('.numbox-button[aria-expanded="true"]'),
+                ].map((node) => node.id),
+              })),
+            );
+            throw error;
+          });
         assert.equal(
           await tunerPage.evaluate(() => document.activeElement.id),
           'tunerSettingsOpen',

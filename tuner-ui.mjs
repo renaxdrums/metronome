@@ -36,6 +36,17 @@ export function createTuner(root) {
   settingsDialog.addEventListener('close', () => {
     window.RENAX_NUMBOX?.closeAll();
     el('SettingsOpen').setAttribute('aria-expanded', 'false');
+    // Some engines leave focus on the body. Restore it only while it is lost
+    // or still in the closed sheet; a fast Tab must keep moving forward.
+    const focused = document.activeElement;
+    if (
+      document.documentElement.dataset.tool === 'tuner' &&
+      (!focused ||
+        focused === document.body ||
+        focused === document.documentElement ||
+        settingsDialog.contains(focused))
+    )
+      el('SettingsOpen').focus();
   });
   settingsDialog.addEventListener('click', (event) => {
     if (event.target !== settingsDialog) return;

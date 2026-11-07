@@ -66,6 +66,37 @@ const { start } = require('../tests/audio-harness.cjs');
         );
         firstGestures[firstGestures.length - 1].browser = name;
         await native.close();
+        const nativeTuner = await browser.newPage({
+          viewport: { width: 390, height: 900 },
+          serviceWorkers: 'block',
+        });
+        await nativeTuner.addInitScript(() => {
+          localStorage.setItem('renax.arrival.enabled.v1', 'false');
+          const original = Element.prototype.requestFullscreen;
+          if (original)
+            Element.prototype.requestFullscreen = function (...args) {
+              const attempt = Reflect.apply(original, this, args);
+              window.__qaFullscreenAttempt = attempt;
+              return attempt;
+            };
+        });
+        await nativeTuner.goto(h.url + '/?tool=tuner');
+        await nativeTuner.waitForFunction(() => window.RENAX_TOOLS?.current === 'tuner');
+        await nativeTuner.locator('#tunerSettingsOpen').click();
+        await nativeTuner.evaluate(async () => {
+          try {
+            await window.__qaFullscreenAttempt;
+          } catch {}
+        });
+        await nativeTuner.locator('#tunerTemperamentSettings > summary').click();
+        await nativeTuner.locator('#tunerSettingsClose').click();
+        assert.equal(
+          await nativeTuner.locator('#tunerSettingsDialog').evaluate((node) => node.open),
+          false,
+        );
+        firstGestures[firstGestures.length - 1].tunerSettingsUsable = true;
+        await nativeTuner.close();
+        console.log('PASS tuner first-gesture fullscreen/settings ' + name);
         for (const width of [1440, 390]) {
           const p = await browser.newPage({
             viewport: { width, height: 900 },
@@ -229,15 +260,66 @@ const { start } = require('../tests/audio-harness.cjs');
         });
         const tunerErrors = [];
         tunerPage.on('pageerror', (error) => tunerErrors.push(error.message));
-        await tunerPage.addInitScript(() =>
-          localStorage.setItem('renax.arrival.enabled.v1', 'false'),
-        );
+        await tunerPage.addInitScript(() => {
+          localStorage.setItem('renax.arrival.enabled.v1', 'false');
+          // As in the metronome layout checks, keep a fixed viewport. The real
+          // first-gesture fullscreen path is exercised independently above.
+          if (Element.prototype.requestFullscreen)
+            Element.prototype.requestFullscreen = () =>
+              Promise.reject(new DOMException('Fixed viewport test', 'NotAllowedError'));
+        });
         await tunerPage.goto(h.url + '/?tool=tuner');
         await tunerPage.waitForFunction(() => window.RENAX_TOOLS?.current === 'tuner');
+        await tunerPage.locator('#tunerSettingsOpen').click();
+        assert.equal(
+          await tunerPage.locator('#tunerSettingsDialog').evaluate((node) => node.open),
+          true,
+        );
+        assert.equal(await tunerPage.evaluate(() => innerWidth), 390);
         await tunerPage.locator('#tunerA4').fill('442.5');
         await tunerPage.locator('#tunerA4').press('Tab');
         assert.equal(await tunerPage.locator('#tunerA4Slider').inputValue(), '442.5');
-        await tunerPage.locator('#tunerTemperament').selectOption('pythagorean', { force: true });
+        await tunerPage.locator('#tunerTemperamentSettings > summary').click();
+        const temperamentControl = tunerPage.locator('.numbox-custom').filter({
+          has: tunerPage.locator('#tunerTemperament'),
+        });
+        // Use the visible control: a hidden native select is not the keyboard
+        // target musicians interact with, particularly in Firefox.
+        await temperamentControl.locator('.numbox-button').click();
+        await tunerPage.keyboard.press('Escape');
+        assert.equal(
+          await tunerPage.locator('#tunerSettingsDialog').evaluate((node) => node.open),
+          true,
+          'Escape closes the open menu before its containing dialog',
+        );
+        await temperamentControl.locator('.numbox-button').click();
+        await temperamentControl.locator('[data-value=pythagorean]').click();
+        assert.equal(await tunerPage.locator('#tunerTemperament').inputValue(), 'pythagorean');
+        await tunerPage.keyboard.press('Escape');
+        await tunerPage
+          .waitForFunction(() => document.activeElement.id === 'tunerSettingsOpen', null, {
+            timeout: 5000,
+          })
+          .catch(async (error) => {
+            console.error(
+              'Tuner dialog focus diagnostic',
+              await tunerPage.evaluate(() => ({
+                open: document.getElementById('tunerSettingsDialog').open,
+                activeTag: document.activeElement?.tagName,
+                activeId: document.activeElement?.id,
+                activeClass: document.activeElement?.className,
+                activeText: document.activeElement?.textContent?.slice(0, 100),
+                expanded: [
+                  ...document.querySelectorAll('.numbox-button[aria-expanded="true"]'),
+                ].map((node) => node.id),
+              })),
+            );
+            throw error;
+          });
+        assert.equal(
+          await tunerPage.evaluate(() => document.activeElement.id),
+          'tunerSettingsOpen',
+        );
         await tunerPage.locator('#toolSwitchLink').click();
         await tunerPage.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
         assert.equal(await tunerPage.locator('#workspaceNav [role=tab]').count(), 6);

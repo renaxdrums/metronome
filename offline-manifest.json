@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "283302ee05041dce",
+  "revision": "e9b6b82f321297b8",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "6590b57300aa3b03bdb697203b6ff87873b019bf948263f21ef3f224e9fee039",
+      "sha256": "c4c3ac6ba954e3900f7ff21835fbc1f16cedc30c264c79d91a2c1452737d37d2",
       "text": true
     },
     {
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "245a00bcf6c83760928dbf7c049bb4ca84608eab2949896f85fa86bb6e8c8cfe",
+      "sha256": "e533282aca51a7b52f93b039840f42c1d37dad29d0680a222e2afbccf0378d50",
       "text": true
     },
     {
@@ -389,7 +389,7 @@
     },
     {
       "path": "musician-tools.mjs",
-      "sha256": "88057bc2391c2c91303a7079687180c7e2596dd1352db40340ba041d08f8f1cb",
+      "sha256": "0a1473022dd29e256308e83a60ad4e966076e5328b51f01fe16bb4f7df731c77",
       "text": true
     },
     {
@@ -449,7 +449,7 @@
     },
     {
       "path": "renax-pulse-ivory.css",
-      "sha256": "fe7d8572ec104f813352988540db5581b3eaaea1ca608c1ddf1ee71c5cc8bbd5",
+      "sha256": "7fc8755bf1d48ae070a0dcdd264146b537ecffe8e2339ef980817771fb0de19b",
       "text": true
     },
     {
@@ -548,8 +548,13 @@
       "text": true
     },
     {
+      "path": "tuner-interface.css",
+      "sha256": "919156b2d8c2dc9539bcb173f3bc01473528ae2e64c6bbc62a6f8fdf89d2c3d1",
+      "text": true
+    },
+    {
       "path": "tuner-ui.mjs",
-      "sha256": "02132208210866ed0c7c2a433634c5ea465af25104202cf3bb4deab411bd06d5",
+      "sha256": "a34b3e544bff1ca0fc64a333d07c6286e093d453b66b783a959f0cdcfc374884",
       "text": true
     },
     {

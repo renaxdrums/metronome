@@ -229,7 +229,7 @@ html#renaxApp[data-theme="avant"] body :is(#tapBtn,.tap-tempo-btn,#workspaceTemp
 }
 html#renaxApp[data-theme="avant"] body input[type="range"] {
   accent-color:#9fb919 !important;
-  background:#c9cfc3 !important;
+  background:var(--tuner-range-bg,#c9cfc3) !important;
 }
 html#renaxApp[data-theme="avant"] body input[type="range"]::-webkit-slider-thumb {
   background:var(--ag-lime) !important;

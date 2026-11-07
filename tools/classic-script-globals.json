@@ -8,6 +8,7 @@
     "playback-support.js",
     "metronome-transport.js",
     "pro-sound-bank.js",
+    "custom-samples.js",
     "sound-bank-menu.js",
     "emergency-backup.js",
     "local-backup.js",

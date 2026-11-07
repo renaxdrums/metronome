@@ -923,6 +923,19 @@
         updateTimerDisplay();
         return;
       }
+      // The circular editor's eraser clears only the selected block's rhythm.
+      // It must never replace the sequence with a single default measure.
+      if (document.body.dataset.workspace === 'sequence' && appMode === 'metronome' && !window.RENAX_MULTI?.active) {
+        const block = measures[activeMeasureIndex];
+        if (!block) return;
+        if (isPlaying) stopMetronome();
+        block.beatStates = block.beatSubdivisions.map(count => Array(count).fill(0));
+        validatePlayingState();
+        renderSequencerList();
+        renderActiveMeasure();
+        refreshMeasurePreviews();
+        return;
+      }
       stopMetronome();
       endTraining();
       resetWorkTimer();

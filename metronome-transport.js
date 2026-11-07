@@ -272,21 +272,44 @@
         tempo: Math.max(2, Math.min(999, Math.round(measureTempo || 120))),
         isPolyrhythm: true,
         outerStates: Array(n).fill(3),
-        innerStates: Array(d).fill(1)
+        innerStates: Array(d).fill(1),
+        polyVoiceCount: 2
       };
     }
 
     function ensurePolyStates(m) {
-      if (!Array.isArray(m.outerStates)) m.outerStates = Array(m.numerator).fill(3);
-      if (!Array.isArray(m.innerStates)) m.innerStates = Array(m.denominator).fill(1);
-      if (m.outerStates.length !== m.numerator) {
-        const old = m.outerStates.slice();
-        m.outerStates = Array.from({length:m.numerator}, (_,i) => old[i] ?? 3);
-      }
-      if (m.innerStates.length !== m.denominator) {
-        const old = m.innerStates.slice();
-        m.innerStates = Array.from({length:m.denominator}, (_,i) => old[i] ?? 1);
-      }
+      const n=clampPolyValue(m.numerator,5),d=clampPolyValue(m.denominator,4);
+      m.numerator=n;m.denominator=d;
+      const oldOuter=Array.isArray(m.outerStates)?m.outerStates:[];
+      const oldInner=Array.isArray(m.innerStates)?m.innerStates:[];
+      m.outerStates=Array.from({length:n},(_,i)=>Number.isInteger(oldOuter[i])?oldOuter[i]:3);
+      m.innerStates=Array.from({length:d},(_,i)=>Number.isInteger(oldInner[i])?oldInner[i]:1);
+      const count=Math.max(2,Math.min(4,Number(m.polyVoiceCount)||2));
+      m.polyVoiceCount=count;
+      if(!Array.isArray(m.polyVoices))m.polyVoices=[];
+      while(m.polyVoices.length<count)m.polyVoices.push({
+        count:2,bank:null,subdivisions:[],states:[]
+      });
+      m.polyVoices.length=count;
+      m.polyVoices.forEach((voice,vi)=>{
+        const beats=vi===0?n:vi===1?d:clampPolyValue(voice.count,2);
+        voice.count=beats;
+        if(!Array.isArray(voice.subdivisions))voice.subdivisions=[];
+        if(!Array.isArray(voice.states))voice.states=[];
+        voice.subdivisions=Array.from({length:beats},(_,b)=>{
+          const value=Number(voice.subdivisions[b]);
+          return allowedSubdivisions(4).includes(value)?value:1;
+        });
+        voice.states=Array.from({length:beats},(_,b)=>{
+          const previous=Array.isArray(voice.states[b])?voice.states[b]:[];
+          const initial=vi===0?m.outerStates[b]:vi===1?m.innerStates[b]:vi===2?2:3;
+          return Array.from({length:voice.subdivisions[b]},(_,s)=>{
+            const state=s===0&&vi<2?initial:previous[s];
+            return Number.isInteger(state)&&state>=0&&state<=3?state:(s===0?initial:0);
+          });
+        });
+        if(!SOUND_BANKS[voice.bank])voice.bank=null;
+      });
     }
 
     function clampPolyValue(value, fallback) {
@@ -295,56 +318,149 @@
     }
 
     function getPolyEvents(m) {
-      const map = new Map();
-      const add = (u, _key) => {
-        const k = Math.round(u * 1000000) / 1000000;
-        if (!map.has(k)) map.set(k, { u:k, outer:false, inner:false, outerIndex:-1, innerIndex:-1 });
+      ensurePolyStates(m);
+      const map=new Map();
+      const add=(u)=>{
+        const k=Math.round(u*100000000)/100000000;
+        if(!map.has(k))map.set(k,{u:k,outer:false,inner:false,outerIndex:-1,innerIndex:-1,hits:[]});
         return map.get(k);
       };
-      for (let i=0;i<m.numerator;i++) { const e=add(i/m.numerator); e.outer=true; e.outerIndex=i; }
-      for (let i=0;i<m.denominator;i++) { const e=add(i/m.denominator); e.inner=true; e.innerIndex=i; }
+      m.polyVoices.forEach((voice,vi)=>{
+        for(let beat=0;beat<voice.count;beat++){
+          for(let sub=0;sub<voice.subdivisions[beat];sub++){
+            const e=add((beat+sub/voice.subdivisions[beat])/voice.count);
+            e.hits.push({voice:vi,beat,sub});
+            if(vi===0&&sub===0){e.outer=true;e.outerIndex=beat;}
+            if(vi===1&&sub===0){e.inner=true;e.innerIndex=beat;}
+          }
+        }
+      });
       return [...map.values()].sort((a,b)=>a.u-b.u);
     }
 
+    const polyVoiceCountLabel=document.createElement('label');
+    polyVoiceCountLabel.className='poly-voice-count';
+    polyVoiceCountLabel.textContent='Voies';
+    const polyVoiceCountInput=document.createElement('select');
+    polyVoiceCountInput.id='polyVoiceCount';
+    polyVoiceCountInput.setAttribute('aria-label','Nombre de voies en polyrythmie');
+    for(let i=2;i<=4;i++){const option=document.createElement('option');option.value=String(i);option.textContent=String(i);polyVoiceCountInput.append(option);}
+    polyVoiceCountLabel.append(polyVoiceCountInput);polyControls.append(polyVoiceCountLabel);
+    enhanceNumboxSelect(polyVoiceCountInput);
+    polyVoiceCountInput.addEventListener('change',()=>{
+      if(appMode!=='polyrhythm')return;
+      const m=measures[activeMeasureIndex];if(!m)return;
+      if(isPlaying)stopMetronome();
+      m.polyVoiceCount=Math.max(2,Math.min(4,Number(polyVoiceCountInput.value)||2));
+      ensurePolyStates(m);
+      closePolyBeatEditor();renderSequencerList();renderActiveMeasure();
+    });
+
+    const polyBeatEditor=document.createElement('div');
+    polyBeatEditor.id='polyBeatEditor';polyBeatEditor.className='poly-beat-editor';
+    polyBeatEditor.hidden=true;polyBeatEditor.setAttribute('role','dialog');
+    polyBeatEditor.setAttribute('aria-label','Édition des subdivisions de polyrythmie');
+    document.body.append(polyBeatEditor);
+    let polyBeatSelection=null;
+    function closePolyBeatEditor(){polyBeatEditor.hidden=true;polyBeatSelection=null;}
+    function syncPolySoundLabel(){
+      const active=appMode==='polyrhythm'&&measures[activeMeasureIndex];
+      const m=active?measures[activeMeasureIndex]:null;
+      if(m)ensurePolyStates(m);
+      const personalized=!!m&&m.polyVoices.some(voice=>voice.bank);
+      soundBankSel.dataset.polyCustom=String(personalized);
+      const label=soundBankSel.closest('.numbox-custom')?.querySelector('.numbox-button span');
+      if(label&&personalized)label.textContent='Personnalisé';
+      else if(label)label.textContent=soundBankSel.selectedOptions[0]?.textContent||currentBank;
+    }
+    soundBankSel.addEventListener('change',()=>queueMicrotask(syncPolySoundLabel));
+    function polyBankForVoice(m,vi){
+      const voice=m.polyVoices[vi];
+      if(voice?.bank&&SOUND_BANKS[voice.bank])return voice.bank;
+      if(m.polyVoices.length<4)return currentBank;
+      // Four clearly distinct recorded accent timbres when the general bank is used.
+      return [currentBank,...['clic','cloche','claves','clic808','beep'].filter(key=>key!==currentBank)][vi]||'clic';
+    }
+    function refreshPolyBeatEditor(){
+      if(!polyBeatSelection)return;
+      const {m,voiceIndex,beat}=polyBeatSelection;
+      if(appMode!=='polyrhythm'||!measures.includes(m)){closePolyBeatEditor();return;}
+      ensurePolyStates(m);
+      const voice=m.polyVoices[voiceIndex];if(!voice||beat>=voice.count){closePolyBeatEditor();return;}
+      polyBeatEditor.replaceChildren();
+      const header=document.createElement('div');header.className='poly-beat-header';
+      const title=document.createElement('strong');title.textContent='Voie '+(voiceIndex+1)+' · temps '+(beat+1);
+      const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Fermer');close.onclick=closePolyBeatEditor;header.append(title,close);
+      const divisionLabel=document.createElement('label');divisionLabel.textContent='Diviser le temps en';
+      const division=document.createElement('select');division.setAttribute('aria-label','Subdivisions du temps');
+      for(const n of allowedSubdivisions(4)){const option=document.createElement('option');option.value=String(n);option.textContent=String(n);division.append(option);}
+      division.value=String(voice.subdivisions[beat]);
+      division.onchange=()=>{
+        if(isPlaying)stopMetronome();
+        const length=Number(division.value),old=voice.states[beat];
+        voice.subdivisions[beat]=length;voice.states[beat]=Array.from({length},(_,i)=>old[i]??0);
+        refreshPolyBeatEditor();renderSequencerList();renderActiveMeasure();
+      };
+      divisionLabel.append(division);
+      const pads=document.createElement('div');pads.className='poly-beat-pads';
+      for(let sub=0;sub<voice.subdivisions[beat];sub++){
+        const pad=document.createElement('button');pad.type='button';pad.className='poly-beat-pad';
+        const state=voice.states[beat][sub];pad.dataset.state=String(state);pad.textContent=String(sub+1);
+        pad.setAttribute('aria-label','Subdivision '+(sub+1)+' · '+(['Silence','Clic 1','Clic 2','Accent'][state]));
+        pad.onclick=()=>{
+          if(isPlaying)stopMetronome();
+          voice.states[beat][sub]=(voice.states[beat][sub]+1)%4;
+          if(sub===0&&voiceIndex===0)m.outerStates[beat]=voice.states[beat][sub];
+          if(sub===0&&voiceIndex===1)m.innerStates[beat]=voice.states[beat][sub];
+          refreshPolyBeatEditor();renderSequencerList();renderActiveMeasure();
+        };
+        pads.append(pad);
+      }
+      const soundLabel=document.createElement('label');soundLabel.textContent='Son de la voie';
+      const sound=document.createElement('select');sound.setAttribute('aria-label','Son de la voie '+(voiceIndex+1));
+      const general=document.createElement('option');general.value='';general.textContent='Banque générale';sound.append(general);
+      for(const option of soundBankSel.options){if(!SOUND_BANKS[option.value])continue;const copy=document.createElement('option');copy.value=option.value;copy.textContent=option.textContent;sound.append(copy);}
+      sound.value=voice.bank||'';
+      sound.onchange=()=>{
+        if(isPlaying)stopMetronome();
+        voice.bank=sound.value||null;
+        syncPolySoundLabel();
+        if(voice.bank){ensureInstrumentBankReady(voice.bank).catch(()=>{});}
+      };
+      soundLabel.append(sound);
+      polyBeatEditor.append(header,divisionLabel,pads,soundLabel);
+    }
+    function openPolyBeatEditor(m,voiceIndex,beat){
+      closeBeatEditor();
+      polyBeatSelection={m,voiceIndex,beat};polyBeatEditor.hidden=false;refreshPolyBeatEditor();
+    }
     function buildPolyVisualizer(m) {
       ensurePolyStates(m);
-      sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring').forEach(el => el.remove());
-      totalSteps = 0;
-      stepsData = [];
-      clearProgressTrail();
-      const outerRing=document.createElement('div'); outerRing.className='poly-ring outer'; sequencerContainer.appendChild(outerRing);
-      const innerRing=document.createElement('div'); innerRing.className='poly-ring inner'; sequencerContainer.appendChild(innerRing);
-
-      const bindPolyState = (el, states, index) => {
-        el.setAttribute('role','button');el.tabIndex=0;el.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();el.click();}});
-        const apply = () => {
-          const s = states[index] ?? 0;
-          el.dataset.state = String(s);
-          el.title = s === 0 ? 'Éteint' : `Clic ${s}`;
-          el.setAttribute('aria-label', el.title);
-        };
-        apply();
-        el.addEventListener('click', ev => {
-          ev.stopPropagation();
-          states[index] = ((states[index] ?? 0) + 1) % 4;
-          apply();
-          renderSequencerList();
-        });
-      };
-
-      for (let i=0;i<m.numerator;i++) {
-        const d=document.createElement('div'); d.className='poly-dot outer'; d.dataset.polyOuter=i;
-        d.style.setProperty('--angle', `${(i/m.numerator)*360}deg`);
-        bindPolyState(d, m.outerStates, i);
-        sequencerContainer.appendChild(d);
-      }
-      for (let i=0;i<m.denominator;i++) {
-        const d=document.createElement('div'); d.className='poly-dot inner'; d.dataset.polyInner=i;
-        d.style.setProperty('--angle', `${(i/m.denominator)*360}deg`);
-        bindPolyState(d, m.innerStates, i);
-        sequencerContainer.appendChild(d);
-      }
-      beatDisplay.textContent=`${m.numerator}:${m.denominator}`;
+      sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring').forEach(el=>el.remove());
+      totalSteps=0;stepsData=[];clearProgressTrail();
+      const radii=['min(19.5dvh,152px)','min(12.5dvh,98px)','min(8.5dvh,65px)','min(5dvh,40px)'];
+      m.polyVoices.forEach((voice,vi)=>{
+        const klass=vi===0?'outer':vi===1?'inner':'voice-'+(vi+1);
+        const ring=document.createElement('div');ring.className='poly-ring '+klass;
+        if(vi>=2){ring.style.width='calc(2 * '+radii[vi]+')';ring.style.height=ring.style.width;}
+        sequencerContainer.append(ring);
+        for(let beat=0;beat<voice.count;beat++){
+          const dot=document.createElement('div');dot.className='poly-dot '+klass;
+          dot.dataset.polyVoice=String(vi);dot.dataset.polyBeat=String(beat);
+          if(vi===0)dot.dataset.polyOuter=String(beat);
+          if(vi===1)dot.dataset.polyInner=String(beat);
+          dot.style.setProperty('--angle',((beat/voice.count)*360)+'deg');
+          if(vi>=2)dot.style.setProperty('--poly-radius',radii[vi]);
+          const state=voice.states[beat][0];dot.dataset.state=String(state);
+          dot.tabIndex=0;dot.setAttribute('role','button');
+          dot.title='Éditer les subdivisions · voie '+(vi+1)+', temps '+(beat+1);
+          dot.setAttribute('aria-label',dot.title);
+          dot.onclick=ev=>{ev.stopPropagation();openPolyBeatEditor(m,vi,beat);};
+          dot.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();dot.click();}};
+          sequencerContainer.append(dot);
+        }
+      });
+      beatDisplay.textContent=m.polyVoices.map(v=>v.count).join(':');
     }
 
     function renderPolyrhythmList() {
@@ -357,6 +473,7 @@
         if(isPlaying && i===playingMeasureIndex) card.classList.add('playing');
         const head=document.createElement('div'); head.className='measure-head';
         head.innerHTML=`<span class="measure-num">MESURE ${i+1} / ${measures.length}</span><span class="measure-sig">${m.numerator}:${m.denominator}</span>`;
+        ensurePolyStates(m);
         const ratio=document.createElement('div'); ratio.className='poly-ratio-row';
         const n=numberMenu(2,20,m.numerator,`Numérateur mesure ${i+1}`);
         const slash=document.createElement('span'); slash.textContent=':'; slash.className='poly-slash';
@@ -365,6 +482,18 @@
         const updateRatio=()=>{ m.numerator=clampPolyValue(n.value,m.numerator); m.denominator=clampPolyValue(d.value,m.denominator); ensurePolyStates(m); n.value=m.numerator; d.value=m.denominator; head.querySelector('.measure-sig').textContent=`${m.numerator}:${m.denominator}`; if(i===activeMeasureIndex) renderActiveMeasure(); };
         n.addEventListener('change',updateRatio); d.addEventListener('change',updateRatio);
         ratio.append(n,slash,d);
+        const extra=document.createElement('div');extra.className='poly-extra-voices';
+        for(let vi=2;vi<m.polyVoices.length;vi++){
+          const voice=m.polyVoices[vi],field=numberMenu(2,20,voice.count,'Pulsations voie '+(vi+1)+' · mesure '+(i+1));
+          const label=document.createElement('label');label.textContent='Voie '+(vi+1);
+          label.append(field);extra.append(label);
+          field.addEventListener('click',stop);field.addEventListener('keydown',stop);
+          field.addEventListener('change',()=>{
+            if(isPlaying)stopMetronome();
+            voice.count=clampPolyValue(field.value,voice.count);ensurePolyStates(m);
+            if(i===activeMeasureIndex)renderActiveMeasure();renderSequencerList();
+          });
+        }
         const tempoRow=document.createElement('div'); tempoRow.className='measure-tempo-row';
         const tempoLabel=document.createElement('span'); tempoLabel.className='measure-tempo-label'; tempoLabel.textContent='TEMPO';
         const tempoInput=numberMenu(2,999,m.tempo,`Tempo mesure ${i+1} (BPM)`);tempoInput.className='measure-tempo-input';
@@ -376,7 +505,7 @@
         const ob=document.createElement('div'); ob.className='outer-mini'; ob.style.width=`${Math.min(100,m.numerator*8)}px`;
         const ib=document.createElement('div'); ib.className='inner-mini'; ib.style.width=`${Math.min(100,m.denominator*8)}px`;
         preview.append(ob,ib);
-        card.append(head,ratio,tempoRow,preview);
+        card.append(head,ratio,extra,tempoRow,preview);
         const select=()=>{ activeMeasureIndex=i; syncTempoUI(m); renderSequencerList(); renderActiveMeasure(); };
         card.addEventListener('click',select); card.addEventListener('keydown',e=>{if(e.target===card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();select();}});
         measureListEl.appendChild(card);
@@ -398,8 +527,10 @@
       activeMeasureLabel.textContent=m.name||`MESURE ${activeMeasureIndex+1} / ${measures.length}`;
       updateVoiceGroupLabel();
       refreshBeatEditor();
-      polyNumeratorInput.value=String(m.numerator); polyDenominatorInput.value=String(m.denominator); syncNumbox(polyNumeratorInput); syncNumbox(polyDenominatorInput);
-      syncTempoUI(m); buildPolyVisualizer(m);
+      ensurePolyStates(m);
+      polyNumeratorInput.value=String(m.numerator);polyDenominatorInput.value=String(m.denominator);polyVoiceCountInput.value=String(m.polyVoiceCount);
+      syncNumbox(polyNumeratorInput);syncNumbox(polyDenominatorInput);syncNumbox(polyVoiceCountInput);
+      syncTempoUI(m);buildPolyVisualizer(m);syncPolySoundLabel();
       playhead.stepIndex=0; playhead.startTime=performance.now();
     };
 
@@ -410,9 +541,11 @@
         if(!isPlaying || appMode!=='polyrhythm' || visualEpoch!==window.RENAX_PLAYBACK?.generation) return;
         if(activeMeasureIndex!==mIdx){ activeMeasureIndex=mIdx; renderActiveMeasure(); renderSequencerList(); }
         sequencerContainer.querySelectorAll('.poly-dot').forEach(el=>el.classList.remove('active'));
-        if(event.outer){ const el=sequencerContainer.querySelector(`[data-poly-outer="${event.outerIndex}"]`); if(el) el.classList.add('active'); }
-        if(event.inner){ const el=sequencerContainer.querySelector(`[data-poly-inner="${event.innerIndex}"]`); if(el) el.classList.add('active'); }
-        const m=measures[mIdx]; if(m){ beatDisplay.textContent=`${m.numerator}:${m.denominator}`; beatDisplay.classList.add('pulse'); setTimeout(()=>beatDisplay.classList.remove('pulse'),130); }
+        for(const hit of event.hits||[]){
+          const el=sequencerContainer.querySelector(`[data-poly-voice="${hit.voice}"][data-poly-beat="${hit.beat}"]`);
+          if(el)el.classList.add('active');
+        }
+        const m=measures[mIdx]; if(m){ beatDisplay.textContent=m.polyVoices.map(v=>v.count).join(':'); beatDisplay.classList.add('pulse'); setTimeout(()=>beatDisplay.classList.remove('pulse'),130); }
       },Math.max(0,drawTime));
     }
 
@@ -425,13 +558,16 @@
         if(polyEventIndex>=events.length) polyEventIndex=0;
         const e=events[polyEventIndex];
         ensurePolyStates(m);
-        if(e.outer) {
-          const s = m.outerStates[e.outerIndex] ?? 3;
-          if (s > 0) playClick(s,nextNoteTime,e.u===0);
-        }
-        if(e.inner) {
-          const s = m.innerStates[e.innerIndex] ?? 1;
-          if (s > 0) playClick(s,nextNoteTime,e.u===0);
+        for(const hit of e.hits){
+          const voice=m.polyVoices[hit.voice];
+          const state=voice.states[hit.beat]?.[hit.sub]??0;
+          if(!state)continue;
+          const bankId=polyBankForVoice(m,hit.voice),bank=SOUND_BANKS[bankId]||SOUND_BANKS.clic;
+          const output=audioCtx.createGain();
+          const safety=m.polyVoices.length<=2?1:1/Math.sqrt(m.polyVoices.length/2);
+          output.gain.value=masterVolume*(BANK_GAINS[bankId]??1)*safety;
+          output.connect(bank.isVoice?getVoiceMixDestination(audioCtx):getAudioMixDestination(audioCtx));
+          bank.play(output,nextNoteTime,state,hit.beat===0&&hit.sub===0,{mode:'polyrhythm',isMainBeat:hit.sub===0,beatNumber:hit.beat+1,subIndex:hit.sub});
         }
         if(e.outer)window.RENAX_PLAYBACK?.recordBeat(audioCtx,nextNoteTime);
         schedulePolyVisualUpdate(mIdx,e,nextNoteTime);
@@ -470,7 +606,8 @@
       metroSigGroup.style.display=mode==='metronome'?'flex':'none';
       polyControls.classList.toggle('active',mode==='polyrhythm');
       modeSwitch.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
-      syncTempoUI(measures[0]); renderSequencerList(); renderActiveMeasure();
+      closePolyBeatEditor();
+      syncTempoUI(measures[0]); renderSequencerList(); renderActiveMeasure();syncPolySoundLabel();
     }
 
     modeSwitch.addEventListener('click',e=>{ const b=e.target.closest('button[data-mode]'); if(b) setAppMode(b.dataset.mode); });
@@ -496,6 +633,11 @@
       } catch (err) {
         console.warn('Voice metronome preload unavailable:', err);
         return;
+      }
+      if(appMode==='polyrhythm'){
+        const banks=new Set();
+        for(const m of measures){ensurePolyStates(m);for(let vi=0;vi<m.polyVoices.length;vi++)banks.add(polyBankForVoice(m,vi));}
+        for(const id of banks){if(id===currentBank)continue;try{await ensureInstrumentBankReady(id);await ensureVoiceMetronomeReady(id);}catch(err){console.warn('Polyrythmie: son indisponible, repli possible',id,err);}}
       }
       if (isPlaying || startEpoch!==window.RENAX_PLAYBACK?.generation) return;
       isPlaying = true;

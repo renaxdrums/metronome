@@ -455,7 +455,7 @@
           dot.title='Éditer les subdivisions · voie '+(vi+1)+', temps '+(beat+1);
           dot.setAttribute('aria-label',dot.title);
           dot.onclick=ev=>{ev.stopPropagation();openPolyBeatEditor(m,vi,beat);};
-          dot.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();dot.click();}};
+          dot.onkeydown=ev=>{if(ev.key===' '){ev.preventDefault();if(isPlaying)stopMetronome();voice.states[beat][0]=(voice.states[beat][0]+1)%4;if(vi===0)m.outerStates[beat]=voice.states[beat][0];if(vi===1)m.innerStates[beat]=voice.states[beat][0];dot.dataset.state=String(voice.states[beat][0]);renderSequencerList();}else if(ev.key==='Enter'){ev.preventDefault();dot.click();}};
           sequencerContainer.append(dot);
         }
       });

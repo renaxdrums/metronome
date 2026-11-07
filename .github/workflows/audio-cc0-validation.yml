@@ -32,6 +32,11 @@ jobs:
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm exec playwright install chromium --with-deps
+      - name: Tuner layout and microphone regression
+        run: |
+          export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          node tests/tuner-core-test.mjs
+          node tests/tuner-interface-test.cjs
       - name: Lint and incremental formatting
         run: |
           pnpm lint

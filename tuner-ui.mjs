@@ -14,6 +14,35 @@ export function createTuner(root) {
     if (node.textContent !== value) node.textContent = value;
   };
   const t = (value) => window.RENAX_I18N?.t(value) || value;
+  const settingsDialog = el('SettingsDialog');
+  function closeSettings() {
+    window.RENAX_NUMBOX?.closeAll();
+    if (settingsDialog.open) settingsDialog.close();
+  }
+  function openSettings(section) {
+    window.RENAX_NUMBOX?.closeAll();
+    if (section) el(section).open = true;
+    if (!settingsDialog.open) settingsDialog.showModal();
+    el('SettingsOpen').setAttribute('aria-expanded', 'true');
+    if (section) el(section).scrollIntoView({ block: 'nearest' });
+  }
+  el('SettingsOpen').addEventListener('click', () => openSettings());
+  el('SettingsClose').addEventListener('click', closeSettings);
+  settingsDialog.addEventListener('close', () => {
+    window.RENAX_NUMBOX?.closeAll();
+    el('SettingsOpen').setAttribute('aria-expanded', 'false');
+  });
+  settingsDialog.addEventListener('click', (event) => {
+    if (event.target !== settingsDialog) return;
+    const box = settingsDialog.getBoundingClientRect();
+    if (
+      event.clientX < box.left ||
+      event.clientX > box.right ||
+      event.clientY < box.top ||
+      event.clientY > box.bottom
+    )
+      closeSettings();
+  });
   const defaults = {
     a4: 440,
     instrument: 'chromatic',
@@ -87,7 +116,6 @@ export function createTuner(root) {
     toneTimer = 0,
     frame = 0,
     strobeOffset = 0,
-    orbitAngle = 0,
     lastFrame = 0;
   let current = null,
     locked = settings.locked;
@@ -204,8 +232,8 @@ export function createTuner(root) {
         updateTargets();
       }
       if (['notation', 'accidentals', 'transpose'].includes(key)) updateTargets();
-      if (key === 'temperament' && value === 'custom') el('Advanced').open = true;
-      if (key === 'instrument' && value === 'custom') el('Advanced').open = true;
+      if (['temperament', 'instrument'].includes(key) && value === 'custom')
+        openSettings('Advanced');
       updateSummary();
       save();
       render();
@@ -320,7 +348,6 @@ export function createTuner(root) {
     render();
     updateTone();
   });
-  const orbit = root.querySelector('.renax-orbit-motion');
   const toleranceBand = el('ToleranceBand');
   function render() {
     const gap = 50 - settings.tolerance;
@@ -329,7 +356,7 @@ export function createTuner(root) {
       toleranceBand.setAttribute('stroke-dasharray', zone);
     el('Idle').hidden = Boolean(current);
     el('Reading').hidden = !current;
-    el('Cents').hidden = !current;
+    el('Cents').hidden = false;
     if (!current) {
       text(el('Note'), '—');
       text(el('Frequency'), '— Hz');
@@ -369,8 +396,6 @@ export function createTuner(root) {
     lastFrame = now;
     if (current?.cents && !reduce.matches) {
       strobeOffset = (strobeOffset + current.cents * dt * 0.008) % 20;
-      orbitAngle = (orbitAngle + current.cents * dt * 0.0018) % 360;
-      orbit.style.setProperty('--tuner-orbit-angle', orbitAngle.toFixed(2) + 'deg');
       el('Strobe').firstElementChild.setAttribute(
         'style',
         'transform:translateX(' + strobeOffset.toFixed(2) + 'px)',
@@ -651,5 +676,5 @@ export function createTuner(root) {
   updateTargets();
   updateSummary();
   render();
-  return { stop };
+  return { stop, closeSettings };
 }

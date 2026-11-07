@@ -33,6 +33,7 @@ function show(tool, { notify = true } = {}) {
   const changed = tool !== current;
   if (changed) {
     window.RENAX_NUMBOX?.closeAll();
+    controller.closeSettings();
     if (current === 'metronome') {
       stopMetronome();
       endTraining();
@@ -76,11 +77,7 @@ function show(tool, { notify = true } = {}) {
     )?.focus({ preventScroll: true });
   }
 }
-for (const title of [
-  home,
-  document.getElementById('tunerTitle'),
-])
-  title.tabIndex = -1;
+for (const title of [home, document.getElementById('tunerTitle')]) title.tabIndex = -1;
 document.addEventListener('click', (event) => {
   const link = event.target.closest('[data-tool-link]');
   if (

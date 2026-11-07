@@ -84,14 +84,13 @@ fs.writeFileSync(wav, data);
     await p.locator('#toolHome [data-tool-link=tuner]').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'tuner');
     assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'avant');
-    const tunerLogo = p.locator('#tunerRoot .renax-orbit-mark').first();
-    assert.equal(
-      await tunerLogo.evaluate((el) => getComputedStyle(el).backgroundColor),
-      'rgb(215, 242, 24)',
-    );
     assert.match(
-      await tunerLogo.evaluate((el) => getComputedStyle(el).maskImage),
+      await p.locator('header .brand-logo').getAttribute('src'),
       /renax-logo-approved\.svg/,
+    );
+    assert.equal(
+      await p.locator('.tuner-center-zone').evaluate((el) => getComputedStyle(el).stroke),
+      'rgb(215, 242, 24)',
     );
     await p.locator('#toolHomeLink').click();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'home');
@@ -145,9 +144,12 @@ fs.writeFileSync(wav, data);
         ) < 0.2,
     );
     assert.equal(await p.locator('.tuner-measurement').getAttribute('data-tuned'), 'true');
-    const orbit = p.locator('.tuner-orbit .renax-orbit-motion');
-    const tunedOrbit = await orbit.getAttribute('style');
+    const strobe = p.locator('#tunerStrobe > div');
+    const tunedStrobe = await strobe.getAttribute('style');
     const measured = await p.locator('#tunerFrequency').textContent();
+    await p.locator('#tunerSettingsOpen').click();
+    assert.equal(await p.locator('#tunerSettingsDialog').evaluate((node) => node.open), true);
+    assert.equal(await p.evaluate(() => document.activeElement.id), 'tunerSettingsClose');
     await p.locator('[data-tuner-a4="442"]').click();
     assert.equal(await p.locator('#tunerA4').inputValue(), '442');
     assert.equal(await p.locator('#tunerA4Slider').inputValue(), '442');
@@ -161,8 +163,8 @@ fs.writeFileSync(wav, data);
     );
     assert.match(await p.locator('#tunerNeedle').getAttribute('transform'), /^rotate\(-/);
     await p.waitForFunction(
-      (previous) => document.querySelector('.tuner-orbit .renax-orbit-motion').getAttribute('style') !== previous,
-      tunedOrbit,
+      (previous) => document.querySelector('#tunerStrobe > div').getAttribute('style') !== previous,
+      tunedStrobe,
     );
     await p.locator('#tunerA4').fill('');
     await p.locator('#tunerA4').pressSequentially('432.5');
@@ -175,15 +177,20 @@ fs.writeFileSync(wav, data);
     assert.equal(await p.locator('#tunerA4Slider').inputValue(), '432.5');
     await p.locator('#tunerA4Slider').fill('441.3');
     assert.equal(await p.locator('#tunerA4').inputValue(), '441.3');
+    await p.locator('#tunerTemperamentSettings > summary').click();
     await p.locator('#tunerTemperament').selectOption('pythagorean');
     await p.locator('#tunerTonic').selectOption('7');
+    await p.keyboard.press('Escape');
+    assert.equal(await p.evaluate(() => document.activeElement.id), 'tunerSettingsOpen');
     await p.locator('#tunerInstrument').selectOption('bass5');
     assert.equal(await p.locator('#tunerStrings button').count(), 5);
     await p.locator('#tunerStrings button').first().click();
     assert.equal(await p.locator('#tunerTarget').inputValue(), '23');
     await p.locator('#tunerInstrument').selectOption('chromatic');
+    await p.locator('#tunerSettingsOpen').click();
     await p.locator('[data-tuner-a4="440"]').click();
     await p.locator('#tunerTemperament').selectOption('equal');
+    await p.locator('#tunerSettingsClose').click();
     await p.locator('#tunerTone').click();
     assert.equal(await p.locator('#tunerListen').getAttribute('aria-pressed'), 'false');
     assert.equal(await p.locator('#tunerTone').getAttribute('aria-pressed'), 'true');
@@ -200,9 +207,12 @@ fs.writeFileSync(wav, data);
     await p.goForward();
     await p.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
     await p.locator('#toolSwitchLink').click();
+    await p.locator('#tunerListen').click();
+    await p.waitForFunction(() => document.getElementById('tunerNote').textContent === 'La4');
     for (const viewport of [
       { width: 1440, height: 1000 },
       { width: 390, height: 844 },
+      { width: 360, height: 780 },
       { width: 320, height: 600 },
       { width: 740, height: 360 },
     ]) {
@@ -234,6 +244,28 @@ fs.writeFileSync(wav, data);
         const b = await p.locator('#tunerRoot').boundingBox();
         assert(b.height > 100);
         assert(b.y + b.height <= viewport.height + 1, JSON.stringify({ viewport, theme, b }));
+        if ([360, 390].includes(viewport.width)) {
+          const controls = await p.locator('#tunerListen').boundingBox();
+          const meter = await p.locator('.tuner-meter').boundingBox();
+          const header = await p.locator('body > header').boundingBox();
+          assert(
+            controls.y + controls.height <= viewport.height,
+            'Microphone control must fit the first phone screen',
+          );
+          assert(
+            meter.y >= header.y + header.height && meter.y + meter.height <= viewport.height,
+            'The complete scale must fit below the header',
+          );
+          assert(header.height <= 64, 'Phone header must stay compact');
+        }
+        await p.locator('#tunerSettingsOpen').click();
+        const sheet = await p.locator('#tunerSettingsDialog').boundingBox();
+        assert(
+          sheet.y >= 0 && sheet.y + sheet.height <= viewport.height + 1,
+          'Settings must fit the viewport',
+        );
+        await p.keyboard.press('Escape');
+        assert.equal(await p.evaluate(() => document.activeElement.id), 'tunerSettingsOpen');
         if (theme === 'avant' && [390, 1440].includes(viewport.width)) {
           const target = p.locator('.numbox-custom:has(#tunerTarget)');
           const trigger = target.locator('.numbox-button');
@@ -243,10 +275,16 @@ fs.writeFileSync(wav, data);
           const selected = menu.locator('.numbox-option[aria-selected="true"]');
           const option = menu.locator('.numbox-option[aria-selected="false"]').first();
           for (const row of [selected, option]) {
-            assert.equal(await row.evaluate((el) => getComputedStyle(el).color), 'rgb(215, 242, 24)');
+            assert.equal(
+              await row.evaluate((el) => getComputedStyle(el).color),
+              'rgb(215, 242, 24)',
+            );
           }
           await option.hover();
-          assert.equal(await option.evaluate((el) => getComputedStyle(el).color), 'rgb(215, 242, 24)');
+          assert.equal(
+            await option.evaluate((el) => getComputedStyle(el).color),
+            'rgb(215, 242, 24)',
+          );
           await p.keyboard.press('Escape');
           await menu.waitFor({ state: 'hidden' });
           assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
@@ -275,6 +313,7 @@ fs.writeFileSync(wav, data);
     }
     await p.setViewportSize({ width: 390, height: 844 });
     await p.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
+    await p.locator('#tunerSettingsOpen').click();
     await p.locator('#tunerAdvanced').evaluate((node) => (node.open = true));
     await p.locator('#tunerTemperament').selectOption('custom');
     await p.locator('#tunerOffsets input').first().fill('12.3');
@@ -342,7 +381,7 @@ fs.writeFileSync(wav, data);
     await offlineContext.close();
     await p.close();
     console.log(
-      'PASS tuner microphone pipeline, A4, instruments, temperaments, 16 layouts, Back/Forward, state retention, denial and late permission cleanup',
+      'PASS tuner microphone pipeline, A4, instruments, temperaments, 20 layouts, modal focus/escape, first-screen phone controls, Back/Forward, state retention, denial and late permission cleanup',
     );
   } finally {
     await h.browser.close();

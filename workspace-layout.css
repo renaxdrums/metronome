@@ -190,6 +190,9 @@ body .silent-section[hidden]{display:none}
 .tempo-range-extend:disabled{opacity:.45;cursor:default}
 @media(min-width:1101px){.visu-toolbar .workspace-tempo-group{position:relative}.visu-toolbar .tempo-range-extend{position:absolute;top:-2px;right:0;min-height:17px;padding:1px 5px;font-size:9px}}
 
+/* Keep the added voice selector inside the measure column instead of covering tempo controls. */
+@media(min-width:1101px){body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-controls{height:auto;min-height:38px;flex-wrap:wrap;align-content:start;row-gap:6px}body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{flex:0 0 100%;min-width:0}}
+
 /* Polyrythmie: additional concentric voices and per-beat editor. */
 .poly-voice-count{display:flex;align-items:center;gap:5px;color:var(--text-muted);font-size:10px}
 .poly-voice-count .numbox-custom{width:52px}

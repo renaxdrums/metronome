@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "8958e7dd2b8220ff",
+  "revision": "a419473c1fab6bc6",
   "resources": [
     {
       "path": "accessibility.css",
@@ -279,7 +279,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "9b5d90fb3e57cd631ffe4e67fce36993514652d8b0820e05e58f016e4e251451",
+      "sha256": "75ac01517ca95585e2bf27b6bfef0d2bca655ece4b58738ff9d31cabe8e1c60a",
       "text": true
     },
     {
@@ -549,7 +549,7 @@
     },
     {
       "path": "tuner-interface.css",
-      "sha256": "1fb064f6fb1fc1e44786a7baac456f628c0510b9b897c3cbb6174aac88332420",
+      "sha256": "5481bfdada31825e8a1781b93682f4a248848f93401a0b0e26ac31f3695751b3",
       "text": true
     },
     {

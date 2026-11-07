@@ -267,11 +267,20 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
 }
 #tunerRoot .tuner-strobe {
   display: block;
+  flex: none;
+  width: min(76%, 480px);
+  max-width: 100%;
+  min-width: 0;
   height: 10px;
-  margin: 8px 12% 0;
+  margin: 8px auto 0;
+  overflow: clip;
+  contain: strict;
   opacity: 0;
   border: 0;
   background: transparent;
+}
+#tunerRoot .tuner-strobe > div {
+  inset: 0 -40px;
 }
 #tunerRoot .tuner-strobe[data-active='true'] {
   opacity: 0.65;

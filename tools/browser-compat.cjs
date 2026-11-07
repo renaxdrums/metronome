@@ -243,7 +243,21 @@ const { start } = require('../tests/audio-harness.cjs');
         await tunerPage.locator('#tunerA4').press('Tab');
         assert.equal(await tunerPage.locator('#tunerA4Slider').inputValue(), '442.5');
         await tunerPage.locator('#tunerTemperamentSettings > summary').click();
-        await tunerPage.locator('#tunerTemperament').selectOption('pythagorean');
+        const temperamentControl = tunerPage.locator('.numbox-custom').filter({
+          has: tunerPage.locator('#tunerTemperament'),
+        });
+        // Use the visible control: a hidden native select is not the keyboard
+        // target musicians interact with, particularly in Firefox.
+        await temperamentControl.locator('.numbox-button').click();
+        await tunerPage.keyboard.press('Escape');
+        assert.equal(
+          await tunerPage.locator('#tunerSettingsDialog').evaluate((node) => node.open),
+          true,
+          'Escape closes the open menu before its containing dialog',
+        );
+        await temperamentControl.locator('.numbox-button').click();
+        await temperamentControl.locator('[data-value=pythagorean]').click();
+        assert.equal(await tunerPage.locator('#tunerTemperament').inputValue(), 'pythagorean');
         await tunerPage.keyboard.press('Escape');
         await tunerPage
           .waitForFunction(() => document.activeElement.id === 'tunerSettingsOpen', null, {

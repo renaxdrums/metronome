@@ -10,6 +10,7 @@
   const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const canPickFile=typeof window.showSaveFilePicker==='function'&&!isMobile;
   async function renderPCM(song,bank,volume,amorcePlan=null) {
+    await window.RENAX_CUSTOM_SAMPLES?.ready;
     song=RENAX_SONGS.finiteExport(song);
     RENAX_SONGS.validateLibrary({version:1,profiles:[{id:'export',name:'Export',songs:[song]}]});
     if(!SOUND_BANKS[bank]||!Number.isFinite(volume)||volume<0||volume>1)throw Error('Réglages audio incorrects.');
@@ -37,6 +38,8 @@
     const length=Math.ceil((lead+duration+tail)*RATE);
     if(!Number.isSafeInteger(length)||length>2147483647)throw Error('Morceau trop long pour le rendu audio de ce navigateur.');
     audioCtx=new OfflineAudioContext(1,length,RATE);currentBank=bank;masterVolume=volume;
+    // Personal samples are decoded per context; never export silent fallback audio.
+    if(window.RENAX_CUSTOM_SAMPLES?.isLocalBank(bank))await ensureInstrumentBankReady(bank);
     if(amorcePlan)RENAX_AMORCE.begin(audioCtx,lead,amorcePlan);
     let time=lead,events=0,steps=0;
     for(const section of song.sections){

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "aa6bc73e684523af",
+  "revision": "939458490eb7e1a9",
   "resources": [
     {
       "path": "accessibility.css",
@@ -284,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "8ea11a7b803314acec1a03c8e39873ba7ac5fdef38c7dd7ee9ce63aa093863be",
+      "sha256": "c5c7b3e43c4ef94d2a3c31273cdaee63374d79433c3a888ed8bdfdacfa65d413",
       "text": true
     },
     {
@@ -504,7 +504,7 @@
     },
     {
       "path": "song-export.js",
-      "sha256": "8eee74326447f104045f9b45b851978c18f06dc7829cbc0e98eb5ce50875bcb3",
+      "sha256": "5382a2ef49d0751e2adaf7a54140d78f7f81247f5f1613a1a010415e5f4f069d",
       "text": true
     },
     {

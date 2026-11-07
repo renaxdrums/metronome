@@ -99,6 +99,17 @@ function wavOneShot() {
         db.close(); return !!row?.data;
       }, sampleId));
 
+      const exported = await page.evaluate(async id => {
+        const song = {id:'sample-export',name:'Local sample',sections:[{
+          id:'sample-block',label:'Intro',count:1,measure:createMeasure(4,4,120),
+        }]};
+        const result = await RENAX_MP3_EXPORT.isolatedRender(song,id,0.8);
+        let peak=0;for(const value of result.pcm)peak=Math.max(peak,Math.abs(value));
+        return {peak,events:result.score.events};
+      }, sampleId);
+      assert(exported.peak>0.01,'Imported sample must remain audible in isolated export');
+      assert.equal(exported.events,4);
+
       // A multipiste fader stores a value for the individual track.
       await nav('multi').click();
       if (!await page.locator('.multi-volume-row input').count())

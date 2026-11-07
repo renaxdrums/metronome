@@ -142,6 +142,7 @@ jobs:
             tests/results/theme-navigation-results.json
             tests/results/continuous-*
             tests/results/track-continuous-results.json
+            tests/results/tuner-interface
 
   firebase:
     runs-on: ubuntu-latest

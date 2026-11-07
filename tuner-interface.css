@@ -21,6 +21,7 @@ html#renaxApp[data-theme='ivory'] #tunerRoot {
 }
 html#renaxApp[data-theme='avant'] #tunerRoot {
   --tune-accent: var(--ag-lime);
+  --tune-good: var(--ag-lime);
   --tune-screen: var(--ag-header);
   --tune-screen-ink: var(--ag-white);
   --tune-screen-muted: #c7cec7;

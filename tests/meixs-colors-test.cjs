@@ -244,7 +244,8 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
         false,
         'Empty measures remain available in Sequencer',
       );
-      await p.locator('.silent-collapse').click();
+      assert.equal(await p.locator('.silent-section').isVisible(), true);
+      assert.equal(await p.locator('#silentToggle').isVisible(), true);
       await p.locator('#silentToggle').click();
       await colour('#silentToggle', 'backgroundColor', palette.lime);
       await colour('#silentToggle', 'color', palette.controlInk);

@@ -191,7 +191,20 @@ body .silent-section[hidden]{display:none}
 @media(min-width:1101px){.visu-toolbar .workspace-tempo-group{position:relative}.visu-toolbar .tempo-range-extend{position:absolute;top:-2px;right:0;min-height:17px;padding:1px 5px;font-size:9px}}
 
 /* Keep the added voice selector inside the measure column instead of covering tempo controls. */
-@media(min-width:1101px){body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-controls{height:auto;min-height:38px;flex-wrap:wrap;align-content:start;row-gap:6px}body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{flex:0 0 100%;min-width:0}}
+@media(min-width:1101px){
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info{position:relative}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-controls{height:38px;min-height:38px;flex-wrap:nowrap;row-gap:0}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{position:absolute;top:-6px;right:0;height:24px;gap:3px;min-width:0;flex:0 0 auto;font-size:9px;line-height:1}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-custom,
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{width:34px!important;min-width:34px!important;flex-basis:34px!important}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{height:24px!important;min-height:24px!important;padding:2px!important}
+}
+@media(min-width:1101px) and (max-width:1250px){
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{font-size:0;gap:2px}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count::before{content:"V";font:600 9px/1 var(--font)}
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-custom,
+ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{width:30px!important;min-width:30px!important;flex-basis:30px!important}
+}
 
 /* Polyrythmie: additional concentric voices and per-beat editor. */
 .poly-voice-count{display:flex;align-items:center;gap:5px;color:var(--text-muted);font-size:10px}

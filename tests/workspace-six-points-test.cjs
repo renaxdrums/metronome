@@ -63,6 +63,17 @@ function wavOneShot() {
 
       // Polyrythm: default two voices and optional independent four-voice editing.
       await nav('polyrhythm').click();
+      if (width === 1440) {
+        const layout = await page.evaluate(() => {
+          const row = document.querySelector('#polyControls').getBoundingClientRect();
+          const voice = document.querySelector('.poly-voice-count').getBoundingClientRect();
+          return { rowHeight: row.height, rowTop: row.top, voiceBottom: voice.bottom };
+        });
+        assert.equal(Math.round(layout.rowHeight), 38,
+          'Voice selector must not create a second row or shrink the circular sequencer');
+        assert(layout.voiceBottom <= layout.rowTop + 1,
+          'Voice selector must remain above the existing pulse controls');
+      }
       assert.equal(await page.locator('#polyVoiceCount').inputValue(), '2');
       await page.locator('#polyVoiceCount').evaluate(select => {
         select.value = '4'; select.dispatchEvent(new Event('change', { bubbles: true }));

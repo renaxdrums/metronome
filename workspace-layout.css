@@ -180,6 +180,9 @@ html,body,body *{scrollbar-width:thin!important;scrollbar-color:var(--editor-scr
 /* Preserve usable preference space in short browser windows. */
 @media(max-width:1100px) and (max-height:600px){body[data-mobile-pane=settings] footer{display:none!important}}
 
+/* Preserve native hidden state for silent measures when layout CSS defines display. */
+body .silent-section[hidden]{display:none}
+
 /* Tempo range option: one compact secondary control, no fader width reduction. */
 .tempo-range-extend{align-self:flex-start;min-height:25px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text-muted);font:600 10px/1.2 var(--font);cursor:pointer;white-space:nowrap}
 .tempo-range-extend[aria-pressed=true]{border-color:var(--cyan);color:var(--cyan)}
@@ -194,9 +197,11 @@ html,body,body *{scrollbar-width:thin!important;scrollbar-color:var(--editor-scr
 .poly-extra-voices label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)}
 .poly-extra-voices select{width:52px;min-height:30px;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:var(--text)}
 .poly-ring.voice-3,.poly-ring.voice-4{border-color:color-mix(in srgb,var(--cyan) 25%,transparent)}
+.poly-ring.voice-3{width:min(17dvh,130px);height:min(17dvh,130px)}
+.poly-ring.voice-4{width:min(10dvh,80px);height:min(10dvh,80px)}
 .poly-dot.voice-3{width:12px;height:12px}
 .poly-dot.voice-4{width:9px;height:9px}
-#polyBeatEditor[hidden]{display:none!important}
+#polyBeatEditor[hidden]{display:none}
 #polyBeatEditor{position:fixed;top:110px;right:16px;z-index:11000;display:flex;flex-direction:column;gap:14px;width:min(354px,calc(100vw - 24px));max-height:calc(100dvh - 120px);overflow:auto;padding:16px;border:1px solid var(--cyan);border-radius:10px;background:var(--panel);color:var(--text);box-shadow:0 18px 55px #000a}
 #polyBeatEditor .poly-beat-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 #polyBeatEditor .poly-beat-header strong{font-size:13px}

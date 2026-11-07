@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "2ff6e34424edce0e",
+  "revision": "797746ac35274605",
   "resources": [
     {
       "path": "accessibility.css",
@@ -554,7 +554,7 @@
     },
     {
       "path": "tuner-ui.mjs",
-      "sha256": "2cacb353af03f43781ec9baf66415ef6e9e8bc058dd68ba1ae8fa10a1ef61b2e",
+      "sha256": "72aea4b708f3b29ebc75cbc618659db14e3fca01a3e1085e00826a047cf6b9e1",
       "text": true
     },
     {

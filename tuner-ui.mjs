@@ -23,8 +23,8 @@ export function createTuner(root) {
     window.RENAX_NUMBOX?.closeAll();
     if (section) el(section).open = true;
     if (!settingsDialog.open) {
-      // Firefox does not always focus a button clicked with a pointer. Give
-      // the native dialog an explicit return target before it captures focus.
+      // Give the dialog a stable return target, including automatic disclosure
+      // of custom tuning after an instrument change.
       el('SettingsOpen').focus({ preventScroll: true });
       settingsDialog.showModal();
     }
@@ -33,6 +33,17 @@ export function createTuner(root) {
   }
   el('SettingsOpen').addEventListener('click', () => openSettings());
   el('SettingsClose').addEventListener('click', closeSettings);
+  settingsDialog.addEventListener('keydown', (event) => {
+    if (
+      event.key !== 'Escape' ||
+      event.defaultPrevented ||
+      settingsDialog.querySelector('.numbox-custom.open')
+    )
+      return;
+    event.preventDefault();
+    event.stopPropagation();
+    closeSettings();
+  });
   settingsDialog.addEventListener('close', () => {
     window.RENAX_NUMBOX?.closeAll();
     el('SettingsOpen').setAttribute('aria-expanded', 'false');

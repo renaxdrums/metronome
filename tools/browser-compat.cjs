@@ -66,6 +66,37 @@ const { start } = require('../tests/audio-harness.cjs');
         );
         firstGestures[firstGestures.length - 1].browser = name;
         await native.close();
+        const nativeTuner = await browser.newPage({
+          viewport: { width: 390, height: 900 },
+          serviceWorkers: 'block',
+        });
+        await nativeTuner.addInitScript(() => {
+          localStorage.setItem('renax.arrival.enabled.v1', 'false');
+          const original = Element.prototype.requestFullscreen;
+          if (original)
+            Element.prototype.requestFullscreen = function (...args) {
+              const attempt = Reflect.apply(original, this, args);
+              window.__qaFullscreenAttempt = attempt;
+              return attempt;
+            };
+        });
+        await nativeTuner.goto(h.url + '/?tool=tuner');
+        await nativeTuner.waitForFunction(() => window.RENAX_TOOLS?.current === 'tuner');
+        await nativeTuner.locator('#tunerSettingsOpen').click();
+        await nativeTuner.evaluate(async () => {
+          try {
+            await window.__qaFullscreenAttempt;
+          } catch {}
+        });
+        await nativeTuner.locator('#tunerTemperamentSettings > summary').click();
+        await nativeTuner.locator('#tunerSettingsClose').click();
+        assert.equal(
+          await nativeTuner.locator('#tunerSettingsDialog').evaluate((node) => node.open),
+          false,
+        );
+        firstGestures[firstGestures.length - 1].tunerSettingsUsable = true;
+        await nativeTuner.close();
+        console.log('PASS tuner first-gesture fullscreen/settings ' + name);
         for (const width of [1440, 390]) {
           const p = await browser.newPage({
             viewport: { width, height: 900 },
@@ -229,9 +260,14 @@ const { start } = require('../tests/audio-harness.cjs');
         });
         const tunerErrors = [];
         tunerPage.on('pageerror', (error) => tunerErrors.push(error.message));
-        await tunerPage.addInitScript(() =>
-          localStorage.setItem('renax.arrival.enabled.v1', 'false'),
-        );
+        await tunerPage.addInitScript(() => {
+          localStorage.setItem('renax.arrival.enabled.v1', 'false');
+          // As in the metronome layout checks, keep a fixed viewport. The real
+          // first-gesture fullscreen path is exercised independently above.
+          if (Element.prototype.requestFullscreen)
+            Element.prototype.requestFullscreen = () =>
+              Promise.reject(new DOMException('Fixed viewport test', 'NotAllowedError'));
+        });
         await tunerPage.goto(h.url + '/?tool=tuner');
         await tunerPage.waitForFunction(() => window.RENAX_TOOLS?.current === 'tuner');
         await tunerPage.locator('#tunerSettingsOpen').click();
@@ -239,6 +275,7 @@ const { start } = require('../tests/audio-harness.cjs');
           await tunerPage.locator('#tunerSettingsDialog').evaluate((node) => node.open),
           true,
         );
+        assert.equal(await tunerPage.evaluate(() => innerWidth), 390);
         await tunerPage.locator('#tunerA4').fill('442.5');
         await tunerPage.locator('#tunerA4').press('Tab');
         assert.equal(await tunerPage.locator('#tunerA4Slider').inputValue(), '442.5');

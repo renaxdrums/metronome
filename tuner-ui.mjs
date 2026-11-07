@@ -45,6 +45,9 @@ export function createTuner(root) {
     closeSettings();
   });
   settingsDialog.addEventListener('close', () => {
+    // A fullscreen entry may require reopening the still-active dialog above
+    // the fullscreen root. Ignore the queued close event from that transition.
+    if (settingsDialog.open) return;
     window.RENAX_NUMBOX?.closeAll();
     el('SettingsOpen').setAttribute('aria-expanded', 'false');
     // Some engines leave focus on the body. Restore it only while it is lost
@@ -58,6 +61,15 @@ export function createTuner(root) {
         settingsDialog.contains(focused))
     )
       el('SettingsOpen').focus();
+  });
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement || !settingsDialog.open) return;
+    // The first pointer gesture starts fullscreen before its click opens the
+    // settings. When fullscreen completes later, put the dialog back on top.
+    const focused = document.activeElement;
+    settingsDialog.close();
+    settingsDialog.showModal();
+    if (settingsDialog.contains(focused)) focused.focus({ preventScroll: true });
   });
   settingsDialog.addEventListener('click', (event) => {
     if (event.target !== settingsDialog) return;

@@ -179,3 +179,41 @@ html,body,body *{scrollbar-width:thin!important;scrollbar-color:var(--editor-scr
 
 /* Preserve usable preference space in short browser windows. */
 @media(max-width:1100px) and (max-height:600px){body[data-mobile-pane=settings] footer{display:none!important}}
+
+/* Preserve native hidden state for silent measures when layout CSS defines display. */
+body .silent-section[hidden]{display:none}
+
+/* Tempo range option: one compact secondary control, no fader width reduction. */
+.tempo-range-extend{align-self:flex-start;min-height:25px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text-muted);font:600 10px/1.2 var(--font);cursor:pointer;white-space:nowrap}
+.tempo-range-extend[aria-pressed=true]{border-color:var(--cyan);color:var(--cyan)}
+.tempo-range-extend:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.tempo-range-extend:disabled{opacity:.45;cursor:default}
+@media(min-width:1101px){.visu-toolbar .workspace-tempo-group{position:relative}.visu-toolbar .tempo-range-extend{position:absolute;top:-2px;right:0;min-height:17px;padding:1px 5px;font-size:9px}}
+
+/* Keep the added voice selector inside the measure column instead of covering tempo controls. */
+@media(min-width:1101px){body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-controls{height:auto;min-height:38px;flex-wrap:wrap;align-content:start;row-gap:6px}body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{flex:0 0 100%;min-width:0}}
+
+/* Polyrythmie: additional concentric voices and per-beat editor. */
+.poly-voice-count{display:flex;align-items:center;gap:5px;color:var(--text-muted);font-size:10px}
+.poly-voice-count .numbox-custom{width:52px}
+.poly-extra-voices{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0}
+.poly-extra-voices label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)}
+.poly-extra-voices select{width:52px;min-height:30px;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:var(--text)}
+.poly-ring.voice-3,.poly-ring.voice-4{border-color:color-mix(in srgb,var(--cyan) 25%,transparent)}
+.poly-ring.voice-3{width:min(17dvh,130px);height:min(17dvh,130px)}
+.poly-ring.voice-4{width:min(10dvh,80px);height:min(10dvh,80px)}
+.poly-dot.voice-3{width:12px;height:12px}
+.poly-dot.voice-4{width:9px;height:9px}
+#polyBeatEditor[hidden]{display:none}
+#polyBeatEditor{position:fixed;top:110px;right:16px;z-index:11000;display:flex;flex-direction:column;gap:14px;width:min(354px,calc(100vw - 24px));max-height:calc(100dvh - 120px);overflow:auto;padding:16px;border:1px solid var(--cyan);border-radius:10px;background:var(--panel);color:var(--text);box-shadow:0 18px 55px #000a}
+#polyBeatEditor .poly-beat-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#polyBeatEditor .poly-beat-header strong{font-size:13px}
+#polyBeatEditor .poly-beat-header button{height:32px;width:32px;border:1px solid var(--orange);border-radius:5px;background:transparent;color:var(--orange);font-size:23px;cursor:pointer}
+#polyBeatEditor label{display:flex;flex-direction:column;gap:7px;font-size:11px;color:var(--text-muted)}
+#polyBeatEditor select{min-height:38px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text)}
+#polyBeatEditor .poly-beat-pads{display:flex;gap:6px;overflow-x:auto;padding:2px 0}
+#polyBeatEditor .poly-beat-pad{flex:1 0 30px;height:47px;border:1px solid var(--border);border-radius:6px;background:var(--grey);color:var(--text);font-weight:700;cursor:pointer}
+#polyBeatEditor .poly-beat-pad[data-state='1']{background:var(--cyan);color:#111}
+#polyBeatEditor .poly-beat-pad[data-state='2']{background:var(--yellow);color:#111}
+#polyBeatEditor .poly-beat-pad[data-state='3']{background:var(--orange);color:#111}
+@media(max-width:1100px){#polyBeatEditor{top:auto;bottom:12px;left:12px;right:12px;width:auto;max-height:min(70dvh,480px)}}

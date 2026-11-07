@@ -65,8 +65,8 @@
 <link rel="stylesheet" href="sequence-parallel.css?v=d94e8e846784">
 <link rel="stylesheet" href="entry-09.css?v=a66a57940143"><link id="circular-view-legend" rel="stylesheet" href="entry-circular-view-legend.css?v=b7784e722d76"><link rel="stylesheet" href="entry-11.css?v=a9bea4c245c7">
 <link rel="stylesheet" href="entry-12.css?v=5956b2c2f6c4">
-<link rel="stylesheet" href="multi-metronome.css?v=f6354c473f35">
-  <link rel="stylesheet" href="workspace-layout.css?v=17de0bda3dda">
+<link rel="stylesheet" href="multi-metronome.css?v=6bf342538e67">
+  <link rel="stylesheet" href="workspace-layout.css?v=f1dbda35baa6">
 <link rel="stylesheet" href="pro-interface.css?v=58585adca440">
 <link rel="stylesheet" href="console-theme.css?v=fba7a0bab865">
 <link rel="stylesheet" href="entry-13.css?v=20b69b1b6a58"><link id="appearance-theme" rel="stylesheet" href="appearance-theme.css?v=b519ea612c4b">
@@ -128,6 +128,7 @@
         <label><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 20h10L14 4h-4L7 20Z M12 16l6-9 M9 20v-3h6v3"/></svg>Tempo (noire)</label>
         <div class="tempo-display" id="bpmDisplay">120 <span>BPM</span></div>
         <div class="tempo-slider-row"><button type="button" id="tempoDecrease" class="tempo-step-button" aria-label="Diminuer le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><input type="range" id="bpmSlider" min="2" max="999" value="120" hidden><input type="range" id="tempoFader" min="0" max="10000" step="1" value="4400" aria-label="Tempo" aria-valuetext="120 BPM"><button type="button" id="tempoIncrease" class="tempo-step-button" aria-label="Augmenter le tempo de 1 BPM"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
+        <button type="button" id="tempoRangeExtend" class="tempo-range-extend" aria-pressed="false" aria-label="Étendre la plage du fader de 2 à 999 BPM" title="Plage habituelle : 2 à 250 BPM">Étendre à 999 BPM</button>
         <button class="tap-tempo-btn notranslate" translate="no" data-no-translate id="tapBtn" type="button">
           <span><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 13V5a2 2 0 0 1 4 0v7l3-1 4 3-2 7H9l-5-7a2 2 0 0 1 3-2l2 1Z"/></svg>TAP TEMPO</span>
           <span class="key-hint">T / NUM 0</span>
@@ -451,12 +452,13 @@
   <script src="metronome-core.js?v=9365c6168329"></script>
   <link rel="stylesheet" href="playback-support.css?v=be7d47c55905">
   <script src="playback-support.js?v=906fd4c12e7e"></script>
-  <script src="metronome-transport.js?v=2031fc79216f"></script>
+  <script src="metronome-transport.js?v=e56bf2c8fbee"></script>
   <script src="pro-sound-bank.js?v=5a4ad356541f"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
 </script>
-<script src="sound-bank-menu.js?v=743d19a77c10"></script>
+<script src="custom-samples.js?v=3551483675e3"></script>
+<script src="sound-bank-menu.js?v=4b24aaf8f0be"></script>
   <script src="emergency-backup.js?v=9a0db8f8e45e"></script>
 <script src="local-backup.js?v=6fb6848845c2"></script>
   <script src="amorce-song.js?v=8ce54d637c8f"></script>
@@ -483,7 +485,7 @@
     })();
   </script>
   <script src="midi-export.js?v=08b4e13a18a1"></script>
-  <script src="song-export.js?v=8eee74326447"></script>
+  <script src="song-export.js?v=5382a2ef49d0"></script>
 
   <script>
   (() => {
@@ -539,7 +541,7 @@
   <script src="compact-controls.js?v=24ce2f42ed2a"></script>
   <script src="navigation-history.js?v=157c31114aa0"></script>
   <script src="rhythm-score.js?v=e058a752abac"></script>
-  <script src="edit-history.js?v=0e5a27a29b3b"></script>
+  <script src="edit-history.js?v=db2e3869063c"></script>
 <script>
 (()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);if(/^(start|play)$/i.test(raw)&&raw!==label)playBtn.textContent=label;playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();
 </script>
@@ -550,30 +552,57 @@ function adjust(delta){if(training.engaged||bpmSlider.disabled)return;const next
 decrease.addEventListener('click',()=>adjust(-1));increase.addEventListener('click',()=>adjust(1));bpmSlider.addEventListener('input',sync);
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});new MutationObserver(sync).observe(trainBtn,{attributes:true,attributeFilter:['aria-pressed','class']});sync();
 })();</script><script>(()=>{
-const fader=document.getElementById('tempoFader');
-let activePointer=null;
-function positionToTempo(position){const p=Math.max(0,Math.min(10000,Number(position)));return Math.round(p<=2000?2+p/2000*38:p<=8000?40+(p-2000)/6000*200:240+(p-8000)/2000*759);}
-function tempoToPosition(bpm){const t=Math.max(2,Math.min(999,Number(bpm)));return Math.round(t<=40?(t-2)/38*2000:t<=240?2000+(t-40)/200*6000:8000+(t-240)/759*2000);}
-function sync(){const bpm=Number(bpmSlider.value),locked=training.engaged||bpmSlider.disabled;if(locked)activePointer=null;if(activePointer===null)fader.value=String(tempoToPosition(bpm));fader.disabled=locked;fader.setAttribute('aria-valuetext',bpm+' BPM');fader.title=bpm+' BPM';}
-function setTempo(bpm){if(training.engaged||bpmSlider.disabled){sync();return;}const next=Math.max(2,Math.min(999,Math.round(bpm)));if(next!==Number(bpmSlider.value)){bpmSlider.value=String(next);bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));}sync();}
+const fader=document.getElementById('tempoFader'),rangeButton=document.getElementById('tempoRangeExtend');
+let activePointer=null,extended=false;
+const maxFaderTempo=()=>extended?999:250;
+function positionToTempo(position){const p=Math.max(0,Math.min(10000,Number(position)));return Math.round(2+p/10000*(maxFaderTempo()-2));}
+function tempoToPosition(bpm){const t=Math.max(2,Math.min(maxFaderTempo(),Number(bpm)));return Math.round((t-2)/(maxFaderTempo()-2)*10000);}
+function sync(){
+ const bpm=Number(bpmSlider.value),locked=training.engaged||bpmSlider.disabled;
+ if(bpm>250&&!extended)extended=true; // Numeric editing may still request an advanced tempo.
+ if(locked)activePointer=null;
+ if(activePointer===null)fader.value=String(tempoToPosition(bpm));
+ fader.disabled=locked;
+ rangeButton.disabled=locked;
+ rangeButton.setAttribute('aria-pressed',String(extended));
+ rangeButton.textContent=extended?'Réduire à 250 BPM':'Étendre à 999 BPM';
+ rangeButton.setAttribute('aria-label',extended?'Revenir à la plage de 2 à 250 BPM':'Étendre la plage du fader de 2 à 999 BPM');
+ rangeButton.title=extended?'Plage étendue : 2 à 999 BPM. Revenir au mode normal ramène un tempo supérieur à 250 BPM à 250.':'Plage habituelle : 2 à 250 BPM';
+ fader.setAttribute('aria-valuetext',bpm+' BPM');fader.title=bpm+' BPM';
+}
+function setTempo(bpm){
+ if(training.engaged||bpmSlider.disabled){sync();return;}
+ const next=Math.max(2,Math.min(999,Math.round(bpm)));
+ if(next!==Number(bpmSlider.value)){bpmSlider.value=String(next);bpmSlider.dispatchEvent(new Event('input',{bubbles:true}));}
+ sync();
+}
+rangeButton.addEventListener('click',()=>{
+ if(training.engaged||bpmSlider.disabled)return;
+ activePointer=null;
+ extended=!extended;
+ if(!extended&&Number(bpmSlider.value)>250)setTempo(250);
+ sync();
+ // Keep keyboard tempo control on the fader after switching its range.
+ fader.focus({preventScroll:true});
+});
 fader.addEventListener('input',()=>setTempo(positionToTempo(fader.value)));
-// Keep the native thumb under the pointer; round BPM without moving the drag origin.
+// Preserve the native thumb position during drags, even between integer BPM values.
 fader.addEventListener('pointerdown',event=>{if(event.isPrimary&&event.button===0&&!fader.disabled)activePointer=event.pointerId;});
 function finishDrag(event){if(activePointer!==null&&(!event||event.pointerId===activePointer)){activePointer=null;sync();}}
 window.addEventListener('pointerup',finishDrag);window.addEventListener('pointercancel',finishDrag);window.addEventListener('blur',()=>finishDrag());
-fader.addEventListener('keydown',event=>{const delta={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1,PageDown:-10,PageUp:10}[event.key];if(delta!==undefined||event.key==='Home'||event.key==='End'){event.preventDefault();setTempo(event.key==='Home'?2:event.key==='End'?999:Number(bpmSlider.value)+delta);}});
+fader.addEventListener('keydown',event=>{const delta={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1,PageDown:-10,PageUp:10}[event.key];if(delta!==undefined||event.key==='Home'||event.key==='End'){event.preventDefault();setTempo(event.key==='Home'?2:event.key==='End'?maxFaderTempo():Number(bpmSlider.value)+delta);}});
 bpmSlider.addEventListener('input',sync);bpmSlider.addEventListener('change',sync);
 new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObserver(sync).observe(bpmSlider,{attributes:true,attributeFilter:['disabled']});sync();
 })();</script>
 <script src="multi-clock.js?v=200171f7f4fd"></script>
-<script src="multi-metronome.js?v=287ba922f2cf"></script>
+<script src="multi-metronome.js?v=9e41c3a2ab8c"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
 <script src="interface-translations.js?v=c4b4483175a0"></script>
 <script src="vendor/i18next-25.6.0.js?v=6077ce0b0640"></script>
 <script src="interface-locales.js?v=d94f599e8511"></script>
 <link rel="stylesheet" href="interface-language.css?v=3995c298df9e">
 <script src="interface-language.js?v=291439ae445e"></script>
-<script src="workspace-layout.js?v=59c5930f2b6d"></script>
+<script src="workspace-layout.js?v=94c5d56db48f"></script>
 <script type="module" src="musician-tools.mjs?v=c16764a7017b"></script>
 <script src="avant-garde-motion.js?v=502d1d826916"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->

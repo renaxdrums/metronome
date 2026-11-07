@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
 <script>
-/* General entry opens the tool chooser. index.html remains a direct metronome link.
-   Incoming playlist links retain their existing import destination. */
-(()=>{const url=new URL(location.href),tool=url.searchParams.get('tool');document.documentElement.dataset.tool=['home','metronome','tuner'].includes(tool)?tool:location.pathname.endsWith('/')&&!location.hash?'home':'metronome';})();
+/* Open the metronome directly; legacy home and unknown tool links use it too. */
+(()=>{const tool=new URL(location.href).searchParams.get('tool');document.documentElement.dataset.tool=tool==='tuner'?'tuner':'metronome';})();
 </script>
 <script>
 /* Apply before first paint. A system light preference never overrides the default. */
-(()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory','avant'].includes(saved))theme=saved;}catch{}const root=document.documentElement;root.dataset.selectedTheme=theme;root.dataset.theme=root.dataset.tool==='home'?'dark':theme;})();
+(()=>{let theme='dark';try{const saved=localStorage.getItem('renax-appearance');if(['dark','light','ivory','avant'].includes(saved))theme=saved;}catch{}const root=document.documentElement;root.dataset.selectedTheme=theme;root.dataset.theme=theme;})();
 </script>
   <link rel="stylesheet" href="entry-01.css?v=210963e43dd8">
   <script>
@@ -42,7 +41,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>RENAX DRUMS — Métronome</title>
-  <link rel="stylesheet" href="app-base.css?v=3382b66ffa93">
+  <link rel="stylesheet" href="app-base.css?v=eaffaff1b6e8">
   <link rel="stylesheet" href="songs.css?v=9ed52968ed47">
   <link rel="stylesheet" href="mp3-export.css?v=86771b5d6ae9">
   <link rel="stylesheet" href="backup-index2.css?v=bba65634db68">
@@ -69,7 +68,7 @@
 <link rel="stylesheet" href="multi-metronome.css?v=f6354c473f35">
   <link rel="stylesheet" href="workspace-layout.css?v=17de0bda3dda">
 <link rel="stylesheet" href="pro-interface.css?v=58585adca440">
-<link rel="stylesheet" href="console-theme.css?v=81653b3d9a80">
+<link rel="stylesheet" href="console-theme.css?v=fba7a0bab865">
 <link rel="stylesheet" href="entry-13.css?v=20b69b1b6a58"><link id="appearance-theme" rel="stylesheet" href="appearance-theme.css?v=b519ea612c4b">
 <link id="light-readability20" rel="stylesheet" href="entry-light-readability20.css?v=f6b6aafc402d">
 <link id="settings-palette24" rel="stylesheet" href="entry-settings-palette24.css?v=86c3933cfed1">
@@ -82,8 +81,8 @@
 <link id="beat-hover45" rel="stylesheet" href="entry-beat-hover45.css?v=b5cd61a9099f"><link rel="stylesheet" href="accessibility.css?v=0d0e695a10ba">
 <link rel="stylesheet" href="kern-intro.css?v=5e2e8530cd7c">
 <link rel="stylesheet" href="avant-garde-theme.css?v=c4c3ac6ba954">
-<link rel="stylesheet" href="musician-tools.css?v=c6121f299000">
-<link rel="stylesheet" href="tuner-interface.css?v=919156b2d8c2">
+<link rel="stylesheet" href="musician-tools.css?v=375776c63dfb">
+<link rel="stylesheet" href="tuner-interface.css?v=02fd2ea43ae5">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -107,7 +106,6 @@
     </div>
 
     <div class="index2-header-actions" aria-label="Navigation rapide">
-      <a class="tool-nav-link" id="toolHomeLink" href="?tool=home" data-tool-link="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8"/></svg><span>Accueil</span></a>
       <a class="tool-nav-link" id="toolSwitchLink" href="?tool=tuner" data-tool-link="tuner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v7a4 4 0 0 0 8 0V3M12 14v7M5 5h3m8 0h3"/></svg><span>Accordeur</span></a>
       <button class="index2-header-btn" id="index2SettingsBtn" type="button" aria-label="Paramètres" title="Paramètres">⚙</button>
     </div>
@@ -382,28 +380,17 @@
     <div class="footer-right"><span>V3.0.1</span><span class="author-credit">David Arens</span></div>
   </footer>
 
-  <main id="toolHome" class="musician-tool" aria-label="Accueil">
-    <div class="practice-console">
-      <div class="renax-orbit practice-orbit" aria-hidden="true"><div class="renax-orbit-motion"></div><span class="renax-orbit-mark"></span></div>
-      <nav class="practice-tools" aria-label="Choisir un outil">
-        <a href="?tool=metronome" data-tool-link="metronome" class="practice-tool practice-rhythm">
-          <span class="practice-tool-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5.5 20h13L15 4h-6L5.5 20ZM12 16l6-10m-2.1 1.9 2 1.2M8.5 20v-2h7v2"/></svg></span>
-          <strong>Métronome</strong>
-        </a>
-        <a href="?tool=tuner" data-tool-link="tuner" class="practice-tool practice-pitch">
-          <span class="practice-tool-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.5 3v7l2.8 4h3.4l2.8-4V3M12 14v7"/><path class="practice-icon-detail" d="M5.5 5.5a8 8 0 0 0 0 6m13-6a8 8 0 0 1 0 6"/></svg></span>
-          <strong>Accordeur</strong>
-        </a>
-      </nav>
-    </div>
-  </main>
   <main id="tunerRoot" class="musician-tool" aria-labelledby="tunerTitle" data-ui>
-    <div class="tuner-heading">
-      <div><h1 id="tunerTitle">Accordeur</h1><p id="tunerSummary">Chromatique · La4 = 440,0 Hz · Tempérament égal</p></div>
-      <button id="tunerSettingsOpen" class="tuner-settings-open" type="button" aria-haspopup="dialog" aria-controls="tunerSettingsDialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>Réglages</span></button>
-    </div>
+    <h1 id="tunerTitle" class="tuner-accessible-title">Accordeur</h1>
     <div class="tuner-layout">
+      <aside class="tuner-controls" aria-label="Réglages de l’accordeur">
+        <div class="tuner-instrument-control"><label for="tunerInstrument"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v7a4 4 0 0 0 8 0V3M12 14v7M5 5h3m8 0h3"/></svg>Instrument / accordage</label><select id="tunerInstrument"></select></div>
+        <div class="tuner-target"><label for="tunerTarget"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"/><ellipse cx="6" cy="18" rx="3" ry="2"/></svg>Note cible</label><select id="tunerTarget"><option value="auto">Détection automatique</option></select></div>
+        <div class="tuner-context"><p id="tunerSummary">Chromatique · La4 = 440,0 Hz · Tempérament égal</p></div>
+        <div id="tunerStrings" class="tuner-strings" role="group" aria-label="Cordes cibles"></div>
+      </aside>
       <section class="tuner-measurement" aria-label="Mesure de la justesse">
+        <div class="tuner-panel-tools"><button id="tunerTone" type="button" aria-pressed="false" title="Écouter la référence">Écouter la référence</button><button id="tunerSettingsOpen" class="tuner-settings-open" type="button" aria-haspopup="dialog" aria-controls="tunerSettingsDialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>Réglages</span></button></div>
         <div class="tuner-measurement-head"><span id="tunerSignal">Microphone arrêté</span><span class="tuner-range" data-no-translate>±50 cents</span></div>
         <div class="tuner-dial">
             <svg class="tuner-meter" viewBox="0 0 360 206" role="img" aria-labelledby="tunerMeterTitle">
@@ -428,14 +415,9 @@
         <div class="tuner-direction"><span>Plus grave</span><span>Plus aigu</span></div>
         <div class="tuner-result"><output id="tunerCents" aria-live="off" data-no-translate aria-label="Écart à la note cible" hidden>— cents</output><p id="tunerStatus" role="status"></p></div>
         <div id="tunerStrobe" class="tuner-strobe" role="img" aria-label="Indicateur de dérive de hauteur"><div></div></div>
-      </section>
-      <aside class="tuner-controls" aria-label="Réglages de l’accordeur">
         <div class="tuner-transport"><button type="button" id="tunerListen" class="tuner-primary" aria-pressed="false">Activer le microphone</button></div>
-        <div class="tuner-instrument-control"><label for="tunerInstrument">Instrument / accordage</label><select id="tunerInstrument"></select></div>
-        <div class="tuner-target"><label for="tunerTarget">Note cible</label><select id="tunerTarget"><option value="auto">Détection automatique</option></select><button id="tunerTone" type="button" aria-pressed="false">Écouter la référence</button></div>
-        <div id="tunerStrings" class="tuner-strings" role="group" aria-label="Cordes cibles"></div>
         <p class="tuner-help">L’analyse reste sur cet appareil. Le microphone se coupe quand vous quittez l’accordeur.</p>
-      </aside>
+      </section>
     </div>
     <dialog id="tunerSettingsDialog" class="tuner-preferences" aria-labelledby="tunerSettingsTitle">
       <div class="tuner-preferences-heading"><h2 id="tunerSettingsTitle">Réglages de l’accordeur</h2><button id="tunerSettingsClose" type="button" aria-label="Fermer" autofocus><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
@@ -592,7 +574,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <link rel="stylesheet" href="interface-language.css?v=3995c298df9e">
 <script src="interface-language.js?v=291439ae445e"></script>
 <script src="workspace-layout.js?v=59c5930f2b6d"></script>
-<script type="module" src="musician-tools.mjs?v=0a1473022dd2"></script>
+<script type="module" src="musician-tools.mjs?v=c16764a7017b"></script>
 <script src="avant-garde-motion.js?v=502d1d826916"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=798a129a814c"></script>
@@ -624,7 +606,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 const valid=theme=>['light','ivory','avant'].includes(theme)?theme:'dark';
 function sync(){
 const selected=valid(root.dataset.selectedTheme);
-const shown=root.dataset.tool==='home'?'dark':selected;
+const shown=selected;
 root.dataset.theme=shown;
 document.querySelector('meta[name="theme-color"]')?.setAttribute('content',shown==='ivory'?'#f3efe4':shown==='light'?'#e4e8eb':shown==='avant'?'#eae9df':'#1c2127');
 buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.appearance===selected)));

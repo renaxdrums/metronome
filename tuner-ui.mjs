@@ -12,6 +12,7 @@ export function createTuner(root) {
   const el = (id) => root.querySelector('#tuner' + id);
   const text = (node, value) => {
     if (node.textContent !== value) node.textContent = value;
+    if (node.id === 'tunerTone') node.title = value;
   };
   const t = (value) => window.RENAX_I18N?.t(value) || value;
   const settingsDialog = el('SettingsDialog');

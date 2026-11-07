@@ -179,3 +179,10 @@ html,body,body *{scrollbar-width:thin!important;scrollbar-color:var(--editor-scr
 
 /* Preserve usable preference space in short browser windows. */
 @media(max-width:1100px) and (max-height:600px){body[data-mobile-pane=settings] footer{display:none!important}}
+
+/* Tempo range option: one compact secondary control, no fader width reduction. */
+.tempo-range-extend{align-self:flex-start;min-height:25px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text-muted);font:600 10px/1.2 var(--font);cursor:pointer;white-space:nowrap}
+.tempo-range-extend[aria-pressed=true]{border-color:var(--cyan);color:var(--cyan)}
+.tempo-range-extend:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.tempo-range-extend:disabled{opacity:.45;cursor:default}
+@media(min-width:1101px){.visu-toolbar .workspace-tempo-group{position:relative}.visu-toolbar .tempo-range-extend{position:absolute;top:-2px;right:0;min-height:17px;padding:1px 5px;font-size:9px}}

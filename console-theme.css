@@ -257,7 +257,7 @@ dialog,#beatEditor,#index2SettingsPanel{background:var(--editor-surface,#272d35)
 .numbox-option{color:var(--text)}
 .numbox-option:hover{background:#414a56!important}
 .numbox-button{display:flex!important;align-items:center;justify-content:space-between;gap:7px;box-sizing:border-box}
-.numbox-button>span{display:block;flex:1;min-width:0;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;line-height:1.25;text-align:left}
+.numbox-button>span{display:block;flex:1;min-width:0;white-space:var(--numbox-value-white-space,nowrap)!important;overflow:hidden;text-overflow:ellipsis;line-height:1.25;text-align:left}
 .numbox-button::after{flex:none}
 .visu-measure-info .numbox-button>span,.song-inline-field .numbox-button>span{text-align:center}
 .btn,#workspaceNav button,.multi-add,.training-mode-tabs button{overflow-wrap:anywhere}

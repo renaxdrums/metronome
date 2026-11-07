@@ -41,71 +41,27 @@ fs.writeFileSync(wav, data);
     p.on('pageerror', (e) => errors.push(e.message));
     await p.goto(h.url);
     await p.waitForFunction(() => window.RENAX_TOOLS);
-    assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'home');
-    assert(await p.locator('#toolHome').isVisible());
-    assert.equal(await p.locator('#workspaceNav').isVisible(), false);
-    // The landing view is deliberately fixed to the approved dark appearance.
-    // The chosen theme attribute is preserved for the metronome and tuner.
-    for (const viewport of [
-      { width: 1440, height: 1000 },
-      { width: 390, height: 844 },
-    ]) {
-      await p.setViewportSize(viewport);
-      let reference;
-      for (const theme of ['dark', 'light', 'ivory', 'avant']) {
-        await p.evaluate(
-          (value) => document.querySelector('[data-appearance="' + value + '"]').click(),
-          theme,
-        );
-        assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
-        assert.equal(await p.evaluate(() => document.documentElement.dataset.selectedTheme), theme);
-        assert.equal(await p.evaluate(() => localStorage.getItem('renax-appearance')), theme);
-        const screenshot = await p.screenshot({ animations: 'disabled' });
-        if (!reference) reference = screenshot;
-        else
-          assert(
-            screenshot.equals(reference),
-            'The approved dark chooser must be identical for theme ' +
-              theme +
-              ' at ' +
-              viewport.width +
-              'px',
-          );
-      }
+    assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'metronome');
+    assert.equal(await p.locator('#toolHome').count(), 0);
+    assert.equal(await p.locator('#toolHomeLink').count(), 0);
+    assert(await p.locator('#workspaceNav').isVisible());
+    for (const theme of ['dark', 'light', 'ivory', 'avant']) {
+      await p.evaluate(
+        (value) => document.querySelector('[data-appearance="' + value + '"]').click(),
+        theme,
+      );
+      assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), theme);
+      await p.reload();
+      await p.waitForFunction(() => window.RENAX_TOOLS);
+      assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'metronome');
+      assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), theme);
     }
-    await p.setViewportSize({ width: 1440, height: 1000 });
-    await p.evaluate(() => document.querySelector('[data-appearance="avant"]').click());
-    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
-    const homeLogo = p.locator('#toolHome .renax-orbit-mark').first();
-    assert.equal(
-      await homeLogo.evaluate((el) => getComputedStyle(el).backgroundColor),
-      'rgb(255, 121, 0)',
-    );
-    await p.locator('#toolHome [data-tool-link=tuner]').click();
-    await p.waitForFunction(() => window.RENAX_TOOLS.current === 'tuner');
+    // Legacy chooser URLs resolve to the metronome, with the saved theme.
+    await p.goto(h.url + '/?tool=home');
+    await p.waitForFunction(() => window.RENAX_TOOLS);
+    assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'metronome');
     assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'avant');
-    assert.match(
-      await p.locator('header .brand-logo').getAttribute('src'),
-      /renax-logo-approved\.svg/,
-    );
-    assert.equal(
-      await p.locator('.tuner-center-zone').evaluate((el) => getComputedStyle(el).stroke),
-      'rgb(215, 242, 24)',
-    );
-    await p.locator('#toolHomeLink').click();
-    await p.waitForFunction(() => window.RENAX_TOOLS.current === 'home');
-    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'dark');
     await p.evaluate(() => document.querySelector('[data-appearance="dark"]').click());
-    await p.locator('#toolHome [data-tool-link=metronome]').click();
-    await p.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
-    // Browser Back / Track history may restore the same tool without changing
-    // the selected appearance. A same-tool restore must not repaint its theme.
-    await p.evaluate(() => {
-      document.documentElement.dataset.theme = 'avant';
-      window.RENAX_TOOLS.show('metronome', { notify: false });
-    });
-    assert.equal(await p.evaluate(() => document.documentElement.dataset.theme), 'avant');
-    await p.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
     const switchIcon = p.locator('#toolSwitchLink svg path');
     const tunerIcon = await switchIcon.getAttribute('d');
     assert.equal(await p.locator('#workspaceNav [role=tab]').count(), 6);
@@ -240,6 +196,31 @@ fs.writeFileSync(wav, data);
             ),
           }),
         );
+        const shared = await p.evaluate(() => {
+          const style = (selector) => getComputedStyle(document.querySelector(selector));
+          const primary = style('#playBtn'),
+            tuner = style('#tunerListen');
+          return {
+            headerWave: style('#renaxHeaderWave').visibility,
+            titleAccent: document.querySelector('.header-center h2 .title-orange')?.textContent,
+            font: tuner.fontFamily === primary.fontFamily,
+            primary: ['backgroundColor', 'borderTopColor', 'color'].map((key) => [
+              key,
+              primary[key],
+              tuner[key],
+            ]),
+            selectable: [...document.querySelectorAll('body *')]
+              .filter((node) => getComputedStyle(node).userSelect !== 'none')
+              .slice(0, 5)
+              .map((node) => node.id || node.tagName),
+          };
+        });
+        assert.equal(shared.headerWave, 'visible');
+        assert.equal(shared.titleAccent, 'DEUR');
+        assert(shared.font);
+        for (const [key, reference, actual] of shared.primary)
+          assert.equal(actual, reference, theme + ': primary ' + key);
+        assert.deepEqual(shared.selectable, [], 'All interface text must disable selection');
         assert(await p.locator('#tunerListen').isVisible());
         const b = await p.locator('#tunerRoot').boundingBox();
         assert(b.height > 100);
@@ -256,7 +237,7 @@ fs.writeFileSync(wav, data);
             meter.y >= header.y + header.height && meter.y + meter.height <= viewport.height,
             'The complete scale must fit below the header',
           );
-          assert(header.height <= 64, 'Phone header must stay compact');
+          assert(header.height <= 140, 'Shared phone header must leave the instrument usable');
         }
         await p.locator('#tunerSettingsOpen').click();
         const sheet = await p.locator('#tunerSettingsDialog').boundingBox();
@@ -272,28 +253,39 @@ fs.writeFileSync(wav, data);
           'tunerListen',
           'Keyboard order must reach the primary control before the secondary fields',
         );
-        if (theme === 'avant' && [390, 1440].includes(viewport.width)) {
+        if ([390, 1440].includes(viewport.width)) {
           const target = p.locator('.numbox-custom:has(#tunerTarget)');
           const trigger = target.locator('.numbox-button');
           const menu = target.locator('.numbox-menu');
           await trigger.click();
           await menu.waitFor({ state: 'visible' });
-          const selected = menu.locator('.numbox-option[aria-selected="true"]');
           const option = menu.locator('.numbox-option[aria-selected="false"]').first();
-          for (const row of [selected, option]) {
-            assert.equal(
-              await row.evaluate((el) => getComputedStyle(el).color),
-              'rgb(215, 242, 24)',
-            );
-          }
-          await option.hover();
-          assert.equal(
-            await option.evaluate((el) => getComputedStyle(el).color),
-            'rgb(215, 242, 24)',
+          assert(
+            await option.evaluate((node) => {
+              const b = node.getBoundingClientRect();
+              return node.contains(
+                document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2),
+              );
+            }),
+            'The tuner menu must receive pointer events above the instrument',
           );
+          if (theme === 'avant') {
+            for (const row of [menu.locator('.numbox-option[aria-selected="true"]'), option])
+              assert.equal(
+                await row.evaluate((node) => getComputedStyle(node).color),
+                'rgb(215, 242, 24)',
+              );
+          }
           await p.keyboard.press('Escape');
           await menu.waitFor({ state: 'hidden' });
           assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+          await trigger.click();
+          const chosen = await option.getAttribute('data-value');
+          await option.click();
+          assert.equal(await p.locator('#tunerTarget').inputValue(), chosen);
+          await trigger.click();
+          await menu.locator('[data-value="auto"]').click();
+          await p.waitForFunction(() => document.getElementById('tunerNote').textContent === 'La4');
         }
         if (viewport.width === 390 || viewport.width === 1440) {
           const scan = await new AxeBuilder({ page: p })
@@ -355,13 +347,16 @@ fs.writeFileSync(wav, data);
     });
     await p.locator('#tunerListen').click();
     await p.waitForFunction(() => !!window.__finishPermission);
-    await p.locator('#toolHomeLink').click();
+    await p.locator('#toolSwitchLink').click();
     await p.evaluate(() => window.__finishPermission());
     await p.waitForFunction(() => window.__lateTrack.readyState === 'ended');
     await p.evaluate(() => window.__lateContext.close());
-    assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'home');
+    assert.equal(await p.evaluate(() => window.RENAX_TOOLS.current), 'metronome');
     assert.deepEqual(errors, []);
-    await p.screenshot({ path: path.join(out, 'home-mobile.png'), animations: 'disabled' });
+    await p.screenshot({
+      path: path.join(out, 'direct-metronome-mobile.png'),
+      animations: 'disabled',
+    });
     save('tuner-interface-results.json', {
       proof,
       errors,

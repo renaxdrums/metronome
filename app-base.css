@@ -963,5 +963,8 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
 }
 
       button, [role="button"], .btn { -webkit-user-select: none; user-select: none; }
-    :is(button, [role="button"], .btn) :is(input, textarea, [contenteditable="true"]) { -webkit-user-select: text; user-select: text; }
+    :is(button, [role="button"], .btn) :is(input, textarea, [contenteditable="true"]) { -webkit-user-select: none; user-select: none; }
 @media(max-width:1100px){body.training-tab-open #playBtn,body.training-tab-open #panicBtn{/* requis : contre renax-pulse-ivory.css:html#renaxApp[data-theme=ivory] :is(.reset-undo-tools #panicBtn,.reset-undo-tools #undoBtn) */display:none!important;}#trainBtn:not(.active)::before{content:"";display:inline-block;width:12px;height:12px;margin-right:7px;vertical-align:-1px;background:currentColor;clip-path:polygon(15% 0,100% 50%,15% 100%);}}
+
+/* Interface text is not selectable; native form controls remain editable. */
+html, body, body * { -webkit-user-select: none; user-select: none; }

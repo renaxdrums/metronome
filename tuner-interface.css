@@ -98,7 +98,7 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
   height: 20px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.6;
+  stroke-width: 1.7;
   stroke-linecap: round;
 }
 /* At 1040px: 640px instrument + 24px gutter + 376px controls. */
@@ -499,56 +499,6 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
   opacity: 0.7;
 }
 @media (max-width: 760px) {
-  html#renaxApp[data-tool='tuner'] body > header {
-    display: flex;
-    flex: none;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    min-height: 60px;
-    height: 60px;
-    padding: 8px 12px;
-  }
-  html#renaxApp[data-tool='tuner'] body > header .header-left {
-    flex: none;
-    min-width: 0;
-    gap: 8px;
-  }
-  html#renaxApp[data-tool='tuner'] body > header :is(.brand, .header-center) {
-    display: none;
-  }
-  html#renaxApp[data-tool='tuner'] body > header .index2-header-actions {
-    display: flex;
-    flex-wrap: nowrap;
-    flex: none;
-    width: auto;
-    gap: 4px;
-  }
-  html#renaxApp[data-tool='tuner'] body > header :is(.tool-nav-link, .index2-header-btn) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    min-width: 44px;
-    height: 44px;
-    min-height: 44px;
-    margin: 0;
-    padding: 0;
-  }
-  html#renaxApp[data-tool='tuner'] body > header .tool-nav-link span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-  html#renaxApp[data-tool='tuner'] body > header .tool-nav-link svg {
-    display: block;
-    stroke: currentColor;
-    width: 20px;
-    height: 20px;
-  }
   html#renaxApp[data-tool='tuner'] #tunerRoot {
     padding: 16px 16px max(20px, env(safe-area-inset-bottom));
   }
@@ -688,4 +638,351 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
   height: 18px;
   border: 0;
   box-shadow: none;
+}
+
+/* Shared Métronome composition: control strip, instrument surface and transport. */
+html#renaxApp[data-tool='tuner'] #tunerRoot {
+  --tune-action-bg: #173f49;
+  --tune-action-border: #327b89;
+  --tune-action-ink: #c4f1f5;
+  --tune-action-icon: var(--cyan);
+  --tune-icon: var(--orange);
+  --tune-action-radius: 6px;
+  --tune-strip-bg: #2b313a;
+  --tune-strip-border: #48525e;
+  --tune-panel-bg: radial-gradient(ellipse at 50% 60%, #303b43, #232a32 75%);
+  --tune-label-icon: var(--orange);
+  --tune-tool-bg: transparent;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0 0;
+  font: 13px/1.5 var(--font);
+}
+html#renaxApp[data-theme='light'] #tunerRoot {
+  --tune-action-bg: #087c90;
+  --tune-action-border: #087c90;
+  --tune-action-ink: #fff;
+  --tune-action-icon: #fff;
+  --tune-action-radius: 8px;
+  --tune-strip-bg: #eff2f4;
+  --tune-strip-border: #d2d9df;
+  --tune-panel-bg: radial-gradient(ellipse at 50% 55%, #fafbfc, #f1f3f5 82%);
+}
+html#renaxApp[data-theme='ivory'] #tunerRoot {
+  --tune-action-bg: #d7ed56;
+  --tune-action-border: #9cac39;
+  --tune-action-ink: #173e37;
+  --tune-action-icon: #173e37;
+  --tune-icon: var(--ivory-green);
+  --tune-label-icon: var(--ivory-green);
+  --tune-action-radius: 12px;
+  --tune-strip-bg: #eeeadd;
+  --tune-strip-border: #d7dbcf;
+  --tune-panel-bg: radial-gradient(ellipse 58% 67% at 50% 48%, #eeeadd, #eae6d8 83%, #e4e0d1);
+}
+html#renaxApp[data-theme='avant'] #tunerRoot {
+  --tune-action-bg: var(--ag-action-bg, var(--ag-lime));
+  --tune-action-border: var(--ag-action-border, #aecb13);
+  --tune-action-ink: var(--ag-action-text, #161b0c);
+  --tune-action-icon: var(--ag-action-text, #161b0c);
+  --tune-icon: var(--ag-lime);
+  --tune-label-icon: var(--ag-ink);
+  --tune-tool-bg: var(--ag-header);
+  --tune-action-radius: 7px;
+  --tune-strip-bg: #eeede5;
+  --tune-strip-border: var(--ag-line);
+  --tune-panel-bg:
+    linear-gradient(
+      125deg,
+      rgba(15, 21, 15, 0.028) 0 17%,
+      transparent 17.05% 82%,
+      rgba(15, 21, 15, 0.025) 82.05%
+    ),
+    var(--ag-paper);
+  --tune-screen: var(--ag-paper);
+  --tune-screen-ink: var(--ag-ink);
+  --tune-screen-muted: var(--ag-muted);
+  --tune-screen-line: var(--ag-line);
+  --tune-good: #3d5d16;
+}
+#tunerRoot .tuner-accessible-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-layout {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(440px, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+}
+html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-controls {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) minmax(220px, 0.9fr);
+  align-items: center;
+  gap: 12px 24px;
+  padding: 16px;
+  border: 1px solid var(--tune-strip-border);
+  border-radius: 12px;
+  background: var(--tune-strip-bg);
+}
+#tunerRoot .tuner-controls :is(.tuner-instrument-control, .tuner-target) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+#tunerRoot .tuner-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 18px;
+}
+#tunerRoot .tuner-controls label svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--tune-label-icon);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#tunerRoot .tuner-controls .numbox-custom,
+#tunerRoot .tuner-controls .numbox-button {
+  min-width: 0;
+  width: 100%;
+}
+#tunerRoot .tuner-controls .numbox-button {
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+}
+#tunerRoot .tuner-context {
+  min-width: 0;
+  padding-left: 24px;
+  border-left: 1px solid var(--tune-line);
+}
+#tunerRoot #tunerSummary {
+  margin: 0;
+  color: var(--tune-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+#tunerRoot .tuner-controls .tuner-strings {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-measurement {
+  position: relative;
+  min-height: 0;
+  padding: 20px;
+  border-radius: 12px;
+  justify-content: flex-start;
+  background: var(--tune-panel-bg);
+}
+#tunerRoot .tuner-panel-tools {
+  position: absolute;
+  inset: 16px 16px auto;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+#tunerRoot .tuner-panel-tools button {
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--tune-screen-line);
+  border-radius: 7px;
+  background: var(--tune-tool-bg);
+  color: var(--tune-icon);
+}
+#tunerRoot .tuner-settings-open span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+#tunerRoot .tuner-panel-tools #tunerTone {
+  font-size: 0;
+}
+#tunerRoot #tunerTone::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' d='M4 9h4l5-4v14l-5-4H4V9zm13 0a5 5 0 0 1 0 6m2-9a9 9 0 0 1 0 12'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+#tunerRoot .tuner-panel-tools button[aria-pressed='true'] {
+  border-color: var(--tune-accent);
+}
+#tunerRoot .tuner-measurement .tuner-measurement-head {
+  margin: 0 52px 12px;
+  min-height: 44px;
+  align-items: center;
+}
+#tunerRoot .tuner-measurement .tuner-dial {
+  width: min(100%, 480px);
+  margin: auto auto 0;
+}
+#tunerRoot .tuner-measurement .tuner-direction {
+  width: min(100%, 480px);
+  max-width: none;
+  margin: 0 auto;
+}
+#tunerRoot .tuner-measurement .tuner-result {
+  margin: 12px auto 0;
+  min-height: 56px;
+}
+#tunerRoot .tuner-measurement .tuner-transport {
+  display: flex;
+  justify-content: center;
+  margin: auto 0 0;
+  padding-top: 12px;
+}
+#tunerRoot .tuner-measurement .tuner-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: auto;
+  min-width: 184px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--tune-action-border);
+  border-radius: var(--tune-action-radius);
+  background: var(--tune-action-bg);
+  color: var(--tune-action-ink);
+  font: 600 12px/1.35 var(--font);
+}
+#tunerRoot #tunerListen::before {
+  content: '';
+  display: block;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background: var(--tune-action-icon);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Crect x='9' y='3' width='6' height='12' rx='3'/%3E%3Cpath d='M6 11v1a6 6 0 0 0 12 0v-1M12 18v3M9 21h6'/%3E%3C/g%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+#tunerRoot #tunerListen[aria-pressed='true']::before {
+  width: 11px;
+  height: 11px;
+  border-radius: 1px;
+  mask: none;
+}
+#tunerRoot .tuner-measurement > .tuner-help {
+  max-width: 520px;
+  margin: 12px auto 0;
+  text-align: center;
+  font-size: 11px;
+}
+@media (hover: hover) and (pointer: fine) {
+  #tunerRoot .tuner-panel-tools button:hover {
+    border-color: var(--tune-icon);
+    background: color-mix(in srgb, var(--tune-icon) 8%, transparent);
+  }
+  #tunerRoot .tuner-measurement #tunerListen:hover {
+    filter: brightness(1.08);
+  }
+}
+#tunerRoot button:active:not(:focus-visible) {
+  transform: scale(0.98);
+}
+@media (max-width: 760px) {
+  html#renaxApp[data-tool='tuner'] #tunerRoot {
+    padding: 10px 0 0;
+  }
+  html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-layout {
+    grid-template-rows: auto minmax(380px, 1fr);
+    gap: 10px;
+  }
+  html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 12px;
+  }
+  #tunerRoot .tuner-controls label {
+    min-height: 36px;
+    font-size: 11px;
+  }
+  #tunerRoot .tuner-controls .numbox-button {
+    --numbox-value-white-space: normal;
+    min-height: 52px;
+    height: 52px;
+    font-size: 14px;
+  }
+  #tunerRoot .tuner-controls .numbox-button > span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+  #tunerRoot .tuner-context {
+    grid-column: 1 / -1;
+    padding: 8px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--tune-line);
+  }
+  #tunerRoot #tunerSummary {
+    font-size: 11px;
+  }
+  html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-measurement {
+    padding: 12px;
+  }
+  #tunerRoot .tuner-panel-tools {
+    inset: 12px 12px auto;
+  }
+  #tunerRoot .tuner-measurement .tuner-measurement-head {
+    margin: 0 52px 8px;
+    font-size: 11px;
+  }
+  #tunerRoot .tuner-measurement .tuner-dial {
+    width: min(100%, 340px);
+  }
+  #tunerRoot .tuner-measurement .tuner-result {
+    margin-top: 8px;
+  }
+}
+@media (max-height: 500px) and (min-width: 600px) {
+  html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-layout {
+    grid-template-columns: minmax(200px, 0.7fr) minmax(340px, 1.3fr);
+    grid-template-rows: minmax(340px, 1fr);
+  }
+  html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-controls {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+  #tunerRoot .tuner-context {
+    padding: 12px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--tune-line);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #tunerRoot button:active:not(:focus-visible) {
+    transform: none;
+  }
+}
+
+/* Citron uses the metronome's paper surface: keep the moving pointer legible. */
+html#renaxApp[data-theme='avant']
+  #tunerRoot
+  .tuner-measurement:not([data-tuned='true'])
+  :is(.tuner-needle-line, .tuner-needle-trail) {
+  stroke: var(--ag-ink);
 }

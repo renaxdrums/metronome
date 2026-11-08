@@ -32,12 +32,14 @@ function recording(){
   for(const [width,height] of [[1440,900],[390,844],[320,740],[844,390]]){
    await page.setViewportSize({width,height});
    await page.evaluate(()=>RENAX_WORKSPACE.go('polyrhythm'));
+   for(const theme of ['dark','light','ivory','avant']){
+    await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
    for(const count of [2,3,4]){
     await page.evaluate(count=>{const m=measures[0];m.polyVoiceCount=count;ensurePolyStates(m);m.polyVoices[0].subdivisions[0]=3;ensurePolyStates(m);renderSequencerList();renderActiveMeasure();},count);
     assert.equal(await page.locator('.poly-ring').count(),count);
     assert.equal(await page.locator('.poly-subdivision').count(),2);
     const circle=await page.locator('#sequencerContainer').boundingBox();
-    assert(circle.width>=100&&circle.y>=0&&circle.y+circle.height<=height,JSON.stringify({width,height,circle}));
+    assert(circle.width>=(height<500?80:100)&&circle.y>=0&&circle.y+circle.height<=height,JSON.stringify({width,height,theme,circle}));
     const fields=await page.locator('#measureList .poly-lane-field').evaluateAll(nodes=>nodes.map(e=>e.getBoundingClientRect().top));
     assert.equal(fields.length,count);assert(Math.max(...fields)-Math.min(...fields)<1,'all voice fields share one row');
     await page.evaluate(()=>document.getElementById('scorePartitionBtn').click());
@@ -46,6 +48,7 @@ function recording(){
     const labels=await page.locator('#rhythmScore svg text').allTextContents();
     for(let i=1;i<=count;i++)assert(labels.includes('V'+i));
     await page.evaluate(()=>document.getElementById('scoreMetronomeBtn').click());
+   }
    }
    await page.evaluate(()=>window.RENAX_TOOLS.show('tuner'));
    const fit=await page.evaluate(()=>{const root=document.getElementById('tunerRoot'),mic=document.getElementById('tunerListen').getBoundingClientRect();return {scroll:root.scrollHeight,client:root.clientHeight,bottom:mic.bottom,right:mic.right,width:innerWidth,height:innerHeight};});

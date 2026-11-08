@@ -1,5 +1,10 @@
 /* Musical workspaces: stable lanes and controls sized to their available space. */
 body.poly-mode .sequencer-wrapper { padding-bottom: 40px; }
+html[data-theme=ivory] body.poly-mode .sequencer-wrapper {
+  --ivory-poly-padding: 0 0 40px; --ivory-poly-gap: 0px;
+  --ivory-dial-tools-position: absolute; --ivory-dial-tools-inset: 0 0 auto;
+  --ivory-dial-clearance: 0px;
+}
 body.poly-mode .sequencer-container { max-width: calc(100cqh - 50px); }
 body.poly-mode #beatDisplay { display: none; }
 .poly-ratio-caption { display: none; }
@@ -21,7 +26,7 @@ body.poly-mode .poly-ring.voice-4 { border-style: dashed; border-color: color-mi
 body.poly-mode .poly-subdivision { width: 8px; height: 8px; padding: 0; min-width: 0; min-height: 0; }
 body.poly-mode .poly-dot::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; }
 body.poly-mode .poly-dot:focus-visible { outline: 2px solid var(--text); outline-offset: 4px; }
-.measure-card .poly-ratio-row { display: flex; flex-wrap: nowrap; align-items: end; gap: 8px; width: 100%; }
+body.poly-mode .measure-card .poly-ratio-row { display: flex; flex-wrap: nowrap; align-items: end; gap: 8px; width: 100%; }
 .measure-card .poly-lane-field { display: flex; flex: 1 1 0; min-width: 0; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 650; }
 .poly-lane-field::before { content: ''; height: 3px; background: var(--orange); border-radius: 2px; }
 .poly-lane-field[data-voice='2']::before { background: var(--cyan); }
@@ -40,17 +45,17 @@ body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-cou
 body.poly-mode .panel-visu.score-view .sequencer-wrapper { overflow: hidden; padding-bottom: 0; }
 body.poly-mode .rhythm-score { overflow: hidden; }
 @media (min-width:1101px) {
-  .panel-visu .visu-toolbar { grid-template-columns: 120px minmax(250px,1.4fr) minmax(180px,1fr) minmax(125px,.7fr) 100px; --workspace-toolbar-gap: 12px; }
-  .visu-toolbar .workspace-control-group,.visu-toolbar #workspaceTimer { --workspace-group-margin: 0; padding-left: 12px; }
-  .visu-toolbar .workspace-tempo-group { grid-template-columns: auto minmax(50px,1fr) 110px; }
-  .visu-toolbar .numbox-button { min-height: 44px; }
+  body.poly-mode .panel-visu .visu-toolbar { grid-template-columns: 120px minmax(250px,1.4fr) minmax(180px,1fr) minmax(125px,.7fr) 100px; --workspace-toolbar-gap: 12px; }
+  body.poly-mode .visu-toolbar .workspace-control-group,body.poly-mode .visu-toolbar #workspaceTimer { --workspace-group-margin: 0; padding-left: 12px; }
+  body.poly-mode .visu-toolbar .workspace-tempo-group { grid-template-columns: auto minmax(50px,1fr) 110px; }
+  body.poly-mode .visu-toolbar .numbox-button { min-height: 44px; }
 }
 @media (max-width:1100px) {
   body.poly-mode .sequencer-wrapper { min-height: 150px; }
   body.poly-mode .panel-visu .sequencer-container { --poly-caption-space: 50px; }
 }
 @media (min-width:1101px) and (max-width:1250px) {
-  .panel-visu .visu-toolbar { grid-template-columns: 130px minmax(250px,1fr) minmax(180px,1fr); }
+  body.poly-mode .panel-visu .visu-toolbar { grid-template-columns: 130px minmax(250px,1fr) minmax(180px,1fr); }
 }
 @media (max-height:500px) and (min-width:600px) and (max-width:1100px) {
   body.poly-mode #workspaceNav { grid-template-columns: repeat(6,minmax(0,1fr)); padding-block: 4px; }
@@ -69,6 +74,7 @@ body.poly-mode .rhythm-score { overflow: hidden; }
   body.poly-mode .panel-visu #workspaceControls { grid-column: 1; grid-row: 2; }
   html#renaxApp body.poly-mode .panel-visu .sequencer-wrapper { grid-column: 2; grid-row: 1 / span 2; min-height: 0; padding-bottom: 24px; }
   body.poly-mode .panel-visu .sequencer-container { --poly-caption-space: 0px; }
+  html[data-theme=ivory] body.poly-mode .sequencer-wrapper { --ivory-poly-min-height: 0px; --ivory-poly-padding: 0 0 24px; }
   html#renaxApp body.poly-mode .panel-visu:not(.score-view) .sequencer-wrapper #sequencerContainer { max-width: min(100%,100cqh); }
   body.poly-mode .poly-ratio-caption { bottom: 0; font-size: 11px; line-height: 18px; }
   body.poly-mode .poly-dot { width: 9px; height: 9px; }

@@ -283,6 +283,16 @@ async function baselineRoute(page, url) {
         pcm.push({ rate, banks: outputs[1], identicalExceptBellResonance: true });
       }
     for (const p of pages) await p.close();
+    // The user requested a new polyrhythm layout. Its old pixel geometry is no
+    // longer the reference; verify its replacement's sample timing, preserved
+    // beats, all lanes, staff and viewport bounds through real interactions.
+    // Every other workspace retains the exact historical pixel/style gate.
+    if (process.env.PCM_ONLY !== '1')
+      cp.execFileSync(process.execPath, [path.join(__dirname, 'poly-layout-sample-test.cjs')], {
+        cwd: root,
+        env: process.env,
+        stdio: 'inherit',
+      });
     if (process.env.PCM_ONLY !== '1')
       for (const [width, height] of [
         [1440, 1000],
@@ -326,14 +336,7 @@ async function baselineRoute(page, url) {
           views.push(p);
         }
         for (const theme of ['dark', 'light', 'ivory'])
-          for (const module of [
-            'Métronome',
-            'Polyrythmie',
-            'Entraînement',
-            'Séquenceur',
-            'Multipiste',
-            'Track',
-          ]) {
+          for (const module of ['Métronome', 'Entraînement', 'Séquenceur', 'Multipiste', 'Track']) {
             const shots = [];
             for (const [i, p] of views.entries()) {
               await p.bringToFront();

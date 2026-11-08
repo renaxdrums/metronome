@@ -499,7 +499,7 @@ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .sequencer-wrapper{
  display:flex!important;flex-direction:column!important;
  align-items:center!important;justify-content:flex-start!important;
  container-type:size;width:100%!important;min-width:0!important;min-height:0!important;
- padding:0!important;gap:12px!important;
+ padding:var(--ivory-poly-padding,0)!important;gap:var(--ivory-poly-gap,12px)!important;
 }
 html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .score-tools-panel{
  position:var(--ivory-dial-tools-position,relative)!important;inset:var(--ivory-dial-tools-inset,auto)!important;order:0!important;
@@ -542,7 +542,7 @@ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) #sequencerContainer
   overflow-y:auto!important;
  }
  html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) .sequencer-wrapper{
-  flex:1 0 248px!important;min-height:248px!important;
+  flex:1 0 var(--ivory-poly-min-height,248px)!important;min-height:var(--ivory-poly-min-height,248px)!important;
  }
 }
 

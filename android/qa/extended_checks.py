@@ -25,24 +25,28 @@ def run_extended_checks(api, api_request):
     def tap_tempo():
         nav('metronome')
         if not js('document.querySelector("#workspaceControls").open'):tap('#workspaceControls summary')
-        js('(()=>{window.__qaTapTimes=[];window.__qaTapListener=()=>__qaTapTimes.push(performance.now());tapBtn.addEventListener("click",__qaTapListener,true);return true})()')
+        js('(()=>{window.__qaTapTimes=[];window.__qaTapStart=()=>{window.__qaTapBefore=performance.now()};window.__qaTapListener=event=>__qaTapTimes.push({before:__qaTapBefore,processed:tapTimes.at(-1),after:performance.now(),trusted:event.isTrusted});tapBtn.addEventListener("click",__qaTapStart,true);tapBtn.addEventListener("click",__qaTapListener);return true})()')
         try:
             api_request('tapCss',selector='#tapBtn',count=4,intervalMs=250)
             wait('__qaTapTimes.length',lambda x:x==4)
             state=js('({times:__qaTapTimes,bpm:tempo,measure:measures[activeMeasureIndex].tempo,retained:tapTimes.slice()})')
             # Native gestures can exceed the app's two-second reset on a busy emulator.
-            # Derive the last uninterrupted series from captured event times, not its BPM.
+            # Bound the app's processing time by listeners before/after its handler.
+            # A busy UI can legitimately spend more than 5 ms inside that handler.
+            require(all(event['trusted'] and event['before']<=event['processed']<=event['after'] for event in state['times']),'Tap was not processed during its trusted native click: '+str(state))
+            # Derive the last uninterrupted series from processing times, not its BPM.
             retained=[]
-            for instant in state['times']:
+            for event in state['times']:
+                instant=event['processed']
                 if retained and instant-retained[-1]>=2000:retained=[]
                 retained.append(instant)
             require(len(retained)>=2,'Emulator too slow to retain two Tap events: '+str(state))
-            require(len(state['retained'])==len(retained) and all(abs(a-b)<5 for a,b in zip(state['retained'],retained)),'Tap history does not match captured events and the two-second reset: '+str(state))
+            require(state['retained']==retained,'Tap history does not match captured events and the two-second reset: '+str(state))
             expected=round(60000/((retained[-1]-retained[0])/(len(retained)-1)))
             require(len(state['times'])==4 and abs(state['bpm']-expected)<=1 and state['measure']==state['bpm'],'Tap tempo differs from the real tap intervals: '+str(state)+'; expected='+str(expected))
             return {'four_native_taps':True,'measured_bpm':expected,'applied_bpm':state['bpm']}
         finally:
-            js('(()=>{tapBtn.removeEventListener("click",__qaTapListener,true);return true})()');set_value('#bpmSlider',120,'input')
+            js('(()=>{tapBtn.removeEventListener("click",__qaTapStart,true);tapBtn.removeEventListener("click",__qaTapListener);return true})()');set_value('#bpmSlider',120,'input')
 
     def step_limits():
         nav('metronome');rows=[]

@@ -20,8 +20,7 @@ jobs:
         include:
           - api: 34
             target: default # AOSP image, as on API 35/36; release does not require Play services.
-            gpu: guest # Avoid host gfxstream ColorBuffer teardown crashes on API 34.
-            emulator_build: 13402964 # Official 35.5.10 retains guest rendering; 37.2 silently substitutes host gfxstream.
+            gpu: lavapipe # Mesa software rendering avoids the crashing SwiftShader backend.
           - api: 35
             target: default
           - api: 36

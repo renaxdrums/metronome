@@ -20,6 +20,7 @@ jobs:
         include:
           - api: 34
             target: default # AOSP image, as on API 35/36; release does not require Play services.
+            gpu: guest # Avoid host gfxstream ColorBuffer teardown crashes on API 34.
             emulator_build: 16740729 # Official 37.2.13, matching the successful API 35/36 renderer.
           - api: 35
             target: default

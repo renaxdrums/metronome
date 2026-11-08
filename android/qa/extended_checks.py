@@ -214,7 +214,10 @@ def run_extended_checks(api, api_request):
         set_value('#measureCount',1)
         tap('#measureList .sequence-more summary');text_button('#measureList .sequence-more-actions','Dupliquer');wait('measures.length',lambda x:x==2)
         tap('#measureList .sequence-more summary');text_button('#measureList .sequence-more-actions','Renommer');multi_confirm('Mesure QA')
-        require(js('measures[0].name')=='Mesure QA','Sequence rename failed')
+        # The modal closes before its awaited rename continuation updates the model.
+        # Require both persisted measure data and the rendered card to agree.
+        renamed=wait('({names:measures.map(m=>m.name||""),labels:[...document.querySelectorAll("#measureList .measure-num")].map(e=>e.textContent.trim())})',lambda s:s['names'][0]=='Mesure QA' and s['labels'][0]=='Mesure QA',timeout=6)
+        require(renamed['names'][0]=='Mesure QA' and renamed['labels'][0]=='Mesure QA','Sequence rename did not persist and render: '+str(renamed))
         tap('#measureList .sequence-more summary');text_button('#measureList .sequence-more-actions','Supprimer');wait('measures.length',lambda x:x==1)
         tap('#measureList .sequence-preview-play');wait('isPlaying&&loopedMeasure===measures[0]')
         tap('#measureList .sequence-preview-play');wait('!isPlaying')

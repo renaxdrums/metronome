@@ -61,7 +61,10 @@ body.poly-mode .rhythm-score { overflow: hidden; }
     --poly-landscape-rows: auto minmax(0,1fr);
     grid-template-columns: 210px minmax(0,1fr); grid-template-rows: auto minmax(0,1fr);
   }
-  html#renaxApp body.poly-mode .panel-visu .visu-toolbar { grid-column: 1; grid-row: 1; min-width: 0; }
+  html#renaxApp body.poly-mode .panel-visu .visu-toolbar { grid-column: 1; grid-row: 1; min-width: 0; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  body.poly-mode .visu-toolbar .visu-measure-info { grid-column: 1 / -1; grid-row: 1; flex-direction: row; align-items: center; }
+  body.poly-mode .visu-toolbar #workspaceTempoShortcut { grid-column: 1; grid-row: 2; }
+  body.poly-mode .visu-toolbar #workspaceTimer { grid-column: 2; grid-row: 2; }
   body.poly-mode .visu-measure-info { flex-wrap: wrap; }
   body.poly-mode .panel-visu #workspaceControls { grid-column: 1; grid-row: 2; }
   html#renaxApp body.poly-mode .panel-visu .sequencer-wrapper { grid-column: 2; grid-row: 1 / span 2; min-height: 0; padding-bottom: 24px; }

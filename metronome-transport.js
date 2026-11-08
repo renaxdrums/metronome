@@ -435,24 +435,27 @@
       polyBeatSelection={m,voiceIndex,beat};polyBeatEditor.hidden=false;refreshPolyBeatEditor();
     }
     function buildPolyVisualizer(m) {
+      const polyRatioCaption=sequencerContainer.parentElement.querySelector('.poly-ratio-caption')||document.createElement('div');
+      polyRatioCaption.className='poly-ratio-caption';sequencerContainer.parentElement.append(polyRatioCaption);
       ensurePolyStates(m);
       sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring').forEach(el=>el.remove());
       totalSteps=0;stepsData=[];clearProgressTrail();
-      const radii=['min(19.5dvh,152px)','min(12.5dvh,98px)','min(8.5dvh,65px)','min(5dvh,40px)'];
+      const radii=[1,.76,.52,.28].map(scale=>'calc(var(--ring-radius) * '+scale+')');
       m.polyVoices.forEach((_voice,vi)=>{
         const ring=document.createElement('div');
         ring.className='poly-ring '+(vi===0?'outer':vi===1?'inner':'voice-'+(vi+1));
+        ring.style.setProperty('--poly-lane-radius',radii[vi]);
         sequencerContainer.append(ring);
       });
       m.polyVoices.forEach((voice,vi)=>{
         const klass=vi===0?'outer':vi===1?'inner':'voice-'+(vi+1);
         for(let beat=0;beat<voice.count;beat++){
           const dot=document.createElement('div');dot.className='poly-dot '+klass;
-          dot.dataset.polyVoice=String(vi);dot.dataset.polyBeat=String(beat);
+          dot.dataset.polyVoice=String(vi);dot.dataset.polyBeat=String(beat);dot.dataset.polySub="0";
           if(vi===0)dot.dataset.polyOuter=String(beat);
           if(vi===1)dot.dataset.polyInner=String(beat);
           dot.style.setProperty('--angle',((beat/voice.count)*360)+'deg');
-          if(vi>=2)dot.style.setProperty('--poly-radius',radii[vi]);
+          dot.style.setProperty('--poly-lane-radius',radii[vi]);
           const state=voice.states[beat][0];dot.dataset.state=String(state);
           dot.tabIndex=0;dot.setAttribute('role','button');
           dot.title='Éditer les subdivisions · voie '+(vi+1)+', temps '+(beat+1);
@@ -460,9 +463,21 @@
           dot.onclick=ev=>{ev.stopPropagation();openPolyBeatEditor(m,vi,beat);};
           dot.onkeydown=ev=>{if(ev.key===' '){ev.preventDefault();ev.stopPropagation();if(isPlaying)stopMetronome();voice.states[beat][0]=(voice.states[beat][0]+1)%4;if(vi===0)m.outerStates[beat]=voice.states[beat][0];if(vi===1)m.innerStates[beat]=voice.states[beat][0];dot.dataset.state=String(voice.states[beat][0]);renderSequencerList();}else if(ev.key==='Enter'){ev.preventDefault();dot.click();}};
           sequencerContainer.append(dot);
+          for(let sub=1;sub<voice.subdivisions[beat];sub++){
+            const point=document.createElement('button');point.type='button';
+            point.className='poly-dot poly-subdivision '+klass;
+            point.dataset.polyVoice=String(vi);point.dataset.polyBeat=String(beat);point.dataset.polySub=String(sub);
+            point.dataset.state=String(voice.states[beat][sub]);
+            point.style.setProperty('--poly-lane-radius',radii[vi]);
+            point.style.setProperty('--angle',((beat+sub/voice.subdivisions[beat])/voice.count*360)+'deg');
+            point.setAttribute('aria-label','Voie '+(vi+1)+' · temps '+(beat+1)+' · subdivision '+(sub+1));
+            point.onclick=ev=>{ev.stopPropagation();openPolyBeatEditor(m,vi,beat);};
+            sequencerContainer.append(point);
+          }
         }
       });
-      beatDisplay.textContent=m.polyVoices.map(v=>v.count).join(':');
+      beatDisplay.textContent=m.polyVoices.map((v,i)=>'V'+(i+1)+' · '+v.count).join('   /   ');
+      polyRatioCaption.textContent=beatDisplay.textContent;
     }
 
     function renderPolyrhythmList() {
@@ -483,12 +498,12 @@
         const stop=e=>e.stopPropagation(); n.addEventListener('click',stop); d.addEventListener('click',stop); n.addEventListener('keydown',stop); d.addEventListener('keydown',stop);
         const updateRatio=()=>{ m.numerator=clampPolyValue(n.value,m.numerator); m.denominator=clampPolyValue(d.value,m.denominator); ensurePolyStates(m); n.value=m.numerator; d.value=m.denominator; head.querySelector('.measure-sig').textContent=`${m.numerator}:${m.denominator}`; if(i===activeMeasureIndex) renderActiveMeasure(); };
         n.addEventListener('change',updateRatio); d.addEventListener('change',updateRatio);
-        ratio.append(n,slash,d);
+        const laneField=(field,vi)=>{const label=document.createElement('label');label.className='poly-lane-field';label.dataset.voice=String(vi+1);label.append(document.createTextNode('V'+(vi+1)),field);return label;};
+        ratio.append(laneField(n,0),laneField(d,1));
         const extra=document.createElement('div');extra.className='poly-extra-voices';
         for(let vi=2;vi<m.polyVoices.length;vi++){
           const voice=m.polyVoices[vi],field=numberMenu(2,20,voice.count,'Pulsations voie '+(vi+1)+' · mesure '+(i+1));
-          const label=document.createElement('label');label.textContent='Voie '+(vi+1);
-          label.append(field);extra.append(label);
+          ratio.append(laneField(field,vi));
           field.addEventListener('click',stop);field.addEventListener('keydown',stop);
           field.addEventListener('change',()=>{
             if(isPlaying)stopMetronome();
@@ -546,10 +561,10 @@
         if(activeMeasureIndex!==mIdx){ activeMeasureIndex=mIdx; renderActiveMeasure(); renderSequencerList(); }
         sequencerContainer.querySelectorAll('.poly-dot').forEach(el=>el.classList.remove('active'));
         for(const hit of event.hits||[]){
-          const el=sequencerContainer.querySelector(`[data-poly-voice="${hit.voice}"][data-poly-beat="${hit.beat}"]`);
+          const el=sequencerContainer.querySelector(`[data-poly-voice="${hit.voice}"][data-poly-beat="${hit.beat}"][data-poly-sub="${hit.sub}"]`);
           if(el)el.classList.add('active');
         }
-        const m=measures[mIdx]; if(m){ beatDisplay.textContent=m.polyVoices.map(v=>v.count).join(':'); beatDisplay.classList.add('pulse'); setTimeout(()=>beatDisplay.classList.remove('pulse'),130); }
+        const m=measures[mIdx]; if(m){ beatDisplay.textContent=m.polyVoices.map((v,i)=>'V'+(i+1)+' · '+v.count).join('   /   '); beatDisplay.classList.add('pulse'); setTimeout(()=>beatDisplay.classList.remove('pulse'),130); }
       },Math.max(0,drawTime));
     }
 
@@ -1077,7 +1092,11 @@
         const block = measures[activeMeasureIndex];
         if (!block) return;
         if (isPlaying) stopMetronome();
-        block.beatStates = block.beatSubdivisions.map(count => Array(count).fill(0));
+        // Preserve each beat's accent; remove its subdivision slots only.
+        block.beatStates = block.beatStates.map(states => [states[0] ?? 1]);
+        block.beatSubdivisions = Array(block.numerator).fill(1);
+        delete block.rhythmEditor;
+        scheduledMeasureLayouts.delete(block);
         validatePlayingState();
         renderSequencerList();
         renderActiveMeasure();

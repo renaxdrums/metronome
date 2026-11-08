@@ -93,22 +93,44 @@
  function draw(){
   if(!enabled||!Flow)return;const measure=measures[activeMeasureIndex];if(!measure)return;
   const width=Math.floor(host.clientWidth-10);if(width<100)return;
-  const key=JSON.stringify([appMode,activeMeasureIndex,width,fitWidth,measure.numerator,measure.denominator,measure.beatSubdivisions,measure.beatStates,measure.outerStates,measure.innerStates,measure.rhythmEditor,editing,selected,isPlaying]);if(key===lastKey)return;lastKey=key;const continuing=active.map(item=>({key:item.key,end:item.end}));clearHeads();notes=new Map();pulseAnchors=[];pulse.classList.remove('pulsing');host.replaceChildren();
+  const key=JSON.stringify([appMode,activeMeasureIndex,width,fitWidth,measure.numerator,measure.denominator,measure.beatSubdivisions,measure.beatStates,measure.outerStates,measure.innerStates,measure.polyVoices,measure.rhythmEditor,editing,selected,isPlaying]);if(key===lastKey)return;lastKey=key;const continuing=active.map(item=>({key:item.key,end:item.end}));clearHeads();notes=new Map();pulseAnchors=[];pulse.classList.remove('pulsing');host.replaceChildren();
   try{
    const poly=appMode==='polyrhythm',beats=poly?null:core.spell(measure,core.editorModel(measure)),rows=poly?[null]:[beats];
    const renderWidth=poly?Math.max(width,fitWidth,Math.max(measure.numerator,measure.denominator)*30+100):Math.max(width,fitWidth,...rows.map(row=>row.reduce((sum,b)=>sum+Math.max(46,b.count*25+12),84)));
-   const height=poly?270:rows.length*140+18,renderer=new Flow.Renderer(host,Flow.Renderer.Backends.SVG);renderer.resize(renderWidth,height);const svg=host.querySelector('svg');svg.style.width='100%';svg.style.height='auto';const context=renderer.getContext();context.setFillStyle('#111').setStrokeStyle('#111');
+   const height=poly?230:rows.length*140+18,renderer=new Flow.Renderer(host,Flow.Renderer.Backends.SVG);renderer.resize(renderWidth,height);const svg=host.querySelector('svg');svg.style.width='100%';svg.style.height='auto';const context=renderer.getContext();context.setFillStyle('#111').setStrokeStyle('#111');
    rows.forEach((row,rowIndex)=>{
-    const voices=[],tuplets=[],beams=[];const stave=new Flow.Stave(2,18+rowIndex*140,renderWidth-4);stave.addClef('percussion');if(rowIndex===0)stave.addTimeSignature(`${measure.numerator}/${poly?4:measure.denominator}`);if(!poly&&rowIndex<rows.length-1)stave.setEndBarType(Flow.Barline.type.NONE);stave.setContext(context).draw();if(!poly)pulseLineY=stave.getYForLine(4);
+    const voices=[],tuplets=[],beams=[];const stave=new Flow.Stave(2,18+rowIndex*140,renderWidth-4);if(poly){stave.options.spacing_between_lines_px=24;stave.setX(34);stave.setWidth(renderWidth-38);}stave.addClef('percussion');if(rowIndex===0)stave.addTimeSignature(`${measure.numerator}/${poly?4:measure.denominator}`);if(!poly&&rowIndex<rows.length-1)stave.setEndBarType(Flow.Barline.type.NONE);stave.setContext(context).draw();if(!poly)pulseLineY=stave.getYForLine(4);
     if(poly){
-     const lanes=[];
-     for(const [lane,count,states] of [['outer',measure.numerator,measure.outerStates],['inner',measure.denominator,measure.innerStates]]){
-      const target=lane==='outer'?stave:new Flow.Stave(2,148,renderWidth-4).addClef('percussion').addTimeSignature(`${measure.numerator}/4`).setContext(context);if(lane==='inner')target.draw();
-      const ns=Array.from({length:count},(_,i)=>makeNote('4',states[i]||0));const tuplet=lane==='inner'&&count!==measure.numerator?new Flow.Tuplet(ns,{num_notes:count,notes_occupied:measure.numerator,bracketed:true,ratioed:false}):null;
-      const voice=new Flow.Voice({num_beats:measure.numerator,beat_value:4}).addTickables(ns);lanes.push({lane,states,ns,tuplet,voice,target});
+     ensurePolyStates(measure);
+     const lanes=[],positions=measure.polyVoices.length===2?['f/5','e/4']:measure.polyVoices.length===3?['f/5','b/4','e/4']:['f/5','c/5','a/4','e/4'];
+     for(const [vi,model] of measure.polyVoices.entries()){
+      const ns=[],tuplets=[],entries=[];
+      const direction=vi<Math.ceil(measure.polyVoices.length/2)?1:-1;
+      for(let beat=0;beat<model.count;beat++){
+       const group=[];
+       for(let sub=0;sub<model.subdivisions[beat];sub++){
+        const state=model.states[beat][sub];
+        const note=new Flow.StaveNote({keys:[positions[vi]],clef:'percussion',duration:'4'+(state?'':'r'),stem_direction:direction});
+        note.setStemLength(18);group.push(note);ns.push(note);entries.push({note,key:`${vi}:${beat}:${sub}`,state});
+       }
+       if(group.length>1)tuplets.push(new Flow.Tuplet(group,{num_notes:group.length,notes_occupied:1,bracketed:true,location:direction}));
+      }
+      // Each lane spans exactly the same measure, including uneven subdivisions.
+      if(model.count!==measure.numerator)tuplets.push(new Flow.Tuplet(ns,{num_notes:model.count,notes_occupied:measure.numerator,bracketed:false,location:direction}));
+      const voice=new Flow.Voice({num_beats:measure.numerator,beat_value:4}).addTickables(ns);
+      lanes.push({voice,entries,tuplets,vi});
      }
-     const formatter=new Flow.Formatter();for(const item of lanes)formatter.joinVoices([item.voice]);formatter.format(lanes.map(item=>item.voice),renderWidth-90);
-     for(const {voice,target,tuplet,ns,lane,states} of lanes){voice.draw(context,target);tuplet?.setContext(context).draw();ns.forEach((note,i)=>remember(note,`${lane}:${i}`,states[i]||0));}return;
+     const formatter=new Flow.Formatter();for(const item of lanes)formatter.joinVoices([item.voice]);formatter.format(lanes.map(item=>item.voice),renderWidth-125);
+     for(const {voice,entries,tuplets,vi} of lanes){
+      voice.draw(context,stave);tuplets.forEach(t=>t.setContext(context).draw());
+      const first=entries[0].note;
+      context.save();context.setFont('sans-serif',11,'bold');context.fillText('V'+(vi+1),7,first.getYs()[0]+4);context.restore();
+      for(const {note,key,state} of entries)remember(note,key,state);
+     }
+     host.dataset.voices=String(lanes.length);
+     host.dataset.noteCount=String(notes.size);
+     host.dataset.font='Bravura';
+     if(scoreLegend)host.append(scoreLegend);fitScore();return;
     }
     const ns=[],entries=[],ties=[];for(const group of row){const groupNotes=[],tupletLanes=new Map();for(const piece of group.notes){const note=makeNote(String(piece.duration)+(piece.dots?'d':''),piece.state);if(piece.dots)Flow.Dot.buildAndAttach([note],{all:true});ns.push(note);groupNotes.push(note);entries.push({note,piece});if(piece.tuplet){const lane=tupletLanes.get(piece.beat)||[];lane.push(note);tupletLanes.set(piece.beat,lane);}if(piece.tie&&piece.state){const previous=entries.at(-2);if(previous?.piece.index===piece.index)ties.push(new Flow.StaveTie({first_note:previous.note,last_note:note,first_indices:[0],last_indices:[0]}));}}
      for(const [beat,lane] of tupletLanes){const ratio=group.notes.find(p=>p.beat===beat&&p.tuplet).tuplet;tuplets.push(new Flow.Tuplet(lane,{num_notes:ratio.count,notes_occupied:ratio.normal,bracketed:true,ratioed:false}));}
@@ -138,7 +160,7 @@
  const render=renderActiveMeasure;renderActiveMeasure=function(...args){const result=render.apply(this,args);syncFreeButton();pencil.hidden=!enabled||appMode!=='metronome';editor.hidden=!enabled||!editing||appMode!=='metronome';pulse.hidden=!enabled||appMode!=='metronome';renderEditor();layout();refresh();return result;};
  const subdivisions=renderSubdivisionDots;renderSubdivisionDots=function(...args){const result=subdivisions.apply(this,args);refresh();return result;};
  const visual=scheduleVisualUpdate;scheduleVisualUpdate=function(mIdx,sIdx,time,position){const result=visual.apply(this,arguments);const m=measures[mIdx],p=position||getBeatAndSub(m,sIdx);enqueue({measure:mIdx,beat:p.beat,key:`${p.beat}:${Math.round(p.subIndex/(p.subdivisions||m.beatSubdivisions[p.beat])*m.beatSubdivisions[p.beat])}`,time,end:time+(p.durationMs||getStepDurationMs(getEffectiveTempo(m),m.denominator,m.beatSubdivisions[p.beat]))/1000,audible:isSilentCycleAudible(),pulse:p.subIndex===0&&(m.denominator>=8?(m.numerator%3===0?p.beat%3===0:m.numerator>=5&&m.numerator%2?p.beat%2===0&&p.beat<m.numerator-2:true):true)});return result;};
- const polyVisual=schedulePolyVisualUpdate;schedulePolyVisualUpdate=function(mIdx,event,time){const result=polyVisual.apply(this,arguments),m=measures[mIdx],cycle=m.numerator*60/getEffectiveTempo(m);if(event.outer)enqueue({measure:mIdx,key:`outer:${event.outerIndex}`,time,end:time+cycle/m.numerator,audible:true});if(event.inner)enqueue({measure:mIdx,key:`inner:${event.innerIndex}`,time,end:time+cycle/m.denominator,audible:true});return result;};
+ const polyVisual=schedulePolyVisualUpdate;schedulePolyVisualUpdate=function(mIdx,event,time){const result=polyVisual.apply(this,arguments),m=measures[mIdx],cycle=m.numerator*60/getEffectiveTempo(m);for(const hit of event.hits||[]){const model=m.polyVoices[hit.voice];enqueue({measure:mIdx,key:`${hit.voice}:${hit.beat}:${hit.sub}`,time,end:time+cycle/model.count/model.subdivisions[hit.beat],audible:true});}return result;};
  const stop=stopMetronome;stopMetronome=function(...args){const result=stop.apply(this,args);cues=[];clearHeads();pulse.classList.remove('pulsing');clearBurst();cancelAnimationFrame(frame);frame=0;refresh();renderEditor();return result;};
  async function setView(next){
   if(enabled===next&&(!next||Flow))return;enabled=next;partitionButton.setAttribute('aria-pressed',String(enabled));metronomeButton.setAttribute('aria-pressed',String(!enabled));partitionButton.classList.toggle('active',enabled);metronomeButton.classList.toggle('active',!enabled);panel.classList.toggle('score-view',enabled);pencil.hidden=!enabled||appMode!=='metronome';editor.hidden=!enabled||!editing||appMode!=='metronome';pulse.hidden=!enabled||appMode!=='metronome';renderEditor();layout();

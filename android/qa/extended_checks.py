@@ -27,7 +27,7 @@ def run_extended_checks(api, api_request):
         if not js('document.querySelector("#workspaceControls").open'):tap('#workspaceControls summary')
         js('(()=>{window.__qaTapTimes=[];window.__qaTapListener=()=>__qaTapTimes.push(performance.now());tapBtn.addEventListener("click",__qaTapListener,true);return true})()')
         try:
-            for _ in range(4):tap('#tapBtn');time.sleep(.25)
+            api_request('tapCss',selector='#tapBtn',count=4,intervalMs=250)
             wait('__qaTapTimes.length',lambda x:x==4)
             state=js('({times:__qaTapTimes,bpm:tempo,measure:measures[activeMeasureIndex].tempo,retained:tapTimes.slice()})')
             # Native gestures can exceed the app's two-second reset on a busy emulator.

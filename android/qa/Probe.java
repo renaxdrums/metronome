@@ -74,6 +74,8 @@ public final class Probe extends Instrumentation {
     long t=SystemClock.uptimeMillis();
     MotionEvent down=MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,x,y,0);
     MotionEvent up=MotionEvent.obtain(t,t+60,MotionEvent.ACTION_UP,x,y,0);
+    down.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+    up.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
     try {
       if(!getUiAutomation().injectInputEvent(down,true))throw new IllegalStateException("Pointer down rejected");
       SystemClock.sleep(60);
@@ -141,7 +143,15 @@ public final class Probe extends Instrumentation {
       for(int i=0;i<10;i++){SystemClock.sleep(100);JSONObject next=new JSONObject((String)evaluate(expression));boolean stable=Math.abs(next.optDouble("x")-r.optDouble("x"))<.5&&Math.abs(next.optDouble("y")-r.optDouble("y"))<.5&&next.optBoolean("hit");r=next;if(stable)break;if(i==9)throw new IllegalStateException("Touch target is moving: "+q.getString("selector"));}
       int[] location=new int[2];runOnMainSync(()->web.getLocationOnScreen(location));
       double scale=web.getWidth()/r.getDouble("w");
-      pointer(location[0]+(int)Math.round(r.getDouble("x")*scale),location[1]+(int)Math.round(r.getDouble("y")*scale));
+      int count=q.optInt("count",1),interval=q.optInt("intervalMs",250);
+      if(count<1||count>10||interval<100||interval>1500)throw new IllegalArgumentException("Invalid native tap series");
+      // Validate geometry once, then send actual touch events at native speed.
+      // Repeating socket/evaluate/visual-state round trips cannot measure tap tempo.
+      for(int i=0;i<count;i++){
+        long started=SystemClock.uptimeMillis();
+        pointer(location[0]+(int)Math.round(r.getDouble("x")*scale),location[1]+(int)Math.round(r.getDouble("y")*scale));
+        if(i+1<count)SystemClock.sleep(Math.max(0,interval-(SystemClock.uptimeMillis()-started)));
+      }
       return true;
     }
     if(action.equals("nodes")){JSONArray list=new JSONArray();nodes(getUiAutomation().getRootInActiveWindow(),list,0);return list;}

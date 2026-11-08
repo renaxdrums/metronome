@@ -81,13 +81,31 @@ def run_extended_checks(api, api_request):
         require(state=={'playing':False,'count':1,'n':4,'d':4},'Reset did not restore one 4/4 measure')
         set_value('#volumeSlider',80,'input');return {'undo_restored_volume':.25,'reset':state}
 
+    def ensure_silent_controls():
+        # Sequencer shows these controls directly. The optional collapse button
+        # is deliberately hidden outside Training by the existing theme CSS.
+        inspection = '''(()=>{
+          const section=document.querySelector(".silent-section");
+          const shown=e=>!!e&&e.getClientRects().length>0&&getComputedStyle(e).visibility!=="hidden";
+          return {section:shown(section),toggle:shown(document.getElementById("silentToggle")),
+            settings:shown(document.getElementById("silentSettings")),
+            expand:shown(section?.querySelector(".silent-collapse"))};
+        })()'''
+        state=js(inspection)
+        require(state['section'],'Silent measures panel is not visible in Sequencer: '+str(state))
+        if not (state['toggle'] and state['settings']):
+            require(state['expand'],'Silent measures controls have no visible way to expand: '+str(state))
+            tap('.silent-collapse')
+            state=js(inspection)
+        require(state['toggle'] and state['settings'],'Silent measures controls are not visible: '+str(state))
+
     def silent_options():
         nav('training')
         require(js('document.querySelector(".silent-section").hidden'),'Silent measures still appear in Training')
         nav('sequence')
         if js('document.body.dataset.mobilePane!=="seq"'):tap('#workspaceMobileViews [data-pane=seq]')
         require(not js('document.querySelector(".silent-section").hidden'),'Silent measures are absent from Sequencer')
-        if not js('document.querySelector(".silent-section").classList.contains("is-expanded")'):tap('.silent-collapse')
+        ensure_silent_controls()
         if not js('silentModeEnabled'):tap('#silentToggle')
         rows=[]
         for selector,field,start in [('#clickMeasureCount','clickMeasures',1),('#silentMeasureCount','silentMeasures',0)]:
@@ -294,7 +312,7 @@ def run_extended_checks(api, api_request):
     def silent_audio():
         nav('sequence')
         if js('document.body.dataset.mobilePane!=="seq"'):tap('#workspaceMobileViews [data-pane=seq]')
-        if not js('document.querySelector(".silent-section").classList.contains("is-expanded")'):tap('.silent-collapse')
+        ensure_silent_controls()
         set_value('#measureCount',1);set_value('#activeNumerator',2);set_value('#activeDenominator',4);set_value('#bpmSlider',300,'input')
         if not js('silentModeEnabled'):tap('#silentToggle')
         set_value('#clickMeasureCount',1);set_value('#silentMeasureCount',1);set_value('#soundBank','clic')

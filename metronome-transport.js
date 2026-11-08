@@ -439,10 +439,13 @@
       sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring').forEach(el=>el.remove());
       totalSteps=0;stepsData=[];clearProgressTrail();
       const radii=['min(19.5dvh,152px)','min(12.5dvh,98px)','min(8.5dvh,65px)','min(5dvh,40px)'];
+      m.polyVoices.forEach((_voice,vi)=>{
+        const ring=document.createElement('div');
+        ring.className='poly-ring '+(vi===0?'outer':vi===1?'inner':'voice-'+(vi+1));
+        sequencerContainer.append(ring);
+      });
       m.polyVoices.forEach((voice,vi)=>{
         const klass=vi===0?'outer':vi===1?'inner':'voice-'+(vi+1);
-        const ring=document.createElement('div');ring.className='poly-ring '+klass;
-        sequencerContainer.append(ring);
         for(let beat=0;beat<voice.count;beat++){
           const dot=document.createElement('div');dot.className='poly-dot '+klass;
           dot.dataset.polyVoice=String(vi);dot.dataset.polyBeat=String(beat);
@@ -504,7 +507,9 @@
         const ob=document.createElement('div'); ob.className='outer-mini'; ob.style.width=`${Math.min(100,m.numerator*8)}px`;
         const ib=document.createElement('div'); ib.className='inner-mini'; ib.style.width=`${Math.min(100,m.denominator*8)}px`;
         preview.append(ob,ib);
-        card.append(head,ratio,extra,tempoRow,preview);
+        card.append(head,ratio);
+        if(extra.childElementCount)card.append(extra);
+        card.append(tempoRow,preview);
         const select=()=>{ activeMeasureIndex=i; syncTempoUI(m); renderSequencerList(); renderActiveMeasure(); };
         card.addEventListener('click',select); card.addEventListener('keydown',e=>{if(e.target===card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();select();}});
         measureListEl.appendChild(card);

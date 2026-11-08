@@ -1,0 +1,73 @@
+/* Musical workspaces: stable lanes and controls sized to their available space. */
+body.poly-mode .sequencer-wrapper { padding-bottom: 40px; }
+body.poly-mode .sequencer-container { max-width: calc(100cqh - 50px); }
+body.poly-mode #beatDisplay { display: none; }
+.poly-ratio-caption { display: none; }
+body.poly-mode:not(:has(.panel-visu.score-view)) .poly-ratio-caption {
+  display: block; position: absolute; inset: auto 8px 8px;
+  text-align: center; font-size: clamp(12px, 1.7vw, 17px); font-weight: 650;
+  line-height: 24px; color: var(--text); font-variant-numeric: tabular-nums;
+}
+body.poly-mode .poly-dot { --poly-radius: var(--poly-lane-radius); width: 16px; height: 16px; }
+body.poly-mode .poly-ring {
+  width: calc(var(--poly-lane-radius) * 2);
+  height: calc(var(--poly-lane-radius) * 2);
+  border-width: 2px;
+}
+body.poly-mode .poly-ring.outer { border-color: color-mix(in srgb, var(--orange) 65%, transparent); }
+body.poly-mode .poly-ring.inner { border-color: color-mix(in srgb, var(--cyan) 65%, transparent); }
+body.poly-mode .poly-ring.voice-3 { border-color: color-mix(in srgb, var(--yellow) 65%, transparent); }
+body.poly-mode .poly-ring.voice-4 { border-style: dashed; border-color: color-mix(in srgb, var(--orange) 65%, transparent); }
+body.poly-mode .poly-subdivision { width: 8px; height: 8px; padding: 0; min-width: 0; min-height: 0; }
+body.poly-mode .poly-dot::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; }
+body.poly-mode .poly-dot:focus-visible { outline: 2px solid var(--text); outline-offset: 4px; }
+.measure-card .poly-ratio-row { display: flex; flex-wrap: nowrap; align-items: end; gap: 8px; width: 100%; }
+.measure-card .poly-lane-field { display: flex; flex: 1 1 0; min-width: 0; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 650; }
+.poly-lane-field::before { content: ''; height: 3px; background: var(--orange); border-radius: 2px; }
+.poly-lane-field[data-voice='2']::before { background: var(--cyan); }
+.poly-lane-field[data-voice='3']::before { background: var(--yellow); }
+.poly-lane-field[data-voice='4']::before { background: repeating-linear-gradient(90deg,var(--orange) 0 5px,transparent 5px 8px); }
+.measure-card .poly-lane-field :is(.numbox-custom,.numbox-button) { width: 100%; min-width: 0; }
+.measure-card .poly-lane-field .numbox-button { min-height: 44px; padding-inline: 8px; }
+body[data-workspace=polyrhythm] .visu-toolbar #polyControls > :is(.numbox-custom,.slash) { display: none; }
+body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count {
+  position: static; height: auto; min-height: 44px; font-size: 12px; gap: 10px;
+}
+body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count::before { content: none; }
+body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count :is(.numbox-custom,.numbox-button) {
+  min-width: 54px; max-width: none; width: 54px; min-height: 44px; height: 44px;
+}
+body.poly-mode .panel-visu.score-view .sequencer-wrapper { overflow: hidden; padding-bottom: 0; }
+body.poly-mode .rhythm-score { overflow: hidden; }
+@media (min-width:1101px) {
+  .panel-visu .visu-toolbar { grid-template-columns: 120px minmax(250px,1.4fr) minmax(180px,1fr) minmax(125px,.7fr) 100px; --workspace-toolbar-gap: 12px; }
+  .visu-toolbar .workspace-control-group,.visu-toolbar #workspaceTimer { --workspace-group-margin: 0; padding-left: 12px; }
+  .visu-toolbar .workspace-tempo-group { grid-template-columns: auto minmax(50px,1fr) 110px; }
+  .visu-toolbar .numbox-button { min-height: 44px; }
+}
+@media (max-width:1100px) {
+  body.poly-mode .sequencer-wrapper { min-height: 150px; }
+  body.poly-mode .panel-visu .sequencer-container { --poly-caption-space: 50px; }
+}
+@media (min-width:1101px) and (max-width:1250px) {
+  .panel-visu .visu-toolbar { grid-template-columns: 130px minmax(250px,1fr) minmax(180px,1fr); }
+}
+@media (max-height:500px) and (min-width:600px) and (max-width:1100px) {
+  body.poly-mode #workspaceNav { grid-template-columns: repeat(6,minmax(0,1fr)); padding-block: 4px; }
+  body.poly-mode #workspaceMobileViews { padding-bottom: 4px; }
+  html#renaxApp body.poly-mode .main-grid > .panel-visu.mobile-active {
+    --workspace-panel-display: grid;
+    --poly-landscape-columns: 210px minmax(0,1fr);
+    --poly-landscape-rows: auto minmax(0,1fr);
+    grid-template-columns: 210px minmax(0,1fr); grid-template-rows: auto minmax(0,1fr);
+  }
+  html#renaxApp body.poly-mode .panel-visu .visu-toolbar { grid-column: 1; grid-row: 1; min-width: 0; }
+  body.poly-mode .visu-measure-info { flex-wrap: wrap; }
+  body.poly-mode .panel-visu #workspaceControls { grid-column: 1; grid-row: 2; }
+  html#renaxApp body.poly-mode .panel-visu .sequencer-wrapper { grid-column: 2; grid-row: 1 / span 2; min-height: 0; padding-bottom: 24px; }
+  body.poly-mode .panel-visu .sequencer-container { --poly-caption-space: 0px; }
+  html#renaxApp body.poly-mode .panel-visu:not(.score-view) .sequencer-wrapper #sequencerContainer { max-width: min(100%,100cqh); }
+  body.poly-mode .poly-ratio-caption { bottom: 0; font-size: 11px; line-height: 18px; }
+  body.poly-mode .poly-dot { width: 9px; height: 9px; }
+  body.poly-mode .poly-subdivision { width: 5px; height: 5px; }
+}

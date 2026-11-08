@@ -256,7 +256,7 @@
     function updateRingRadius() {
       const size = sequencerContainer.clientWidth;
       if (size === 0) return;
-      RING_RADIUS = size * 0.406;
+      RING_RADIUS = size * (appMode === 'polyrhythm' ? 0.44 : 0.406);
       STEP_SIZE = Math.max(10, size * 0.076);
       sequencerContainer.style.setProperty('--ring-radius', `${RING_RADIUS}px`);
       sequencerContainer.style.setProperty('--step-size', `${STEP_SIZE}px`);

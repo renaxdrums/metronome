@@ -1,5 +1,6 @@
 {
   "nightly": [
+    "tests/poly-layout-sample-test.cjs",
     "tests/tuner-core-test.mjs",
     "tests/tuner-interface-test.cjs",
     "tests/playlist-sharing-test.mjs",

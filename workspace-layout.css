@@ -9,10 +9,10 @@
 #workspaceMobileViews,#modeSwitch,.panel-seq>.song-tabs,.panel-seq .multi-mode-tabs,.mobile-tabs,.main-grid>.panel-params{display:none!important}
 #workspaceControls{flex:0 0 auto;border-bottom:1px solid var(--border);padding:0 0 12px;min-width:0}
 #workspaceControls>summary{color:var(--text);font-size:11px;font-weight:600;cursor:pointer;padding:8px 0}
-.poly-dot.outer{--poly-radius:var(--ring-radius)!important}
-.poly-dot.inner{--poly-radius:calc(var(--ring-radius) * .64)!important}
-.poly-ring.outer{width:calc(var(--ring-radius) * 2)!important;height:calc(var(--ring-radius) * 2)!important}
-.poly-ring.inner{width:calc(var(--ring-radius) * 1.28)!important;height:calc(var(--ring-radius) * 1.28)!important}
+.poly-dot.outer{--poly-radius:var(--poly-lane-radius,var(--ring-radius))!important}
+.poly-dot.inner{--poly-radius:var(--poly-lane-radius,calc(var(--ring-radius) * .64))!important}
+.poly-ring.outer{width:calc(var(--poly-lane-radius,var(--ring-radius)) * 2)!important;height:calc(var(--poly-lane-radius,var(--ring-radius)) * 2)!important}
+.poly-ring.inner{width:calc(var(--poly-lane-radius,calc(var(--ring-radius) * .64)) * 2)!important;height:calc(var(--poly-lane-radius,calc(var(--ring-radius) * .64)) * 2)!important}
 .workspace-controls-grid{display:grid;grid-template-columns:minmax(210px,1.2fr) minmax(160px,1fr) minmax(130px,.8fr);gap:24px;align-items:start}
 .workspace-controls-grid .control-group{margin:0!important;gap:8px!important;min-width:0}
 .workspace-controls-grid .control-group>label{display:flex;align-items:center;gap:8px;font-size:10px;min-height:18px;line-height:18px;margin:0;letter-spacing:.3px}
@@ -80,11 +80,11 @@
  #workspaceMobileViews button[aria-pressed=true]{color:var(--text);background:#00cee510;border-color:#009cab}
  .main-grid{display:block!important;flex:1;min-height:0;overflow:hidden}
  .main-grid>.panel{height:100%;max-height:100%;display:none!important;padding:12px!important}
- body[data-mobile-pane=visu] .main-grid>.panel-visu,body[data-mobile-pane=seq] .main-grid>.panel-seq,body[data-mobile-pane=training] .main-grid>.panel-training{display:flex!important}
+ body[data-mobile-pane=visu] .main-grid>.panel-visu,body[data-mobile-pane=seq] .main-grid>.panel-seq,body[data-mobile-pane=training] .main-grid>.panel-training{display:var(--workspace-panel-display,flex)!important}
  body[data-mobile-pane=settings] .main-grid{display:none!important}
  .panel-visu{gap:10px!important}
  .panel-visu .sequencer-wrapper{flex:1;min-height:190px;container-type:size;overflow:hidden;width:100%;display:flex;align-items:center;justify-content:center}
- .panel-visu .sequencer-container{width:min(100%,calc(100cqh - 8px))!important;height:auto!important;aspect-ratio:1;max-height:none}
+ .panel-visu .sequencer-container{width:min(100%,calc(100cqh - var(--poly-caption-space,8px)))!important;height:auto!important;aspect-ratio:1;max-height:none}
  .panel-visu.score-view .sequencer-wrapper{overflow:auto;min-height:190px}
  .panel-visu .visu-toolbar{flex-shrink:0;min-height:42px}
  .panel-visu .panel-title{display:none}
@@ -117,10 +117,10 @@
 #workspaceTimer{display:contents}
 .workspace-timer-label{display:none}
 @media(min-width:1101px){
- .panel-visu .visu-toolbar{display:grid!important;grid-template-columns:128px minmax(250px,1.55fr) minmax(110px,1fr) minmax(80px,.65fr) 96px;align-items:start;gap:0!important;flex-wrap:nowrap;padding:12px!important;background:#0d0f1480;border:1px solid var(--border);border-radius:8px}
+ .panel-visu .visu-toolbar{display:grid!important;grid-template-columns:128px minmax(250px,1.55fr) minmax(110px,1fr) minmax(80px,.65fr) 96px;align-items:start;gap:var(--workspace-toolbar-gap,0)!important;flex-wrap:nowrap;padding:12px!important;background:#0d0f1480;border:1px solid var(--border);border-radius:8px}
  .visu-toolbar #workspaceControls{display:none}
  .visu-toolbar .visu-measure-info,.visu-toolbar .workspace-control-group,.visu-toolbar #workspaceTimer{min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:7px!important}
- .visu-toolbar .workspace-control-group,.visu-toolbar #workspaceTimer{padding-left:14px;margin-left:14px!important;border-left:1px solid #ffffff0b}
+ .visu-toolbar .workspace-control-group,.visu-toolbar #workspaceTimer{padding-left:14px;margin-left:var(--workspace-group-margin,14px)!important;border-left:1px solid #ffffff0b}
  .visu-toolbar .measure-label,.visu-toolbar .control-group>label,.workspace-timer-label{display:flex!important;align-items:center;gap:5px;font:600 9px/13px var(--font)!important;letter-spacing:.4px;color:var(--text-muted);text-transform:uppercase;min-height:13px;margin:0;padding:0;white-space:nowrap}
  .visu-toolbar .measure-label{max-width:126px;overflow:hidden;text-overflow:ellipsis}
  .visu-toolbar .control-group>label svg{width:12px;height:12px;flex:0 0 12px;margin:0}
@@ -189,23 +189,6 @@ body .silent-section[hidden]{display:none}
 .tempo-range-extend:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .tempo-range-extend:disabled{opacity:.45;cursor:default}
 @media(min-width:1101px){.visu-toolbar .workspace-tempo-group{position:relative}.visu-toolbar .tempo-range-extend{position:absolute;top:-2px;right:0;min-height:17px;padding:1px 5px;font-size:9px}}
-
-/* Keep the added voice selector inside the measure column instead of covering tempo controls. */
-@media(min-width:1101px){
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info{position:relative}
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .measure-label{width:max-content;max-width:calc(100% - 36px)}
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-controls{height:38px;min-height:38px;flex-wrap:nowrap;row-gap:0}
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{position:absolute;top:-6px;right:0;height:24px;gap:3px;min-width:0;flex:0 0 auto;font-size:9px;line-height:1}
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-custom,
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{width:34px;min-width:34px;flex-basis:34px}
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{height:24px;min-height:24px;padding:2px}
-}
-@media(min-width:1101px){
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count{font-size:0;gap:1px}
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count::before{content:"V";font:600 9px/1 var(--font)}
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-custom,
- body[data-workspace=polyrhythm] .visu-toolbar .visu-measure-info .poly-voice-count .numbox-button{min-width:26px!important;max-width:26px}
-}
 
 /* Polyrythmie: additional concentric voices and per-beat editor. */
 .poly-voice-count{display:flex;align-items:center;gap:5px;color:var(--text-muted);font-size:10px}

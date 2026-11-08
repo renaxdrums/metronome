@@ -14,7 +14,7 @@ const {start,save}=require('./audio-harness.cjs');
       await page.goto(runner.url);
       await page.waitForFunction(()=>window.RENAX_NUMBOX&&window.RENAX_WORKSPACE);
       await page.getByRole('tab',{name:'Polyrythmie',exact:true}).click();
-      for(const id of ['polyNumerator','polyDenominator']){
+      for(const id of ['polyVoiceCount']){
         const wrapper=page.locator('#'+id).locator('..'),trigger=wrapper.locator('.numbox-button');
         await trigger.click();
         const state=await page.evaluate(id=>{
@@ -27,8 +27,8 @@ const {start,save}=require('./audio-harness.cjs');
         assert(state.panelZ>state.navZ,JSON.stringify({width,id,...state}));
         assert.equal(state.panelOverflow,'visible',JSON.stringify({width,id,...state}));
         assert.equal(state.gridOverflow,'visible',JSON.stringify({width,id,...state}));
-        await wrapper.locator('.numbox-option[data-value="7"]').click();
-        assert.equal(await page.locator('#'+id).inputValue(),'7');
+        await wrapper.locator('.numbox-option[data-value="3"]').click();
+        assert.equal(await page.locator('#'+id).inputValue(),'3');
       }
       await page.locator('#index2SettingsBtn').click();
       const colors=await page.evaluate(()=>{

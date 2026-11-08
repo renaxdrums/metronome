@@ -39,6 +39,23 @@
    transaction.onabort=()=>reject(transaction.error||Error('Sauvegarde locale annulée'));
   });
  }
+ function prepareOneShot(buffer){
+  const prepared=prepareInstrumentSample(buffer,Infinity);
+  const channels=Array.from({length:buffer.numberOfChannels},(_,i)=>buffer.getChannelData(i));
+  const rate=buffer.sampleRate,window=Math.max(1,Math.round(rate*.005));
+  const first=Math.round(prepared.offset*rate);
+  let peak=0,quiet=0,end=buffer.length;
+  for(let start=first;start<buffer.length;start+=window){
+   let energy=0;
+   const last=Math.min(buffer.length,start+window);
+   for(let i=start;i<last;i++)for(const channel of channels)energy+=channel[i]*channel[i];
+   const rms=Math.sqrt(energy/((last-start)*channels.length));
+   peak=Math.max(peak,rms);
+   quiet=rms<peak*.025?quiet+(last-start):0;
+   if(start-first>rate*.025&&quiet>=rate*.04){end=last;break;}
+  }
+  return {...prepared,duration:Math.max(.015,Math.min(prepared.duration,(end-first)/rate))};
+ }
  const recordBanks=new Set();
  function register(meta){
   if(recordBanks.has(meta.id)||!meta.id?.startsWith(PREFIX))return;
@@ -54,7 +71,7 @@
       const saved=await read(meta.id);
       if(!saved?.data)throw Error('Sample local introuvable sur cet appareil : '+meta.name);
       const buffer=await context.decodeAudioData(saved.data.slice(0));
-      const prepared=prepareInstrumentSample(buffer,Infinity);
+      const prepared=prepareOneShot(buffer);
       loaded.set(context,prepared);
       this.tail=Math.max(1,prepared.duration);
      })();
@@ -68,12 +85,17 @@
     if(!prepared)return;
     const source=context.createBufferSource(),gain=context.createGain();
     source.buffer=prepared.buffer;
+    source.loop=false;
     const level=state===3?1:state===2?.91:.78;
     gain.gain.setValueAtTime(prepared.gain*level*(isFirst?1.12:1),time);
     source.connect(gain);gain.connect(dest);
     scheduledVoiceSources.add(source);
     source.onended=()=>{scheduledVoiceSources.delete(source);source.disconnect();gain.disconnect();};
-    source.start(time,prepared.offset,prepared.duration);
+    const duration=prepared.duration,fade=Math.min(.005,duration/4);
+    gain.gain.setValueAtTime(prepared.gain*level*(isFirst?1.12:1),time+duration-fade);
+    gain.gain.linearRampToValueAtTime(0,time+duration);
+    source.start(time,prepared.offset,duration);
+    source.stop(time+duration);
    }
   };
   BANK_GAINS[meta.id]=.42;

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "da2f909f8b4e1a2c",
+  "revision": "d70486a9d03454a3",
   "resources": [
     {
       "path": "accessibility.css",
@@ -159,12 +159,12 @@
     },
     {
       "path": "custom-samples.js",
-      "sha256": "3551483675e329912e0990815aa6bdbd4d33a994578a464c8596a4769f1e616c",
+      "sha256": "fc537faea98a376507b00c3cc083d264e3a7f9b9262d06aa2f98e130c7dc50a6",
       "text": true
     },
     {
       "path": "edit-history.js",
-      "sha256": "db2e3869063ccfa7fb909188bd2d2c2714fd7907e142049be7dc073b8ee45f69",
+      "sha256": "bca355c4b6ec5cb90962e9619792e6451b8eb063a9e915418ded5f74bc9d3128",
       "text": true
     },
     {
@@ -284,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "c715aca2807093195314bd69d65b8e06aafe5aa9c30f8a34e8b6e98fcb5847cf",
+      "sha256": "74763e6089974cb21c26a00aab6ec626bb8ae6059412ba2dd49bd445594c0b8d",
       "text": true
     },
     {
@@ -339,12 +339,12 @@
     },
     {
       "path": "metronome-core.js",
-      "sha256": "9365c61683297f739cef8a6280ad1afe14081b7200d169acd6c996081bf40f29",
+      "sha256": "261cdd7e655624342e5e2f44f36450ae60343a9f7fed118a91e381b136cd9981",
       "text": true
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "f5f3312638d37e127b1ef93a7ef337fb97f233779fabd2f833767c75dac319a8",
+      "sha256": "791913fd89f2800bb8e54b23a6c3998f517b3bd475874bb1fd1b4216d458eff4",
       "text": true
     },
     {
@@ -354,7 +354,7 @@
     },
     {
       "path": "mobile-landscape.css",
-      "sha256": "7356072925d64ec64a9ace449ab34eeecc70f8a059d2b844a547d4d82ba9eb40",
+      "sha256": "0bc777f4f75896ece7abe30542f48c0637f2366a2f736e627fc55b7f3f35c53c",
       "text": true
     },
     {
@@ -443,6 +443,11 @@
       "text": true
     },
     {
+      "path": "poly-layout.css",
+      "sha256": "c945fbe22f47545bedfd82f02b58919ece387eae39ef7518ba2d6a55a37cf77d",
+      "text": true
+    },
+    {
       "path": "pro-interface.css",
       "sha256": "58585adca440c15586546cc65a4148dcdfb29af677bf531bc8a733a33cdd1d9b",
       "text": true
@@ -474,7 +479,7 @@
     },
     {
       "path": "rhythm-score.js",
-      "sha256": "e058a752abacc54686d99d6c50c308ec350a87f95801f7eee4bbcc5c291ae920",
+      "sha256": "2d5d5de80a9042aa178f11c8cc302f590b0cac95ed01fd062584141570d9810d",
       "text": true
     },
     {
@@ -553,6 +558,11 @@
       "text": true
     },
     {
+      "path": "tuner-fit.css",
+      "sha256": "a20d4a12136cb50346f18ba02cb586916e819e3557e4eb1b2b6d3a4b4633c223",
+      "text": true
+    },
+    {
       "path": "tuner-interface.css",
       "sha256": "02fd2ea43ae5ccdbcd3f95ca5470f7420ed1acb637805d8e93ea547a04def300",
       "text": true
@@ -599,7 +609,7 @@
     },
     {
       "path": "workspace-layout.css",
-      "sha256": "eaa5c0056d8d34136b8f765ff1e4e450759c7428dbda8ec214db621d61d3d500",
+      "sha256": "312689549f5ac7113d644178277184f5581e731907fc5eb4b29f00d6bb56ffbd",
       "text": true
     },
     {

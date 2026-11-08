@@ -1,0 +1,36 @@
+/* Share the viewport between setup, meter and transport; never push the mic away. */
+html#renaxApp[data-tool='tuner'] #tunerRoot {
+  display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+  padding: 8px 0 12px;
+}
+html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-layout {
+  grid-template-columns: minmax(0,1fr); grid-template-rows: auto minmax(0,1fr);
+  min-height: 0; gap: 10px;
+}
+html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-controls { padding: 10px 16px; gap: 8px 20px; }
+html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-measurement {
+  display: flex; flex-direction: column; min-height: 0; padding: 12px;
+  container-type: size; gap: 4px;
+}
+#tunerRoot .tuner-measurement .tuner-measurement-head { margin: 0 52px; flex-shrink: 0; min-height: 40px; }
+#tunerRoot .tuner-measurement .tuner-dial {
+  width: min(100%,480px,calc((100cqh - 164px) * 1.7));
+  min-width: 0; flex: 0 1 auto; margin: auto auto 0;
+}
+#tunerRoot .tuner-measurement .tuner-direction { margin: 0 auto; font-size: 12px; flex-shrink: 0; }
+#tunerRoot .tuner-measurement .tuner-result { margin: 0 auto; min-height: 30px; flex-shrink: 0; }
+#tunerRoot .tuner-measurement .tuner-transport { margin: auto 0 0; padding-top: 4px; flex-shrink: 0; }
+#tunerRoot .tuner-measurement #tunerStatus:empty { display: none; }
+@media (max-width:600px) {
+  html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-controls { grid-template-columns: repeat(2,minmax(0,1fr)); padding: 8px; gap: 6px; }
+  #tunerRoot .tuner-controls label { min-height: 18px; font-size: 11px; }
+  #tunerRoot .tuner-context { padding: 4px 0 0; }
+  #tunerRoot .tuner-controls .numbox-button { min-height: 44px; height: 44px; }
+}
+@media (max-height:500px) and (min-width:600px) {
+  html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-layout { grid-template-columns: minmax(180px,.65fr) minmax(0,1.35fr); grid-template-rows: minmax(0,1fr); }
+  html#renaxApp[data-tool='tuner'] #tunerRoot .tuner-controls { grid-template-columns: minmax(0,1fr); align-content: start; }
+  #tunerRoot .tuner-measurement .tuner-dial { width: min(90%,calc((100cqh - 135px) * 1.7)); }
+  #tunerRoot .tuner-measurement .tuner-direction { display: none; }
+  #tunerRoot .tuner-measurement .tuner-result { min-height: 22px; }
+}

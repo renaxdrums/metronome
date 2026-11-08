@@ -106,7 +106,7 @@ async function probe(menu) {
           assert(count>0,JSON.stringify({width,height,theme,workspace}));
           results.push({width,height,theme,workspace,count,hitTesting:true,negativeControl:true,selection:true,keyboard:true});
           if (workspace==='polyrhythm') {
-            const trigger=p.locator('#polyNumerator').locator('..').locator('.numbox-button');
+            const trigger=p.locator('#polyVoiceCount').locator('..').locator('.numbox-button');
             await trigger.click();
             await p.screenshot({path:path.join(out,`${theme}-${width}-poly.png`)});
             await p.keyboard.press('Escape');

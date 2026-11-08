@@ -181,7 +181,15 @@ def tempo_and_metric():
  set_value('#activeNumerator',4);set_value('#activeDenominator',4);set_value('#bpmSlider',120,'input')
  return {'tempo_steps':'137 → 138 → 137','metric':'7/8 → 4/4'}
 def banks():
- nav('metronome'); choices=js('Array.from(document.querySelector("#soundBank").options).map(o=>({value:o.value,text:o.textContent}))'); tested=[]
+ nav('metronome')
+ # The final menu entry opens the file picker; it is not an audio bank.
+ # Assert its presence and keep checking the actual output of every real bank.
+ options=js('Array.from(document.querySelector("#soundBank").options).map(o=>({value:o.value,text:o.textContent,is_bank:!!SOUND_BANKS[o.value]}))')
+ require(sum(o['value']=='addLocalSamples' for o in options)==1,'Local sample picker action is absent or duplicated')
+ require(all(o['is_bank'] for o in options if o['value']!='addLocalSamples'),'Unregistered sound-bank option: '+str(options))
+ choices=[{'value':o['value'],'text':o['text']} for o in options if o['value']!='addLocalSamples']
+ require(bool(choices),'No playable sound bank available')
+ tested=[]
  set_value('#volumeSlider',80,'input')
  tap('#playBtn');wait('isPlaying')
  js('(()=>{window.__qaBankAnalyser=audioCtx.createAnalyser();__qaBankAnalyser.fftSize=4096;getAudioMixDestination(audioCtx).connect(__qaBankAnalyser);window.__qaBankCalls=[];window.__qaOriginalPlayClick=playClick;playClick=function(...args){__qaBankCalls.push(currentBank);return __qaOriginalPlayClick(...args)};return true})()')

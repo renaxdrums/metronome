@@ -116,9 +116,15 @@ def run_extended_checks(api, api_request):
         try:
             tap('#playBtn');wait('isPlaying&&RENAX_SONGS.navigation.song==="Track QA A"');wait('!isPlaying',timeout=8)
             require(js('RENAX_SONGS.navigation.profile')=='qa-first','Playback chose wrong first nonempty playlist')
-            require(js('document.querySelector(".song-chain-toggle").getAttribute("aria-pressed")')=='false','Chaining should be off initially')
+            require(js('RENAX_SONGS.library.profiles.find(p=>p.id==="qa-first").songs.every(s=>s.chainNext!==true)'),'Chaining should be off initially for every song')
             tap('.song-playlist-card[data-song-id="Track QA B"] .song-open');tap('#playBtn');wait('isPlaying&&RENAX_SONGS.navigation.song==="Track QA B"');wait('!isPlaying',timeout=8)
-            tap('.song-chain-toggle');tap('.song-playlist-card .song-open');tap('#playBtn')
+            # Chaining is a per-song detail control, not the removed playlist toggle.
+            js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"detail",profile:"qa-first",song:"Track QA A"})')
+            require(js('document.querySelector(".song-next-toggle").getAttribute("aria-pressed")')=='false','First song chaining should be off')
+            tap('.song-next-toggle')
+            require(js('RENAX_SONGS.library.profiles.find(p=>p.id==="qa-first").songs[0].chainNext===true'),'First song chaining was not saved')
+            require(js('RENAX_SONGS.library.profiles.find(p=>p.id==="qa-first").songs[1].chainNext!==true'),'Chaining leaked to the second song')
+            tap('#playBtn')
             wait('isPlaying&&RENAX_SONGS.navigation.song==="Track QA B"',timeout=10);wait('!isPlaying',timeout=8)
             require(js('RENAX_SONGS.navigation.profile')=='qa-first','Playback crossed into a different playlist')
             return {'first_nonempty_playlist':True,'selected_track':True,'default_end_stop':True,'optional_chain_within_playlist_only':True}

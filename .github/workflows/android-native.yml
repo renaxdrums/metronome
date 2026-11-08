@@ -20,7 +20,7 @@ jobs:
         include:
           - api: 34
             target: google_apis
-            emulator_build: 15507667 # Official 36.6.11 stable; compare with current emulator on API 35/36.
+            emulator_build: 16740729 # Official 37.2.13, matching the successful API 35/36 renderer.
           - api: 35
             target: default
           - api: 36

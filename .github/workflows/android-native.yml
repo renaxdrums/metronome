@@ -20,6 +20,7 @@ jobs:
         include:
           - api: 34
             target: google_apis
+            gpu: swangle # Use ANGLE on API 34 to avoid native SwiftShader ColorBuffer crashes.
             emulator_build: 16740729 # Official 37.2.13, matching the successful API 35/36 renderer.
           - api: 35
             target: default
@@ -56,7 +57,7 @@ jobs:
           arch: x86_64
           emulator-build: ${{ matrix.emulator_build }}
           ram-size: 6144
-          emulator-options: -no-window -gpu swiftshader -feature -Vulkan -noaudio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340 -memory 6144 -show-kernel -verbose
+          emulator-options: -no-window -gpu ${{ matrix.gpu || 'swiftshader' }} -feature -Vulkan -noaudio -no-boot-anim -camera-back none -no-snapshot -skin 1080x2340 -memory 6144 -show-kernel -verbose
           disable-animations: true
           script: python3 android/qa/suite.py
       - name: Preserve host diagnostics after native testing

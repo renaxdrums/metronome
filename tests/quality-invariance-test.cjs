@@ -622,6 +622,7 @@ async function baselineRoute(page, url) {
       styleComparisons,
       styleDiffs,
     });
+    if (styleDiffs.length) console.error('Computed-style differences:', JSON.stringify(styleDiffs));
     assert.equal(
       styleDiffs.length,
       0,

@@ -852,6 +852,8 @@
 
     function doTapTempo() {
       const now = performance.now();
+      // Timers may be delayed by a busy WebView; expire the series at the event itself.
+      if (tapTimes.length && now - tapTimes[tapTimes.length - 1] >= 2000) tapTimes = [];
       tapTimes.push(now);
       if (tapTimes.length > 5) tapTimes.shift();
       tapBtn.classList.add('hit');

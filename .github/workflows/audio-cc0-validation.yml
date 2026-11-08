@@ -202,11 +202,13 @@ jobs:
           node tests/startup-layout-test.cjs
           node tests/phone-rotation-test.cjs
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always() && steps.audio_impact.outputs.run_audio == 'true'
         with:
           name: sound-menu-foreground
           path: |
+            tests/results/quality-invariance-results.json
+            tests/results/invariance
             tests/results/sound-menu-*
             tests/results/numbox-foreground*
             tests/results/curves-*
@@ -267,7 +269,7 @@ jobs:
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tools/build-production.cjs --csp
           pnpm test:production
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: production-verification
@@ -302,7 +304,7 @@ jobs:
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           export TEST_OUTPUT_DIR=tests/results/compatibility
           pnpm test:compat
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: browser-compatibility

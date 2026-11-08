@@ -19,8 +19,7 @@ jobs:
       matrix:
         include:
           - api: 34
-            target: google_apis
-            gpu: swangle # Use ANGLE on API 34 to avoid native SwiftShader ColorBuffer crashes.
+            target: default # AOSP image, as on API 35/36; release does not require Play services.
             emulator_build: 16740729 # Official 37.2.13, matching the successful API 35/36 renderer.
           - api: 35
             target: default

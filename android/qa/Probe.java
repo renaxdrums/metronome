@@ -145,10 +145,15 @@ public final class Probe extends Instrumentation {
       double scale=web.getWidth()/r.getDouble("w");
       int count=q.optInt("count",1),interval=q.optInt("intervalMs",250);
       if(count<1||count>10||interval<100||interval>1500)throw new IllegalArgumentException("Invalid native tap series");
-      // Validate geometry once, then send actual touch events at native speed.
-      // Repeating socket/evaluate/visual-state round trips cannot measure tap tempo.
+      // Keep real native timing, but reacquire the target after tempo text reflows.
+      // Do not repeat scrolling or visual-state waits between taps.
       for(int i=0;i<count;i++){
         long started=SystemClock.uptimeMillis();
+        if(i>0){
+          r=new JSONObject((String)evaluate(expression));
+          if(r.optDouble("h")<=0||!r.optBoolean("hit")||!r.optBoolean("visible"))throw new IllegalStateException("Tap series target unavailable: "+q.getString("selector"));
+          scale=web.getWidth()/r.getDouble("w");
+        }
         pointer(location[0]+(int)Math.round(r.getDouble("x")*scale),location[1]+(int)Math.round(r.getDouble("y")*scale));
         if(i+1<count)SystemClock.sleep(Math.max(0,interval-(SystemClock.uptimeMillis()-started)));
       }

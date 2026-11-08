@@ -354,6 +354,8 @@ async function baselineRoute(page, url) {
                 }, module);
               }
               await p.getByRole('tab', { name: module, exact: true }).click();
+              if (!i && !referenceAgainstItself)
+                await require('./workspace-controls-reference.cjs')(p, module);
               if (
                 !i &&
                 !referenceAgainstItself &&
@@ -620,6 +622,7 @@ async function baselineRoute(page, url) {
       styleComparisons,
       styleDiffs,
     });
+    if (styleDiffs.length) console.error('Computed-style differences:', JSON.stringify(styleDiffs));
     assert.equal(
       styleDiffs.length,
       0,

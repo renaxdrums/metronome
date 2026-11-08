@@ -14,12 +14,16 @@ def waveform_match(filename, source):
     require(len(reference)>1000 and len(signal)>len(reference),'Missing speech samples')
     rate=source['rate'];count=round(len(reference)*48000/rate)
     reference=np.interp(np.arange(count)*rate/48000,np.arange(len(reference)),reference)
-    reference-=reference.mean();energy=float(reference@reference)
+    reference-=reference.mean()
+    # The saved program also contains the approved spoken count-in. Weight by
+    # reference speech energy so counts during the announcement's silent tail
+    # do not count as corruption of speech. Keep every sample and the .65 gate.
+    weights=reference*reference
+    energy=float((reference*weights)@reference)
     require(energy>1e-8,'Silent reference speech')
     n=1<<(len(signal)+len(reference)-1).bit_length()
-    correlation=np.fft.irfft(np.fft.rfft(signal,n)*np.conj(np.fft.rfft(reference,n)),n)[:len(signal)-len(reference)+1]
-    cumulative=np.r_[0.,np.cumsum(signal*signal)]
-    window_energy=cumulative[len(reference):]-cumulative[:-len(reference)]
+    correlation=np.fft.irfft(np.fft.rfft(signal,n)*np.conj(np.fft.rfft(reference*weights,n)),n)[:len(signal)-len(reference)+1]
+    window_energy=np.fft.irfft(np.fft.rfft(signal*signal,n)*np.conj(np.fft.rfft(weights,n)),n)[:len(signal)-len(reference)+1]
     valid=window_energy>max(1e-9,float(window_energy.max())*1e-3)
     scores=np.full(len(correlation),-1.,dtype=np.float64)
     scores[valid]=np.clip(correlation[valid]/np.sqrt(window_energy[valid]*energy),-1.,1.)

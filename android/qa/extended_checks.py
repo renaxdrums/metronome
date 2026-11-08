@@ -25,24 +25,28 @@ def run_extended_checks(api, api_request):
     def tap_tempo():
         nav('metronome')
         if not js('document.querySelector("#workspaceControls").open'):tap('#workspaceControls summary')
-        js('(()=>{window.__qaTapTimes=[];window.__qaTapListener=()=>__qaTapTimes.push(performance.now());tapBtn.addEventListener("click",__qaTapListener,true);return true})()')
+        js('(()=>{window.__qaTapTimes=[];window.__qaTapStart=()=>{window.__qaTapBefore=performance.now()};window.__qaTapListener=event=>__qaTapTimes.push({before:__qaTapBefore,processed:tapTimes.at(-1),after:performance.now(),trusted:event.isTrusted});tapBtn.addEventListener("click",__qaTapStart,true);tapBtn.addEventListener("click",__qaTapListener);return true})()')
         try:
-            for _ in range(4):tap('#tapBtn');time.sleep(.25)
+            api_request('tapCss',selector='#tapBtn',count=4,intervalMs=250)
             wait('__qaTapTimes.length',lambda x:x==4)
             state=js('({times:__qaTapTimes,bpm:tempo,measure:measures[activeMeasureIndex].tempo,retained:tapTimes.slice()})')
             # Native gestures can exceed the app's two-second reset on a busy emulator.
-            # Derive the last uninterrupted series from captured event times, not its BPM.
+            # Bound the app's processing time by listeners before/after its handler.
+            # A busy UI can legitimately spend more than 5 ms inside that handler.
+            require(all(event['trusted'] and event['before']<=event['processed']<=event['after'] for event in state['times']),'Tap was not processed during its trusted native click: '+str(state))
+            # Derive the last uninterrupted series from processing times, not its BPM.
             retained=[]
-            for instant in state['times']:
+            for event in state['times']:
+                instant=event['processed']
                 if retained and instant-retained[-1]>=2000:retained=[]
                 retained.append(instant)
             require(len(retained)>=2,'Emulator too slow to retain two Tap events: '+str(state))
-            require(len(state['retained'])==len(retained) and all(abs(a-b)<5 for a,b in zip(state['retained'],retained)),'Tap history does not match captured events and the two-second reset: '+str(state))
+            require(state['retained']==retained,'Tap history does not match captured events and the two-second reset: '+str(state))
             expected=round(60000/((retained[-1]-retained[0])/(len(retained)-1)))
             require(len(state['times'])==4 and abs(state['bpm']-expected)<=1 and state['measure']==state['bpm'],'Tap tempo differs from the real tap intervals: '+str(state)+'; expected='+str(expected))
             return {'four_native_taps':True,'measured_bpm':expected,'applied_bpm':state['bpm']}
         finally:
-            js('(()=>{tapBtn.removeEventListener("click",__qaTapListener,true);return true})()');set_value('#bpmSlider',120,'input')
+            js('(()=>{tapBtn.removeEventListener("click",__qaTapStart,true);tapBtn.removeEventListener("click",__qaTapListener);return true})()');set_value('#bpmSlider',120,'input')
 
     def step_limits():
         nav('metronome');rows=[]
@@ -77,10 +81,31 @@ def run_extended_checks(api, api_request):
         require(state=={'playing':False,'count':1,'n':4,'d':4},'Reset did not restore one 4/4 measure')
         set_value('#volumeSlider',80,'input');return {'undo_restored_volume':.25,'reset':state}
 
+    def ensure_silent_controls():
+        # Sequencer shows these controls directly. The optional collapse button
+        # is deliberately hidden outside Training by the existing theme CSS.
+        inspection = '''(()=>{
+          const section=document.querySelector(".silent-section");
+          const shown=e=>!!e&&e.getClientRects().length>0&&getComputedStyle(e).visibility!=="hidden";
+          return {section:shown(section),toggle:shown(document.getElementById("silentToggle")),
+            settings:shown(document.getElementById("silentSettings")),
+            expand:shown(section?.querySelector(".silent-collapse"))};
+        })()'''
+        state=js(inspection)
+        require(state['section'],'Silent measures panel is not visible in Sequencer: '+str(state))
+        if not (state['toggle'] and state['settings']):
+            require(state['expand'],'Silent measures controls have no visible way to expand: '+str(state))
+            tap('.silent-collapse')
+            state=js(inspection)
+        require(state['toggle'] and state['settings'],'Silent measures controls are not visible: '+str(state))
+
     def silent_options():
         nav('training')
-        if js('document.body.dataset.mobilePane!=="training"'):tap('#workspaceMobileViews [data-pane=training]')
-        if not js('document.querySelector(".silent-section").classList.contains("is-expanded")'):tap('.silent-collapse')
+        require(js('document.querySelector(".silent-section").hidden'),'Silent measures still appear in Training')
+        nav('sequence')
+        if js('document.body.dataset.mobilePane!=="seq"'):tap('#workspaceMobileViews [data-pane=seq]')
+        require(not js('document.querySelector(".silent-section").hidden'),'Silent measures are absent from Sequencer')
+        ensure_silent_controls()
         if not js('silentModeEnabled'):tap('#silentToggle')
         rows=[]
         for selector,field,start in [('#clickMeasureCount','clickMeasures',1),('#silentMeasureCount','silentMeasures',0)]:
@@ -116,9 +141,15 @@ def run_extended_checks(api, api_request):
         try:
             tap('#playBtn');wait('isPlaying&&RENAX_SONGS.navigation.song==="Track QA A"');wait('!isPlaying',timeout=8)
             require(js('RENAX_SONGS.navigation.profile')=='qa-first','Playback chose wrong first nonempty playlist')
-            require(js('document.querySelector(".song-chain-toggle").getAttribute("aria-pressed")')=='false','Chaining should be off initially')
+            require(js('RENAX_SONGS.library.profiles.find(p=>p.id==="qa-first").songs.every(s=>s.chainNext!==true)'),'Chaining should be off initially for every song')
             tap('.song-playlist-card[data-song-id="Track QA B"] .song-open');tap('#playBtn');wait('isPlaying&&RENAX_SONGS.navigation.song==="Track QA B"');wait('!isPlaying',timeout=8)
-            tap('.song-chain-toggle');tap('.song-playlist-card .song-open');tap('#playBtn')
+            # Chaining is a per-song detail control, not the removed playlist toggle.
+            js('RENAX_SONGS.restoreNavigation({pane:"songs",view:"detail",profile:"qa-first",song:"Track QA A"})')
+            require(js('document.querySelector(".song-next-toggle").getAttribute("aria-pressed")')=='false','First song chaining should be off')
+            tap('.song-next-toggle')
+            require(js('RENAX_SONGS.library.profiles.find(p=>p.id==="qa-first").songs[0].chainNext===true'),'First song chaining was not saved')
+            require(js('RENAX_SONGS.library.profiles.find(p=>p.id==="qa-first").songs[1].chainNext!==true'),'Chaining leaked to the second song')
+            tap('#playBtn')
             wait('isPlaying&&RENAX_SONGS.navigation.song==="Track QA B"',timeout=10);wait('!isPlaying',timeout=8)
             require(js('RENAX_SONGS.navigation.profile')=='qa-first','Playback crossed into a different playlist')
             return {'first_nonempty_playlist':True,'selected_track':True,'default_end_stop':True,'optional_chain_within_playlist_only':True}
@@ -183,7 +214,10 @@ def run_extended_checks(api, api_request):
         set_value('#measureCount',1)
         tap('#measureList .sequence-more summary');text_button('#measureList .sequence-more-actions','Dupliquer');wait('measures.length',lambda x:x==2)
         tap('#measureList .sequence-more summary');text_button('#measureList .sequence-more-actions','Renommer');multi_confirm('Mesure QA')
-        require(js('measures[0].name')=='Mesure QA','Sequence rename failed')
+        # The modal closes before its awaited rename continuation updates the model.
+        # Require both persisted measure data and the rendered card to agree.
+        renamed=wait('({names:measures.map(m=>m.name||""),labels:[...document.querySelectorAll("#measureList .measure-num")].map(e=>e.textContent.trim())})',lambda s:s['names'][0]=='Mesure QA' and s['labels'][0]=='Mesure QA',timeout=6)
+        require(renamed['names'][0]=='Mesure QA' and renamed['labels'][0]=='Mesure QA','Sequence rename did not persist and render: '+str(renamed))
         tap('#measureList .sequence-more summary');text_button('#measureList .sequence-more-actions','Supprimer');wait('measures.length',lambda x:x==1)
         tap('#measureList .sequence-preview-play');wait('isPlaying&&loopedMeasure===measures[0]')
         tap('#measureList .sequence-preview-play');wait('!isPlaying')
@@ -279,24 +313,24 @@ def run_extended_checks(api, api_request):
             tap('#scoreMetronomeBtn');tap('#panicBtn')
 
     def silent_audio():
-        nav('training')
-        if js('document.body.dataset.mobilePane!=="training"'):tap('#workspaceMobileViews [data-pane=training]')
-        if not js('document.querySelector(".silent-section").classList.contains("is-expanded")'):tap('.silent-collapse')
-        set_value('#activeNumerator',2);set_value('#activeDenominator',4)
-        for selector,value in [('#trainStart',300),('#trainEnd',301),('#trainDuration',3),('#trainDurationUnit','seconds')]:set_value(selector,value)
+        nav('sequence')
+        if js('document.body.dataset.mobilePane!=="seq"'):tap('#workspaceMobileViews [data-pane=seq]')
+        ensure_silent_controls()
+        set_value('#measureCount',1);set_value('#activeNumerator',2);set_value('#activeDenominator',4);set_value('#bpmSlider',300,'input')
         if not js('silentModeEnabled'):tap('#silentToggle')
         set_value('#clickMeasureCount',1);set_value('#silentMeasureCount',1);set_value('#soundBank','clic')
         js('(()=>{window.__qaSilentCalls=[];window.__qaSilentClick=playClick;playClick=function(...args){__qaSilentCalls.push(args[1]);return __qaSilentClick(...args)};return true})()')
         try:
-            tap('#trainBtn');wait('isPlaying');wait('!isPlaying&&!training.engaged',timeout=8)
+            tap('#playBtn');wait('isPlaying');wait('__qaSilentCalls.length',lambda count:count>=8,timeout=8)
+            tap('#playBtn');wait('!isPlaying')
             calls=js('__qaSilentCalls');gaps=[b-a for a,b in zip(calls,calls[1:])]
             require(len(calls)>=4 and min(gaps)<.22 and max(gaps)>.5,'Silent measures did not create the expected missing beats: '+str(gaps))
             return {'recorded_note_times':calls,'note_intervals':gaps,'one_audible_one_silent_bar':True}
         finally:
             js('(()=>{playClick=__qaSilentClick;stopMetronome();endTraining();return true})()')
-            nav('training')
+            nav('sequence')
             if js('silentModeEnabled'):tap('#silentToggle')
-            set_value('#activeNumerator',4);set_value('#activeDenominator',4);set_value('#trainStart',80);set_value('#trainEnd',140);set_value('#trainDuration',2)
+            set_value('#activeNumerator',4);set_value('#activeDenominator',4);set_value('#bpmSlider',120,'input')
 
     def native_block_reorder():
         nav('tracks');original=seed_tracks()

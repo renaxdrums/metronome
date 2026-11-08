@@ -114,7 +114,8 @@ async function checkSoundMenuForeground(h,proof,errors) {
      assert.equal(await trigger.getAttribute('aria-expanded'),'false');
      assert.equal(await trigger.evaluate(element=>element===document.activeElement),true);
      await trigger.click();
-     const last=page.locator('.sound-bank-cards .numbox-option').last();
+     // The import action opens a picker and deliberately preserves the current bank.
+     const last=page.locator('.sound-bank-cards .numbox-option:not([data-value="addLocalSamples"])').last();
      const value=await last.getAttribute('data-value');
      await last.scrollIntoViewIfNeeded();
      const scrolled=await soundMenuProbe(page);
@@ -123,6 +124,14 @@ async function checkSoundMenuForeground(h,proof,errors) {
      assert.equal(await page.locator('#soundBank').inputValue(),value);
      assert.equal(await trigger.getAttribute('aria-expanded'),'false');
      assert.equal(await page.locator('.main-grid>.panel:has(.sound-bank-cards)').evaluate(panel=>getComputedStyle(panel).zIndex),'auto');
+     await trigger.click();
+     const [picker]=await Promise.all([
+      page.waitForEvent('filechooser'),
+      page.locator('.sound-bank-cards .numbox-option[data-value="addLocalSamples"]').click(),
+     ]);
+     assert.equal(picker.isMultiple(),true);
+     assert.equal(await page.locator('#soundBank').inputValue(),value,'Opening import must preserve the selected sound');
+     assert.equal(await trigger.getAttribute('aria-expanded'),'false');
      results.push({viewport,theme,workspace,opaque:probe.opaque,unobstructed:true,lastSoundSelectable:true,keyboardClose:true});
     }
    } finally {await page.close();}

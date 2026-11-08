@@ -49,7 +49,9 @@ def run_control_checks(api):
         before=js('measures[activeMeasureIndex].beatStates[0][0]');states=[]
         for index in range(4):
             tap('#beatEditorPads button')
-            state=js('measures[activeMeasureIndex].beatStates[0][0]')
+            # Native input acknowledgement precedes the WebView click handler.
+            # Observe the result of this one tap; never send a replacement tap.
+            state=wait('measures[activeMeasureIndex].beatStates[0][0]',lambda value:value==(before+index+1)%4)
             require(state==(before+index+1)%4,'Accent cycle mismatch');states.append(state)
         tap('#beatEditor [aria-label="Fermer"]');wait('document.querySelector("#beatEditor").hidden')
         return {'subdivisions':rows,'accent_states':states,'immediate_popup_bounds':bounds}

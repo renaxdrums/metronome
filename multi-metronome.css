@@ -80,3 +80,9 @@
 .multi-solo[aria-pressed=true]{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.10)}
 .multi-solo:disabled{opacity:.4;cursor:default}
 .multi-solo:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* Individual motif level, using the same visual language as bank controls. */
+.multi-volume-row{display:flex;align-items:center;gap:10px;margin:0 0 10px;min-width:0}
+.multi-volume-row label{display:flex;align-items:center;gap:10px;min-width:0;flex:1;color:var(--text-muted);font-size:10px}
+.multi-volume-row input[type=range]{min-width:0;flex:1;accent-color:var(--cyan);touch-action:pan-y}
+.multi-volume-row output{min-width:36px;text-align:right;color:var(--text);font-size:11px;font-variant-numeric:tabular-nums}

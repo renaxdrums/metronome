@@ -231,13 +231,24 @@ const { start, showMeasures, openControls, newTrack } = require('./audio-harness
       await p.locator('#trainingMode-steps').click();
       await colour('#trainingMode-steps', 'backgroundColor', palette.lime);
       await action('#trainingMode-progressive');
-      await p.locator('.silent-collapse').click();
-      await p.locator('#silentToggle').click();
-      await colour('#silentToggle', 'backgroundColor', palette.lime);
-      await colour('#silentToggle', 'color', palette.controlInk);
+      assert.equal(
+        await p.locator('.silent-section').evaluate(el => el.hidden),
+        true,
+        'Empty measures are unavailable in Training',
+      );
       await capture('training-steps');
       await tab('Séquenceur');
       await showMeasures(p);
+      assert.equal(
+        await p.locator('.silent-section').evaluate(el => el.hidden),
+        false,
+        'Empty measures remain available in Sequencer',
+      );
+      assert.equal(await p.locator('.silent-section').isVisible(), true);
+      assert.equal(await p.locator('#silentToggle').isVisible(), true);
+      await p.locator('#silentToggle').click();
+      await colour('#silentToggle', 'backgroundColor', palette.lime);
+      await colour('#silentToggle', 'color', palette.controlInk);
       await action('#sequenceAddMeasure');
       await p.locator('.sequence-more summary').first().click();
       await action('.sequence-more-actions,.sequence-more-actions button');

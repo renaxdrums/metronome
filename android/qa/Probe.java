@@ -73,12 +73,16 @@ public final class Probe extends Instrumentation {
   private void pointer(int x,int y) {
     long t=SystemClock.uptimeMillis();
     MotionEvent down=MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,x,y,0);
-    MotionEvent up=MotionEvent.obtain(t,t+60,MotionEvent.ACTION_UP,x,y,0);
+    down.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
     try {
       if(!getUiAutomation().injectInputEvent(down,true))throw new IllegalStateException("Pointer down rejected");
       SystemClock.sleep(60);
-      if(!getUiAutomation().injectInputEvent(up,true))throw new IllegalStateException("Pointer up rejected");
-    } finally { down.recycle();up.recycle(); }
+      MotionEvent up=MotionEvent.obtain(t,SystemClock.uptimeMillis(),MotionEvent.ACTION_UP,x,y,0);
+      up.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+      try {
+        if(!getUiAutomation().injectInputEvent(up,true))throw new IllegalStateException("Pointer up rejected");
+      } finally { up.recycle(); }
+    } finally { down.recycle(); }
   }
   private void visualReady() throws Exception {
     final WebView target=web;final CountDownLatch latch=new CountDownLatch(1);
@@ -141,7 +145,30 @@ public final class Probe extends Instrumentation {
       for(int i=0;i<10;i++){SystemClock.sleep(100);JSONObject next=new JSONObject((String)evaluate(expression));boolean stable=Math.abs(next.optDouble("x")-r.optDouble("x"))<.5&&Math.abs(next.optDouble("y")-r.optDouble("y"))<.5&&next.optBoolean("hit");r=next;if(stable)break;if(i==9)throw new IllegalStateException("Touch target is moving: "+q.getString("selector"));}
       int[] location=new int[2];runOnMainSync(()->web.getLocationOnScreen(location));
       double scale=web.getWidth()/r.getDouble("w");
-      pointer(location[0]+(int)Math.round(r.getDouble("x")*scale),location[1]+(int)Math.round(r.getDouble("y")*scale));
+      int count=q.optInt("count",1),interval=q.optInt("intervalMs",250);
+      if(count<1||count>10||interval<100||interval>1500)throw new IllegalArgumentException("Invalid native tap series");
+      // A synchronous OS injection does not acknowledge a WebView click. Wait
+      // for each actual trusted click before the next gesture. Layout is read
+      // again below; a compositor barrier here can itself exceed the app's
+      // two-second tap reset. Never manufacture or retry a missing native tap.
+      if(count>1)evaluate("(()=>{const e=document.querySelector("+selector+");window.__qaNativeTapCount=0;window.__qaNativeTapAck=event=>{if(event.isTrusted)__qaNativeTapCount++};e.addEventListener('click',__qaNativeTapAck);return true})()");
+      try { for(int i=0;i<count;i++){
+        long started=SystemClock.uptimeMillis();
+        if(i>0){
+          r=new JSONObject((String)evaluate(expression));
+          if(r.optDouble("h")<=0||!r.optBoolean("hit")||!r.optBoolean("visible"))throw new IllegalStateException("Tap series target unavailable: "+q.getString("selector"));
+          scale=web.getWidth()/r.getDouble("w");
+        }
+        pointer(location[0]+(int)Math.round(r.getDouble("x")*scale),location[1]+(int)Math.round(r.getDouble("y")*scale));
+        if(count>1){
+          long clickDeadline=SystemClock.uptimeMillis()+5000;
+          while(((Number)evaluate("window.__qaNativeTapCount")).intValue()!=i+1){
+            if(SystemClock.uptimeMillis()>=clickDeadline)throw new TimeoutException("Native tap "+(i+1)+" did not produce exactly one trusted click");
+            SystemClock.sleep(20);
+          }
+        }
+        if(i+1<count)SystemClock.sleep(Math.max(0,interval-(SystemClock.uptimeMillis()-started)));
+      }} finally { if(count>1)evaluate("(()=>{document.querySelector("+selector+")?.removeEventListener('click',__qaNativeTapAck);delete window.__qaNativeTapAck;delete window.__qaNativeTapCount;return true})()"); }
       return true;
     }
     if(action.equals("nodes")){JSONArray list=new JSONArray();nodes(getUiAutomation().getRootInActiveWindow(),list,0);return list;}
@@ -163,6 +190,10 @@ public final class Probe extends Instrumentation {
         String line=reader.readLine();JSONObject response=new JSONObject();
         try {response.put("value",command(new JSONObject(line)));}catch(Exception e){response.put("error",e.toString());}
         Writer writer=new OutputStreamWriter(socket.getOutputStream(),"UTF-8");writer.write(response.toString()+"\n");writer.flush();
+      } catch(SocketException|SocketTimeoutException e) {
+        // The client records its failed/timed-out request. Keep the separate
+        // probe alive so it can collect diagnostics and run the remaining checks.
+        System.err.println("QA client disconnected: "+e);
       }
       result.putString("stream","Native QA probe finished\n");finish(Activity.RESULT_OK,result);
     } catch(Exception e){result.putString("stream",e.toString()+"\n");finish(Activity.RESULT_CANCELED,result);}

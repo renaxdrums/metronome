@@ -112,7 +112,8 @@
     "tests/training-modes-test.cjs",
     "tests/transport-timer-test.cjs",
     "tests/voice-bank-switch-test.cjs",
-    "tests/voice-subdivision-gain-test.cjs"
+    "tests/voice-subdivision-gain-test.cjs",
+    "tests/workspace-six-points-test.cjs"
   ],
   "excluded": {
     "tests/mp3-native-picker-test.cjs": {

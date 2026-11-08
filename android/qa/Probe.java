@@ -148,8 +148,9 @@ public final class Probe extends Instrumentation {
       int count=q.optInt("count",1),interval=q.optInt("intervalMs",250);
       if(count<1||count>10||interval<100||interval>1500)throw new IllegalArgumentException("Invalid native tap series");
       // A synchronous OS injection does not acknowledge a WebView click. Wait
-      // for each actual trusted click and its committed layout before the next
-      // gesture. Never manufacture a DOM click or retry a missing native tap.
+      // for each actual trusted click before the next gesture. Layout is read
+      // again below; a compositor barrier here can itself exceed the app's
+      // two-second tap reset. Never manufacture or retry a missing native tap.
       if(count>1)evaluate("(()=>{const e=document.querySelector("+selector+");window.__qaNativeTapCount=0;window.__qaNativeTapAck=event=>{if(event.isTrusted)__qaNativeTapCount++};e.addEventListener('click',__qaNativeTapAck);return true})()");
       try { for(int i=0;i<count;i++){
         long started=SystemClock.uptimeMillis();
@@ -165,7 +166,6 @@ public final class Probe extends Instrumentation {
             if(SystemClock.uptimeMillis()>=clickDeadline)throw new TimeoutException("Native tap "+(i+1)+" did not produce exactly one trusted click");
             SystemClock.sleep(20);
           }
-          if(i+1<count)visualReady();
         }
         if(i+1<count)SystemClock.sleep(Math.max(0,interval-(SystemClock.uptimeMillis()-started)));
       }} finally { if(count>1)evaluate("(()=>{document.querySelector("+selector+")?.removeEventListener('click',__qaNativeTapAck);delete window.__qaNativeTapAck;delete window.__qaNativeTapCount;return true})()"); }
@@ -190,6 +190,10 @@ public final class Probe extends Instrumentation {
         String line=reader.readLine();JSONObject response=new JSONObject();
         try {response.put("value",command(new JSONObject(line)));}catch(Exception e){response.put("error",e.toString());}
         Writer writer=new OutputStreamWriter(socket.getOutputStream(),"UTF-8");writer.write(response.toString()+"\n");writer.flush();
+      } catch(SocketException|SocketTimeoutException e) {
+        // The client records its failed/timed-out request. Keep the separate
+        // probe alive so it can collect diagnostics and run the remaining checks.
+        System.err.println("QA client disconnected: "+e);
       }
       result.putString("stream","Native QA probe finished\n");finish(Activity.RESULT_OK,result);
     } catch(Exception e){result.putString("stream",e.toString()+"\n");finish(Activity.RESULT_CANCELED,result);}

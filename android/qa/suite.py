@@ -32,7 +32,9 @@ def wait(expression,predicate=bool,timeout=20):
   if predicate(last):return last
   time.sleep(.2)
  raise AssertionError('Timed out: '+expression+'; last='+str(last)[:400])
-def tap(selector):request('tapCss',selector=selector)
+def tap(selector):
+ dismiss_launcher_boot_dialog()
+ request('tapCss',selector=selector)
 def click(selector):return js('(()=>{const e=document.querySelector('+json.dumps(selector)+');if(!e)throw Error("Missing control");e.click();return true})()')
 def set_value(selector,value,event='change'):
  return js('(()=>{const e=document.querySelector('+json.dumps(selector)+');if(!e)throw Error("Missing input");e.value='+json.dumps(str(value))+';e.dispatchEvent(new Event('+json.dumps(event)+',{bubbles:true}));return e.value})()')
@@ -108,14 +110,15 @@ def native_click_text(texts):
  if not found:raise AssertionError('Native control missing: '+str(texts)+'; available='+str([(n['text'],n['desc']) for n in choices])[:1600])
  n=next((n for n in found if n['clickable']),found[-1]);request('tap',x=n['x'],y=n['y'])
 def dismiss_launcher_boot_dialog():
- titles={"Quickstep isn't responding","Quickstep isn’t responding","Launcher3 isn't responding","Launcher3 isn’t responding"}
+ titles={"Quickstep isn't responding","Quickstep isn’t responding","Launcher3 isn't responding","Launcher3 isn’t responding","System UI isn't responding","System UI isn’t responding"}
  current=nodes();found=[n['text'] for n in current if n.get('package')=='android' and n['text'] in titles]
  if not found:return
- # This is the emulator's launcher, never the application under test.
+ # Exact system/launcher titles only; never dismiss an ANR of the tested app.
  (out/'external-launcher-boot-anr.png').write_bytes(adb('exec-out','screencap','-p',check=False).stdout)
- require(request('nativeFile',filename='Close app'),'Could not close the unrelated launcher boot error')
- launcher_boot_dialogs.append({'title':found[0],'action':'Close app through native accessibility','application_anr_dismissed':False})
- print('Emulator startup: closed unrelated launcher ANR: '+found[0],flush=True)
+ action='Wait' if found[0].startswith('System UI ') else 'Close app'
+ require(request('nativeFile',filename=action),'Could not dismiss the unrelated emulator boot error')
+ launcher_boot_dialogs.append({'title':found[0],'action':action+' through native accessibility','application_anr_dismissed':False})
+ print('Emulator startup: dismissed unrelated system ANR using '+action+': '+found[0],flush=True)
  request('resume');wait('document.hasFocus()')
 
 def wait_native_file(filename):

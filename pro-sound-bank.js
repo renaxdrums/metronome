@@ -24,6 +24,15 @@ if(sample.key!=='proShaker'){const option=document.createElement('option');optio
 // Preserve saved Beep identifiers while replacing the arcade sound.
 SOUND_BANKS.beep=SOUND_BANKS.proShaker;
 BANK_GAINS.beep=BANK_GAINS.proShaker;
+// Keep the banks with little peak headroom unchanged; raise quieter recordings
+// according to their measured worst coincident-beat peaks, retaining headroom.
+for(const [id,factor] of Object.entries({
+ clic:1.25,claves:1.25,beep:1.25,voiceMale:1.08,voiceFemale:1.08,
+ proClaves:1.25,proCowbell:1.25,proTriangle:1.25,proShaker:1.25,
+ proDigital:1.58,proQuartz:1.25,proTick:1.58,proSoft:1.58,
+ userViii:1.25,userWater:1.58,userMetroclic:1.58,userTicking:1.08,
+ gospelTambourine:1.25,gospelKick:1.1,gospelSnare:1.25,gospelHiHat:1.25
+}))if(Number.isFinite(BANK_GAINS[id]))BANK_GAINS[id]*=factor;
 const names={clic:'Clic bois',cloche:'Cowbell',claves:'Claves',clic808:'Kit TR-808',beep:'Shaker acoustique',voiceMale:'Voix masculine EN',voiceFemale:'Voix féminine EN'};
 for(const option of menu.options){if(names[option.value])option.textContent=names[option.value];}
 if(currentBank==='proGuiro'){currentBank='clic';menu.value='clic';}

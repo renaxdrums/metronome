@@ -98,7 +98,7 @@
     source.stop(time+duration);
    }
   };
-  BANK_GAINS[meta.id]=.42;
+  BANK_GAINS[meta.id]=.52;
   const option=document.createElement('option');
   option.value=meta.id;option.textContent=meta.name;option.title='Sample personnel · stockage local sur cet appareil';
   select.insertBefore(option,action);

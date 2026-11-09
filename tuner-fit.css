@@ -1,4 +1,9 @@
 /* Share the viewport between setup, meter and transport; never push the mic away. */
+.tuner-signal-accessible { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+#tunerRoot .tuner-panel-tools #tunerTone { display:flex; align-items:center; justify-content:center; }
+#tunerRoot #tunerTone::before { margin:0; flex:none; }
+#tunerRoot .tuner-color-band { fill:none; stroke-width:6; stroke-linecap:butt; stroke:url(#tunerColorGradient); opacity:.55; }
+#tunerRoot .tuner-measurement:has(#tunerListen[aria-pressed='true']) .tuner-color-band { opacity:1; }
 html#renaxApp[data-tool='tuner'] #tunerRoot {
   display: flex; flex-direction: column; min-height: 0; overflow: hidden;
   padding: 8px 0 12px;

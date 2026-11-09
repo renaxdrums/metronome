@@ -1,5 +1,8 @@
 {
   "nightly": [
+    "tests/audio-fast-headroom-test.cjs",
+    "tests/poly-playback-resize-regression-test.cjs",
+    "tests/tempo-live-regression-test.cjs",
     "tests/poly-layout-sample-test.cjs",
     "tests/tuner-core-test.mjs",
     "tests/tuner-interface-test.cjs",

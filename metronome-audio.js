@@ -93,6 +93,8 @@
       gain.gain.linearRampToValueAtTime(opts.vol, time + (opts.attack || 0.002));
       gain.gain.exponentialRampToValueAtTime(0.0001, time + (opts.duration || 0.08));
       osc.start(time); osc.stop(time + (opts.duration || 0.08) + 0.02);
+      scheduledVoiceSources.add(osc);
+      osc.onended=()=>{scheduledVoiceSources.delete(osc);osc.disconnect();gain.disconnect();};
     }
 
     function noiseBurst(dest, time, vol, duration, hpFreq) {
@@ -112,6 +114,8 @@
       gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
       src.connect(hp); hp.connect(gain); gain.connect(dest);
       src.start(time); src.stop(time + duration + 0.01);
+      scheduledVoiceSources.add(src);
+      src.onended=()=>{scheduledVoiceSources.delete(src);src.disconnect();hp.disconnect();gain.disconnect();};
     }
 
     const FIRST_BEAT_RATIO = 1.35;

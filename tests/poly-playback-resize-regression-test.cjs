@@ -78,6 +78,22 @@ const {start}=require('./audio-harness.cjs');
   const fastFour=await p.evaluate(()=>({events:window.polyEvents,playing:isPlaying}));
   assert(fastFour.playing);for(const measure of [0,1])assert(fastFour.events.some(e=>e.measure===measure));
   assert.deepEqual(fastFour.events.filter(e=>e.late>=.05),[]);
+  const stopped=await p.evaluate(async()=>{
+   stopMetronome();currentBank='voiceMale';
+   for(const m of measures){m.tempo=300;m.polyVoiceCount=2;ensurePolyStates(m);for(const v of m.polyVoices){v.bank=null;v.subdivisions=v.subdivisions.map(()=>2);v.states=v.states.map(row=>[row[0],1]);}ensurePolyStates(m);}
+   await ensureVoiceMetronomeReady(currentBank);
+   window.polyOscillators=[];
+   const make=audioCtx.createOscillator.bind(audioCtx);
+   audioCtx.createOscillator=function(){
+    const node=make(),item={start:null,stops:[]},start=node.start.bind(node),stop=node.stop.bind(node);
+    node.start=time=>{item.start=time;return start(time);};node.stop=time=>{item.stops.push(time??0);return stop(time);};
+    window.polyOscillators.push(item);return node;
+   };
+   await startMetronome();Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+   document.dispatchEvent(new Event('visibilitychange'));const now=audioCtx.currentTime;stopMetronome();delete document.hidden;
+   return {total:window.polyOscillators.length,ghosts:window.polyOscillators.filter(x=>x.start>now&&x.stops.at(-1)>now).length};
+  });
+  assert(stopped.total>0,JSON.stringify(stopped));assert.equal(stopped.ghosts,0,JSON.stringify(stopped));
   assert.deepEqual(errors,[]);console.log('PASS two poly measures retain sound and timing across resize');
  }finally{await h.browser.close();h.server?.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

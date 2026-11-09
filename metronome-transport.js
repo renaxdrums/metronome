@@ -557,8 +557,15 @@
       const visualEpoch=window.RENAX_PLAYBACK?.generation;
       const drawTime=(time-audioCtx.currentTime)*1000+(window.RENAX_PLAYBACK?.delayMs(audioCtx)||0);
       setTimeout(()=>{
-        if(!isPlaying || appMode!=='polyrhythm' || visualEpoch!==window.RENAX_PLAYBACK?.generation) return;
-        if(activeMeasureIndex!==mIdx){ activeMeasureIndex=mIdx; renderActiveMeasure(); renderSequencerList(); }
+        if(!isPlaying || appMode!=='polyrhythm' || visualEpoch!==window.RENAX_PLAYBACK?.generation || document.hidden) return;
+        if(audioCtx.currentTime-time>(window.RENAX_PLAYBACK?.delayMs(audioCtx)||0)/1000+.15)return;
+        if(activeMeasureIndex!==mIdx){
+          activeMeasureIndex=mIdx; renderActiveMeasure();
+          measureListEl.querySelectorAll('.measure-card').forEach((card,i)=>{
+            card.classList.toggle('active',i===mIdx);
+            card.classList.toggle('playing',i===mIdx);
+          });
+        }
         sequencerContainer.querySelectorAll('.poly-dot').forEach(el=>el.classList.remove('active'));
         for(const hit of event.hits||[]){
           const el=sequencerContainer.querySelector(`[data-poly-voice="${hit.voice}"][data-poly-beat="${hit.beat}"][data-poly-sub="${hit.sub}"]`);
@@ -569,21 +576,25 @@
     }
 
     function schedulerPolyrhythm() {
-      while(nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+      const resizeAhead=performance.now()<(schedulerPolyrhythm.resizeUntil||0) ? 0.6 : scheduleAheadTime;
+      const horizon=audioCtx.currentTime+(document.hidden ? 2 : resizeAhead);
+      const eventCache=new Map();
+      while(nextNoteTime < horizon) {
         if(playingMeasureIndex>=measures.length){playingMeasureIndex=0; polyEventIndex=0;}
         const mIdx=playingMeasureIndex, m=measures[mIdx];
         if(!m){timerID=setTimeout(schedulerSafely,lookahead);return;}
-        const events=getPolyEvents(m);
+        let events=eventCache.get(m);
+        if(!events){events=getPolyEvents(m);eventCache.set(m,events);}
         if(polyEventIndex>=events.length) polyEventIndex=0;
         const e=events[polyEventIndex];
-        ensurePolyStates(m);
         for(const hit of e.hits){
           const voice=m.polyVoices[hit.voice];
           const state=voice.states[hit.beat]?.[hit.sub]??0;
           if(!state)continue;
           const bankId=polyBankForVoice(m,hit.voice),bank=SOUND_BANKS[bankId]||SOUND_BANKS.clic;
           const output=audioCtx.createGain();
-          const safety=m.polyVoices.length<=2?1:1/Math.sqrt(m.polyVoices.length/2);
+          // Preserve the two-voice peak budget when three or four lanes coincide.
+          const safety=m.polyVoices.length<=2?1:2/m.polyVoices.length;
           output.gain.value=masterVolume*(BANK_GAINS[bankId]??1)*safety;
           output.connect(bank.isVoice?getVoiceMixDestination(audioCtx):getAudioMixDestination(audioCtx));
           bank.play(output,nextNoteTime,state,hit.beat===0&&hit.sub===0,{mode:'polyrhythm',isMainBeat:hit.sub===0,beatNumber:hit.beat+1,subIndex:hit.sub});
@@ -600,6 +611,16 @@
       }
       timerID=setTimeout(schedulerSafely,lookahead);
     }
+
+    document.addEventListener('visibilitychange',()=>{
+      if(!isPlaying||appMode!=='polyrhythm'||window.RENAX_MULTI?.active)return;
+      clearTimeout(timerID);schedulerSafely();
+    });
+    window.addEventListener('resize',()=>{
+      if(!isPlaying||appMode!=='polyrhythm'||window.RENAX_MULTI?.active)return;
+      schedulerPolyrhythm.resizeUntil=performance.now()+500;
+      clearTimeout(timerID);schedulerSafely();
+    },true);
 
     function setAppMode(mode) {
       if(mode!== 'metronome' && mode!=='polyrhythm') return;
@@ -672,9 +693,6 @@
       scheduledMeasureLayouts = new WeakMap();
       renderSequencerList();
       renderActiveMeasure();
-      const voiceLead = appMode === 'metronome' && (SOUND_BANKS[currentBank]?.isVoice || window.RENAX_AMORCE?.active) ? Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds || 0) : 0;
-      nextNoteTime = audioCtx.currentTime + 0.05 + voiceLead;
-      window.RENAX_AMORCE?.begin(audioCtx,nextNoteTime);
       playBtn.textContent = 'STOP';
       playBtn.classList.remove('btn-primary');
       playBtn.classList.add('btn-cyan');
@@ -687,8 +705,23 @@
       playhead.span = 0;
       playhead.startTime = performance.now();
       clearProgressTrail();
-      scheduler();
-      } catch(error) { stopMetronome({startupFailure:true}); throw error; } finally { playbackStarting = false; updateTrainButton(); renderSequencerList(); }
+      } catch(error) { stopMetronome({startupFailure:true}); throw error; } finally {
+        playbackStarting = false; updateTrainButton(); renderSequencerList();
+        if(isPlaying){
+          const generation=window.RENAX_PLAYBACK?.generation;
+          // Let pending control rebuilds finish before starting the audio clock,
+          // but do not resolve startMetronome until scheduling has begun.
+          await new Promise(resolve=>setTimeout(resolve,0));
+          if(isPlaying&&generation===window.RENAX_PLAYBACK?.generation){
+           try{
+            const voiceLead=appMode==='metronome'&&(SOUND_BANKS[currentBank]?.isVoice||window.RENAX_AMORCE?.active)?Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds||0):0;
+            nextNoteTime=audioCtx.currentTime+.05+voiceLead;
+            window.RENAX_AMORCE?.begin(audioCtx,nextNoteTime);
+            playhead.startTime=performance.now();schedulerSafely();
+           }catch(error){stopMetronome({startupFailure:true});throw error;}
+          }
+        }
+      }
     }
 
     function stopMetronome({ keepTrainingMode = false } = {}) {

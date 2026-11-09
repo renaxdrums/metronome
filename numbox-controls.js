@@ -54,18 +54,24 @@
         menu.querySelectorAll('.numbox-option:not(:disabled)')
       ),
     ];
+    /** @type {Map<string, HTMLButtonElement[]>} */
+    let optionItems = new Map();
+    /** @type {HTMLButtonElement[]} */
+    let selectedItems = [];
     function sync() {
       value.textContent = select.options[select.selectedIndex]?.textContent || select.value;
       const label =
         select.getAttribute('aria-label') || select.labels?.[0]?.firstChild?.textContent?.trim();
       if (label) trigger.setAttribute('aria-label', label + ' : ' + value.textContent);
-      /** @type {NodeListOf<HTMLButtonElement>} */ (
-        menu.querySelectorAll('.numbox-option')
-      ).forEach((item) => {
-        const selected = item.dataset.value === select.value;
-        item.classList.toggle('active', selected);
-        item.setAttribute('aria-selected', String(selected));
-      });
+      for (const item of selectedItems) {
+        item.classList.remove('active');
+        item.setAttribute('aria-selected', 'false');
+      }
+      selectedItems = optionItems.get(select.value) || [];
+      for (const item of selectedItems) {
+        item.classList.add('active');
+        item.setAttribute('aria-selected', 'true');
+      }
     }
     /** @type {string | null} */
     let optionSignature = null;
@@ -78,6 +84,8 @@
         return;
       }
       optionSignature = signature;
+      optionItems = new Map();
+      selectedItems = [];
       const focused = menu.contains(document.activeElement)
         ? /** @type {HTMLButtonElement} */ (document.activeElement).dataset.value
         : null;
@@ -92,6 +100,10 @@
         item.disabled = option.disabled;
         item.tabIndex = -1;
         item.setAttribute('role', 'option');
+        item.setAttribute('aria-selected', 'false');
+        const sameValue = optionItems.get(option.value) || [];
+        sameValue.push(item);
+        optionItems.set(option.value, sameValue);
         item.addEventListener('click', (event) => {
           event.stopPropagation();
           const previousValue = select.value;

@@ -83,8 +83,8 @@
 <link rel="stylesheet" href="avant-garde-theme.css?v=c4c3ac6ba954">
 <link rel="stylesheet" href="musician-tools.css?v=375776c63dfb">
 <link rel="stylesheet" href="tuner-interface.css?v=02fd2ea43ae5">
-<link rel="stylesheet" href="poly-layout.css?v=39a3ea53a20a">
-<link rel="stylesheet" href="tuner-fit.css?v=a20d4a12136c">
+<link rel="stylesheet" href="poly-layout.css?v=994b2aa3d0c3">
+<link rel="stylesheet" href="tuner-fit.css?v=595254bcedb6">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -394,11 +394,13 @@
       </aside>
       <section class="tuner-measurement" aria-label="Mesure de la justesse">
         <div class="tuner-panel-tools"><button id="tunerTone" type="button" aria-pressed="false" title="Écouter la référence">Écouter la référence</button><button id="tunerSettingsOpen" class="tuner-settings-open" type="button" aria-haspopup="dialog" aria-controls="tunerSettingsDialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>Réglages</span></button></div>
-        <div class="tuner-measurement-head"><span id="tunerSignal">Microphone arrêté</span><span class="tuner-range" data-no-translate>±50 cents</span></div>
+        <div class="tuner-measurement-head"><span>Diapason</span><span id="tunerSignal" class="tuner-signal-accessible">Microphone arrêté</span><span class="tuner-range" data-no-translate>±50 cents</span></div>
         <div class="tuner-dial">
             <svg class="tuner-meter" viewBox="0 0 360 206" role="img" aria-labelledby="tunerMeterTitle">
               <title id="tunerMeterTitle">Écart de moins 50 à plus 50 cents</title>
+              <defs><linearGradient id="tunerColorGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#e95151"/><stop offset="22%" stop-color="#ff8a33"/><stop offset="38%" stop-color="#e8cf45"/><stop offset="50%" stop-color="#32bd70"/><stop offset="62%" stop-color="#e8cf45"/><stop offset="78%" stop-color="#ff8a33"/><stop offset="100%" stop-color="#e95151"/></linearGradient></defs>
               <path class="tuner-dial-track" d="M48 164A132 132 0 0 1 312 164"/>
+              <path class="tuner-color-band" d="M48 164A132 132 0 0 1 312 164" pathLength="100"/>
               <path class="tuner-dial-grave" d="M54.5 123.2A132 132 0 0 1 120.1 46.4"/>
               <path class="tuner-dial-aigu" d="M239.9 46.4A132 132 0 0 1 305.5 123.2"/>
               <path id="tunerToleranceBand" class="tuner-center-zone" d="M48 164A132 132 0 0 1 312 164" pathLength="100" stroke-dasharray="0 48 4 48"/>
@@ -448,18 +450,18 @@
 
 
   <script src="ui-feedback.js?v=eae7d41e1fb6"></script>
-<script src="numbox-controls.js?v=f2ba76d7a0e0"></script>
-  <script src="metronome-audio.js?v=aeb485c3d328"></script>
+<script src="numbox-controls.js?v=6c6ad2425a48"></script>
+  <script src="metronome-audio.js?v=0cba66047440"></script>
   <script src="sequence-parallel.js?v=7e849a3254eb"></script>
   <script src="metronome-core.js?v=261cdd7e6556"></script>
   <link rel="stylesheet" href="playback-support.css?v=be7d47c55905">
   <script src="playback-support.js?v=906fd4c12e7e"></script>
-  <script src="metronome-transport.js?v=791913fd89f2"></script>
-  <script src="pro-sound-bank.js?v=5a4ad356541f"></script>
+  <script src="metronome-transport.js?v=4f7035efc1be"></script>
+  <script src="pro-sound-bank.js?v=0ca9920a8560"></script>
 <script>/* Start with Metroclic on a fresh load; saved sound order is restored separately. */
 (()=>{const menu=document.getElementById("soundBank"),first=menu.querySelector('option[value="userMetroclic"]');if(first){menu.prepend(first);menu.value="userMetroclic";currentBank="userMetroclic";numboxWidgets.get(menu)?.rebuild();}})();
 </script>
-<script src="custom-samples.js?v=fc537faea98a"></script>
+<script src="custom-samples.js?v=c93fc16f1f08"></script>
 <script src="sound-bank-menu.js?v=4b24aaf8f0be"></script>
   <script src="emergency-backup.js?v=9a0db8f8e45e"></script>
 <script src="local-backup.js?v=6fb6848845c2"></script>
@@ -542,7 +544,7 @@
   <script src="training-numbox.js?v=5464fb23be6c"></script>
   <script src="compact-controls.js?v=24ce2f42ed2a"></script>
   <script src="navigation-history.js?v=157c31114aa0"></script>
-  <script src="rhythm-score.js?v=2d5d5de80a90"></script>
+  <script src="rhythm-score.js?v=d1972d4fec7a"></script>
   <script src="edit-history.js?v=bca355c4b6ec"></script>
 <script>
 (()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);if(/^(start|play)$/i.test(raw)&&raw!==label)playBtn.textContent=label;playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();

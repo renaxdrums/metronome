@@ -97,9 +97,9 @@
   try{
    const poly=appMode==='polyrhythm',beats=poly?null:core.spell(measure,core.editorModel(measure)),rows=poly?[null]:[beats];
    const renderWidth=poly?Math.max(width,fitWidth,Math.max(measure.numerator,measure.denominator)*30+100):Math.max(width,fitWidth,...rows.map(row=>row.reduce((sum,b)=>sum+Math.max(46,b.count*25+12),84)));
-   const height=poly?230:rows.length*140+18,renderer=new Flow.Renderer(host,Flow.Renderer.Backends.SVG);renderer.resize(renderWidth,height);const svg=host.querySelector('svg');svg.style.width='100%';svg.style.height='auto';const context=renderer.getContext();context.setFillStyle('#111').setStrokeStyle('#111');
+   const height=poly?270:rows.length*140+18,renderer=new Flow.Renderer(host,Flow.Renderer.Backends.SVG);renderer.resize(renderWidth,height);const svg=host.querySelector('svg');svg.style.width='100%';svg.style.height='auto';const context=renderer.getContext();context.setFillStyle('#111').setStrokeStyle('#111');
    rows.forEach((row,rowIndex)=>{
-    const voices=[],tuplets=[],beams=[];const stave=new Flow.Stave(2,18+rowIndex*140,renderWidth-4);if(poly){stave.options.spacing_between_lines_px=24;stave.setX(34);stave.setWidth(renderWidth-38);}stave.addClef('percussion');if(rowIndex===0)stave.addTimeSignature(`${measure.numerator}/${poly?4:measure.denominator}`);if(!poly&&rowIndex<rows.length-1)stave.setEndBarType(Flow.Barline.type.NONE);stave.setContext(context).draw();if(!poly)pulseLineY=stave.getYForLine(4);
+    const voices=[],tuplets=[],beams=[];const stave=new Flow.Stave(2,(poly?58:18)+rowIndex*140,renderWidth-4);if(poly){stave.options.spacing_between_lines_px=24;stave.setX(34);stave.setWidth(renderWidth-38);}stave.addClef('percussion');if(rowIndex===0)stave.addTimeSignature(`${measure.numerator}/${poly?4:measure.denominator}`);if(!poly&&rowIndex<rows.length-1)stave.setEndBarType(Flow.Barline.type.NONE);stave.setContext(context).draw();if(!poly)pulseLineY=stave.getYForLine(4);
     if(poly){
      ensurePolyStates(measure);
      const lanes=[],positions=measure.polyVoices.length===2?['f/5','e/4']:measure.polyVoices.length===3?['f/5','b/4','e/4']:['f/5','c/5','a/4','e/4'];
@@ -116,7 +116,7 @@
        if(group.length>1)tuplets.push(new Flow.Tuplet(group,{num_notes:group.length,notes_occupied:1,bracketed:true,location:direction}));
       }
       // Each lane spans exactly the same measure, including uneven subdivisions.
-      if(model.count!==measure.numerator)tuplets.push(new Flow.Tuplet(ns,{num_notes:model.count,notes_occupied:measure.numerator,bracketed:false,location:direction}));
+      if(model.count!==measure.numerator)tuplets.push(new Flow.Tuplet(ns,{num_notes:model.count,notes_occupied:measure.numerator,bracketed:true,ratioed:true,location:direction,y_offset:vi===1?-50:0}));
       const voice=new Flow.Voice({num_beats:measure.numerator,beat_value:4}).addTickables(ns);
       lanes.push({voice,entries,tuplets,vi});
      }

@@ -709,13 +709,17 @@
         playbackStarting = false; updateTrainButton(); renderSequencerList();
         if(isPlaying){
           const generation=window.RENAX_PLAYBACK?.generation;
-          setTimeout(()=>{
-            if(!isPlaying||generation!==window.RENAX_PLAYBACK?.generation)return;
+          // Let pending control rebuilds finish before starting the audio clock,
+          // but do not resolve startMetronome until scheduling has begun.
+          await new Promise(resolve=>setTimeout(resolve,0));
+          if(isPlaying&&generation===window.RENAX_PLAYBACK?.generation){
+           try{
             const voiceLead=appMode==='metronome'&&(SOUND_BANKS[currentBank]?.isVoice||window.RENAX_AMORCE?.active)?Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds||0):0;
             nextNoteTime=audioCtx.currentTime+.05+voiceLead;
             window.RENAX_AMORCE?.begin(audioCtx,nextNoteTime);
             playhead.startTime=performance.now();schedulerSafely();
-          },0);
+           }catch(error){stopMetronome({startupFailure:true});throw error;}
+          }
         }
       }
     }

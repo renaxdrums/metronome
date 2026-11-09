@@ -1,6 +1,8 @@
 /* Offline French/English interface resources. */
 window.RENAX_TRANSLATIONS = Object.freeze({
   "legacy": {
+"Utiliser cet accordage":"Use this tuning",
+"Utiliser le tempérament personnalisé":"Use custom temperament",
 "Jouez une note à la fois, près du microphone. L’analyse reste sur cet appareil. Le microphone est coupé en quittant cet espace.":"Play one note at a time near the microphone. Analysis stays on this device. The microphone stops when you leave this workspace.",
 "La transposition change le nom écrit ; la fréquence cible reste celle du son réel.":"Transposition changes the written note name; the target frequency remains at concert pitch.",
 "À régler uniquement avec une source externe étalonnée. Le nombre de décimales affichées ne garantit pas la précision du microphone.":"Adjust only using an externally calibrated source. Displayed decimal places do not guarantee microphone accuracy.",

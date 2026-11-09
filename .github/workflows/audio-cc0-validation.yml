@@ -98,6 +98,7 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/tuner-core-test.mjs
+          node tests/tuner-advanced-controls-test.cjs
           node tests/tuner-interface-test.cjs
       - name: Lint and incremental formatting
         if: steps.audio_impact.outputs.run_audio == 'true'

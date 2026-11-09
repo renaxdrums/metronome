@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "e327efae2080b5ac",
+  "revision": "b8ea64af2fa8044c",
   "resources": [
     {
       "path": "accessibility.css",
@@ -284,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "2b0e398f53709902fd98aef921aeed5d77a497d7cac1a99f5c4b399945f4c7bb",
+      "sha256": "a2fa462d3ba0425577b9bed35b545bb4191d5f3a57fb6c259b5786762950cc54",
       "text": true
     },
     {
@@ -299,12 +299,12 @@
     },
     {
       "path": "interface-locales.js",
-      "sha256": "d94f599e851186c44c5e3a6b1dde3c90f6642bce5d00465a220d5e75961fc053",
+      "sha256": "329b4fe182ae809f545763b3b8ae61f6013696255f7ab20e4d54539cee5d1902",
       "text": true
     },
     {
       "path": "interface-translations.js",
-      "sha256": "c4b4483175a0dcb2675aa9bf07ff24e3a55ac9c06c96549ac2632ce4a312a8fa",
+      "sha256": "31d1f5e6473dd546e29edae58a53d4f9deb80348360910c7ff716af2cc8cee2a",
       "text": true
     },
     {
@@ -564,12 +564,12 @@
     },
     {
       "path": "tuner-interface.css",
-      "sha256": "02fd2ea43ae5ccdbcd3f95ca5470f7420ed1acb637805d8e93ea547a04def300",
+      "sha256": "6d818b206138f251e38087c9963e4aee5fb0595168a0dd3cc796792ebffa2a23",
       "text": true
     },
     {
       "path": "tuner-ui.mjs",
-      "sha256": "a22914fb8af156258d9dd991dcfd5b96fc0c7ab199bd3af2c0a2d3ac3e90540f",
+      "sha256": "1deab4d013e141171155e1dc4c1aa44a286b234f309c88f9776763d2d90acbb3",
       "text": true
     },
     {

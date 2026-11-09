@@ -62,6 +62,22 @@ const {start}=require('./audio-harness.cjs');
   assert(fast.times.length>=20,JSON.stringify(fast));
   for(let i=1;i<fast.times.length;i++)assert(Math.abs(fast.times[i]-fast.times[i-1]-60/999)<.002,JSON.stringify(fast.times));
   assert.deepEqual(fast.late,[]);
+  await p.evaluate(async()=>{
+   stopMetronome();
+   for(const m of measures){m.polyVoiceCount=4;ensurePolyStates(m);m.polyVoices[2].count=5;m.polyVoices[3].count=7;ensurePolyStates(m);}
+   window.polyEvents=[];await startMetronome();
+  });
+  await p.waitForTimeout(1000);
+  await p.evaluate(()=>{
+   Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+   document.dispatchEvent(new Event('visibilitychange'));
+   const end=performance.now()+1200;while(performance.now()<end){ /* Simulate a blocked UI thread. */ }
+   delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await p.waitForTimeout(1800);
+  const fastFour=await p.evaluate(()=>({events:window.polyEvents,playing:isPlaying}));
+  assert(fastFour.playing);for(const measure of [0,1])assert(fastFour.events.some(e=>e.measure===measure));
+  assert.deepEqual(fastFour.events.filter(e=>e.late>=.05),[]);
   assert.deepEqual(errors,[]);console.log('PASS two poly measures retain sound and timing across resize');
  }finally{await h.browser.close();h.server?.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

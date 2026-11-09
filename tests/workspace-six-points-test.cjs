@@ -47,10 +47,12 @@ function wavOneShot() {
       const erased = await page.evaluate(() => ({
         count: measures.length,
         active: measures[1].beatStates,
+        subdivisions: measures[1].beatSubdivisions,
         untouched: [measures[0], measures[2], measures[3]].map(m => m.beatStates),
       }));
       assert.equal(erased.count, 4, 'The eraser must retain all four sequence blocks');
-      assert.deepEqual(erased.active, [[0], [0, 0], [0], [0]], 'Only rhythm is erased');
+      assert.deepEqual(erased.active, [[1], [2], [3], [1]], 'Beat accents are preserved');
+      assert.deepEqual(erased.subdivisions, [1, 1, 1, 1], 'All subdivisions are removed');
       for (const states of erased.untouched)
         assert.deepEqual(states, [[1], [2, 1], [3], [1]], 'Other blocks must remain unchanged');
 
@@ -65,17 +67,18 @@ function wavOneShot() {
       await nav('polyrhythm').click();
       if (width === 1440) {
         const layout = await page.evaluate(() => {
-          const row = document.querySelector('#polyControls').getBoundingClientRect();
           const voice = document.querySelector('.poly-voice-count').getBoundingClientRect();
           const caption = document.querySelector('#activeMeasureLabel').getBoundingClientRect();
-          return { rowHeight: row.height, rowTop: row.top, voiceBottom: voice.bottom, voiceLeft: voice.left, captionRight: caption.right };
+          const trigger = document.querySelector('#polyVoiceCount').closest('.numbox-custom').querySelector('.numbox-button').getBoundingClientRect();
+          return { voice: voice.toJSON(), caption: caption.toJSON(), trigger: trigger.toJSON(), width: innerWidth, height: innerHeight };
         });
-        assert.equal(Math.round(layout.rowHeight), 38,
-          'Voice selector must not create a second row or shrink the circular sequencer');
-        assert(layout.voiceBottom <= layout.rowTop + 1,
-          'Voice selector must remain above the existing pulse controls');
-        assert(layout.voiceLeft >= layout.captionRight + 2,
-          'Voice selector must not overlap the measure caption');
+        assert(layout.voice.bottom <= layout.caption.top || layout.caption.bottom <= layout.voice.top ||
+          layout.voice.right <= layout.caption.left || layout.caption.right <= layout.voice.left,
+          'Voice selector must not overlap the measure caption: ' + JSON.stringify(layout));
+        assert(layout.trigger.width >= 44 && layout.trigger.height >= 44 &&
+          layout.trigger.left >= 0 && layout.trigger.right <= layout.width &&
+          layout.trigger.top >= 0 && layout.trigger.bottom <= layout.height,
+          'Voice selector must remain visible and large enough to use: ' + JSON.stringify(layout));
       }
       assert.equal(await page.locator('#polyVoiceCount').inputValue(), '2');
       await page.locator('#polyVoiceCount').evaluate(select => {

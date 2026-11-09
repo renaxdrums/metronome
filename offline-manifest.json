@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "b8ea64af2fa8044c",
+  "revision": "03cabe46ced06b8a",
   "resources": [
     {
       "path": "accessibility.css",
@@ -154,7 +154,7 @@
     },
     {
       "path": "console-theme.css",
-      "sha256": "fba7a0bab865c7180fe7b67439851cf13ef84bb986556d73186b055916f4936d",
+      "sha256": "bb57f6a347b6ef5fa4a296adeaa7c486b7a4bce4694b2f1df4f6d99fb731bfa8",
       "text": true
     },
     {
@@ -284,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "a2fa462d3ba0425577b9bed35b545bb4191d5f3a57fb6c259b5786762950cc54",
+      "sha256": "15d6f8c78aeb854e73483786d7e1cdc8f520de0588fe8febc590cb6e8c368498",
       "text": true
     },
     {

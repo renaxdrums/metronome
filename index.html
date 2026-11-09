@@ -68,7 +68,7 @@
 <link rel="stylesheet" href="multi-metronome.css?v=6bf342538e67">
   <link rel="stylesheet" href="workspace-layout.css?v=312689549f5a">
 <link rel="stylesheet" href="pro-interface.css?v=58585adca440">
-<link rel="stylesheet" href="console-theme.css?v=fba7a0bab865">
+<link rel="stylesheet" href="console-theme.css?v=bb57f6a347b6">
 <link rel="stylesheet" href="entry-13.css?v=20b69b1b6a58"><link id="appearance-theme" rel="stylesheet" href="appearance-theme.css?v=b519ea612c4b">
 <link id="light-readability20" rel="stylesheet" href="entry-light-readability20.css?v=f6b6aafc402d">
 <link id="settings-palette24" rel="stylesheet" href="entry-settings-palette24.css?v=86c3933cfed1">
@@ -82,7 +82,7 @@
 <link rel="stylesheet" href="kern-intro.css?v=5e2e8530cd7c">
 <link rel="stylesheet" href="avant-garde-theme.css?v=c4c3ac6ba954">
 <link rel="stylesheet" href="musician-tools.css?v=375776c63dfb">
-<link rel="stylesheet" href="tuner-interface.css?v=02fd2ea43ae5">
+<link rel="stylesheet" href="tuner-interface.css?v=6d818b206138">
 <link rel="stylesheet" href="poly-layout.css?v=994b2aa3d0c3">
 <link rel="stylesheet" href="tuner-fit.css?v=595254bcedb6">
 </head>
@@ -394,7 +394,7 @@
       </aside>
       <section class="tuner-measurement" aria-label="Mesure de la justesse">
         <div class="tuner-panel-tools"><button id="tunerTone" type="button" aria-pressed="false" title="Écouter la référence">Écouter la référence</button><button id="tunerSettingsOpen" class="tuner-settings-open" type="button" aria-haspopup="dialog" aria-controls="tunerSettingsDialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>Réglages</span></button></div>
-        <div class="tuner-measurement-head"><span>Diapason</span><span id="tunerSignal" class="tuner-signal-accessible">Microphone arrêté</span><span class="tuner-range" data-no-translate>±50 cents</span></div>
+        <div class="tuner-measurement-head"><span>Diapason</span><span id="tunerSignal" class="tuner-signal-accessible">Microphone arrêté</span></div>
         <div class="tuner-dial">
             <svg class="tuner-meter" viewBox="0 0 360 206" role="img" aria-labelledby="tunerMeterTitle">
               <title id="tunerMeterTitle">Écart de moins 50 à plus 50 cents</title>
@@ -440,7 +440,8 @@
           <label for="tunerInput">Microphone / entrée audio</label><select id="tunerInput"><option value="">Microphone par défaut</option></select>
           <label for="tunerCalibration">Correction d’étalonnage (cents)</label><input id="tunerCalibration" type="number" min="-50" max="50" step="0.1" value="0"><p class="tuner-help">À régler uniquement avec une source externe étalonnée. Le nombre de décimales affichées ne garantit pas la précision du microphone.</p>
 </div></details>
-        <details class="tuner-setting-group" id="tunerAdvanced"><summary>Réglages avancés</summary><div class="tuner-setting-fields"><label for="tunerCustomNotes">Accordage personnalisé · notes réelles</label><input id="tunerCustomNotes" type="text" value="E2 A2 D3 G3 B3 E4" aria-describedby="tunerCustomHelp"><p id="tunerCustomHelp" class="tuner-help">Ex. E2 A2 D3 G3 B3 E4. De 1 à 12 cordes, de Do0 à Do8.</p>
+        <details class="tuner-setting-group" id="tunerAdvanced"><summary>Réglages avancés</summary><div class="tuner-setting-fields"><label for="tunerCustomNotes">Accordage personnalisé · notes réelles</label><input id="tunerCustomNotes" type="text" value="E2 A2 D3 G3 B3 E4" aria-describedby="tunerCustomHelp tunerCustomError"><p id="tunerCustomHelp" class="tuner-help">Ex. E2 A2 D3 G3 B3 E4. De 1 à 12 cordes, de Do0 à Do8.</p><p id="tunerCustomError" role="status"></p><button id="tunerUseCustomNotes" type="button">Utiliser cet accordage</button>
+          <button id="tunerUseCustomTemperament" type="button">Utiliser le tempérament personnalisé</button>
           <fieldset id="tunerOffsets"><legend>Tempérament personnalisé · écarts en cents</legend><p class="tuner-help">Écarts par rapport au tempérament égal, de −50 à +50 cents. Actifs en mode Personnalisé.</p><div></div></fieldset>
           <p class="tuner-help">La référence La4 reste fixe dans les tempéraments prédéfinis. En mode personnalisé, chaque écart s’applique à sa note, y compris le La.</p></div></details>
       </div>
@@ -601,9 +602,9 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="multi-clock.js?v=200171f7f4fd"></script>
 <script src="multi-metronome.js?v=9e41c3a2ab8c"></script>
 <script src="offline-cache.js?v=f41c06ec6200"></script>
-<script src="interface-translations.js?v=c4b4483175a0"></script>
+<script src="interface-translations.js?v=31d1f5e6473d"></script>
 <script src="vendor/i18next-25.6.0.js?v=6077ce0b0640"></script>
-<script src="interface-locales.js?v=d94f599e8511"></script>
+<script src="interface-locales.js?v=329b4fe182ae"></script>
 <link rel="stylesheet" href="interface-language.css?v=3995c298df9e">
 <script src="interface-language.js?v=291439ae445e"></script>
 <script src="workspace-layout.js?v=94c5d56db48f"></script>

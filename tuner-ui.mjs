@@ -302,7 +302,7 @@ export function createTuner(root) {
   for (const b of root.querySelectorAll('[data-tuner-a4]'))
     b.addEventListener('click', () => setA4(Number(b.dataset.tunerA4)));
   el('CustomNotes').value = settings.customNotes.map((v) => noteName(v)).join(' ');
-  el('CustomNotes').addEventListener('change', () => {
+  function applyCustomNotes() {
     const raw = el('CustomNotes').value.trim().split(/\s+/),
       notes = raw.map(parseNote);
     if (
@@ -310,15 +310,33 @@ export function createTuner(root) {
       notes.length > 12 ||
       !notes.every((v) => Number.isInteger(v) && v >= 12 && v <= 108)
     ) {
-      el('CustomNotes').value = settings.customNotes.map((v) => noteName(v)).join(' ');
-      status('Accordage invalide : indiquez de 1 à 12 notes, par exemple E2 A2 D3 G3 B3 E4.');
-      return;
+      el('CustomNotes').setAttribute('aria-invalid', 'true');
+      text(el('CustomError'), t('Accordage invalide : indiquez de 1 à 12 notes, par exemple E2 A2 D3 G3 B3 E4.'));
+      return false;
     }
+    el('CustomNotes').removeAttribute('aria-invalid');
+    text(el('CustomError'), '');
     settings.customNotes = notes;
     locked = null;
     updateTargets();
     save();
     render();
+    return true;
+  }
+  el('CustomNotes').addEventListener('input', () => {
+    el('CustomNotes').removeAttribute('aria-invalid');
+    text(el('CustomError'), '');
+  });
+  el('CustomNotes').addEventListener('change', applyCustomNotes);
+  el('UseCustomNotes').addEventListener('click', () => {
+    if (!applyCustomNotes()) return;
+    el('Instrument').value = 'custom';
+    el('Instrument').dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  el('UseCustomTemperament').addEventListener('click', () => {
+    el('Temperament').value = 'custom';
+    el('Temperament').dispatchEvent(new Event('change', { bubbles: true }));
+    el('Offsets').querySelector('input').focus({ preventScroll: true });
   });
   function updateSummary() {
     text(

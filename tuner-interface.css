@@ -458,6 +458,17 @@ html#renaxApp[data-theme='avant'] #tunerRoot {
 #tunerRoot .tuner-setting-fields .tuner-help {
   font-size: 12px;
 }
+#tunerRoot .tuner-setting-fields > button {
+  min-height: 44px;
+  padding: 8px 12px;
+  color: var(--tune-ink);
+  background: transparent;
+  border: 1px solid var(--tune-line);
+  border-radius: 8px;
+}
+#tunerRoot #tunerCustomError:empty { display: none; }
+#tunerRoot #tunerCustomError { margin: 0; color: var(--tune-ink); }
+#tunerRoot #tunerCustomNotes[aria-invalid='true'] { outline: 2px solid #d74b45; }
 #tunerRoot .tuner-preferences :is(input, select) {
   width: 100%;
   min-width: 0;

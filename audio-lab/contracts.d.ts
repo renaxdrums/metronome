@@ -9,7 +9,10 @@ export type AudioIdentity = {
   sizeBytes: number;
   mimeType: string;
   sha256?: string;
-  sampleRate: number;
+  sampleRate: number; // decoded AudioBuffer rate; may be resampled by Web Audio
+  sourceSampleRate?: number; // original WAV source rate (when PCM metadata recognized)
+  sourceBitDepth?: 16 | 24;
+  sourceChannels?: number;
   channels: number;
   durationSeconds: Seconds;
 };

@@ -1,3 +1,5 @@
+import { inspectWavPcm } from './wav-info.mjs';
+
 /**
  * Audio Lab local import: no upload, no writes to the original file.
  * decodeAudioData is a whole-file decoder; memory limits are explicit.
@@ -92,6 +94,7 @@ export async function decodeLocalAudio(file, options = {}) {
     ...options,
     onProgress: (loaded, total) => onProgress({ phase: 'read', loaded, total }),
   });
+  const sourcePcm = format === 'wav' ? inspectWavPcm(new Uint8Array(bytes)) : null;
   aborted(signal);
   let context;
   try {
@@ -113,6 +116,9 @@ export async function decodeLocalAudio(file, options = {}) {
         sizeBytes: file.size,
         mimeType: file.type || '',
         sampleRate: buffer.sampleRate,
+        sourceSampleRate: sourcePcm?.sampleRate,
+        sourceBitDepth: sourcePcm?.bitDepth,
+        sourceChannels: sourcePcm?.channels,
         channels: buffer.numberOfChannels,
         durationSeconds: buffer.duration,
       },

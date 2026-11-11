@@ -21,3 +21,9 @@
 - Contrôler les ambiguïtés d'anacrouse, premier temps après silence, silence instrumental, changements non quantifiés, métriques fractionnées, marqueurs aux mêmes ticks, tempo variable et interpolation.
 - Préserver les protections AGENTS.md, la CI des tests nouveaux et les fichiers audio historiques. Ajouter l'onglet uniquement lors d'une intégration visuelle testée PC/Android.
 - Skills design/REA et véritables sous-agents Codex : uniquement lorsqu'ils sont disponibles et nécessaires ; ne jamais revendiquer leur exécution dans cette étape.
+
+## Spécification d'import WAV confirmée (11 novembre 2026)
+
+- WAV PCM source en 16 ou 24 bits, à 44 100, 48 000 ou **96 000 Hz** (six combinaisons). La valeur 92 000 Hz évoquée précédemment était une erreur et ne figure plus dans les tests de conformité.
+- Conserver séparément la fréquence et la profondeur d'origine, car `decodeAudioData` peut rééchantillonner vers la fréquence de l'`AudioContext`.
+- Reconnaissance d'en-tête et tests synthétiques ne valent pas validation de décodage réel sur Chromium/Android. Ne pas annoncer l'import complet sans cette vérification.

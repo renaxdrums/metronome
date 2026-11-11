@@ -56,7 +56,7 @@ function buildSourceWav(sampleRate, bitDepth, withOddJunk = true) {
   put(at, 'data'); view.setUint32(at + 4, dataLength, true);
   return bytes;
 }
-for (const sourceSampleRate of [44100, 48000, 92000]) {
+for (const sourceSampleRate of [44100, 48000, 96000]) {
   for (const sourceBitDepth of [16, 24]) {
     const bytes = buildSourceWav(sourceSampleRate, sourceBitDepth);
     assert.deepEqual(inspectWavPcm(bytes), {
@@ -78,4 +78,4 @@ for (const sourceSampleRate of [44100, 48000, 92000]) {
 }
 assert.equal(inspectWavPcm(new Uint8Array(32)), null);
 assert.equal(inspectWavPcm(buildSourceWav(44100, 32)), null);
-console.log('Audio Lab: WAV source PCM 16/24-bit, 44.1/48/92 kHz metadata preserved independently of decoded sample rate');
+console.log('Audio Lab: WAV source PCM 16/24-bit, 44.1/48/96 kHz metadata preserved independently of decoded sample rate');

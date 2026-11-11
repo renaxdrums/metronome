@@ -61,7 +61,7 @@ audio-lab/tempo-warp-core.mjs contient :
 5. Insertion, déplacement, suppression de marqueurs intérieurs ; verrouillage et protection des extrémités.
 6. Valeurs immuables ; ni écriture ni modification des données audio sources.
 
-**Limite essentielle :** il s'agit d'une carte mathématique, pas d'un algorithme de stretch. Le moteur PCM, les transitoires, le transport, l'analyse automatique, la waveform et l'interface ne sont pas encore implémentés. Il faut benchmarker et tester la qualité avant toute promesse d'écoute.
+audio-lab/waveform/peaks.mjs ajoute un accumulateur multi-canal de crêtes min/max à plusieurs résolutions, alimentable par blocs, sans modification des échantillons originaux. Il doit être exécuté dans un Worker au stade de l'intégration navigateur.\n\n**Limite essentielle :** il s'agit d'une carte mathématique, pas d'un algorithme de stretch. Le moteur PCM, les transitoires, le transport, l'analyse automatique, la waveform et l'interface ne sont pas encore implémentés. Il faut benchmarker et tester la qualité avant toute promesse d'écoute.
 
 ## Banc DSP et licences : présélection, aucune intégration
 
@@ -85,7 +85,7 @@ Sources primaires :
 | --- | --- | --- | --- |
 | A-01 Indépendance du module | Nouveaux fichiers isolés, 1 | Diff et non-régression | Noyau présent |
 | B-01 Import MP3 local | io, 8 | Import PC + Android réel | Non réalisé |
-| B-02 Waveform / zoom / loupe | waveform, 7 | Long fichier et tactile | Non réalisé |
+| B-02 Waveform / zoom / loupe | waveform, 7 | audio-lab-peaks-test.mjs + rendu tactile futur | Pyramide de crêtes seule, sans éditeur |
 | B-03 Horloge commune | transport, 5 | Seek/loop/dérive | Non réalisé |
 | C-01 Attaques multibandes et BPM implicite | analysis, 3 | Corpus annoté | Non réalisé |
 | C-02 Hypothèses concurrentes | AnalysisResult, 3 | Cas de faible confiance | Contrat défini |
@@ -112,4 +112,4 @@ Sources primaires :
 - **H** UI premium démarrée conceptuellement en A ; aucun changement visuel sans revue dédiée, skills réellement présents et contrôle des quatre thèmes.
 - **I** Mesures audio, licences, disponibilité hors connexion, tests visuels et matériels, CI obligatoire ; puis PR, fusion autorisée, déploiement et vérification du site.
 
-Les tests purement musicaux ne prouvent ni la qualité DSP ni le fonctionnement sur smartphone. Ne pas fusionner ou annoncer un déploiement sur la base du seul noyau.
+Les tests musicaux et de crêtes ne prouvent ni la qualité DSP ni le fonctionnement sur smartphone. Ne pas fusionner ou annoncer un déploiement sur la base du seul noyau.

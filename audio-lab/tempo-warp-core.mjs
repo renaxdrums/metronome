@@ -123,11 +123,14 @@ export function sourceSecondsToTick(map, seconds) {
 export function tickToWarpSeconds(tick, bpm, pulse = { count: 1, denominator: 4 }) {
   if (!Number.isFinite(tick) || tick < 0 || !Number.isFinite(bpm) || bpm <= 0)
     throw new RangeError('tick and bpm must be nonnegative and positive finite, respectively');
-  return (tick * 60) / (noteUnitTicks(pulse.count, pulse.denominator) * bpm);
+  const result = (tick * 60) / (noteUnitTicks(pulse.count, pulse.denominator) * bpm);
+  if (!Number.isFinite(result)) throw new RangeError('warp time exceeds numeric range');
+  return result;
 }
 
 export function warpSecondsToSourceSeconds(map, warpSeconds, bpm, pulse = { count: 1, denominator: 4 }) {
-  if (!Number.isFinite(warpSeconds) || warpSeconds < 0) throw new RangeError('invalid warp time');
+  if (!Number.isFinite(warpSeconds) || warpSeconds < 0 || !Number.isFinite(bpm) || bpm <= 0)
+    throw new RangeError('invalid warp time or bpm');
   const tick = (warpSeconds * noteUnitTicks(pulse.count, pulse.denominator) * bpm) / 60;
   return tickToSourceSeconds(map, tick);
 }

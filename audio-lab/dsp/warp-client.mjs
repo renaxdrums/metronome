@@ -6,7 +6,7 @@ import { WarpRenderError } from './wsola.mjs';
 
 /** Process decoded audio outside the UI thread, with hard cancellation. */
 export function renderWarpInWorker(config) {
-  const { buffer, timeline, signal, onProgress = () => {},
+  const { buffer, timeline, signal, onsets = [], onProgress = () => {},
     workerFactory = () => new Worker(new URL('./warp-worker.mjs', import.meta.url), { type: 'module' }),
     maxOutputBytes = 256 * 1024 * 1024 } = config || {};
   if (!buffer || !Number.isSafeInteger(buffer.length) || buffer.length <= 0 ||
@@ -14,6 +14,7 @@ export function renderWarpInWorker(config) {
       buffer.numberOfChannels > 8 || typeof buffer.getChannelData !== 'function' ||
       !Number.isFinite(buffer.sampleRate) || !timeline || !Number.isFinite(timeline.outputDurationSeconds))
     throw new TypeError('decoded AudioBuffer and Warp timeline are required');
+  if (!Array.isArray(onsets) || onsets.length > 200000) throw new RangeError('invalid transient onset list');
   if (typeof onProgress !== 'function' || typeof workerFactory !== 'function')
     throw new TypeError('invalid Worker callback');
   if (!Number.isSafeInteger(maxOutputBytes) || maxOutputBytes <= 1024)
@@ -57,7 +58,7 @@ export function renderWarpInWorker(config) {
       worker.onerror = event =>
         finish(new WarpRenderError('DSP_FAILED', event?.message || 'Warp Worker crashed'));
       worker.postMessage({ id: 1, type: 'render', config: {
-        channels, sampleRate: buffer.sampleRate, timeline, maxOutputBytes,
+        channels, sampleRate: buffer.sampleRate, timeline, onsets, maxOutputBytes,
       } }, transfer);
     } catch (error) { finish(error); }
   });

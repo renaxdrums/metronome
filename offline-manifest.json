@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "1776370019b22521",
+  "revision": "fb6f2cdcbe64eb09",
   "resources": [
     {
       "path": "accessibility.css",
@@ -123,13 +123,23 @@
       "text": true
     },
     {
+      "path": "audio-lab/dsp/transients.mjs",
+      "sha256": "8a0268a223a763264b5ef968731b33e3506c77d1dfb726a6ab47b4ead03b65f8",
+      "text": true
+    },
+    {
       "path": "audio-lab/dsp/warp-client.mjs",
-      "sha256": "e75d9615df4b2cc24e788082b1deae1621bafa5516bdf44526e98854317ad349",
+      "sha256": "4ff3ac6bbf5836067d0edc646509780a6242f6d18f2ae339b134cbf460caba08",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-render.mjs",
+      "sha256": "2cb70a673d074da13fc309dc73413bfb6c7c329d5d86430451b2e4e694b375de",
       "text": true
     },
     {
       "path": "audio-lab/dsp/warp-worker.mjs",
-      "sha256": "52590c899631d0603f5cbb647e1fee22022d650613dd3851fdcb8272298b4e4e",
+      "sha256": "60a1051d3065554290ccb26158025cb09cbcb005dd9a8cc31ea09c4f7202fab8",
       "text": true
     },
     {
@@ -160,6 +170,11 @@
     {
       "path": "audio-lab/transport/original-player.mjs",
       "sha256": "fbbaf505fb773b92339787e3243861139e5fccabd15f6e4269b24b5f739046a2",
+      "text": true
+    },
+    {
+      "path": "audio-lab/transport/warp-click.mjs",
+      "sha256": "d5d371bf31b9e1b4c96fc3b8671f5d9166a0deaaa522fd3258b7e26c4e5d9fa3",
       "text": true
     },
     {
@@ -359,7 +374,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "75bdfbb77c3c52faf09051429b616d4d10e92c517eefcad8898798cbf09243f6",
+      "sha256": "72b155baea4a4adc4b36baa57fd10bda0318d63e69f7467c969751ec24ff6738",
       "text": true
     },
     {
@@ -429,7 +444,7 @@
     },
     {
       "path": "mobile-landscape.css",
-      "sha256": "0bc777f4f75896ece7abe30542f48c0637f2366a2f736e627fc55b7f3f35c53c",
+      "sha256": "a3343babed15c3e0dd5f9bb7971325f98ff212e0f3861ed1ab0ffbdff3fa4595",
       "text": true
     },
     {

@@ -1,11 +1,11 @@
 /** Offline Warp in a dedicated Worker; rendering never runs on the UI thread. */
-import { renderWarpPCM } from './wsola.mjs';
+import { renderWarpWithTransients } from './warp-render.mjs';
 
 self.addEventListener('message', (event) => {
   const { id, type, config } = event.data || {};
   if (type !== 'render') return;
   try {
-    const rendered = renderWarpPCM({
+    const rendered = renderWarpWithTransients({
       ...config,
       onProgress: progress => self.postMessage({ id, type: 'progress', progress }),
     });

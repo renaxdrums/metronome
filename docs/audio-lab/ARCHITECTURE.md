@@ -125,3 +125,8 @@ Nouveaux composants : `audio-lab/io/local-decode.mjs`, `audio-lab/waveform/peak-
 - Lecteur Original fondé sur `AudioContext.currentTime`, lecture à vitesse 1, Play/Pause/Stop/Seek, loop A/B, fade court et gain Audio Lab isolé. Retourne le temps audio de départ afin d'aligner un futur scheduler de clic. Le moteur ne préserve pas encore la hauteur lors des ralentissements : **aucune commande de ralentissement n'est proposée**.
 - Ces fichiers ne sont **pas encore intégrés à index.html, à la navigation, ni à une page accessible**. Pas de lecture publique, pas de sauvegarde de projet, pas de clic RENAX, pas d'exports. Le test Android réel reste indispensable.
 - Les tests de modules utilisent un faux contexte/Worker ; ils ne constituent pas une validation de décodage MP3 réel ni de navigation PC/smartphone.
+
+
+### Test navigateur réel ajouté
+
+`tests/audio-lab-browser-test.cjs` passe par Chromium/Playwright, génère un WAV original et local, le décode réellement par Web Audio, invoque un Worker module pour calculer sa waveform, puis vérifie le transport Play/Seek/Loop/Pause/Stop sans toucher au fichier. L'entrée est créée en mémoire, sans téléchargement externe. Le test tient compte du rééchantillonnage de `decodeAudioData` vers le taux du contexte audio. Les résultats doivent être contrôlés dans la CI avant de revendiquer une exécution dans Chromium. Ce test ne remplace pas le contrôle Android physique, ni l'import d'un vrai MP3.

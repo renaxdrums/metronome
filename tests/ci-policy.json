@@ -5,6 +5,7 @@
     "tests/audio-lab-import-test.mjs",
     "tests/audio-lab-transport-test.mjs",
     "tests/audio-lab-waveform-worker-test.mjs",
+    "tests/audio-lab-browser-test.cjs",
     "tests/audio-fast-headroom-test.cjs",
     "tests/poly-playback-resize-regression-test.cjs",
     "tests/tempo-live-regression-test.cjs",

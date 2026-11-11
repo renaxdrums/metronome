@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "03cabe46ced06b8a",
+  "revision": "18b19d45c1486f8d",
   "resources": [
     {
       "path": "accessibility.css",
@@ -115,6 +115,61 @@
     {
       "path": "assets/renax-logo-ivory.svg",
       "sha256": "cc89489b1b0e94b0a782c7e241138d560d1a5ed1aff6b0c79129c8bd36f5a9b6",
+      "text": true
+    },
+    {
+      "path": "audio-lab/analysis/onsets.mjs",
+      "sha256": "5d3f51e087329250ebeafc0ce43555fbcb777f4a56bdc8b25cd6145515285a18",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/local-decode.mjs",
+      "sha256": "fe9f6bc12ddf439fd76dfd21f9d2dbe05f89248817b59f863a693bec7ee779fd",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wav-info.mjs",
+      "sha256": "f75846c51494e6b6d893f22bdd08c0f3226652aa04a62a446a72df3b1a022056",
+      "text": true
+    },
+    {
+      "path": "audio-lab/meter-timeline.mjs",
+      "sha256": "06eab216b50ba8523ebbcabcfed1f8e17359b630c5ea46d23db3639c2dbdc905",
+      "text": true
+    },
+    {
+      "path": "audio-lab/tempo-warp-core.mjs",
+      "sha256": "a0ce3eb4534c4278b13a33078696fbee8cb8b9b9def53ba00d055d1202624846",
+      "text": true
+    },
+    {
+      "path": "audio-lab/transport/original-player.mjs",
+      "sha256": "fbbaf505fb773b92339787e3243861139e5fccabd15f6e4269b24b5f739046a2",
+      "text": true
+    },
+    {
+      "path": "audio-lab/ui/audio-lab.css",
+      "sha256": "1bf72055ad0caa4731acbeea77915c65f6989be4d74973b140ae8ffb47f3491a",
+      "text": true
+    },
+    {
+      "path": "audio-lab/ui/audio-lab.mjs",
+      "sha256": "50521834d7a4875edda17517d626767dab3a9c9dbde2561fec02720da968d0c6",
+      "text": true
+    },
+    {
+      "path": "audio-lab/waveform/peak-client.mjs",
+      "sha256": "2c3598f6d17b61c6b05808e4f83ccf2ec648c30d75a89f75ae34aa92614298ab",
+      "text": true
+    },
+    {
+      "path": "audio-lab/waveform/peak-worker.mjs",
+      "sha256": "bcfcddf2824fa31eed4d82b544138aa5cbca42e12615ddf8e3bfd8331e542630",
+      "text": true
+    },
+    {
+      "path": "audio-lab/waveform/peaks.mjs",
+      "sha256": "89970803e45fa23fcd8c2ccedc189a1f786c71c24525427d883375c259eca33d",
       "text": true
     },
     {
@@ -284,7 +339,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "15d6f8c78aeb854e73483786d7e1cdc8f520de0588fe8febc590cb6e8c368498",
+      "sha256": "e33cc6953fbbfb750537cd562901a97ca323408ff5bad5c0f9cf687da0e63c81",
       "text": true
     },
     {

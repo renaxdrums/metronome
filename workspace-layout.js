@@ -26,7 +26,7 @@
  const silentCollapse=document.createElement('button');silentCollapse.type='button';silentCollapse.className='silent-collapse';silentCollapse.textContent='Mesures vides';silentCollapse.setAttribute('aria-expanded','false');silentCollapse.setAttribute('aria-controls','silentSettings');silent.querySelector('.silent-head').prepend(silentCollapse);
  silentCollapse.onclick=()=>{const expanded=silent.classList.toggle('is-expanded');silentCollapse.setAttribute('aria-expanded',String(expanded));};
  const nav=document.getElementById('workspaceNav');nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Espaces de travail');
- const items=['metronome','polyrhythm','training','sequence','multi','tracks'];
+ const items=['metronome','polyrhythm','training','sequence','multi','tracks','audio-lab'];
  let page='metronome',changing=false;
  // Each native workspace owns its musical model. The audio scheduler is reused.
  const musicalStates=new Map();
@@ -83,7 +83,7 @@
   if(silent.parentNode!==silentHome.parentNode)silentHome.after(silent);
   silent.hidden=page!=='sequence';
  }
- function sync(){if(changing)return;if(window.RENAX_MULTI?.active)page='multi';else if(!document.getElementById('songsRoot').hidden)page='tracks';else if(appMode==='polyrhythm')page='polyrhythm';else if(!['metronome','sequence','training'].includes(page))page='sequence';document.body.dataset.workspace=page;
+ function sync(){if(changing)return;if(page!=='audio-lab'){if(window.RENAX_MULTI?.active)page='multi';else if(!document.getElementById('songsRoot').hidden)page='tracks';else if(appMode==='polyrhythm')page='polyrhythm';else if(!['metronome','sequence','training'].includes(page))page='sequence';}document.body.dataset.workspace=page;
   const viewButton=mobileViews.querySelector('button:last-child');viewButton.dataset.pane=page==='training'?'training':'seq';const viewSource=page==='training'?'Paramètres':page==='multi'?'Pistes':page==='tracks'?'Playlist':'Mesures';const viewLabel=window.RENAX_I18N?.t(viewSource)??viewSource;if(viewButton.textContent!==viewLabel)viewButton.textContent=viewLabel;for(const b of mobileViews.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.pane===document.body.dataset.mobilePane));
   for(const [id,b] of buttons){const selected=id===page;b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1;}try{localStorage.setItem('renax.workspace.v1',page);}catch{}place();syncAdd();
  }

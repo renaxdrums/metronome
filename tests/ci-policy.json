@@ -26,6 +26,7 @@
     "tests/audio-lab-onsets-test.mjs",
     "tests/audio-lab-peaks-test.mjs",
     "tests/audio-lab-transport-test.mjs",
+    "tests/audio-lab-warp-timeline-test.mjs",
     "tests/audio-lab-ui-test.cjs",
     "tests/audio-lab-waveform-worker-test.mjs",
     "tests/audio-linear-mix-test.cjs",

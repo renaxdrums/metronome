@@ -322,7 +322,7 @@ const { start } = require('../tests/audio-harness.cjs');
         );
         await tunerPage.locator('#toolSwitchLink').click();
         await tunerPage.waitForFunction(() => window.RENAX_TOOLS.current === 'metronome');
-        assert.equal(await tunerPage.locator('#workspaceNav [role=tab]').count(), 6);
+        assert.equal(await tunerPage.locator('#workspaceNav [role=tab]').count(), 7);
         assert.deepEqual(tunerErrors, []);
         await tunerPage.close();
         console.log('PASS tuner navigation/settings ' + name);

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "7e269b12d1b2c147",
+  "revision": "1776370019b22521",
   "resources": [
     {
       "path": "accessibility.css",
@@ -123,6 +123,21 @@
       "text": true
     },
     {
+      "path": "audio-lab/dsp/warp-client.mjs",
+      "sha256": "e75d9615df4b2cc24e788082b1deae1621bafa5516bdf44526e98854317ad349",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-worker.mjs",
+      "sha256": "52590c899631d0603f5cbb647e1fee22022d650613dd3851fdcb8272298b4e4e",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/wsola.mjs",
+      "sha256": "3d1774a0f62ddcb2348d262d4d168c2068765f445323353cc69fc699a47b8670",
+      "text": true
+    },
+    {
       "path": "audio-lab/io/local-decode.mjs",
       "sha256": "fe9f6bc12ddf439fd76dfd21f9d2dbe05f89248817b59f863a693bec7ee779fd",
       "text": true
@@ -155,6 +170,11 @@
     {
       "path": "audio-lab/ui/audio-lab.mjs",
       "sha256": "50521834d7a4875edda17517d626767dab3a9c9dbde2561fec02720da968d0c6",
+      "text": true
+    },
+    {
+      "path": "audio-lab/warp/warp-timeline.mjs",
+      "sha256": "da777ceab427119d5621a602f8acf108cfc345f6dddd4f774632ce6f77c511a5",
       "text": true
     },
     {

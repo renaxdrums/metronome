@@ -27,3 +27,13 @@
 - WAV PCM source en 16 ou 24 bits, à 44 100, 48 000 ou **96 000 Hz** (six combinaisons). La valeur 92 000 Hz évoquée précédemment était une erreur et ne figure plus dans les tests de conformité.
 - Conserver séparément la fréquence et la profondeur d'origine, car `decodeAudioData` peut rééchantillonner vers la fréquence de l'`AudioContext`.
 - Reconnaissance d'en-tête et tests synthétiques ne valent pas validation de décodage réel sur Chromium/Android. Ne pas annoncer l'import complet sans cette vérification.
+
+## Priorité moteur audio (11 novembre 2026)
+
+L'interface sombre actuelle, validée **uniquement pour les tests**, est figée. Ne pas modifier sa structure ni ses styles pendant la phase moteur. La priorité comprend le moteur Warp complet, le traitement PCM, les transitoires, la hauteur conservée, l'horloge et le clic RENAX synchronisé.
+
+### Premier moteur DSP de référence
+
+`audio-lab/dsp/wsola.mjs` effectue désormais un étirement temporel réel hors ligne en WSOLA multicanal, en suivant la carte Warp et les changements de tempo. `warp-client.mjs` exécute le traitement dans un Worker avec transfert de copies PCM, annulation et limites mémoire. La lecture du fichier original et les modules RENAX historiques restent intacts.
+
+**Statut : prototype DSP de validation, pas moteur final ni résultat sonore masterisé.** Les mesures synthétiques vérifient une lecture à 120→40 BPM avec hauteur stable sur une sinusoïde, plus un contrôle initial de localisation des attaques, mais les enregistrements réels de percussions, cymbales, piano, réverbérations et changements brutaux exigent écoute comparative et mesures supplémentaires. Restent à développer : traitement stéréo long format en streaming, préservation améliorée des transitoires, réglages de qualité DSP, lecture Warp temps réel et synchronisation de l'horloge RENAX. Ne pas publier avant ces étapes et la validation PC/Android.

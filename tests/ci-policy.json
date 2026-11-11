@@ -28,6 +28,8 @@
     "tests/audio-lab-transport-test.mjs",
     "tests/audio-lab-warp-timeline-test.mjs",
     "tests/audio-lab-ui-test.cjs",
+    "tests/audio-lab-warp-client-test.mjs",
+    "tests/audio-lab-wsola-test.mjs",
     "tests/audio-lab-waveform-worker-test.mjs",
     "tests/audio-linear-mix-test.cjs",
     "tests/bell-resonance-test.cjs",

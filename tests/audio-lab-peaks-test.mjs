@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import { PeakPyramidBuilder } from '../audio-lab/waveform/peaks.mjs';
+
+const builder = new PeakPyramidBuilder(2, 16);
+const a = Float32Array.from({ length: 35 }, (_, i) => i === 7 ? -0.9 : i === 27 ? 0.8 : 0.1);
+const b = Float32Array.from({ length: 35 }, (_, i) => i === 15 ? 0.7 : i === 30 ? -0.6 : -0.1);
+const copy = a.slice();
+builder.push([a.subarray(0, 11), b.subarray(0, 11)]);
+builder.push([a.subarray(11), b.subarray(11)]);
+const peaks = builder.finish();
+assert.equal(peaks.sampleCount, 35);
+assert.deepEqual(peaks.levels.map((l) => l.minimum[0].length), [3, 2, 1]);
+assert.deepEqual(Array.from(peaks.levels[0].minimum[0]).map((v) => +v.toFixed(2)), [-0.9, 0.1, 0.1]);
+assert.deepEqual(Array.from(peaks.levels[0].maximum[0]).map((v) => +v.toFixed(2)), [0.1, 0.8, 0.1]);
+assert.deepEqual(Array.from(peaks.levels[0].maximum[1]).map((v) => +v.toFixed(2)), [0.7, -0.1, -0.1]);
+assert.equal(+peaks.levels.at(-1).minimum[1][0].toFixed(2), -0.6);
+assert.deepEqual(a, copy);
+assert.throws(() => builder.finish(), /finalized/);
+assert.throws(() => builder.push([a, b]), /finalized/);
+assert.throws(() => new PeakPyramidBuilder(2, 17), /power/);
+const empty = new PeakPyramidBuilder(1);
+assert.equal(empty.finish().levels.length, 0);
+const invalid = new PeakPyramidBuilder(1, 16);
+assert.throws(() => invalid.push([Float32Array.of(Number.NaN)]), /non-finite/);
+assert.throws(() => invalid.push([new Int16Array(10)]), /Float32Array/);
+invalid.push([new Float32Array(16).fill(0.1)]);
+assert.equal(invalid.finish().sampleCount, 16);
+console.log('Audio Lab: incremental stereo waveform peak pyramid invariants passed');

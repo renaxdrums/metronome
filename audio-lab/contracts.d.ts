@@ -95,7 +95,7 @@ export type AudioLabProject = {
   };
 };
 export type AudioLabErrorCode =
-  | 'UNSUPPORTED_FORMAT' | 'DECODE_FAILED' | 'MEMORY_PRESSURE'
+  | 'UNSUPPORTED_FORMAT' | 'DECODE_FAILED' | 'MEMORY_PRESSURE' | 'CANCELLED'
   | 'LOW_CONFIDENCE' | 'INVALID_ANCHORS' | 'MISSING_SOURCE'
   | 'STORAGE_QUOTA' | 'DSP_UNAVAILABLE' | 'AUDIO_CONTEXT_SUSPENDED';
 export type AudioLabError = { code: AudioLabErrorCode; message: string; recoverable: boolean };

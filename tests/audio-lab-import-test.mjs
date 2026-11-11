@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import { AudioLabImportError, sniffAudioFormat, readLocalAudioBytes, decodeLocalAudio } from '../audio-lab/io/local-decode.mjs';
+
+const mp3 = Uint8Array.from([...Buffer.from('ID3'), ...new Uint8Array(97)]);
+const wav = Uint8Array.from([...Buffer.from('RIFF'), 0, 0, 0, 0, ...Buffer.from('WAVE'), ...new Uint8Array(48)]);
+const flac = Uint8Array.from([...Buffer.from('fLaC'), ...new Uint8Array(24)]);
+assert.equal(sniffAudioFormat(mp3), 'mp3');
+assert.equal(sniffAudioFormat(wav), 'wav');
+assert.equal(sniffAudioFormat(flac), 'flac');
+assert.equal(sniffAudioFormat(new Uint8Array(20)), null);
+const file = new File([mp3], 'recording.mp3', { type: 'audio/mpeg' });
+const progress = [];
+const raw = await readLocalAudioBytes(file, { onProgress: (loaded, total) => progress.push([loaded, total]) });
+assert.equal(raw.bytes.byteLength, mp3.length);
+assert.equal(raw.format, 'mp3');
+assert.equal(progress.at(-1)[0], mp3.length);
+await assert.rejects(readLocalAudioBytes(file, { maxEncodedBytes: 20 }), (error) => error.code === 'MEMORY_PRESSURE');
+await assert.rejects(readLocalAudioBytes(new File([new Uint8Array(20)], 'x.mp3')), (error) => error.code === 'UNSUPPORTED_FORMAT');
+const controller = new AbortController(); controller.abort();
+await assert.rejects(readLocalAudioBytes(file, { signal: controller.signal }), (error) => error.code === 'CANCELLED');
+
+let closed = 0;
+const buffer = { duration: 2, length: 88200, numberOfChannels: 2, sampleRate: 44100 };
+const createContext = () => ({ decodeAudioData: async () => buffer, close: async () => { closed++; } });
+const events = [];
+const decoded = await decodeLocalAudio(file, { createContext, onProgress: (e) => events.push(e) });
+assert.equal(decoded.identity.channels, 2);
+assert.equal(decoded.identity.name, 'recording.mp3');
+assert.equal(decoded.identity.sampleRate, 44100);
+assert.deepEqual(events.filter((e) => e.phase !== 'read').map((e) => e.phase), ['decode', 'ready']);
+assert.equal(closed, 0, 'success returns context ownership to caller');
+await assert.rejects(decodeLocalAudio(file, { createContext, maxDecodedBytes: 100 }), (error) => error.code === 'MEMORY_PRESSURE');
+assert.equal(closed, 1, 'failed decode cleans up owned context');
+await assert.rejects(decodeLocalAudio(file, { createContext: () => ({ decodeAudioData: async () => { throw Error('bad codec'); }, close: async () => { closed++; } }) }), (error) => error.code === 'DECODE_FAILED');
+assert.equal(closed, 2);
+assert(AudioLabImportError.prototype instanceof Error);
+console.log('Audio Lab: offline local import, format sniffing, progress, cancellation, decode diagnostics passed');

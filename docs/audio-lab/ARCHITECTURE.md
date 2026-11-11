@@ -113,3 +113,15 @@ Sources primaires :
 - **I** Mesures audio, licences, disponibilité hors connexion, tests visuels et matériels, CI obligatoire ; puis PR, fusion autorisée, déploiement et vérification du site.
 
 Les tests musicaux et de crêtes ne prouvent ni la qualité DSP ni le fonctionnement sur smartphone. Ne pas fusionner ou annoncer un déploiement sur la base du seul noyau.
+
+
+## Phase B en cours — import et transport original (11 novembre 2026)
+
+Nouveaux composants : `audio-lab/io/local-decode.mjs`, `audio-lab/waveform/peak-worker.mjs`, `audio-lab/waveform/peak-client.mjs`, `audio-lab/transport/original-player.mjs`. Les tests correspondants sont inscrits au registre CI.
+
+- Import local de Blob/File par lecture chunkée avec signal d'annulation et progression ; reconnaissance élémentaire de conteneur (signature, pas validation de codec), sans réseau.
+- `AudioContext.decodeAudioData` reste un décodage **complet en mémoire**, non progressif. La limite de 512 Mio compressés et 768 Mio de PCM est un budget de sécurité provisoire et configurable, pas une garantie de fonctionnement sur mobile ; le navigateur peut échouer avant le contrôle post-décodage. Décodage réellement progressif et segmentation des fichiers longs restent à réaliser.
+- Worker de pyramide de crêtes utilisant une fenêtre d'échantillons bornée, **un seul bloc PCM transféré à la fois** avec accusé de réception et annulation ; les échantillons sources ne sont pas altérés.
+- Lecteur Original fondé sur `AudioContext.currentTime`, lecture à vitesse 1, Play/Pause/Stop/Seek, loop A/B, fade court et gain Audio Lab isolé. Retourne le temps audio de départ afin d'aligner un futur scheduler de clic. Le moteur ne préserve pas encore la hauteur lors des ralentissements : **aucune commande de ralentissement n'est proposée**.
+- Ces fichiers ne sont **pas encore intégrés à index.html, à la navigation, ni à une page accessible**. Pas de lecture publique, pas de sauvegarde de projet, pas de clic RENAX, pas d'exports. Le test Android réel reste indispensable.
+- Les tests de modules utilisent un faux contexte/Worker ; ils ne constituent pas une validation de décodage MP3 réel ni de navigation PC/smartphone.

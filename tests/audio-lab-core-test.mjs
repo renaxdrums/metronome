@@ -37,6 +37,8 @@ const map = createWarpMap([
 ]);
 assert.equal(tickToSourceSeconds(map, 3840), 0.53);
 assert.equal(tickToWarpSeconds(3840, 120), 0.5);
+assert.throws(() => warpSecondsToSourceSeconds(map, 0, 0), /bpm/);
+assert.throws(() => tickToWarpSeconds(1e308, 0.1), /numeric range/);
 assert.equal(tickToWarpSeconds(5760, 120, { count: 3, denominator: 8 }), 0.5);
 assert(Math.abs(warpSecondsToSourceSeconds(map, 0.5, 120) - 0.53) < 1e-10);
 assert(Math.abs(sourceSecondsToTick(map, 0.53) - 3840) < 1e-9);

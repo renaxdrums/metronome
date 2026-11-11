@@ -1,5 +1,6 @@
 {
   "nightly": [
+    "tests/audio-lab-core-test.mjs",
     "tests/audio-fast-headroom-test.cjs",
     "tests/poly-playback-resize-regression-test.cjs",
     "tests/tempo-live-regression-test.cjs",

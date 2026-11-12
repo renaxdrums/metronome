@@ -7,6 +7,8 @@ import { decodeLocalAudio } from '../io/local-decode.mjs';
 import { extractWaveformPeaks } from '../waveform/peak-client.mjs';
 import { OriginalAudioPlayer } from '../transport/original-player.mjs';
 import { ManualClick } from '../transport/manual-click.mjs';
+import { detectOnsets } from '../analysis/onsets.mjs';
+import { inferTempoFromOnsets } from '../analysis/tempo-hypotheses.mjs';
 
 const root = document.getElementById('audioLabRoot');
 if (!root) throw new Error('Audio Lab HTML view not found');
@@ -16,7 +18,7 @@ const fileInput = $('alFileInput'), openButton = $('alOpenFile');
 const playButton = $('alPlay'), stopButton = $('alStop'), seekSlider = $('alSeek');
 const zoomSlider = $('alZoom'), markerTime = $('alMarkerTime'), removeButton = $('alDeleteMarker');
 const kinds = { cursor:'Curseur', downbeat:'Premier temps', meter:'Métrique', tempo:'Tempo', warp:'Warp (repère seul)' };
-let click = null;
+let click = null, loopA = 0, loopB = null, pulseJob = 0;
 let decoded = null, player = null, pyramid = null, selected = null, kind = 'cursor';
 let zoom = 1, start = 0, nextId = 1, markers = [], busy = false, job = null, frame = 0;
 const canvasCtx = canvas.getContext('2d'), rulerCtx = ruler.getContext('2d');
@@ -37,6 +39,7 @@ function isVisible() { return !root.hidden && document.documentElement.dataset.t
 
 function refreshTransport() {
   const active = !!player && !busy;
+  for(const id of ['alDetectPulse','alLoopEnabled','alLoopA','alLoopB'])$(id).disabled=!active;
   playButton.disabled = !active;
   stopButton.disabled = !active;
   seekSlider.disabled = !active;
@@ -234,7 +237,9 @@ function changeMarkerPosition(id,seconds){
   $('alMarkerInfo').textContent=markerDescription(marker);
 }
 function unload(){
+  pulseJob++;
   job?.abort();job=null;
+  loopA=0;loopB=null;$('alLoopEnabled').checked=false;$('alLoopInfo').textContent='—';$('alPulseResult').textContent='';
   if(click){click.dispose();click=null;}
   $('alClickEnabled').checked=false;
   if(player){player.dispose();player=null;}
@@ -265,6 +270,7 @@ async function loadFile(file){
     pyramid=await extractWaveformPeaks(imported.buffer,{signal});
     if(signal.aborted)return;
     $('alEmpty').hidden=true;
+    loopB=imported.buffer.duration;
     const identity=imported.identity;
     const sourceRate=identity.sourceSampleRate||identity.sampleRate;
     const sourceBits=identity.sourceBitDepth?identity.sourceBitDepth+' bits · ':'';
@@ -414,3 +420,60 @@ $('alManualBpm').addEventListener('change',()=>{
 });
 $('alAudioVolume').addEventListener('input',event=>player?.setVolume(Number(event.target.value)));
 $('alClickVolume').addEventListener('input',event=>click?.setVolume(Number(event.target.value)));
+
+function refreshLoop(){
+  if(!player)return;
+  const a=loopA,b=loopB??totalDuration();
+  $('alLoopInfo').textContent=formatTime(a)+' – '+formatTime(b);
+  if($('alLoopEnabled').checked && b>a+0.02)player.setLoop(a,b);
+  else { $('alLoopEnabled').checked=false;player.clearLoop(); }
+  click?.sync();
+}
+$('alLoopA').addEventListener('click',()=>{
+  if(!player)return;
+  const p=playerPosition();
+  if(p>=(loopB??totalDuration())-0.02){setStatus('Début A doit précéder la fin B.');return;}
+  loopA=p;refreshLoop();
+});
+$('alLoopB').addEventListener('click',()=>{
+  if(!player)return;
+  const p=playerPosition();
+  if(p<=loopA+0.02){setStatus('Fin B doit suivre le début A.');return;}
+  loopB=p;refreshLoop();
+});
+$('alLoopEnabled').addEventListener('change',event=>{
+  if(!player){event.target.checked=false;return;}
+  refreshLoop();
+});
+$('alDetectPulse').addEventListener('click',async()=>{
+  if(!decoded||busy)return;
+  const token=++pulseJob;
+  const button=$('alDetectPulse');
+  button.disabled=true;
+  setStatus('Analyse locale des attaques et estimation de la pulsation…');
+  // Cap the analysis window for responsive use on Android. Source PCM is never modified.
+  try{
+    await new Promise(resolve=>setTimeout(resolve,0));
+    if(token!==pulseJob||!decoded)return;
+    const buffer=decoded.buffer;
+    const frames=Math.min(buffer.length,Math.round(buffer.sampleRate*35));
+    const channels=Array.from({length:Math.min(2,buffer.numberOfChannels)},(_,i)=>
+      buffer.getChannelData(i).subarray(0,frames));
+    const result=detectOnsets(channels,buffer.sampleRate,{maxOnsets:3000});
+    if(token!==pulseJob)return;
+    const hypotheses=inferTempoFromOnsets(result.onsets);
+    if(!hypotheses.candidates.length){
+      $('alPulseResult').textContent='Pulsation indéterminée';
+      setStatus('Analyse ambiguë : régler le BPM manuellement.');
+      return;
+    }
+    const first=hypotheses.candidates[0];
+    $('alManualBpm').value=String(first.bpm);
+    click?.configure({bpm:first.bpm});
+    $('alPulseResult').textContent='≈ '+first.bpm+' BPM · hypothèse';
+    setStatus('Pulsation estimée à '+first.bpm+' BPM (non confirmée). Vérifier à l’oreille et ajuster.');
+  }catch(error){
+    $('alPulseResult').textContent='Analyse indisponible';
+    setStatus('Analyse impossible : '+error.message);
+  }finally{if(token===pulseJob)button.disabled=!player;}
+});

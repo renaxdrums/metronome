@@ -64,6 +64,8 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    // Playlist Play toggles Stop, and a different song starts from its own beginning.
    await p.evaluate(()=>RENAX_SONGS.restoreNavigation({pane:'songs',view:'playlist',profile:'p',song:'s'}));await showMeasures(p);
    const play=p.locator('[data-play-song-id=s]');await play.click();await p.waitForFunction(()=>isPlaying);
+   // Audio may start before its async transport callback updates the button state.
+   await p.waitForFunction(()=>document.querySelector('[data-play-song-id=s]')?.getAttribute('aria-pressed')==='true');
    assert.equal(await play.getAttribute('aria-pressed'),'true');assert.match(await play.getAttribute('aria-label'),/Arrêter/);
    await play.click();assert.equal(await p.evaluate(()=>isPlaying),false);
    await p.locator('[data-play-song-id=finite]').click();await p.waitForFunction(()=>isPlaying&&RENAX_SONGS.loaded.song.id==='finite');await p.evaluate(()=>stopMetronome());

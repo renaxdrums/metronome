@@ -9,7 +9,8 @@ const sink={write:bytes=>{pieces.push(bytes.slice());},close:()=>closed++,
 let worker;
 const workerFactory=()=>{
   worker={postMessage:data=>{
-    if(data.type!=='render-chunks')return;
+    if(data.type==='render-chunks')worker.sent=0;
+    else if(data.type!=='ack')return;
     const frameOffset=worker.sent||0,frames=Math.min(1024,14400-frameOffset);
     if(frames>0){
       worker.sent=frameOffset+frames;

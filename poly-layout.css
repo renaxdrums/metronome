@@ -75,3 +75,17 @@ body.poly-mode .rhythm-score { overflow: hidden; }
   body.poly-mode .poly-dot { width: 9px; height: 9px; }
   body.poly-mode .poly-subdivision { width: 5px; height: 5px; }
 }
+
+/* The main poly beat has a real 24px hit target in portrait. */
+@media (max-width:1100px) and (min-height:600px){
+  body.poly-mode .poly-dot:not(.poly-subdivision){width:24px;height:24px}
+}
+
+/* Compact Polyrythmie needs at least an 80px dial; a later max-width
+ * otherwise clamps the 80px layout target to 69px at 844x390. */
+@media (min-width:600px) and (max-width:1100px) and (max-height:500px){
+  html#renaxApp body.poly-mode .panel-visu:not(.score-view) .sequencer-wrapper #sequencerContainer{
+    width:max(80px,min(100%,calc(100cqh - 4px)))!important;
+    max-width:none!important;
+  }
+}

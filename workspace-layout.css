@@ -214,3 +214,16 @@ body .silent-section[hidden]{display:none}
 #polyBeatEditor .poly-beat-pad[data-state='2']{background:var(--yellow);color:#111}
 #polyBeatEditor .poly-beat-pad[data-state='3']{background:var(--orange);color:#111}
 @media(max-width:1100px){#polyBeatEditor{top:auto;bottom:12px;left:12px;right:12px;width:auto;max-height:min(70dvh,480px)}}
+
+/* Fine-pointer landscape windows also need a compact Track navigation.
+ * Without this, the generic three-row nav leaves Export under other UI. */
+@media (orientation:landscape) and (pointer:fine) and (max-width:1100px) and (max-height:600px){
+  html#renaxApp body[data-workspace=tracks] header{min-height:28px;padding-bottom:3px}
+  html#renaxApp body[data-workspace=tracks] #workspaceNav{grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;padding:2px 0}
+  html#renaxApp body[data-workspace=tracks] #workspaceNav button{min-height:30px;padding:3px 1px;font-size:9px}
+  html#renaxApp body[data-workspace=tracks] #workspaceNav svg{width:12px;height:12px;flex-basis:12px}
+  html#renaxApp body[data-workspace=tracks] #workspaceMobileViews{padding:0 0 3px}
+  html#renaxApp body[data-workspace=tracks] #workspaceMobileViews button{min-height:26px}
+  html#renaxApp body[data-workspace=tracks] footer{min-height:40px;margin-top:3px;padding-top:3px}
+  html#renaxApp body[data-workspace=tracks] footer .footer-center #playBtn{height:34px!important;min-height:34px!important}
+}

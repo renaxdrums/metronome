@@ -4,7 +4,7 @@
 L'interface sombre actuelle est validée uniquement comme interface de test. Ne pas la redessiner pendant la phase moteur. Les autres modules, les banques de sons et le mastering RENAX restent intacts.
 
 ## Chaîne réalisée — prototype technique
-1. Source décodée localement et conservée (WAV/MP3 selon décodeur navigateur ; métadonnées PCM WAV 16/24 bits, 44,1/48/96 kHz).
+1. Source décodée localement et conservée : WAV/MP3 selon décodeur navigateur, AIFF/AIFC PCM signé 16/24 bits en big/little endian avec 44,1/48/96 kHz testés. Le conteneur ASF/WMA est reconnu, mais le décodage WMA reste conditionné à un codec réellement disponible.
 2. Attaques multibandes exploratoires ; elles ne constituent PAS une métrique ou un BPM automatiquement certifiés.
 3. Carte d'ancres musicales ↔ source, métriques/groupements libres et timeline Warp à tempo variable.
 4. Worker : rendu PCM WSOLA hors ligne, stéréo liée, validation stricte, annulation, garde-fous mémoire et restauration facultative d'attaques validées.
@@ -19,7 +19,7 @@ L'interface sombre actuelle est validée uniquement comme interface de test. Ne 
 - Les fichiers longs exigent des blocs DSP et un tampon roulant, au lieu d'un AudioBuffer complet.
 - La mise en veille et le throttling des timers exigent un ordonnanceur robuste (AudioWorklet ou équivalent) avant toute garantie mobile.
 - Adaptateur clics : les échantillons historiques sont réutilisés ; le bus de mixage audio doit être branché sur la sortie sécurisée validée RENAX lors de l'intégration.
-- Analyse automatique métrique, WMA/AIFF, édition et historique complets, projets, exports et validation smartphone restent à réaliser.
+- Analyse automatique métrique, décodage WMA universel, édition et historique complets, projets, exports et validation smartphone restent à réaliser.
 
 ## Matrice des tests
 - Mathématiques : source↔ticks↔sortie inversibles, changements de tempo, pas de trou ni inversion.

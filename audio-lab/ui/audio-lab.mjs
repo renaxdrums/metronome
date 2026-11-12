@@ -269,7 +269,7 @@ async function loadFile(file){
     $('alFileName').textContent='Échec de l’import';
     $('alFormatInfo').textContent='Codec non pris en charge ou ressources insuffisantes';
     const message=error?.code==='UNSUPPORTED_FORMAT'
-      ?'Format non reconnu. AIFF/WMA nécessitent encore un décodeur dédié.'
+      ?'Format non reconnu. WAV, MP3 et AIFF PCM acceptés ; WMA dépend du navigateur.'
       :error?.code==='CANCELLED'?'Import annulé.'
       :error?.code==='MEMORY_PRESSURE'?'Fichier trop volumineux pour la mémoire disponible.'
       :'Impossible de décoder ce fichier sur ce navigateur.';

@@ -18,8 +18,7 @@ const clickBuffer=()=>{
   return {sampleRate:rate,length:pcm.length,numberOfChannels:1,duration:pcm.length/rate,
     getChannelData:()=>pcm};
 };
-let stopCount=0,posted=0,started=[],tick=null,decoded=0;
-const clock={setInterval:fn=>{tick=fn;return 1;},clearInterval:()=>tick=null};
+let stopCount=0,posted=0,started=[],decoded=0;
 const context={state:'running',currentTime:5,destination:{},
   resume:async()=>{},
   createBuffer:(channels,length,sampleRate)=>({
@@ -32,7 +31,7 @@ const context={state:'running',currentTime:5,destination:{},
   decodeAudioData:async()=>{decoded++;return clickBuffer()},
 };
 const workerFactory=()=>({
-  onmessage:null,postMessage(message,transfer){
+  onmessage:null,postMessage(message,_transfer){
     posted++;assert.equal(message.config.channels.length,1);
     assert.notEqual(message.config.channels[0].buffer,source.buffer);
     const frames=Math.round(warpTimeline.outputDurationSeconds*rate);

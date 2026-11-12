@@ -1,4 +1,5 @@
 import { inspectWavPcm } from './wav-info.mjs';
+import { inspectAiffPcm, decodeAiffPcm } from './aiff-pcm.mjs';
 
 /**
  * Audio Lab local import: no upload, no writes to the original file.
@@ -22,6 +23,10 @@ export function sniffAudioFormat(bytes) {
   if (!(bytes instanceof Uint8Array) || bytes.length < 12) return null;
   const ascii = (start, len) => String.fromCharCode(...bytes.subarray(start, start + len));
   if (ascii(0, 4) === 'RIFF' && ascii(8, 4) === 'WAVE') return 'wav';
+  if (ascii(0, 4) === 'FORM' && ['AIFF', 'AIFC'].includes(ascii(8, 4))) return 'aiff';
+  // ASF/WMA container: decoding still depends on the installed browser codec.
+  if (bytes.length >= 16 && [0x30,0x26,0xb2,0x75,0x8e,0x66,0xcf,0x11,
+    0xa6,0xd9,0x00,0xaa,0x00,0x62,0xce,0x6c].every((v,i)=>bytes[i]===v)) return 'wma';
   if (ascii(0, 4) === 'fLaC') return 'flac';
   if (ascii(0, 4) === 'OggS') return 'ogg';
   if (ascii(0, 3) === 'ID3') return 'mp3';
@@ -94,13 +99,19 @@ export async function decodeLocalAudio(file, options = {}) {
     ...options,
     onProgress: (loaded, total) => onProgress({ phase: 'read', loaded, total }),
   });
-  const sourcePcm = format === 'wav' ? inspectWavPcm(new Uint8Array(bytes)) : null;
+  const sourcePcm = format === 'wav' ? inspectWavPcm(new Uint8Array(bytes)) :
+    format === 'aiff' ? inspectAiffPcm(new Uint8Array(bytes)) : null;
+  if (format === 'aiff' && sourcePcm &&
+      sourcePcm.frames * sourcePcm.channels * 4 > maxDecodedBytes)
+    throw new AudioLabImportError('MEMORY_PRESSURE', 'AIFF PCM dépasse le budget mémoire.');
   aborted(signal);
   let context;
   try {
     context = createContext();
     onProgress({ phase: 'decode', loaded: 0, total: 1 });
-    const buffer = await context.decodeAudioData(bytes);
+    const buffer = format === 'aiff' ?
+      decodeAiffPcm(new Uint8Array(bytes), context, { maxDecodedBytes, signal }).buffer :
+      await context.decodeAudioData(bytes);
     aborted(signal);
     if (!buffer || !Number.isFinite(buffer.duration) || buffer.duration <= 0 ||
         !Number.isSafeInteger(buffer.length) || buffer.length <= 0 ||

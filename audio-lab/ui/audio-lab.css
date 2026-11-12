@@ -192,3 +192,23 @@ body[data-workspace="audio-lab"] #workspaceMobileViews{display:none!important}
  #audioLabRoot .al-file-actions{margin-left:auto}
  #audioLabRoot .al-top{align-items:center}
 }
+
+/* Match the four existing RENAX appearances without changing their settings. */
+html[data-selected-theme="light"] #audioLabRoot,
+html[data-selected-theme="ivory"] #audioLabRoot{
+ --al-bg:#f5f1e7;--al-panel:#fffdf7;--al-stroke:#c8c6b9;
+ --al-muted:#656b6e;--al-ink:#242c30;--al-warm:#b65f30;--al-cyan:#167d85;--al-purple:#73509e;
+ background:linear-gradient(145deg,#fdfbf4,#e8e8df);color:var(--al-ink);
+ border-color:var(--al-stroke)
+}
+html[data-selected-theme="light"] #audioLabRoot .al-tool,
+html[data-selected-theme="ivory"] #audioLabRoot .al-tool,
+html[data-selected-theme="light"] #audioLabRoot .al-transport,
+html[data-selected-theme="ivory"] #audioLabRoot .al-transport{
+ color:var(--al-ink);border-color:var(--al-stroke)
+}
+html[data-selected-theme="avant"] #audioLabRoot{
+ --al-bg:#191c14;--al-panel:#292e20;--al-stroke:#647143;
+ --al-muted:#c4c7a4;--al-ink:#f3f4d9;--al-warm:#f3a34d;--al-cyan:#d9ff00;--al-purple:#e5bd71;
+ background:linear-gradient(145deg,#252b1b,#10150e);border-color:var(--al-stroke)
+}

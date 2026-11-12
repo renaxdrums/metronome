@@ -79,9 +79,11 @@ body.poly-mode .rhythm-score { overflow: hidden; }
 /* The main poly beat has a real 24px hit target in portrait. */
 @media (max-width:1100px) and (min-height:600px){
   body.poly-mode .poly-dot:not(.poly-subdivision){width:24px;height:24px}
-  /* Avoid a subpixel overlap between the first outer and inner beat targets. */
+  /* Keep a full 24px WCAG target between the first inner/outer beats.
+   * --poly-radius is already !important upstream, so changing it here had
+   * no effect. Offset only the rendered inner beat in phone portrait. */
   body.poly-mode .poly-dot.inner:not(.poly-subdivision){
-    --poly-radius:calc(var(--poly-lane-radius) - 2px);
+    transform:translate(-50%,-50%) rotate(var(--angle)) translateY(calc(3px - var(--poly-lane-radius)));
   }
   /* In Ivory, the absolute score toolbar obscures the first inner beat. */
   html[data-theme=ivory] body.poly-mode .sequencer-wrapper{

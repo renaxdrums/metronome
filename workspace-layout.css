@@ -224,6 +224,5 @@ body .silent-section[hidden]{display:none}
   html#renaxApp body[data-workspace=tracks] #workspaceNav svg{width:12px;height:12px;flex-basis:12px}
   html#renaxApp body[data-workspace=tracks] #workspaceMobileViews{padding:0 0 3px}
   html#renaxApp body[data-workspace=tracks] #workspaceMobileViews button{min-height:26px}
-  html#renaxApp body[data-workspace=tracks] footer{min-height:40px;margin-top:3px;padding-top:3px}
-  html#renaxApp body[data-workspace=tracks] footer .footer-center #playBtn{height:34px!important;min-height:34px!important}
+  html#renaxApp body[data-workspace=tracks] footer{min-height:48px;margin-top:2px;padding-top:2px}
 }

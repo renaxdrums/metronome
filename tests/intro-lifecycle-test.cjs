@@ -10,6 +10,39 @@ const { start, save } = require('./audio-harness.cjs');
       page.on('pageerror', error => errors.push(error.message));
       await page.addInitScript(() => {
         window.qaIntroText = {};
+        // Observe from document construction: short black/fade phases can
+        // finish before page.goto and the intro-ready wait complete.
+        window.qaIntroFrames = {};
+        const attachIntroObserver = () => {
+          const overlay = document.getElementById('renaxArrival');
+          if (!overlay) return false;
+          const capture = () => {
+            const scene = overlay.querySelector('.kern-intro-presentation');
+            if (!scene) return;
+            const frame = {
+              overlay: Number(getComputedStyle(overlay).opacity),
+              scene: Number(getComputedStyle(scene).opacity),
+              background: getComputedStyle(overlay).backgroundColor,
+            };
+            if (overlay.dataset.introPhase === 'black' && frame.overlay === 1 && frame.scene === 0)
+              window.qaIntroFrames.black = frame;
+            if (overlay.dataset.introPhase === 'fade-in' && frame.overlay > .1 && frame.overlay < .9 && frame.scene === 0)
+              window.qaIntroFrames.fadeIn = frame;
+          };
+          const sceneObserver = new MutationObserver(capture);
+          sceneObserver.observe(overlay, { attributes: true, childList: true, subtree: true });
+          capture();
+          const cleanup = new MutationObserver(() => {
+            if (overlay.hidden) { sceneObserver.disconnect(); cleanup.disconnect(); }
+          });
+          cleanup.observe(overlay, { attributes: true, attributeFilter: ['hidden'] });
+          return true;
+        };
+        const arrivalObserver = new MutationObserver(() => {
+          if (attachIntroObserver()) arrivalObserver.disconnect();
+        });
+        arrivalObserver.observe(document, { childList: true, subtree: true });
+        if (attachIntroObserver()) arrivalObserver.disconnect();
         const draw = CanvasRenderingContext2D.prototype.fillText;
         CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
           if (this.canvas.classList.contains('kern-intro-scene')) window.qaIntroText[text] = this.fillStyle;
@@ -23,24 +56,7 @@ const { start, save } = require('./audio-harness.cjs');
         // Observe short transition phases in the page, before playback/resize.
         // The runner can resume after finish() has removed the presentation.
         // Keep the exact visual requirements; a missing phase still times out.
-        window.qaIntroFrames = {};
-        const overlay = document.getElementById('renaxArrival');
-        const observer = new MutationObserver(() => {
-          const scene = overlay.querySelector('.kern-intro-presentation');
-          if (scene) {
-            const frame = {
-              overlay: Number(getComputedStyle(overlay).opacity),
-              scene: Number(getComputedStyle(scene).opacity),
-              background: getComputedStyle(overlay).backgroundColor,
-            };
-            if (overlay.dataset.introPhase === 'black' && frame.overlay === 1 && frame.scene === 0)
-              window.qaIntroFrames.black = frame;
-            if (overlay.dataset.introPhase === 'fade-in' && frame.overlay > .1 && frame.overlay < .9 && frame.scene === 0)
-              window.qaIntroFrames.fadeIn = frame;
-          }
-          if (overlay.hidden) observer.disconnect();
-        });
-        observer.observe(overlay, { attributes: true, childList: true, subtree: true });
+        // Intro phases are recorded by the early document observer.
         window.qaCoveredDraws = { particleCanvas: 0, renaxHeaderWave: 0 };
         const clear = CanvasRenderingContext2D.prototype.clearRect;
         CanvasRenderingContext2D.prototype.clearRect = function (...args) {

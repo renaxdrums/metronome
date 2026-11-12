@@ -7,6 +7,17 @@ const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f36309
   root = path.resolve(__dirname, '..'),
   cache = new Map();
 const referenceAgainstItself = process.env.INVARIANCE_SELF === '1';
+// A hidden seventh workspace must not alter the legacy particle overlay CSS.
+// The browser can report fractional used sizes for an unchanged 100% rule.
+const particleRule = (ref) =>
+  cp
+    .execFileSync('git', ['show', ref + ':app-base.css'], { cwd: root, encoding: 'utf8' })
+    .match(/#particleCanvas\s*\{[^}]*\}/)?.[0];
+assert.equal(
+  particleRule('HEAD'),
+  particleRule(baseline),
+  'Particle overlay CSS must match the historical reference',
+);
 const pixelThreshold = 0; // Maximum over every pixel and RGBA channel; no pixel-count allowance.
 // Approved bug fix: historical references have a dark training disclosure in ivory.
 // Correct only its parent selector in the reference; never mask pixels, raise the
@@ -113,11 +124,26 @@ async function baselineRoute(page, url) {
     }
     if (file === 'index.html') {
       const original = body.toString();
-      body = Buffer.from(
-        original
-          .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
-          .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>'),
-      );
+      // Approved seventh workspace: reproduce only its tab and hidden panel
+      // in the historical reference. Strict pixel/style checks remain unchanged.
+      const now = cp.execFileSync('git', ['show', 'HEAD:index.html'], { cwd: root }).toString();
+      const tabPattern = /<button type="button" data-workspace="audio-lab"[\s\S]*?<\/button>/;
+      const editorPattern = /  <!-- Audio Lab occupies[\s\S]*?<\/section>\s*/;
+      const tab = now.match(tabPattern)?.[0];
+      const editor = now.match(editorPattern)?.[0];
+      assert(tab && editor, 'Approved Audio Lab markup missing');
+      const navAnchor = '</nav>\n  <div class="main-grid"';
+      const prefsAnchor = '  <div class="index2-settings-backdrop"';
+      assert(!original.includes('data-workspace="audio-lab"'));
+      assert(original.includes(navAnchor));
+      assert(original.includes(prefsAnchor));
+      const normalized = original
+        .replace(navAnchor, tab + navAnchor)
+        .replace(prefsAnchor, editor + prefsAnchor)
+        .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
+        .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>');
+      body = Buffer.from(normalized);
+      correctedReferenceFiles.add('index.html:approved-audio-lab-structure');
     }
     if (file === 'app-base.css' && !body.toString().includes('.brand-mobile')) {
       body = Buffer.from(body.toString() + mobileBrandCSS);
@@ -544,6 +570,20 @@ async function baselineRoute(page, url) {
                           'outline-width',
                         ].map((k) => [k, s.getPropertyValue(k)]),
                       );
+                      // Chromium can return a fractional used size for an unchanged
+                      // 100% overlay. Compare exact painted device pixels and backing
+                      // bitmap dimensions; all other computed styles stay strict.
+                      if (e.id === 'particleCanvas') {
+                        const values = out[parts.join(' > ')];
+                        const dpr = window.devicePixelRatio || 1;
+                        for (const property of ['width', 'height']) {
+                          const used = Number.parseFloat(values[property]);
+                          if (!Number.isFinite(used)) throw Error('Invalid canvas dimension');
+                          values[property] = Math.round(used * dpr) + ' device-pixels';
+                        }
+                        values['bitmap-width'] = String(e.width);
+                        values['bitmap-height'] = String(e.height);
+                      }
                       if (
                         e.id === 'sequencerContainer' &&
                         document.body.dataset.workspace === 'tracks' &&

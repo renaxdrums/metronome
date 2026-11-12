@@ -64,7 +64,7 @@ fs.writeFileSync(wav, data);
     await p.evaluate(() => document.querySelector('[data-appearance="dark"]').click());
     const switchIcon = p.locator('#toolSwitchLink svg path');
     const tunerIcon = await switchIcon.getAttribute('d');
-    assert.equal(await p.locator('#workspaceNav [role=tab]').count(), 6);
+    assert.equal(await p.locator('#workspaceNav [role=tab]').count(), 7);
     await p.evaluate(() => {
       bpmSlider.value = '137';
       bpmSlider.dispatchEvent(new Event('input', { bubbles: true }));

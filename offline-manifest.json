@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "03cabe46ced06b8a",
+  "revision": "4e3d3dc04476bf1e",
   "resources": [
     {
       "path": "accessibility.css",
@@ -115,6 +115,161 @@
     {
       "path": "assets/renax-logo-ivory.svg",
       "sha256": "cc89489b1b0e94b0a782c7e241138d560d1a5ed1aff6b0c79129c8bd36f5a9b6",
+      "text": true
+    },
+    {
+      "path": "audio-lab/analysis/onsets.mjs",
+      "sha256": "5d3f51e087329250ebeafc0ce43555fbcb777f4a56bdc8b25cd6145515285a18",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/transients.mjs",
+      "sha256": "8a0268a223a763264b5ef968731b33e3506c77d1dfb726a6ab47b4ead03b65f8",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-chunk-client.mjs",
+      "sha256": "21cd369ec4e6e99325a2131d171dfd55f68030df7204054da60c918537321cc2",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-chunk-worker.mjs",
+      "sha256": "508f01599f540acd681fab836d69d4e5925d0344350d89b4c40d5d8c3d0c02b4",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-client.mjs",
+      "sha256": "4ff3ac6bbf5836067d0edc646509780a6242f6d18f2ae339b134cbf460caba08",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-render.mjs",
+      "sha256": "2cb70a673d074da13fc309dc73413bfb6c7c329d5d86430451b2e4e694b375de",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-stream.mjs",
+      "sha256": "be9e94eb8f3c18a38d099d7fa25dfd1adb30ee7862f27fecf3326c553879ae60",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-worker.mjs",
+      "sha256": "60a1051d3065554290ccb26158025cb09cbcb005dd9a8cc31ea09c4f7202fab8",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/wsola.mjs",
+      "sha256": "3d1774a0f62ddcb2348d262d4d168c2068765f445323353cc69fc699a47b8670",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/aiff-pcm.mjs",
+      "sha256": "4111544026cd097b775f78634e641ffde43c15baf4fb970e0fc69ff15363a64b",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/local-decode.mjs",
+      "sha256": "dcbae71f0ac5b62dee1c15ea0b04093efbd23a5e099eb6e8e9f3c01f4a190cac",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/warp-wav-export.mjs",
+      "sha256": "4acd9bcaf1520f2981b0a164c5d7c45831ffe82c389531e7f7904d7864e5a819",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wav-export.mjs",
+      "sha256": "994287f167a3e71aaf6b6de98524e5aabb07ab3c6bf4a51aad3dbd48f94a7c21",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wav-info.mjs",
+      "sha256": "f75846c51494e6b6d893f22bdd08c0f3226652aa04a62a446a72df3b1a022056",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wav-stream.mjs",
+      "sha256": "ba51a46a4b94fb108770a6ebba31aea4cddf78807a909fb80dadd9067688b508",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wma-client.mjs",
+      "sha256": "c163cc6a15de73adedd1c5fcc0155bd32abe9e879e6d1ed55419fa924991cf2e",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wma-worker.mjs",
+      "sha256": "5d5e3869c83ea56750906d1fb8bd0d6cc0d7d0e97ec5aac6a504e3b53548a84f",
+      "text": true
+    },
+    {
+      "path": "audio-lab/meter-timeline.mjs",
+      "sha256": "06eab216b50ba8523ebbcabcfed1f8e17359b630c5ea46d23db3639c2dbdc905",
+      "text": true
+    },
+    {
+      "path": "audio-lab/project/edit-history.mjs",
+      "sha256": "bc21a3a44958b70d148a29f5e265f2101089cafd391f88c17a828dea3b061616",
+      "text": true
+    },
+    {
+      "path": "audio-lab/tempo-warp-core.mjs",
+      "sha256": "a0ce3eb4534c4278b13a33078696fbee8cb8b9b9def53ba00d055d1202624846",
+      "text": true
+    },
+    {
+      "path": "audio-lab/transport/original-player.mjs",
+      "sha256": "fbbaf505fb773b92339787e3243861139e5fccabd15f6e4269b24b5f739046a2",
+      "text": true
+    },
+    {
+      "path": "audio-lab/transport/renax-click-presets.mjs",
+      "sha256": "f521988ac5db4059de1e1785a6617d47ffe58d250c03f1169062e3c17c14c83c",
+      "text": true
+    },
+    {
+      "path": "audio-lab/transport/warp-click.mjs",
+      "sha256": "8066d4243425b78babda6bf8409103603113c1a34bffa6f5c9e2bdc4c0e425d2",
+      "text": true
+    },
+    {
+      "path": "audio-lab/transport/warp-player.mjs",
+      "sha256": "7487bf37b4825d17707025284d74fa3f66d731795e22a586d919baaa1a46f11b",
+      "text": true
+    },
+    {
+      "path": "audio-lab/transport/warp-session.mjs",
+      "sha256": "e8e9e291de108b4c0e6e2987ea698943e7e2db1268d8c6fd3b1f34edcece4f30",
+      "text": true
+    },
+    {
+      "path": "audio-lab/ui/audio-lab.css",
+      "sha256": "1bf72055ad0caa4731acbeea77915c65f6989be4d74973b140ae8ffb47f3491a",
+      "text": true
+    },
+    {
+      "path": "audio-lab/ui/audio-lab.mjs",
+      "sha256": "0a36c81bd26f9c7a2c373386f458533fb706180ed9531b4f06d0084eb03aef4e",
+      "text": true
+    },
+    {
+      "path": "audio-lab/warp/warp-timeline.mjs",
+      "sha256": "da777ceab427119d5621a602f8acf108cfc345f6dddd4f774632ce6f77c511a5",
+      "text": true
+    },
+    {
+      "path": "audio-lab/waveform/peak-client.mjs",
+      "sha256": "2c3598f6d17b61c6b05808e4f83ccf2ec648c30d75a89f75ae34aa92614298ab",
+      "text": true
+    },
+    {
+      "path": "audio-lab/waveform/peak-worker.mjs",
+      "sha256": "bcfcddf2824fa31eed4d82b544138aa5cbca42e12615ddf8e3bfd8331e542630",
+      "text": true
+    },
+    {
+      "path": "audio-lab/waveform/peaks.mjs",
+      "sha256": "89970803e45fa23fcd8c2ccedc189a1f786c71c24525427d883375c259eca33d",
       "text": true
     },
     {
@@ -284,7 +439,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "15d6f8c78aeb854e73483786d7e1cdc8f520de0588fe8febc590cb6e8c368498",
+      "sha256": "eff7a2984757c7132665a37e7cd87a96ac00efffd56542fa35efba16a32eaa20",
       "text": true
     },
     {
@@ -354,7 +509,7 @@
     },
     {
       "path": "mobile-landscape.css",
-      "sha256": "0bc777f4f75896ece7abe30542f48c0637f2366a2f736e627fc55b7f3f35c53c",
+      "sha256": "667fbc95f82dc50a5bf82978809fa22e0d910f225c04a7833f90788349bca3e3",
       "text": true
     },
     {
@@ -444,7 +599,7 @@
     },
     {
       "path": "poly-layout.css",
-      "sha256": "994b2aa3d0c3b2a7a07ffd665d677507c7062b9af0b08a3a338ea3c6de9daa48",
+      "sha256": "0d5a007f4366d51f284d99f9bea8b5736d2c9e839d1ded09d86b8a4b01793959",
       "text": true
     },
     {
@@ -459,7 +614,7 @@
     },
     {
       "path": "renax-pulse-ivory.css",
-      "sha256": "c3542282ee0eedaaf50f262a3ef52a35f85c4b7969e497474fdb7bd01d6357a7",
+      "sha256": "40bae8bf17238ba443cb78695c01df0b12db5cae71711e332584840b6041c94d",
       "text": true
     },
     {
@@ -608,13 +763,23 @@
       "text": true
     },
     {
+      "path": "vendor/wma/decode-wma.js",
+      "sha256": "30f18749335d52776d813299fc1bd22ae9b15b28942a390c97557db7ddf278a0",
+      "text": true
+    },
+    {
+      "path": "vendor/wma/src/wma.wasm.js",
+      "sha256": "5a51d90a6ab3274ead7d8bce3912828d3b1dba1790c5b08b31321b0f86bd1b80",
+      "text": true
+    },
+    {
       "path": "workspace-layout.css",
-      "sha256": "312689549f5ac7113d644178277184f5581e731907fc5eb4b29f00d6bb56ffbd",
+      "sha256": "1615be38e9ab0d19c36be01e3201a87a818bfbee707415f0e4186266c4543424",
       "text": true
     },
     {
       "path": "workspace-layout.js",
-      "sha256": "94c5d56db48fb777d03e6948b729d9b284dbbc9d310051dc32e1858cfc293888",
+      "sha256": "3807bde57a792740f3eead34669fcfc03ebc848a07ffa7c99207be1115c234f5",
       "text": true
     }
   ]

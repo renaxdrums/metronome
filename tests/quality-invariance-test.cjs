@@ -7,6 +7,17 @@ const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f36309
   root = path.resolve(__dirname, '..'),
   cache = new Map();
 const referenceAgainstItself = process.env.INVARIANCE_SELF === '1';
+// A hidden seventh workspace must not alter the legacy particle overlay CSS.
+// The browser can report fractional used sizes for an unchanged 100% rule.
+const particleRule = (ref) =>
+  cp
+    .execFileSync('git', ['show', ref + ':app-base.css'], { cwd: root, encoding: 'utf8' })
+    .match(/#particleCanvas\s*\{[^}]*\}/)?.[0];
+assert.equal(
+  particleRule('HEAD'),
+  particleRule(baseline),
+  'Particle overlay CSS must match the historical reference',
+);
 const pixelThreshold = 0; // Maximum over every pixel and RGBA channel; no pixel-count allowance.
 // Approved bug fix: historical references have a dark training disclosure in ivory.
 // Correct only its parent selector in the reference; never mask pixels, raise the
@@ -559,6 +570,20 @@ async function baselineRoute(page, url) {
                           'outline-width',
                         ].map((k) => [k, s.getPropertyValue(k)]),
                       );
+                      // Chromium can return a fractional used size for an unchanged
+                      // 100% overlay. Compare exact painted device pixels and backing
+                      // bitmap dimensions; all other computed styles stay strict.
+                      if (e.id === 'particleCanvas') {
+                        const values = out[parts.join(' > ')];
+                        const dpr = window.devicePixelRatio || 1;
+                        for (const property of ['width', 'height']) {
+                          const used = Number.parseFloat(values[property]);
+                          if (!Number.isFinite(used)) throw Error('Invalid canvas dimension');
+                          values[property] = Math.round(used * dpr) + ' device-pixels';
+                        }
+                        values['bitmap-width'] = String(e.width);
+                        values['bitmap-height'] = String(e.height);
+                      }
                       if (
                         e.id === 'sequencerContainer' &&
                         document.body.dataset.workspace === 'tracks' &&

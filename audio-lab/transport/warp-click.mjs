@@ -51,28 +51,53 @@ export function createWarpClickPlan(options) {
   return Object.freeze({events:Object.freeze(events),mode,subdivisions});
 }
 
+/** Play the unchanged RENAX sample metadata on the exact shared audio clock.
+ * Either an AudioBuffer or a validated sample descriptor is accepted.
+ */
+function inspectClickSample(value) {
+  const buffer=value?.buffer ?? value;
+  if (!buffer || !Number.isFinite(buffer.duration) || buffer.duration<=0)
+    throw new TypeError('invalid RENAX click sample');
+  if (buffer===value) return {buffer,offset:0,duration:buffer.duration,volume:1,rate:1,plain:true};
+  const {offset=0,duration=buffer.duration-offset,volume=1,rate=1}=value;
+  if (![offset,duration,volume,rate].every(Number.isFinite)||
+      offset<0||duration<=0||offset+duration>buffer.duration+1e-8||
+      volume<0||volume>128||rate<=0||rate>4)
+    throw new RangeError('invalid RENAX click sample descriptor');
+  return {buffer,offset,duration,volume,rate,plain:false};
+}
+
 /** Schedule a non-overlapping window with a single AudioContext shared by Warp audio. */
 export function scheduleWarpClickRange({context,clickSamples,destination,plan,sessionStartAudioTime,
     fromSeconds=0,toSeconds=Infinity,gain=1}){
   if(!context||typeof context.createBufferSource!=='function'||
+    typeof context.createGain!=='function'||
     !Array.isArray(clickSamples)||clickSamples.length!==3||
-    !clickSamples.every(b=>b&&Number.isFinite(b.duration)&&b.duration>0)||
     !Array.isArray(plan?.events)||!Number.isFinite(sessionStartAudioTime)||
     !Number.isFinite(fromSeconds)||fromSeconds<0||!(toSeconds>fromSeconds)||
     !Number.isFinite(gain)||gain<0||gain>2)
     throw new TypeError('invalid click-scheduler arguments');
+  const samples=clickSamples.map(inspectClickSample);
   const nodes=[];
   for(const event of plan.events){
     if(event.seconds<fromSeconds)continue;
     if(event.seconds>=toSeconds)break;
     const when=sessionStartAudioTime+event.seconds;
     if(when<context.currentTime)continue;
+    const sample=samples[event.accent];
+    if(!sample)throw new RangeError('click accent outside supported range');
     const source=context.createBufferSource(),level=context.createGain();
-    source.buffer=clickSamples[event.accent];
-    level.gain.value=gain;
+    source.buffer=sample.buffer;
+    if(sample.rate!==1){
+      if(typeof source.playbackRate?.setValueAtTime==='function')
+        source.playbackRate.setValueAtTime(sample.rate,when);
+      else source.playbackRate.value=sample.rate;
+    }
+    level.gain.value=gain*sample.volume;
     source.connect(level);level.connect(destination||context.destination);
     source.onended=()=>{source.disconnect();level.disconnect();};
-    source.start(when);
+    if(sample.plain)source.start(when);
+    else source.start(when,sample.offset,sample.duration);
     nodes.push(source);
   }
   return nodes;

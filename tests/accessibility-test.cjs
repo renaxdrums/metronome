@@ -13,6 +13,7 @@ const {start,save,newTrack}=require('./audio-harness.cjs');
   if(!settled)console.log('Animation settling bounded',JSON.stringify(meta));
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();engine=result.testEngine;
   runs.push({...meta,violations:result.violations,incomplete:result.incomplete});
+  if(result.violations.length)console.warn('A11Y DETAILS '+JSON.stringify({meta,violations:result.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,html:n.html?.slice(0,180),reason:n.failureSummary?.slice(0,240)})).slice(0,8)}))}));
   console.log('AUDIT accessibility '+meta.width+' '+meta.theme+' '+meta.module+' '+result.violations.map(v=>v.id+':'+v.nodes.length).join(', '));
  }
  for(const [width,height]of [[1440,1000],[390,844]]){

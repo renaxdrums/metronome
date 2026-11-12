@@ -79,12 +79,23 @@ body.poly-mode .rhythm-score { overflow: hidden; }
 /* The main poly beat has a real 24px hit target in portrait. */
 @media (max-width:1100px) and (min-height:600px){
   body.poly-mode .poly-dot:not(.poly-subdivision){width:24px;height:24px}
+  /* Avoid a subpixel overlap between the first outer and inner beat targets. */
+  body.poly-mode .poly-dot.inner:not(.poly-subdivision){
+    --poly-radius:calc(var(--poly-lane-radius) - 2px);
+  }
+  /* In Ivory, the absolute score toolbar obscures the first inner beat. */
+  html[data-theme=ivory] body.poly-mode .sequencer-wrapper{
+    --ivory-dial-tools-position:relative;
+    --ivory-dial-tools-inset:auto;
+    --ivory-dial-clearance:44px;
+  }
 }
 
 /* Compact Polyrythmie needs at least an 80px dial; a later max-width
  * otherwise clamps the 80px layout target to 69px at 844x390. */
 @media (min-width:600px) and (max-width:1100px) and (max-height:500px){
   html#renaxApp body.poly-mode .panel-visu:not(.score-view) .sequencer-wrapper #sequencerContainer{
+    --poly-landscape-min-size:80px;
     min-width:80px;
     max-width:none;
   }

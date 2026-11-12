@@ -511,7 +511,7 @@ html#renaxApp[data-theme=ivory] .panel-visu:not(.score-view) #sequencerContainer
  order:1!important;position:relative!important;inset:auto!important;
  flex:0 0 auto!important;box-sizing:border-box!important;
  width:max(0px,min(calc(100cqw - 24px),calc(100cqh - var(--ivory-dial-clearance,72px)),var(--seq-size)))!important;
- height:auto!important;min-width:0!important;min-height:0!important;
+ height:auto!important;min-width:var(--poly-landscape-min-size,0px)!important;min-height:0!important;
  max-width:100%!important;max-height:none!important;aspect-ratio:1!important;
  margin:auto!important;align-self:center!important;
 }

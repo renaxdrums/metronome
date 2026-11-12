@@ -113,11 +113,23 @@ async function baselineRoute(page, url) {
     }
     if (file === 'index.html') {
       const original = body.toString();
-      body = Buffer.from(
-        original
-          .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
-          .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>'),
-      );
+      // Approved seventh workspace: reference the exact new tab and hidden
+      // panel. Other historical UI and the strict pixel/style gates remain.
+      const current = cp.execFileSync('git', ['show', 'HEAD:index.html'], {
+        cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+      });
+      const tab = current.match(/<button type="button" data-workspace="audio-lab"[\s\S]*?<\/button>/)?.[0];
+      const editor = current.match(/  <!-- Audio Lab occupies[\s\S]*?<\/section>\s*/)?.[0];
+      assert(tab && editor, 'Approved Audio Lab markup missing');
+      assert(!original.includes('data-workspace="audio-lab"'), 'Unexpected seventh tab in historical reference');
+      assert(original.includes('</nav>\n  <div class="main-grid"'), 'Historical navigation anchor missing');
+      assert(original.includes('  <div class="index2-settings-backdrop"'), 'Historical settings anchor missing');
+      body = Buffer.from(original
+        .replace('</nav>\n  <div class="main-grid"', tab + '</nav>\n  <div class="main-grid"')
+        .replace('  <div class="index2-settings-backdrop"', editor + '  <div class="index2-settings-backdrop"')
+        .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
+        .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>'));
+      correctedReferenceFiles.add('index.html:approved-audio-lab-structure');
     }
     if (file === 'app-base.css' && !body.toString().includes('.brand-mobile')) {
       body = Buffer.from(body.toString() + mobileBrandCSS);

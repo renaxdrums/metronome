@@ -259,7 +259,7 @@ async function loadFile(file){
     const identity=imported.identity;
     const sourceRate=identity.sourceSampleRate||identity.sampleRate;
     const sourceBits=identity.sourceBitDepth?identity.sourceBitDepth+' bits · ':'';
-    $('alFormatInfo').textContent=imported.format.toUpperCase()+' · '+sourceBits+(sourceRate/1000).toLocaleString('fr-BE',{maximumFractionDigits:1})+' kHz · '+identity.channels+' canal'+(identity.channels>1?'aux':'');
+    $('alFormatInfo').textContent=imported.format.toUpperCase()+' · '+sourceBits+(sourceRate/1000).toLocaleString('fr-BE',{maximumFractionDigits:1})+' kHz · '+identity.channels+(identity.channels>1?' canaux':' canal');
     $('alEditorHint').textContent='Original · '+formatTime(identity.durationSeconds)+' · marqueurs modifiables';
     setStatus('Import local prêt. Lecture originale et repères manuels disponibles.');
     paint();

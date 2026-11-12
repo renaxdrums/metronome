@@ -1,5 +1,6 @@
 import { inspectWavPcm } from './wav-info.mjs';
 import { inspectAiffPcm, decodeAiffPcm } from './aiff-pcm.mjs';
+import { decodeWmaInWorker } from './wma-client.mjs';
 
 /**
  * Audio Lab local import: no upload, no writes to the original file.
@@ -92,7 +93,7 @@ export async function readLocalAudioBytes(file, options = {}) {
  */
 export async function decodeLocalAudio(file, options = {}) {
   const { createContext = () => new AudioContext(), maxDecodedBytes = 768 * 1024 * 1024,
-    signal, onProgress = () => {} } = options;
+    signal, onProgress = () => {}, wmaWorkerFactory } = options;
   if (!Number.isSafeInteger(maxDecodedBytes) || maxDecodedBytes <= 0)
     throw new RangeError('maxDecodedBytes must be a positive safe integer');
   const { bytes, format } = await readLocalAudioBytes(file, {
@@ -109,9 +110,18 @@ export async function decodeLocalAudio(file, options = {}) {
   try {
     context = createContext();
     onProgress({ phase: 'decode', loaded: 0, total: 1 });
-    const buffer = format === 'aiff' ?
-      decodeAiffPcm(new Uint8Array(bytes), context, { maxDecodedBytes, signal }).buffer :
-      await context.decodeAudioData(bytes);
+    let buffer;
+    if (format === 'aiff') {
+      buffer = decodeAiffPcm(new Uint8Array(bytes), context, { maxDecodedBytes, signal }).buffer;
+    } else if (format === 'wma') {
+      const args = { bytes: new Uint8Array(bytes), signal, maxDecodedBytes,
+        onProgress: fraction => onProgress({ phase: 'decode', loaded: fraction, total: 1 }) };
+      if (wmaWorkerFactory) args.workerFactory = wmaWorkerFactory;
+      const pcm = await decodeWmaInWorker(args);
+      aborted(signal);
+      buffer = context.createBuffer(pcm.channels.length, pcm.channels[0].length, pcm.sampleRate);
+      for (let i = 0; i < pcm.channels.length; i++) buffer.copyToChannel(pcm.channels[i], i);
+    } else buffer = await context.decodeAudioData(bytes);
     aborted(signal);
     if (!buffer || !Number.isFinite(buffer.duration) || buffer.duration <= 0 ||
         !Number.isSafeInteger(buffer.length) || buffer.length <= 0 ||

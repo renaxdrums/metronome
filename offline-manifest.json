@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "4562d3fe626f8f10",
+  "revision": "891daeca90a95af8",
   "resources": [
     {
       "path": "accessibility.css",
@@ -128,6 +128,16 @@
       "text": true
     },
     {
+      "path": "audio-lab/dsp/warp-chunk-client.mjs",
+      "sha256": "21cd369ec4e6e99325a2131d171dfd55f68030df7204054da60c918537321cc2",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-chunk-worker.mjs",
+      "sha256": "508f01599f540acd681fab836d69d4e5925d0344350d89b4c40d5d8c3d0c02b4",
+      "text": true
+    },
+    {
       "path": "audio-lab/dsp/warp-client.mjs",
       "sha256": "4ff3ac6bbf5836067d0edc646509780a6242f6d18f2ae339b134cbf460caba08",
       "text": true
@@ -135,6 +145,11 @@
     {
       "path": "audio-lab/dsp/warp-render.mjs",
       "sha256": "2cb70a673d074da13fc309dc73413bfb6c7c329d5d86430451b2e4e694b375de",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-stream.mjs",
+      "sha256": "be9e94eb8f3c18a38d099d7fa25dfd1adb30ee7862f27fecf3326c553879ae60",
       "text": true
     },
     {
@@ -154,7 +169,12 @@
     },
     {
       "path": "audio-lab/io/local-decode.mjs",
-      "sha256": "49769fc052544799fcd4ec3fc58c8f720644d3a487fcba1a6c930e500d6f1e52",
+      "sha256": "dcbae71f0ac5b62dee1c15ea0b04093efbd23a5e099eb6e8e9f3c01f4a190cac",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/warp-wav-export.mjs",
+      "sha256": "4acd9bcaf1520f2981b0a164c5d7c45831ffe82c389531e7f7904d7864e5a819",
       "text": true
     },
     {
@@ -165,6 +185,21 @@
     {
       "path": "audio-lab/io/wav-info.mjs",
       "sha256": "f75846c51494e6b6d893f22bdd08c0f3226652aa04a62a446a72df3b1a022056",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wav-stream.mjs",
+      "sha256": "ba51a46a4b94fb108770a6ebba31aea4cddf78807a909fb80dadd9067688b508",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wma-client.mjs",
+      "sha256": "c163cc6a15de73adedd1c5fcc0155bd32abe9e879e6d1ed55419fa924991cf2e",
+      "text": true
+    },
+    {
+      "path": "audio-lab/io/wma-worker.mjs",
+      "sha256": "5d5e3869c83ea56750906d1fb8bd0d6cc0d7d0e97ec5aac6a504e3b53548a84f",
       "text": true
     },
     {
@@ -214,7 +249,7 @@
     },
     {
       "path": "audio-lab/ui/audio-lab.mjs",
-      "sha256": "f85d3272b5f197849e6d88cb0336601e4b7b4b674ae994f7319065b36e813bea",
+      "sha256": "0a36c81bd26f9c7a2c373386f458533fb706180ed9531b4f06d0084eb03aef4e",
       "text": true
     },
     {
@@ -404,7 +439,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "c8a40662cbc555f345d9d859b4dc31676910035e7699fe9e8240a75be6fc691f",
+      "sha256": "ef81f2336fd18a416ab56a30aa74c725999c76124759d513a00b58014a5c4753",
       "text": true
     },
     {
@@ -474,7 +509,7 @@
     },
     {
       "path": "mobile-landscape.css",
-      "sha256": "5f8f37609f87af6bc98368cbb3110a2c427583b58ee9c664fa1ccb397e934d0f",
+      "sha256": "667fbc95f82dc50a5bf82978809fa22e0d910f225c04a7833f90788349bca3e3",
       "text": true
     },
     {
@@ -725,6 +760,16 @@
     {
       "path": "vendor/web-vitals-6.2.3.js",
       "sha256": "bc5c6069604dc4c9026acc93f3926071ee223ebd69fd6ddfea531bc218ce18b6",
+      "text": true
+    },
+    {
+      "path": "vendor/wma/decode-wma.js",
+      "sha256": "30f18749335d52776d813299fc1bd22ae9b15b28942a390c97557db7ddf278a0",
+      "text": true
+    },
+    {
+      "path": "vendor/wma/src/wma.wasm.js",
+      "sha256": "5a51d90a6ab3274ead7d8bce3912828d3b1dba1790c5b08b31321b0f86bd1b80",
       "text": true
     },
     {

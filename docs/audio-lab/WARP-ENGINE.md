@@ -25,6 +25,7 @@ L'interface sombre actuelle est validée uniquement comme interface de test. Ne 
 - Mathématiques : source↔ticks↔sortie inversibles, changements de tempo, pas de trou ni inversion.
 - DSP : 440 Hz stable au ralentissement ×3, stéréo, transitoires synthétiques, pics, mémoire, annulation.
 - Transport : AudioContext commun, zéro dédoublement de clic sur fenêtre, seek, boucle, arrêt, fins naturelles, départs async obsolètes.
+- Test de dérive mathématique : simulation de 30 minutes / 3 000 clics sur l'horloge AudioContext sans erreur cumulative ; ce n'est PAS une mesure sur appareil réel.
 - Clics RENAX : fichiers originaux locaux, offset, état, accent, premier temps, métadonnées, abandon.
 - Intégration : PCM source immuable, rendu Worker, AudioBuffer, transport et clic.
 - Non-régression : ancienne UI, sept onglets, dimensions du cercle, WCAG, production et cache hors ligne.

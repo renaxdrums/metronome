@@ -36,6 +36,7 @@
     "tests/audio-lab-warp-click-test.mjs",
     "tests/audio-lab-renax-bank-test.mjs",
     "tests/audio-lab-warp-player-test.mjs",
+    "tests/audio-lab-warp-clock-drift-test.mjs",
     "tests/audio-lab-warp-session-test.mjs",
     "tests/audio-lab-edit-history-test.mjs",
     "tests/audio-lab-wav-export-test.mjs",

@@ -100,14 +100,14 @@
     flex-basis: 26px !important;
   }
   html#renaxApp[data-theme=ivory] body[data-workspace] .panel-visu:not(.score-view) #sequencerContainer {
-    width: max(0px, min(calc(100cqw - 24px), calc(100cqh - 44px), var(--seq-size))) !important;
+    width: max(var(--poly-landscape-min-size, 0px), min(calc(100cqw - 24px), calc(100cqh - 44px), var(--seq-size))) !important;
   }
 }
 
-/* Seven workspaces must not shrink the approved poly circle below 80px in phone landscape. */
+/* Polyrythmie keeps at least an 80px dial in compact phone landscape without increasing the importance budget. */
 @media (orientation:landscape) and (pointer:coarse) and (max-width:1100px) and (max-height:600px){
  html#renaxApp[data-theme] body[data-workspace=polyrhythm] .panel-visu:not(.score-view) #sequencerContainer{
-   width:max(80px,min(100%,calc(100cqh - 4px)))!important;
-   min-width:80px;
+   --poly-caption-space:-6px;
+   --poly-landscape-min-size:80px;
  }
 }

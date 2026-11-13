@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "647a258511c379d2",
+  "revision": "8440f7c1f4f5a3b3",
   "resources": [
     {
       "path": "accessibility.css",
@@ -254,7 +254,7 @@
     },
     {
       "path": "audio-lab/ui/audio-lab.css",
-      "sha256": "c6938c972369e01f6d18a52de78a51ddc28fc1cfa9dec514c13c785783746d3f",
+      "sha256": "9a60a3c74f95e1e7cd2661ff39c9a206e46fb51cf4b7773fb2b53d3a425ea963",
       "text": true
     },
     {
@@ -449,7 +449,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "cd36dd15084133ef6ff8180c82c33481801af9c48e3c4311a1419baa817edd8b",
+      "sha256": "e91b99a0b05e0899b76399fda7978210a845cb42a6e10a825177676853112193",
       "text": true
     },
     {

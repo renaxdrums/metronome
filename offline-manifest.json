@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "372e97b48b57b301",
+  "revision": "bb77954b17cb3542",
   "resources": [
     {
       "path": "accessibility.css",
@@ -449,7 +449,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "daa25c85c778268c44928d15c21847fcc839d765284fd5fb9a4c1fb7b8415b97",
+      "sha256": "729c4e260fda4cc6d289f6bf698fd03692bcd03e292756fae987254b4dac3820",
       "text": true
     },
     {
@@ -784,7 +784,7 @@
     },
     {
       "path": "workspace-layout.css",
-      "sha256": "3544646aefc813c64af59ef9d201a4442c0dd26f93aa01e8bc40a9683300c244",
+      "sha256": "ccd19e24d85830a7f1e14ac18c0dac0b9626b9907ccf938645cd312433a7f756",
       "text": true
     },
     {

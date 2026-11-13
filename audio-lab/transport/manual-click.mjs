@@ -77,9 +77,17 @@ export class ManualClick {
     for(let i=begin;i<=end && events.length<256;i++){
       const pos=i%this.numerator;
       const when=origin+i*unit;
-      const sourceSeconds=this.downbeat+i*unit;
+      const rawSourceSeconds=p.startedOffset+(when-p.startedAt);
+      const loop=p.loop;
+      const sourceSeconds=loop && rawSourceSeconds>=loop.end
+        ? loop.start+((rawSourceSeconds-loop.start)%(loop.end-loop.start))
+        : rawSourceSeconds;
       if(sourceSeconds>=p.buffer.duration || sourceSeconds<0)continue;
-      events.push({seconds:when,accent:pos===0?2:groupStarts.has(pos)?1:0});
+      // Accent follows the looped source timeline, not the ever-increasing clock.
+      const beatIndex=Math.round((sourceSeconds-this.downbeat)/unit);
+      if(Math.abs(sourceSeconds-(this.downbeat+beatIndex*unit))>0.008)continue;
+      const beatPosition=((beatIndex%this.numerator)+this.numerator)%this.numerator;
+      events.push({seconds:when,accent:beatPosition===0?2:groupStarts.has(beatPosition)?1:0});
     }
     if(events.length){
       const nodes=scheduleWarpClickRange({

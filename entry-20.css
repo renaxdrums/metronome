@@ -34,7 +34,7 @@
     gap:7px!important;
     font-size:11px!important;
     white-space:nowrap;
-    scroll-snap-align:nearest;
+    scroll-snap-align:start;
   }
   html#renaxApp body[data-workspace] #workspaceNav svg {
     width:16px!important;

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "bb77954b17cb3542",
+  "revision": "c7cdd9471d985a52",
   "resources": [
     {
       "path": "accessibility.css",
@@ -449,7 +449,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "729c4e260fda4cc6d289f6bf698fd03692bcd03e292756fae987254b4dac3820",
+      "sha256": "71e77d295a8e0df5b6c3e78fef7a5e23a81390c20653e842436d9f36fe1a3134",
       "text": true
     },
     {
@@ -519,7 +519,7 @@
     },
     {
       "path": "mobile-landscape.css",
-      "sha256": "667fbc95f82dc50a5bf82978809fa22e0d910f225c04a7833f90788349bca3e3",
+      "sha256": "bfaf1803cd85bd52ffb577a407dd2d6d1599a3b1b40dc61f8a3692da4c204f6b",
       "text": true
     },
     {
@@ -784,7 +784,7 @@
     },
     {
       "path": "workspace-layout.css",
-      "sha256": "ccd19e24d85830a7f1e14ac18c0dac0b9626b9907ccf938645cd312433a7f756",
+      "sha256": "2c9dde6369ea065bb7c26acd67d31b630962fa157b7d1082c7d3b0dd06a156c9",
       "text": true
     },
     {

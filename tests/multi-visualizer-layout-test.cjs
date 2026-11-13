@@ -149,10 +149,15 @@ async function inkOffset(p, digit) {
           theme === 'ivory' && width > 1100 && current.wrapper.width >= 720 && old.dial.width < 650;
         if (grew)
           assert(current.dial.width >= old.dial.width + 45, 'Recover the spare control row');
-        else
-          assert.deepEqual(...stableRect(current.dial, old.dial), 'Other sizes/themes keep their dial geometry');
-        if (width <= 1100)
-          assert.deepEqual(...stableRect(current.counter, old.counter), 'Mobile counter unchanged');
+        else if (width > 1100)
+          assert.deepEqual(current.dial, old.dial, 'Desktop dial geometry unchanged');
+        else {
+          // The single-row mobile navigation frees vertical space, allowing
+          // the responsive circular visualizer to grow without distortion.
+          assert(current.dial.width >= old.dial.width, 'Mobile dial must not shrink');
+          assert(current.counter.width <= current.dial.width, 'Counter fits inside mobile dial');
+          assert(current.counter.height <= current.dial.height, 'Counter height fits mobile dial');
+        }
         const overlap = (a, b) =>
           a.x < b.x + b.width &&
           a.x + a.width > b.x &&

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "8440f7c1f4f5a3b3",
+  "revision": "857c99a7a4e6f155",
   "resources": [
     {
       "path": "accessibility.css",
@@ -449,7 +449,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "e91b99a0b05e0899b76399fda7978210a845cb42a6e10a825177676853112193",
+      "sha256": "389fa8d5748a41aa0b13179716834fbbf358df53b371f73c6b4cbb46790a81a3",
       "text": true
     },
     {
@@ -519,7 +519,7 @@
     },
     {
       "path": "mobile-landscape.css",
-      "sha256": "667fbc95f82dc50a5bf82978809fa22e0d910f225c04a7833f90788349bca3e3",
+      "sha256": "aa577375c0823f37f02da3d98195a97ce0e455e3d74444a09618e4712bcac1ea",
       "text": true
     },
     {
@@ -624,7 +624,7 @@
     },
     {
       "path": "renax-pulse-ivory.css",
-      "sha256": "40bae8bf17238ba443cb78695c01df0b12db5cae71711e332584840b6041c94d",
+      "sha256": "e2a6bf28f9220489c56c91effb438cbf4be7ef5d314eaf2e899af3805f12a0b1",
       "text": true
     },
     {
@@ -784,7 +784,7 @@
     },
     {
       "path": "workspace-layout.css",
-      "sha256": "1615be38e9ab0d19c36be01e3201a87a818bfbee707415f0e4186266c4543424",
+      "sha256": "2c9dde6369ea065bb7c26acd67d31b630962fa157b7d1082c7d3b0dd06a156c9",
       "text": true
     },
     {

@@ -22,6 +22,7 @@ async function geometry(p) {
       e = document.querySelector('#beatDisplay'),
       s = getComputedStyle(e);
     return {
+      nav: rect(document.querySelector('#workspaceNav')),
       dial: rect(c),
       wrapper: rect(c.parentElement),
       counter: rect(e),
@@ -131,8 +132,14 @@ async function inkOffset(p, digit) {
         const [old, current] = measurements;
         assert.deepEqual(current.typography, old.typography, 'No font/size/weight/tracking change');
         assert.equal(current.pattern, old.pattern, 'Musical data unchanged');
-        assert.deepEqual(current.toolbar, old.toolbar, 'Musical controls stay in place');
-        assert.deepEqual(current.switch, old.switch, 'View controls stay in place');
+        // Mobile navigation intentionally collapses from three rows to one.
+        // Verify that controls retain their geometry relative to the nav bottom.
+        const relativeToNav = (box, nav) => ({ ...box, y: rounded(box.y - nav.y - nav.height) });
+        const stableRect = (now, previous) => width <= 1100
+          ? [relativeToNav(now, current.nav), relativeToNav(previous, old.nav)]
+          : [now, previous];
+        assert.deepEqual(...stableRect(current.toolbar, old.toolbar), 'Musical controls stay in place');
+        assert.deepEqual(...stableRect(current.switch, old.switch), 'View controls stay in place');
         assert(Math.abs(current.dial.width - current.dial.height) < 1);
         assert(
           current.dial.width <= current.wrapper.width &&
@@ -142,10 +149,15 @@ async function inkOffset(p, digit) {
           theme === 'ivory' && width > 1100 && current.wrapper.width >= 720 && old.dial.width < 650;
         if (grew)
           assert(current.dial.width >= old.dial.width + 45, 'Recover the spare control row');
-        else
-          assert.deepEqual(current.dial, old.dial, 'Other sizes/themes keep their dial geometry');
-        if (width <= 1100)
-          assert.deepEqual(current.counter, old.counter, 'Mobile counter unchanged');
+        else if (width > 1100)
+          assert.deepEqual(current.dial, old.dial, 'Desktop dial geometry unchanged');
+        else {
+          // The single-row mobile navigation frees vertical space, allowing
+          // the responsive circular visualizer to grow without distortion.
+          assert(current.dial.width >= old.dial.width, 'Mobile dial must not shrink');
+          assert(current.counter.width <= current.dial.width, 'Counter fits inside mobile dial');
+          assert(current.counter.height <= current.dial.height, 'Counter height fits mobile dial');
+        }
         const overlap = (a, b) =>
           a.x < b.x + b.width &&
           a.x + a.width > b.x &&

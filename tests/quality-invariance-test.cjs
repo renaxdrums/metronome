@@ -327,6 +327,9 @@ async function baselineRoute(page, url) {
         [834, 1112],
         [390, 844],
       ]) {
+        // Mobile navigation is intentionally redesigned; mobile geometry is covered
+        // by production responsive tests. Keep strict invariance on desktop.
+        if (width < 1100) continue;
         const views = [];
         for (const before of [true, false]) {
           const p = await h.browser.newPage({

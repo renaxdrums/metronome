@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "4e3d3dc04476bf1e",
+  "revision": "8440f7c1f4f5a3b3",
   "resources": [
     {
       "path": "accessibility.css",
@@ -123,6 +123,11 @@
       "text": true
     },
     {
+      "path": "audio-lab/analysis/tempo-hypotheses.mjs",
+      "sha256": "3f56d27e7d57053e9bb2b0d9729d136d8af3fe809a756832f5d960e6268a7ad6",
+      "text": true
+    },
+    {
       "path": "audio-lab/dsp/transients.mjs",
       "sha256": "8a0268a223a763264b5ef968731b33e3506c77d1dfb726a6ab47b4ead03b65f8",
       "text": true
@@ -218,6 +223,11 @@
       "text": true
     },
     {
+      "path": "audio-lab/transport/manual-click.mjs",
+      "sha256": "0380ac7ccd96f7c27f1ba890357c740488958c03aebcf0d677c9751bdce24409",
+      "text": true
+    },
+    {
       "path": "audio-lab/transport/original-player.mjs",
       "sha256": "fbbaf505fb773b92339787e3243861139e5fccabd15f6e4269b24b5f739046a2",
       "text": true
@@ -244,12 +254,12 @@
     },
     {
       "path": "audio-lab/ui/audio-lab.css",
-      "sha256": "1bf72055ad0caa4731acbeea77915c65f6989be4d74973b140ae8ffb47f3491a",
+      "sha256": "9a60a3c74f95e1e7cd2661ff39c9a206e46fb51cf4b7773fb2b53d3a425ea963",
       "text": true
     },
     {
       "path": "audio-lab/ui/audio-lab.mjs",
-      "sha256": "0a36c81bd26f9c7a2c373386f458533fb706180ed9531b4f06d0084eb03aef4e",
+      "sha256": "7682e2d7be2719e618dccb02e47a8bd181c679d9b64284ed17e3479e1f913ea4",
       "text": true
     },
     {
@@ -439,7 +449,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "eff7a2984757c7132665a37e7cd87a96ac00efffd56542fa35efba16a32eaa20",
+      "sha256": "e91b99a0b05e0899b76399fda7978210a845cb42a6e10a825177676853112193",
       "text": true
     },
     {

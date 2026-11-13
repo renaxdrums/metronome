@@ -163,3 +163,4 @@ body[data-workspace="audio-lab"] #workspaceMobileViews{display:none!important}
 #audioLabRoot .al-marker[data-kind=tempo]{--marker-color:var(--al-purple)}
 #audioLabRoot .al-marker[data-kind=warp]{--marker-color:var(--al-cyan)}
 #audioLabRoot .al-marker span{color:#151a1d;background:var(--marker-color)}
+

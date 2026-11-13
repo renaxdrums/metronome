@@ -85,7 +85,7 @@
 <link rel="stylesheet" href="tuner-interface.css?v=6d818b206138">
 <link rel="stylesheet" href="poly-layout.css?v=0d5a007f4366">
 <link rel="stylesheet" href="tuner-fit.css?v=595254bcedb6">
-  <link rel="stylesheet" href="audio-lab/ui/audio-lab.css?v=1bf72055ad0c">
+  <link rel="stylesheet" href="audio-lab/ui/audio-lab.css?v=9a60a3c74f95">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -321,9 +321,9 @@
   <!-- Audio Lab occupies the central editor, leaving the historical sequencer untouched. -->
   <section id="audioLabRoot" class="audio-lab" aria-labelledby="alTitle" hidden>
     <div class="al-top">
-      <div class="al-identity"><span class="al-overline"><span class="al-live-dot"></span> RENAX / STUDIO TOOLS <span class="al-separator">/</span> 07</span><h2 id="alTitle">AUDIO <em>LAB</em></h2><span class="al-subtitle">Éditeur de temps musical <span aria-hidden="true">·</span> Source non destructive</span></div>
+      <div class="al-identity"><h2 id="alTitle">AUDIO <em>LAB</em></h2></div>
       <div class="al-file-actions">
-        <div class="al-source-state"><span class="al-label">FICHIER SOURCE</span><strong id="alFileName">Aucun audio importé</strong><span id="alFormatInfo">WAV / MP3 / AIFF · WMA selon navigateur</span></div>
+        <div class="al-source-state"><strong id="alFileName" hidden></strong><span id="alFormatInfo">WAV / MP3 / AIFF · WMA selon navigateur</span></div>
         <button type="button" id="alOpenFile" class="al-primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg>IMPORTER</button>
         <input id="alFileInput" type="file" accept=".wav,.wave,.mp3,.aif,.aiff,.wma,audio/wav,audio/mpeg" hidden aria-label="Choisir un fichier audio local">
       </div>
@@ -363,7 +363,7 @@
     </div>
 
     <div class="al-bottom">
-      <div class="al-transport"><span class="al-transport-title">TRANSPORT</span><button id="alPlay" class="al-play" type="button" disabled aria-label="Lire l'audio original">▶</button><button id="alStop" class="al-stop" type="button" disabled aria-label="Arrêter la lecture">■</button><input id="alSeek" type="range" min="0" max="1000" value="0" step="1" disabled aria-label="Position dans le fichier audio"><span id="alPlaybackState" class="al-playback-state">À L’ARRÊT</span></div>
+      <div class="al-transport"><span class="al-transport-title">TRANSPORT</span><button id="alDetectPulse" type="button" disabled>Détecter pulsation</button><output id="alPulseResult" aria-live="polite"></output><label>Loop <input id="alLoopEnabled" type="checkbox" disabled></label><button id="alLoopA" type="button" disabled>Début A</button><button id="alLoopB" type="button" disabled>Fin B</button><output id="alLoopInfo">—</output><label style="display:inline-flex;align-items:center;gap:6px">Clic <input id="alClickEnabled" type="checkbox"></label><label>BPM <input id="alManualBpm" type="number" min="1" max="500" step="0.1" value="120" style="width:70px"></label><label>Volume audio <input id="alAudioVolume" type="range" min="0" max="1" step=".01" value=".7"></label><label>Volume clic <input id="alClickVolume" type="range" min="0" max="1" step=".01" value=".7"></label><button id="alPlay" class="al-play" type="button" disabled aria-label="Lire l'audio original">▶</button><button id="alStop" class="al-stop" type="button" disabled aria-label="Arrêter la lecture">■</button><input id="alSeek" type="range" min="0" max="1000" value="0" step="1" disabled aria-label="Position dans le fichier audio"><span id="alPlaybackState" class="al-playback-state">À L’ARRÊT</span></div>
       <div class="al-inspector"><span class="al-transport-title">REPÈRE SÉLECTIONNÉ</span><span id="alMarkerInfo">Aucun</span><label for="alMarkerTime">Position (s) <input id="alMarkerTime" type="number" min="0" step="0.001" value="0" disabled></label><button id="alDeleteMarker" type="button" disabled aria-label="Supprimer le repère sélectionné">Supprimer</button></div>
     </div>
     <div class="al-status-bar"><span class="al-status-pulse" aria-hidden="true"></span><output id="alStatus" role="status" aria-live="polite">Prêt. Import local sans transfert de fichier.</output><span class="al-phase">AUDIO LAB / ÉTAPE INTERFACE</span></div>
@@ -661,7 +661,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="interface-language.js?v=291439ae445e"></script>
 <script src="workspace-layout.js?v=3807bde57a79"></script>
 <script type="module" src="musician-tools.mjs?v=c16764a7017b"></script>
-<script type="module" src="audio-lab/ui/audio-lab.mjs?v=0a36c81bd26f"></script>
+<script type="module" src="audio-lab/ui/audio-lab.mjs?v=7682e2d7be27"></script>
 <script src="avant-garde-motion.js?v=502d1d826916"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=798a129a814c"></script>

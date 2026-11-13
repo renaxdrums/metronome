@@ -1,2 +1,44 @@
 /* Extracted from index.html, cascade slot 20. */
 #renaxArrival{display:none!important}
+
+/* Smartphone only: keep workspace tabs on one horizontally swipeable row.
+   Overrides the three-column mobile grid and seven-column landscape layouts. */
+@media (max-width:600px), (pointer:coarse) and (max-width:1100px) and (max-height:600px) {
+  html#renaxApp body[data-workspace] #workspaceNav {
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    grid-template-columns:none!important;
+    justify-content:flex-start!important;
+    align-items:center!important;
+    gap:6px!important;
+    width:100%;
+    min-width:0;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;
+    scrollbar-width:none;
+    padding:5px 2px 7px!important;
+    margin:0!important;
+    touch-action:pan-x pan-y;
+  }
+  html#renaxApp body[data-workspace] #workspaceNav::-webkit-scrollbar {display:none}
+  html#renaxApp body[data-workspace] #workspaceNav button {
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:max-content!important;
+    min-height:44px!important;
+    height:auto!important;
+    padding:7px 12px!important;
+    gap:7px!important;
+    font-size:11px!important;
+    white-space:nowrap;
+    scroll-snap-align:start;
+  }
+  html#renaxApp body[data-workspace] #workspaceNav svg {
+    width:16px!important;
+    height:16px!important;
+    flex:0 0 16px!important;
+  }
+}

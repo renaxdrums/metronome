@@ -154,7 +154,7 @@ html#renaxApp[data-theme=ivory] ::-webkit-scrollbar-thumb{background:#58bfc4!imp
 }
 @media(max-width:1100px){
  html#renaxApp[data-theme=ivory] body{padding:8px!important}
- html#renaxApp[data-theme=ivory] #workspaceNav{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;padding:5px 0 9px!important}
+ html#renaxApp[data-theme=ivory] #workspaceNav{display:flex!important;overflow-x:auto!important;gap:5px!important;padding:5px 0 9px!important}
  html#renaxApp[data-theme=ivory] #workspaceNav button{min-height:43px!important;padding:5px 4px!important;font-size:10px!important;gap:4px!important;border-radius:10px!important}
  html#renaxApp[data-theme=ivory] #workspaceNav button svg{padding:0!important;width:16px!important;height:16px!important;flex:0 0 16px!important;box-sizing:border-box!important}
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{height:3px!important;bottom:0!important;left:24%!important;right:24%!important}

@@ -22,6 +22,7 @@ async function geometry(p) {
       e = document.querySelector('#beatDisplay'),
       s = getComputedStyle(e);
     return {
+      nav: rect(document.querySelector('#workspaceNav')),
       dial: rect(c),
       wrapper: rect(c.parentElement),
       counter: rect(e),
@@ -131,8 +132,14 @@ async function inkOffset(p, digit) {
         const [old, current] = measurements;
         assert.deepEqual(current.typography, old.typography, 'No font/size/weight/tracking change');
         assert.equal(current.pattern, old.pattern, 'Musical data unchanged');
-        assert.deepEqual(current.toolbar, old.toolbar, 'Musical controls stay in place');
-        assert.deepEqual(current.switch, old.switch, 'View controls stay in place');
+        // Mobile navigation intentionally collapses from three rows to one.
+        // Verify that controls retain their geometry relative to the nav bottom.
+        const relativeToNav = (box, nav) => ({ ...box, y: rounded(box.y - nav.y - nav.height) });
+        const stableRect = (now, previous) => width <= 1100
+          ? [relativeToNav(now, current.nav), relativeToNav(previous, old.nav)]
+          : [now, previous];
+        assert.deepEqual(...stableRect(current.toolbar, old.toolbar), 'Musical controls stay in place');
+        assert.deepEqual(...stableRect(current.switch, old.switch), 'View controls stay in place');
         assert(Math.abs(current.dial.width - current.dial.height) < 1);
         assert(
           current.dial.width <= current.wrapper.width &&
@@ -143,9 +150,9 @@ async function inkOffset(p, digit) {
         if (grew)
           assert(current.dial.width >= old.dial.width + 45, 'Recover the spare control row');
         else
-          assert.deepEqual(current.dial, old.dial, 'Other sizes/themes keep their dial geometry');
+          assert.deepEqual(...stableRect(current.dial, old.dial), 'Other sizes/themes keep their dial geometry');
         if (width <= 1100)
-          assert.deepEqual(current.counter, old.counter, 'Mobile counter unchanged');
+          assert.deepEqual(...stableRect(current.counter, old.counter), 'Mobile counter unchanged');
         const overlap = (a, b) =>
           a.x < b.x + b.width &&
           a.x + a.width > b.x &&

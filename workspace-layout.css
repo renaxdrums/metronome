@@ -71,8 +71,8 @@
 @media(max-width:1100px){
  body{height:100dvh;min-height:0;padding:8px;overflow:hidden}
  header{margin:0;min-height:42px;padding:0 0 8px}
- #workspaceNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:8px 0}
- #workspaceNav button{min-width:0;min-height:44px;padding:6px 2px;font-size:10px;gap:5px;background:#ffffff03;border-color:var(--border)}
+ #workspaceNav{display:flex;flex-wrap:nowrap;gap:6px;padding:8px 0;min-width:0;width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-snap-type:x proximity}
+ #workspaceNav button{flex:0 0 auto;min-width:max-content;min-height:44px;padding:6px 12px;font-size:11px;gap:6px;white-space:nowrap;scroll-snap-align:start;background:#ffffff03;border-color:var(--border)}
  #workspaceNav svg{width:15px;height:15px;flex:0 0 15px}
  #workspaceMobileViews{gap:6px;padding:0 0 8px}
  body[data-workspace=training] #workspaceMobileViews,body[data-workspace=sequence] #workspaceMobileViews,body[data-workspace=multi] #workspaceMobileViews,body[data-workspace=tracks] #workspaceMobileViews,body[data-workspace=polyrhythm] #workspaceMobileViews{display:flex!important}
@@ -111,7 +111,7 @@
  .mobile-training-bpm{display:none!important}
  .index2-settings-panel.mobile-active{height:100%;overflow:auto}
 }
-@media(max-width:360px){#workspaceNav button{font-size:9px;gap:3px}#workspaceNav svg{width:13px;flex-basis:13px}.workspace-controls-grid{gap:8px}}
+@media(max-width:360px){#workspaceNav button{font-size:10px;gap:4px}#workspaceNav svg{width:13px;flex-basis:13px}.workspace-controls-grid{gap:8px}}
 
 /* Five aligned groups: every caption sits above one uniform control row. */
 #workspaceTimer{display:contents}
@@ -219,10 +219,10 @@ body .silent-section[hidden]{display:none}
  * Without this, the generic three-row nav leaves Export under other UI. */
 @media (orientation:landscape) and (pointer:fine) and (max-width:1100px) and (max-height:600px){
   html#renaxApp body[data-workspace=tracks] header{min-height:28px;padding-bottom:3px}
-  html#renaxApp body[data-workspace=tracks] #workspaceNav{grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;padding:2px 0}
+  html#renaxApp body[data-workspace=tracks] #workspaceNav{flex-wrap:nowrap;overflow-x:auto;gap:3px;padding:2px 0}
   html#renaxApp body[data-workspace=tracks] #workspaceNav button{min-height:30px;padding:3px 1px;font-size:9px}
   html#renaxApp body[data-workspace=tracks] #workspaceNav svg{width:12px;height:12px;flex-basis:12px}
   html#renaxApp body[data-workspace=tracks] #workspaceMobileViews{padding:0 0 3px}
   html#renaxApp body[data-workspace=tracks] #workspaceMobileViews button{min-height:26px}
   html#renaxApp body[data-workspace=tracks] footer{min-height:48px;margin-top:2px;padding-top:2px}
-}@media (max-width:600px),(pointer:coarse) and (max-width:1100px) and (max-height:600px){html#renaxApp[data-theme] body[data-workspace] #workspaceNav{display:flex!important;flex-wrap:nowrap!important;grid-template-columns:none!important;justify-content:flex-start!important;align-items:center!important;gap:6px!important;width:100%;min-width:0;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:none;padding:5px 2px 7px!important;margin:0!important;touch-action:pan-x pan-y}html#renaxApp[data-theme] body[data-workspace] #workspaceNav::-webkit-scrollbar{display:none}html#renaxApp[data-theme] body[data-workspace] #workspaceNav button{flex:0 0 auto!important;width:auto!important;min-width:max-content!important;min-height:44px!important;height:auto!important;padding:7px 12px!important;gap:7px!important;font-size:11px!important;white-space:nowrap;scroll-snap-align:start}html#renaxApp[data-theme] body[data-workspace] #workspaceNav svg{width:16px!important;height:16px!important;flex:0 0 16px!important}}
+}

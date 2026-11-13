@@ -134,12 +134,16 @@ async function baselineRoute(page, url) {
       assert(tab && editor, 'Approved Audio Lab markup missing');
       const navAnchor = '</nav>\n  <div class="main-grid"';
       const prefsAnchor = '  <div class="index2-settings-backdrop"';
-      assert(!original.includes('data-workspace="audio-lab"'));
-      assert(original.includes(navAnchor));
-      assert(original.includes(prefsAnchor));
-      const normalized = original
-        .replace(navAnchor, tab + navAnchor)
-        .replace(prefsAnchor, editor + prefsAnchor)
+      // The approved Audio Lab workspace is now present in main (PR #97).
+      // Inject it only for older baselines; never duplicate existing markup.
+      const hasAudioLab = original.includes('data-workspace="audio-lab"');
+      if (!hasAudioLab) {
+        assert(original.includes(navAnchor));
+        assert(original.includes(prefsAnchor));
+      }
+      const normalized = (hasAudioLab
+        ? original
+        : original.replace(navAnchor, tab + navAnchor).replace(prefsAnchor, editor + prefsAnchor))
         .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
         .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>');
       body = Buffer.from(normalized);

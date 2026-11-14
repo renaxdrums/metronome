@@ -6,7 +6,8 @@
  * The caller owns the AudioContext and must explicitly dispose the session.
  */
 import { renderWarpInWorker } from '../dsp/warp-client.mjs';
-import { createWebAudioBuffer } from '../dsp/wsola.mjs';
+import { createWebAudioBuffer, WarpRenderError } from '../dsp/wsola.mjs';
+import { planWarpResources } from '../dsp/warp-resource-plan.mjs';
 import { createWarpClickPlan } from './warp-click.mjs';
 import { loadRenaxClickSamples } from './renax-click-presets.mjs';
 import { WarpPlaybackSession } from './warp-player.mjs';
@@ -35,6 +36,16 @@ export async function prepareWarpPlayback(cfg) {
     typeof onState!=='function')
     throw new TypeError('Invalid Warp session configuration');
   if(signal?.aborted)throw new DOMException('Warp preparation cancelled','AbortError');
+  const resourcePlan=planWarpResources({sourceFrames:sourceBuffer.length,
+    channels:sourceBuffer.numberOfChannels,sampleRate:sourceBuffer.sampleRate,
+    outputDurationSeconds:warpTimeline.outputDurationSeconds,
+    fullBufferBudgetBytes:maxOutputBytes});
+  if(!resourcePlan.fullBufferPossible){
+    const error=new WarpRenderError('MEMORY_PRESSURE',
+      'Warp playback requires a full rendered AudioBuffer beyond the configured memory budget');
+    error.resourcePlan=resourcePlan;
+    throw error;
+  }
   const workerOptions={
     buffer:sourceBuffer,timeline:warpTimeline,signal,onsets,maxOutputBytes,
     onProgress:fraction=>onProgress({phase:'warp',fraction}),
@@ -59,6 +70,7 @@ export async function prepareWarpPlayback(cfg) {
     session,buffer:outputBuffer,warpTimeline,
     diagnostics:Object.freeze([...rendered.diagnostics]),
     metrics:Object.freeze({...rendered.metrics}),
+    resourcePlan,
     clickEventCount:plan.events.length,
   });
 }

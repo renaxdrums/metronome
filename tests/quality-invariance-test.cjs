@@ -1,5 +1,6 @@
 const path = require('node:path'),
   cp = require('node:child_process'),
+  fs = require('node:fs'),
   assert = require('node:assert/strict');
 const { start, save } = require('./audio-harness.cjs');
 const normalizeVisualReference = require('./visual-reference-normalizations.cjs');
@@ -28,6 +29,68 @@ const ivoryControlsBefore =
 const ivoryControlsAfter =
   'html#renaxApp[data-theme=ivory] :is(.panel-visu,.panel-training) :is(.visu-toolbar,#workspaceControls){';
 const correctedReferenceFiles = new Set();
+// The approved desktop navigation now occupies one row. Apply only its exact
+// layout declarations to the historical page, then keep the zero-pixel and
+// computed-style comparisons for every legacy workspace.
+const approvedDesktopNav = {
+  'console-theme.css': [
+    [
+      'grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(8px,.65vw,14px)',
+      'grid-template-columns:repeat(7,minmax(0,1fr));width:100%;gap:clamp(4px,.6vw,10px)',
+    ],
+  ],
+  'ivory-theme.css': [
+    [
+      'display:grid!important;grid-template-columns:180px minmax(0,1fr);grid-template-rows:66px minmax(0,1fr) 20px;',
+      'display:grid!important;grid-template-columns:minmax(0,1fr);grid-template-rows:66px auto minmax(0,1fr) 20px;',
+    ],
+    [
+      'column-gap:26px;row-gap:22px;padding:22px 26px 12px!important',
+      'column-gap:0;row-gap:10px;padding:22px 26px 12px!important',
+    ],
+    [
+      'grid-column:1;grid-row:2;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;',
+      'grid-column:1;grid-row:2;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));align-items:center;justify-content:stretch;',
+    ],
+    [
+      'gap:10px!important;padding:16px 0 0!important;min-width:0;',
+      'gap:clamp(4px,.6vw,10px)!important;padding:0!important;min-width:0;',
+    ],
+    [
+      '#workspaceNav button{justify-content:flex-start;min-height:48px;',
+      '#workspaceNav button{justify-content:center;min-width:0;min-height:44px;',
+    ],
+    ['font-size:12px;gap:13px}', 'font-size:12px;gap:6px;white-space:nowrap}'],
+    ['body>.main-grid{grid-column:2;grid-row:2;', 'body>.main-grid{grid-column:1;grid-row:3;'],
+    ['body>footer{grid-column:1/-1;grid-row:3;', 'body>footer{grid-column:1;grid-row:4;'],
+    [
+      'grid-template-columns:166px minmax(0,1fr);column-gap:22px;',
+      'grid-template-columns:minmax(0,1fr);column-gap:0;',
+    ],
+    [
+      'body{grid-template-columns:180px minmax(0,1fr)!important}',
+      'body{grid-template-columns:minmax(0,1fr)!important}',
+    ],
+  ],
+  'renax-pulse-ivory.css': [
+    [
+      'grid-template-columns:186px minmax(0,1fr)!important;column-gap:24px!important',
+      'grid-template-columns:minmax(0,1fr)!important;column-gap:0!important',
+    ],
+    [
+      '#workspaceNav{gap:9px!important;padding-top:12px!important}',
+      '#workspaceNav{gap:clamp(4px,.6vw,10px)!important;padding-top:0!important}',
+    ],
+    [
+      '#workspaceNav button{min-height:51px!important;padding:11px 14px!important;gap:10px!important}',
+      '#workspaceNav button{min-height:44px!important;padding:6px clamp(4px,.6vw,10px)!important;gap:6px!important}',
+    ],
+    [
+      'body>#workspaceNav{min-height:520px!important}',
+      'body>#workspaceNav{min-height:44px!important}',
+    ],
+  ],
+};
 // Approved mobile header and Ivory spacing changes. Normalize only these exact
 // declarations/labels; keep the strict pixel and computed-style gates elsewhere.
 const mobileBrandCSS = `
@@ -189,6 +252,25 @@ async function baselineRoute(page, url) {
         );
         correctedReferenceFiles.add(file);
       }
+    }
+    if (approvedDesktopNav[file]) {
+      let reference = body.toString();
+      const current = fs.readFileSync(path.join(root, file), 'utf8');
+      for (const [before, after] of approvedDesktopNav[file]) {
+        assert.equal(
+          reference.split(before).length,
+          2,
+          `Reference navigation declaration changed: ${file}: ${before}`,
+        );
+        assert.equal(
+          current.split(after).length,
+          2,
+          `Current navigation declaration changed: ${file}`,
+        );
+        reference = reference.replace(before, after);
+      }
+      body = Buffer.from(reference);
+      correctedReferenceFiles.add(file + ':approved-desktop-navigation');
     }
     const contentType = /\.html$/.test(file)
       ? 'text/html'
@@ -608,6 +690,25 @@ async function baselineRoute(page, url) {
                         ])
                           if (typed.get(property)?.toString() === 'auto') values[property] = 'auto';
                         values['track-ring-bounds'] = [b.x, b.y, b.width, b.height].join(',');
+                      }
+                      if (
+                        e.id === 'sequencerContainer' &&
+                        document.body.dataset.workspace === 'metronome'
+                      ) {
+                        // Resolved auto margins differ under the approved nav geometry.
+                        // Require exact element bounds and zero screenshot differences.
+                        const values = out[parts.join(' > ')];
+                        for (const property of [
+                          'margin',
+                          'margin-top',
+                          'margin-right',
+                          'margin-bottom',
+                          'margin-left',
+                        ])
+                          values[property] = 'compared-via-bounds';
+                        values['metronome-sequencer-bounds'] = [b.x, b.y, b.width, b.height].join(
+                          ',',
+                        );
                       }
                     }
                     return out;

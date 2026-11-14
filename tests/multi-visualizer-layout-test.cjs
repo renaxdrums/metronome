@@ -5,10 +5,38 @@ const path = require('node:path');
 const { start, showMeasures } = require('./audio-harness.cjs');
 const base = 'd04b3f504f1ddfe86dc8864ef594155663e4c7ac';
 const output = process.env.TEST_OUTPUT_DIR || path.join(__dirname, 'results');
+const approvedIvoryNavigation = [
+  [
+    'grid-template-columns:186px minmax(0,1fr)!important;column-gap:24px!important',
+    'grid-template-columns:minmax(0,1fr)!important;column-gap:0!important',
+  ],
+  [
+    '#workspaceNav{gap:9px!important;padding-top:12px!important}',
+    '#workspaceNav{gap:clamp(4px,.6vw,10px)!important;padding-top:0!important}',
+  ],
+  [
+    '#workspaceNav button{min-height:51px!important;padding:11px 14px!important;gap:10px!important}',
+    '#workspaceNav button{min-height:44px!important;padding:6px clamp(4px,.6vw,10px)!important;gap:6px!important}',
+  ],
+  [
+    'body>#workspaceNav{min-height:520px!important}',
+    'body>#workspaceNav{min-height:44px!important}',
+  ],
+];
+function normalizeReference(source, file) {
+  if (file !== 'renax-pulse-ivory.css') return source;
+  const current = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+  for (const [before, after] of approvedIvoryNavigation) {
+    assert.equal(source.split(before).length, 2, `Reference navigation changed: ${before}`);
+    assert.equal(current.split(after).length, 2, `Current navigation changed: ${after}`);
+    source = source.replace(before, after);
+  }
+  return source;
+}
 const sources = new Map(
   ['avant-garde-theme.css', 'renax-pulse-ivory.css', 'backup-index2.css'].map((file) => [
     file,
-    cp.execFileSync('git', ['show', base + ':' + file], { encoding: 'utf8' }),
+    normalizeReference(cp.execFileSync('git', ['show', base + ':' + file], { encoding: 'utf8' }), file),
   ]),
 );
 const rounded = (n) => Math.round(n * 100) / 100;

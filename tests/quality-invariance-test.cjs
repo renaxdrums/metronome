@@ -257,9 +257,15 @@ async function baselineRoute(page, url) {
       let reference = body.toString();
       const current = fs.readFileSync(path.join(root, file), 'utf8');
       for (const [before, after] of approvedDesktopNav[file]) {
-        assert.equal(
-          reference.split(before).length,
-          2,
+        const beforeMatches = reference.split(before).length - 1;
+        const afterMatches = reference.split(after).length - 1;
+        // A Chromium route may be revalidated after this exact reference has
+        // already been normalized.  Both forms are explicitly approved; any
+        // third declaration remains a hard failure, so visual coverage is not
+        // weakened by making this fixture normalization idempotent.
+        assert(
+          (beforeMatches === 1 && afterMatches === 0) ||
+            (beforeMatches === 0 && afterMatches === 1),
           `Reference navigation declaration changed: ${file}: ${before}`,
         );
         assert.equal(
@@ -267,7 +273,7 @@ async function baselineRoute(page, url) {
           2,
           `Current navigation declaration changed: ${file}`,
         );
-        reference = reference.replace(before, after);
+        if (beforeMatches === 1) reference = reference.replace(before, after);
       }
       body = Buffer.from(reference);
       correctedReferenceFiles.add(file + ':approved-desktop-navigation');

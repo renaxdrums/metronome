@@ -43,17 +43,36 @@ function scoreWindow(events, minBpm, maxBpm) {
 
 /** Acoustic onset periodicity; every candidate still requires human validation. */
 export function inferTempoFromOnsets(onsets, { minBpm = 40, maxBpm = 240,
-  localWindowSeconds = 10 } = {}) {
+  localWindowSeconds = 10, subdivision = 'auto', originSeconds = null } = {}) {
   if (!Array.isArray(onsets)) throw new TypeError('onsets must be an array');
   if (![minBpm, maxBpm, localWindowSeconds].every(Number.isFinite) ||
       minBpm < 20 || maxBpm > 400 || minBpm >= maxBpm ||
-      localWindowSeconds < 4 || localWindowSeconds > 60)
+      localWindowSeconds < 4 || localWindowSeconds > 60 ||
+      !['auto','binary','ternary'].includes(subdivision) ||
+      (originSeconds!==null&&(!Number.isFinite(originSeconds)||originSeconds<0)))
     throw new RangeError('invalid tempo analysis range');
   const events = onsets.filter(o => Number.isFinite(o?.seconds) && o.seconds >= 0)
     .map(o => ({ seconds: o.seconds, strength: clamp01(Number.isFinite(o.strength) ? o.strength : 1) }))
     .filter(o => o.strength > 0)
     .sort((a, b) => a.seconds - b.seconds);
-  const ranked = scoreWindow(events, minBpm, maxBpm);
+  let ranked = scoreWindow(events, minBpm, maxBpm);
+  // A musician's binary/ternary indication is a soft phase-fit hint. It may
+  // reorder close hypotheses, but never manufactures evidence or confidence.
+  if (subdivision !== 'auto') {
+    const division = subdivision === 'ternary' ? 3 : 2;
+    ranked = ranked.map(candidate => {
+      const step = 60 / candidate.bpm / division;
+      const origin = originSeconds ?? events[0]?.seconds ?? 0;
+      const fit = events.reduce((sum,event) => {
+        const position=(event.seconds-origin)/step;
+        const distance=Math.abs(position-Math.round(position));
+        return sum + 1-Math.min(1,distance*2);
+      },0)/Math.max(1,events.length);
+      return {...candidate,score:candidate.score*(.94+.12*fit)};
+    }).sort((a,b)=>b.score-a.score||a.bpm-b.bpm);
+    const best=ranked[0]?.score||1;
+    ranked=ranked.map(candidate=>({...candidate,relativeEvidence:candidate.score/best}));
+  }
   if (!ranked.length) return { candidates: [], confidence: 0, ambiguous: true,
     localTempo: [], diagnostics: ['Insufficient acoustic evidence for tempo'] };
 
@@ -87,5 +106,5 @@ export function inferTempoFromOnsets(onsets, { minBpm = 40, maxBpm = 240,
     }
   }
   return { candidates, confidence, ambiguous, localTempo,
-    diagnostics: ['Attack periodicity only; pulse level, meter and downbeat require musician validation'] };
+    diagnostics: ['Attack periodicity with '+subdivision+' subdivision guidance; pulse level, meter and downbeat require musician validation'] };
 }

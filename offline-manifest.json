@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "cf2e4401622b9a4e",
+  "revision": "c5262ed660108a67",
   "resources": [
     {
       "path": "accessibility.css",
@@ -139,7 +139,7 @@
     },
     {
       "path": "audio-lab/analysis/tempo-hypotheses.mjs",
-      "sha256": "110a34df137f40db5046b17b1c02c87b3a477bc5eba220e0fccf43e825fe3741",
+      "sha256": "50352dd96a96557ae0a8a94f35f820b5874c9e75febd7c4a422f26bada6fdead",
       "text": true
     },
     {
@@ -284,12 +284,12 @@
     },
     {
       "path": "audio-lab/ui/audio-lab.css",
-      "sha256": "b2d93a8178d43bb2c15411c795b2a24d329e2670a60b2d3cc36877c50a7ae6e1",
+      "sha256": "5e1143c7c8500f8fd4e14d579d0533adb054aa45abdf87f8e895fd28df5a880b",
       "text": true
     },
     {
       "path": "audio-lab/ui/audio-lab.mjs",
-      "sha256": "ec81d8226937666974197a0b60018cfd28b38f0f26e511be89714642610be07b",
+      "sha256": "a5d4972834f5e8f4dc0095203992c9789d84a13868c4f0b040fb91c9dd26f659",
       "text": true
     },
     {
@@ -484,7 +484,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "2477864c28c09f47e36b576a8fefd34a0fec311e2e7701cd360bdf765180405a",
+      "sha256": "b59e446afa680343d3549c5efe2318dafdc562ff5b3e8947c660124bf2565b91",
       "text": true
     },
     {

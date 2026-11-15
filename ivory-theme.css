@@ -114,20 +114,21 @@ html#renaxApp[data-theme=ivory] footer .footer-right{color:#62786f!important}
 html#renaxApp[data-theme=ivory] button:focus-visible,html#renaxApp[data-theme=ivory] summary:focus-visible{outline:2px solid #70d5df;outline-offset:3px}
 @media(min-width:1101px){
  html#renaxApp[data-theme=ivory] body{
-  display:grid!important;grid-template-columns:180px minmax(0,1fr);grid-template-rows:66px minmax(0,1fr) 20px;
-  column-gap:26px;row-gap:22px;padding:22px 26px 12px!important;height:100dvh;min-height:0;overflow:hidden;
+  display:grid!important;grid-template-columns:minmax(0,1fr);grid-template-rows:66px auto minmax(0,1fr) 20px;
+  column-gap:0;row-gap:10px;padding:22px 26px 12px!important;height:100dvh;min-height:0;overflow:hidden;
  }
  html#renaxApp[data-theme=ivory] body>header{grid-column:1/-1;grid-row:1;margin:0!important;padding:0 0 10px!important;min-height:0!important}
  html#renaxApp[data-theme=ivory] .header-center{left:50%!important}
  html#renaxApp[data-theme=ivory] #workspaceNav{
-  grid-column:1;grid-row:2;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;
-  gap:10px!important;padding:16px 0 0!important;min-width:0;
+  grid-column:1;grid-row:2;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));align-items:center;justify-content:stretch;
+  gap:clamp(4px,.6vw,10px)!important;padding:0!important;min-width:0;
  }
- html#renaxApp[data-theme=ivory] #workspaceNav button{justify-content:flex-start;min-height:48px;font-size:12px;gap:13px}
+ html#renaxApp[data-theme=ivory] #workspaceNav button{justify-content:center;min-width:0;min-height:44px;font-size:12px;gap:6px;white-space:nowrap}
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::before{content:'';position:absolute;left:0;top:13px;bottom:13px;width:3px;border-radius:3px;background:#2d7559}
  html#renaxApp[data-theme=ivory] #workspaceNav button[aria-selected=true]::after{content:'';width:5px;height:5px;border-radius:50%;background:#2d7559;margin-left:auto;flex:0 0 5px}
- html#renaxApp[data-theme=ivory] body>.main-grid{grid-column:2;grid-row:2;margin:0;min-height:0;min-width:0;gap:20px!important}
- html#renaxApp[data-theme=ivory] body>footer{grid-column:1/-1;grid-row:3;min-height:0;margin:0;padding:0;border:0}
+ html#renaxApp[data-theme=ivory] body>.main-grid{grid-column:1;grid-row:3;margin:0;min-height:0;min-width:0;gap:20px!important}
+ html#renaxApp[data-theme=ivory] body>#audioLabRoot{grid-column:1;grid-row:3;min-width:0;min-height:0}
+ html#renaxApp[data-theme=ivory] body>footer{grid-column:1;grid-row:4;min-height:0;margin:0;padding:0;border:0}
  html#renaxApp[data-theme=ivory] .main-grid:has(.panel-seq){grid-template-columns:minmax(0,1fr) clamp(330px,27vw,420px)}
  html#renaxApp[data-theme=ivory] body[data-workspace=metronome] .main-grid{grid-template-columns:minmax(0,1fr)!important}
  html#renaxApp[data-theme=ivory] .panel-visu{padding:16px!important;gap:14px!important}
@@ -140,7 +141,7 @@ html#renaxApp[data-theme=ivory] button:focus-visible,html#renaxApp[data-theme=iv
  html#renaxApp[data-theme=ivory] #playBtn{min-width:168px!important;min-height:46px!important}
 }
 @media(min-width:1101px) and (max-width:1550px){
- html#renaxApp[data-theme=ivory] body{grid-template-columns:166px minmax(0,1fr);column-gap:22px;padding-left:22px!important;padding-right:22px!important}
+ html#renaxApp[data-theme=ivory] body{grid-template-columns:minmax(0,1fr);column-gap:0;padding-left:22px!important;padding-right:22px!important}
  html#renaxApp[data-theme=ivory] .visu-toolbar{grid-template-columns:100px minmax(0,1fr) 125px!important;row-gap:14px!important}
  html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-tempo-group{grid-column:2;grid-row:1}
  html#renaxApp[data-theme=ivory] .visu-toolbar .workspace-control-group:has(#soundBank){grid-column:1/3;grid-row:2;padding-left:0!important;margin-left:0!important;border-left:0!important}
@@ -195,7 +196,7 @@ html#renaxApp[data-theme=ivory] .training-mode-tabs button[aria-selected=true]{b
 html#renaxApp[data-theme=ivory] .training-row :is(.row-label,.unit){font-size:11px!important;text-transform:none!important;letter-spacing:0}
 html#renaxApp[data-theme=ivory] :is(.multi-preset-create,.sequence-add){text-transform:none!important;letter-spacing:0!important;font-size:12px!important}
 @media(min-width:1101px){
- html#renaxApp[data-theme=ivory] body{grid-template-columns:180px minmax(0,1fr)!important}
+ html#renaxApp[data-theme=ivory] body{grid-template-columns:minmax(0,1fr)!important}
  html#renaxApp[data-theme=ivory] #workspaceNav button{gap:11px;white-space:nowrap}
  html#renaxApp[data-theme=ivory] #workspaceNav button span{white-space:nowrap}
 }

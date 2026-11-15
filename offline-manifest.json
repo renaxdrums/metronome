@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "857c99a7a4e6f155",
+  "revision": "cf2e4401622b9a4e",
   "resources": [
     {
       "path": "accessibility.css",
@@ -118,13 +118,28 @@
       "text": true
     },
     {
+      "path": "audio-lab/analysis/metric-hypotheses.mjs",
+      "sha256": "4a0485311adfd04933b1d2a6fe4663b44b381cc6d70684db9221998ff4f43f06",
+      "text": true
+    },
+    {
+      "path": "audio-lab/analysis/onset-client.mjs",
+      "sha256": "9e4c09e343d0c3371b80683da3b6165a9248d246fa8415d997dd867aa0ca166c",
+      "text": true
+    },
+    {
+      "path": "audio-lab/analysis/onset-worker.mjs",
+      "sha256": "a5669c77242559f14c32e00860c0d0eb11c5af0e83f33cb18a05fab7ca76da69",
+      "text": true
+    },
+    {
       "path": "audio-lab/analysis/onsets.mjs",
       "sha256": "5d3f51e087329250ebeafc0ce43555fbcb777f4a56bdc8b25cd6145515285a18",
       "text": true
     },
     {
       "path": "audio-lab/analysis/tempo-hypotheses.mjs",
-      "sha256": "3f56d27e7d57053e9bb2b0d9729d136d8af3fe809a756832f5d960e6268a7ad6",
+      "sha256": "110a34df137f40db5046b17b1c02c87b3a477bc5eba220e0fccf43e825fe3741",
       "text": true
     },
     {
@@ -150,6 +165,11 @@
     {
       "path": "audio-lab/dsp/warp-render.mjs",
       "sha256": "2cb70a673d074da13fc309dc73413bfb6c7c329d5d86430451b2e4e694b375de",
+      "text": true
+    },
+    {
+      "path": "audio-lab/dsp/warp-resource-plan.mjs",
+      "sha256": "2b921fa2f4310a20eafdf274bddb6b12a7d7de7b71faa869301d7fe4e8c42288",
       "text": true
     },
     {
@@ -213,8 +233,18 @@
       "text": true
     },
     {
+      "path": "audio-lab/musical-grid.mjs",
+      "sha256": "df46f9ab86ca346f439e0ccc743406d54615d5e2244695adfb44cb05d7bcd646",
+      "text": true
+    },
+    {
       "path": "audio-lab/project/edit-history.mjs",
       "sha256": "bc21a3a44958b70d148a29f5e265f2101089cafd391f88c17a828dea3b061616",
+      "text": true
+    },
+    {
+      "path": "audio-lab/project/local-project.mjs",
+      "sha256": "b568ea29309bd2fd5c6718b69f1b1a596b3e594a0ff10a4d89edd248c360f591",
       "text": true
     },
     {
@@ -224,7 +254,7 @@
     },
     {
       "path": "audio-lab/transport/manual-click.mjs",
-      "sha256": "0380ac7ccd96f7c27f1ba890357c740488958c03aebcf0d677c9751bdce24409",
+      "sha256": "da78d435ec5bf57d6348729b0c625f5d1b87342b91da5797e3ea2b3b449b80db",
       "text": true
     },
     {
@@ -249,17 +279,22 @@
     },
     {
       "path": "audio-lab/transport/warp-session.mjs",
-      "sha256": "e8e9e291de108b4c0e6e2987ea698943e7e2db1268d8c6fd3b1f34edcece4f30",
+      "sha256": "9b22917dad782ce3d8646ebc35d5badc0d243f07a74f828cc09e5ce9b3562d12",
       "text": true
     },
     {
       "path": "audio-lab/ui/audio-lab.css",
-      "sha256": "9a60a3c74f95e1e7cd2661ff39c9a206e46fb51cf4b7773fb2b53d3a425ea963",
+      "sha256": "b2d93a8178d43bb2c15411c795b2a24d329e2670a60b2d3cc36877c50a7ae6e1",
       "text": true
     },
     {
       "path": "audio-lab/ui/audio-lab.mjs",
-      "sha256": "7682e2d7be2719e618dccb02e47a8bd181c679d9b64284ed17e3479e1f913ea4",
+      "sha256": "ec81d8226937666974197a0b60018cfd28b38f0f26e511be89714642610be07b",
+      "text": true
+    },
+    {
+      "path": "audio-lab/warp/validated-map.mjs",
+      "sha256": "15e36194a5e3f3bf439ba6696595a4419ab7513a5183f35cffce25cff02011ff",
       "text": true
     },
     {
@@ -319,7 +354,7 @@
     },
     {
       "path": "console-theme.css",
-      "sha256": "bb57f6a347b6ef5fa4a296adeaa7c486b7a4bce4694b2f1df4f6d99fb731bfa8",
+      "sha256": "076dde3f582d3647722bc76d489e5d6862ea06820ff1bf94f966dd3731eaf67e",
       "text": true
     },
     {
@@ -449,7 +484,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "389fa8d5748a41aa0b13179716834fbbf358df53b371f73c6b4cbb46790a81a3",
+      "sha256": "2477864c28c09f47e36b576a8fefd34a0fec311e2e7701cd360bdf765180405a",
       "text": true
     },
     {
@@ -474,7 +509,7 @@
     },
     {
       "path": "ivory-theme.css",
-      "sha256": "456166e9a80a29cd936b19554b4757563604f0262b7c37d6cae7e5e81d7d59b2",
+      "sha256": "2747183df164fbd28edb45f49c1a139aa679591737d1f66303dcf69dc29512fa",
       "text": true
     },
     {
@@ -609,7 +644,7 @@
     },
     {
       "path": "poly-layout.css",
-      "sha256": "0d5a007f4366d51f284d99f9bea8b5736d2c9e839d1ded09d86b8a4b01793959",
+      "sha256": "a1fe4d65f5a1aaf84caa355f584fa29bcf3b532735ddd256c90a41e6a062ebbe",
       "text": true
     },
     {
@@ -624,7 +659,7 @@
     },
     {
       "path": "renax-pulse-ivory.css",
-      "sha256": "e2a6bf28f9220489c56c91effb438cbf4be7ef5d314eaf2e899af3805f12a0b1",
+      "sha256": "bef5dd9dbbe13b9526d1ca5399b9ce7a200cddd896cb18ac26c56f4323944bf1",
       "text": true
     },
     {

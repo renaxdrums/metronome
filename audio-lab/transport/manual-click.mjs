@@ -2,6 +2,45 @@
 import { loadRenaxClickSamples } from './renax-click-presets.mjs';
 import { scheduleWarpClickRange } from './warp-click.mjs';
 
+/** Map a short AudioContext scheduling window through the source A/B loop.
+ * The click follows source beats again after every wrap, even for free loops
+ * whose duration is not a whole number of beats.
+ */
+export function planManualClickEvents({player,fromSeconds,toSeconds,bpm,downbeat,numerator,
+  denominator,groups,maxEvents=256}) {
+  if (!player || !Number.isFinite(fromSeconds) || !Number.isFinite(toSeconds) ||
+      toSeconds < fromSeconds || !Number.isFinite(player.startedAt) ||
+      !Number.isFinite(player.startedOffset)) throw new RangeError('Invalid click window');
+  const unit=60/bpm*4/denominator;
+  const groupStarts=new Set([0]);
+  let sum=0;for(const group of groups){sum+=group;groupStarts.add(sum);}
+  const events=[];
+  let cursor=Math.max(fromSeconds,player.startedAt);
+  while(cursor<toSeconds && events.length<maxEvents){
+    const elapsed=cursor-player.startedAt;
+    const rawSource=player.startedOffset+elapsed;
+    const loop=player.loop;
+    const sourceSeconds=loop && rawSource>=loop.end
+      ? loop.start+(rawSource-loop.end)%(loop.end-loop.start)
+      : rawSource;
+    const remaining=(loop ? loop.end : player.buffer.duration)-sourceSeconds;
+    if(remaining<=0)break;
+    const segmentEnd=Math.min(toSeconds,cursor+remaining);
+    const sourceEnd=sourceSeconds+(segmentEnd-cursor);
+    const firstBeat=Math.max(0,Math.ceil((sourceSeconds-downbeat)/unit-1e-9));
+    for(let i=firstBeat;events.length<maxEvents;i++){
+      const beatSource=downbeat+i*unit;
+      if(beatSource>=sourceEnd-1e-9)break;
+      if(beatSource<sourceSeconds-1e-9)continue;
+      const beatPosition=i%numerator;
+      events.push({seconds:cursor+beatSource-sourceSeconds,
+        accent:beatPosition===0?2:groupStarts.has(beatPosition)?1:0});
+    }
+    cursor=segmentEnd;
+  }
+  return events;
+}
+
 export class ManualClick {
   constructor(player) {
     this.player = player;
@@ -66,29 +105,9 @@ export class ManualClick {
     const from=Math.max(this.through,context.currentTime);
     const to=context.currentTime+0.20;
     if (to<=from) return;
-    const unit=60/this.bpm*4/this.denominator;
-    const bar=unit*this.numerator;
-    const origin=p.startedAt-p.startedOffset+this.downbeat;
-    const begin=Math.max(0,Math.ceil((from-origin)/unit-1e-9));
-    const end=Math.floor((to-origin)/unit-1e-9);
-    const groupStarts=new Set([0]);
-    let sum=0;for(const group of this.groups){sum+=group;groupStarts.add(sum);}
-    const events=[];
-    for(let i=begin;i<=end && events.length<256;i++){
-      const pos=i%this.numerator;
-      const when=origin+i*unit;
-      const rawSourceSeconds=p.startedOffset+(when-p.startedAt);
-      const loop=p.loop;
-      const sourceSeconds=loop && rawSourceSeconds>=loop.end
-        ? loop.start+((rawSourceSeconds-loop.start)%(loop.end-loop.start))
-        : rawSourceSeconds;
-      if(sourceSeconds>=p.buffer.duration || sourceSeconds<0)continue;
-      // Accent follows the looped source timeline, not the ever-increasing clock.
-      const beatIndex=Math.round((sourceSeconds-this.downbeat)/unit);
-      if(Math.abs(sourceSeconds-(this.downbeat+beatIndex*unit))>0.008)continue;
-      const beatPosition=((beatIndex%this.numerator)+this.numerator)%this.numerator;
-      events.push({seconds:when,accent:beatPosition===0?2:groupStarts.has(beatPosition)?1:0});
-    }
+    const events=planManualClickEvents({player:p,fromSeconds:from,toSeconds:to,
+      bpm:this.bpm,downbeat:this.downbeat,numerator:this.numerator,
+      denominator:this.denominator,groups:this.groups});
     if(events.length){
       const nodes=scheduleWarpClickRange({
         context,clickSamples:this.samples,destination:this.bus,

@@ -41,7 +41,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>RENAX DRUMS — Métronome</title>
-  <link rel="stylesheet" href="app-base.css?v=eaffaff1b6e8">
+  <link rel="stylesheet" href="app-base.css?v=e09e7e8e53bf">
   <link rel="stylesheet" href="songs.css?v=9ed52968ed47">
   <link rel="stylesheet" href="mp3-export.css?v=86771b5d6ae9">
   <link rel="stylesheet" href="backup-index2.css?v=bba65634db68">
@@ -85,7 +85,7 @@
 <link rel="stylesheet" href="tuner-interface.css?v=6d818b206138">
 <link rel="stylesheet" href="poly-layout.css?v=a1fe4d65f5a1">
 <link rel="stylesheet" href="tuner-fit.css?v=595254bcedb6">
-  <link rel="stylesheet" href="audio-lab/ui/audio-lab.css?v=b2d93a8178d4">
+  <link rel="stylesheet" href="audio-lab/ui/audio-lab.css?v=5e1143c7c850">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -329,12 +329,15 @@
       </div>
     </div>
 
+    <div class="al-workspace">
+      <main class="al-canvas-column" aria-label="Éditeur audio">
     <div class="al-tool-strip" role="toolbar" aria-label="Outils de timeline musicale">
+      <span class="al-section-label">ÉDITION</span>
       <div class="al-tools">
         <button type="button" class="al-tool is-active" data-al-tool="cursor" aria-pressed="true" title="Placer le curseur et déplacer les repères"><span class="al-tool-icon">↖</span><span>Curseur</span></button>
         <button type="button" class="al-tool" data-al-tool="selection" aria-pressed="false" title="Glisser pour sélectionner une région audio"><span class="al-tool-icon">▤</span><span>Sélection</span></button>
-        <button type="button" class="al-tool" data-al-tool="hand" aria-pressed="false" title="Glisser pour déplacer la vue zoomée"><span class="al-tool-icon">✋</span><span>Main</span></button>
-        <button type="button" class="al-tool" data-al-tool="downbeat" aria-pressed="false" title="Positionner manuellement un premier temps"><span class="al-tool-icon">Ⅰ</span><span>Temps 1</span></button>
+        <button type="button" class="al-tool" data-al-tool="hand" aria-pressed="false" title="Glisser pour déplacer la vue zoomée"><span class="al-tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V6a2 2 0 0 1 4 0v4-6a2 2 0 0 1 4 0v6-4a2 2 0 0 1 4 0v8c0 4-3 7-7 7h-1c-3 0-5-1-7-4l-2-3a2 2 0 0 1 3-2l2 2"/></svg></span><span>Main</span></button>
+        <button type="button" class="al-tool" data-al-tool="downbeat" aria-pressed="false" title="Placer le drapeau du premier temps"><span class="al-tool-icon">⚑</span><span>Drapeau Temps 1</span></button>
         <button type="button" class="al-tool" data-al-tool="meter" aria-pressed="false" title="Insérer un changement de signature rythmique"><span class="al-tool-icon">≡</span><span>Métrique</span></button>
         <button type="button" class="al-tool" data-al-tool="tempo" aria-pressed="false" title="Insérer un repère de tempo"><span class="al-tool-icon">♩</span><span>Tempo</span></button>
         <button type="button" class="al-tool" data-al-tool="warp" aria-pressed="false" title="Drapeau Warp : placer un ancrage musical à vérifier"><span class="al-tool-icon">⚑</span><span>Drapeau Warp</span></button>
@@ -342,7 +345,6 @@
         <button type="button" class="al-tool" data-al-tool="zoom" aria-pressed="false" title="Glisser pour agrandir la zone choisie"><span class="al-tool-icon">⌕</span><span>Zoom</span></button>
       </div>
       <div class="al-tool-actions"><button id="alSnap" type="button" aria-pressed="false" title="Aimantation sur la grille validée ou les attaques proches">Snap</button><button id="alUndo" type="button" disabled aria-label="Annuler la dernière correction" title="Annuler la dernière correction">↶ <span>Undo</span></button><button id="alRedo" type="button" disabled aria-label="Rétablir la correction" title="Rétablir la correction">↷ <span>Redo</span></button></div>
-      <span class="al-mode">ÉDITION MANUELLE <span class="al-mode-dot"></span></span>
     </div>
 
     <div class="al-signature-strip">
@@ -369,24 +371,42 @@
       <div class="al-timeline-footer"><div><span class="al-rail-label">TEMPS SOURCE</span><output id="alReadout">00:00.000</output><span class="al-slash">/</span><span id="alDuration">00:00.000</span></div><label class="al-zoom" for="alZoom"><span>ZOOM</span><input id="alZoom" type="range" min="1" max="24" step="1" value="1" aria-label="Zoom horizontal de la waveform"><output id="alZoomValue">×1</output></label></div>
     </div>
 
-    <div class="al-bottom">
-      <div class="al-transport"><span class="al-transport-title">TRANSPORT</span><button id="alDetectPulse" type="button" disabled>Détecter pulsation</button><output id="alPulseResult" aria-live="polite"></output><label>Loop <input id="alLoopEnabled" type="checkbox" disabled></label><button id="alLoopA" type="button" disabled>Début A</button><button id="alLoopB" type="button" disabled>Fin B</button><output id="alLoopInfo">—</output><label style="display:inline-flex;align-items:center;gap:6px">Clic <input id="alClickEnabled" type="checkbox"></label><label>BPM <input id="alManualBpm" type="number" min="1" max="500" step="0.1" value="120" style="width:70px"></label><label>Volume audio <input id="alAudioVolume" type="range" min="0" max="1" step=".01" value=".7"></label><label>Volume clic <input id="alClickVolume" type="range" min="0" max="1" step=".01" value=".7"></label><button id="alPlay" class="al-play" type="button" disabled aria-label="Lire l'audio original">▶</button><button id="alStop" class="al-stop" type="button" disabled aria-label="Arrêter la lecture">■</button><input id="alSeek" type="range" min="0" max="1000" value="0" step="1" disabled aria-label="Position dans le fichier audio"><span id="alPlaybackState" class="al-playback-state">À L’ARRÊT</span></div>
-      <div class="al-inspector"><span class="al-transport-title">REPÈRE SÉLECTIONNÉ</span><span id="alMarkerInfo">Aucun</span><label for="alMarkerTime">Position (s) <input id="alMarkerTime" type="number" min="0" step="0.001" value="0" disabled></label><button id="alDeleteMarker" type="button" disabled aria-label="Supprimer le repère sélectionné">Supprimer</button></div>
+    <div class="al-transport" aria-label="Transport">
+      <div class="al-transport-main"><span class="al-transport-title">TRANSPORT</span><button id="alPlay" class="al-play" type="button" disabled aria-label="Lire l'audio original">▶</button><button id="alStop" class="al-stop" type="button" disabled aria-label="Arrêter la lecture">■</button><input id="alSeek" type="range" min="0" max="1000" value="0" step="1" disabled aria-label="Position dans le fichier audio"><span id="alPlaybackState" class="al-playback-state">À L’ARRÊT</span></div>
+      <div class="al-loop-controls"><label>Loop <input id="alLoopEnabled" type="checkbox" disabled></label><button id="alLoopA" type="button" disabled>Début A</button><button id="alLoopB" type="button" disabled>Fin B</button><output id="alLoopInfo">—</output></div>
+      <div class="al-transport-options"><label>Clic <input id="alClickEnabled" type="checkbox"></label><label>BPM <input id="alManualBpm" type="number" min="1" max="500" step="0.1" value="120"></label><label>Audio <input id="alAudioVolume" type="range" min="0" max="1" step=".01" value=".7" aria-label="Volume audio"></label><label>Clic <input id="alClickVolume" type="range" min="0" max="1" step=".01" value=".7" aria-label="Volume clic"></label></div>
     </div>
-    <div id="alWarpMarkerEditor" class="al-warp-marker-editor" hidden><label for="alWarpMarkerBeat">Repère Warp · position musicale en noires depuis le début <input id="alWarpMarkerBeat" type="number" min="0" step="0.25" value="0"></label><label for="alWarpMarkerValidated"><input id="alWarpMarkerValidated" type="checkbox"> Valider cet ancrage</label><span>Vérifiez l’attaque et le temps musical avant de valider. Seuls les ancrages validés corrigent Warp.</span></div>
-    <div id="alTempoMarkerEditor" class="al-warp-marker-editor" hidden><label for="alTempoMarkerBpm">Tempo après ce repère <input id="alTempoMarkerBpm" type="number" min="20" max="400" step="0.1" value="120"> BPM</label><label for="alTempoMarkerValidated"><input id="alTempoMarkerValidated" type="checkbox"> Valider ce changement</label><span>Seuls les BPM locaux vérifiés modifient la grille source et le rendu Warp.</span></div>
-    <div id="alTempoAlternatives" class="al-tempo-alternatives" role="status" aria-live="polite" hidden></div>
-    <div class="al-warp-panel" aria-label="Smart Warp">
-      <strong>Smart Warp</strong>
-      <label for="alWarpSourceBpm">BPM source <input id="alWarpSourceBpm" type="number" min="20" max="400" step="0.1" value="120"></label>
-      <label for="alWarpTargetBpm">BPM cible <input id="alWarpTargetBpm" type="number" min="20" max="400" step="0.1" value="40"></label>
-      <label class="al-warp-confirm"><input id="alWarpConfirmed" type="checkbox"> Tempo source vérifié (temps 1 à 0 s, sauf repère « Temps 1 »)</label>
-      <button id="alPrepareWarp" type="button" disabled>Préparer Warp</button>
-      <button id="alCancelWarp" type="button" hidden>Annuler</button>
-      <progress id="alWarpProgress" max="1" value="0" hidden aria-label="Progression du rendu Warp"></progress>
-      <div class="al-warp-mode" role="group" aria-label="Mode de lecture"><button id="alOriginalMode" type="button" aria-pressed="true">Original</button><button id="alWarpMode" type="button" aria-pressed="false" disabled>Warp</button></div>
-      <output id="alWarpStatus" role="status" aria-live="polite">Validez le tempo source et placez un premier temps pour synchroniser le clic.</output>
-      <div class="al-project-actions" role="group" aria-label="Projet Audio Lab local"><button id="alExportProject" type="button" disabled>Exporter le projet</button><button id="alImportProject" type="button" disabled>Restaurer un projet</button><input id="alProjectInput" type="file" accept=".json,application/json" hidden aria-label="Choisir un projet Audio Lab JSON"><output id="alProjectStatus" role="status" aria-live="polite">Projet sans audio · correspondance du fichier source vérifiée par métadonnées.</output></div>
+      </main>
+
+      <aside class="al-side-rail" aria-label="Réglages Audio Lab">
+        <section class="al-rail-section al-analysis-panel" aria-labelledby="alAnalysisTitle">
+          <div class="al-rail-heading"><span class="al-step">01</span><h3 id="alAnalysisTitle">Analyse</h3></div>
+          <p>Indique le ressenti du morceau pour guider le calcul.</p>
+          <fieldset class="al-analysis-guide"><legend>Mode d’analyse</legend><div class="al-choice-row"><label><input type="radio" name="alPulseFeel" value="auto" checked><span>Auto seul</span></label><label><input type="radio" name="alPulseFeel" value="binary"><span>Binaire</span></label><label><input type="radio" name="alPulseFeel" value="ternary"><span>Ternaire</span></label></div><small id="alAnalysisGuideHelp">Auto seul n’utilise aucun repère. Binaire ou Ternaire active l’aide du drapeau Temps 1 et de sa métrique.</small></fieldset>
+          <button id="alDetectPulse" type="button" disabled>Détecter la pulsation</button><output id="alPulseResult" aria-live="polite">Aucune analyse</output>
+          <div id="alTempoLevel" class="al-tempo-level" hidden><span>Niveau du tempo</span><div><button id="alTempoHalf" type="button" aria-label="Diviser le tempo détecté par deux"><b>÷2</b><output>—</output></button><button id="alTempoBase" type="button" aria-pressed="true" aria-label="Garder le tempo détecté"><b>Détecté</b><output>—</output></button><button id="alTempoDouble" type="button" aria-label="Multiplier le tempo détecté par deux"><b>×2</b><output>—</output></button></div><small>Choisis la pulsation que tu comptes réellement.</small></div>
+          <div id="alTempoAlternatives" class="al-tempo-alternatives" role="status" aria-live="polite" hidden></div>
+        </section>
+        <section class="al-rail-section al-inspector" aria-labelledby="alInspectorTitle">
+          <div class="al-rail-heading"><span class="al-step">02</span><h3 id="alInspectorTitle">Repère</h3></div>
+          <strong id="alMarkerInfo">Aucun repère</strong><label for="alMarkerTime">Position source <span><input id="alMarkerTime" type="number" min="0" step="0.001" value="0" disabled> s</span></label><button id="alDeleteMarker" type="button" disabled aria-label="Supprimer le repère sélectionné">Supprimer le repère</button>
+          <div id="alDownbeatMarkerEditor" class="al-warp-marker-editor" hidden><label for="alDownbeatMeter">Métrique du drapeau <select id="alDownbeatMeter"><option value="4/4">4/4</option><option value="3/4">3/4</option><option value="2/4">2/4</option><option value="6/8">6/8</option><option value="9/8">9/8</option><option value="12/8">12/8</option><option value="custom">Personnalisée</option></select></label><span>Le Temps 1 et cette métrique guident l’analyse sans la forcer.</span></div>
+          <div id="alWarpMarkerEditor" class="al-warp-marker-editor" hidden><label for="alWarpMarkerBeat">Position musicale <input id="alWarpMarkerBeat" type="number" min="0" step="0.25" value="0"></label><label for="alWarpMarkerValidated"><input id="alWarpMarkerValidated" type="checkbox"> Valider cet ancrage</label><span>Seuls les ancrages validés corrigent Warp.</span></div>
+          <div id="alTempoMarkerEditor" class="al-warp-marker-editor" hidden><label for="alTempoMarkerBpm">Tempo local <span><input id="alTempoMarkerBpm" type="number" min="20" max="400" step="0.1" value="120"> BPM</span></label><label for="alTempoMarkerValidated"><input id="alTempoMarkerValidated" type="checkbox"> Valider ce changement</label><span>Seuls les tempos validés corrigent la grille.</span></div>
+        </section>
+        <section class="al-rail-section al-warp-panel" aria-labelledby="alWarpTitle">
+          <div class="al-rail-heading"><span class="al-step">03</span><h3 id="alWarpTitle">Smart Warp</h3></div>
+          <div class="al-warp-mode" role="group" aria-label="Mode de lecture"><button id="alOriginalMode" type="button" aria-pressed="true">Original</button><button id="alWarpMode" type="button" aria-pressed="false" disabled>Warp</button></div>
+          <div class="al-warp-tempos"><label for="alWarpSourceBpm">BPM source <input id="alWarpSourceBpm" type="number" min="20" max="400" step="0.1" value="120"></label><span aria-hidden="true">→</span><label for="alWarpTargetBpm">BPM cible <input id="alWarpTargetBpm" type="number" min="20" max="400" step="0.1" value="40"></label></div>
+          <label class="al-warp-confirm"><input id="alWarpConfirmed" type="checkbox"> Tempo source et premier temps vérifiés</label>
+          <button id="alPrepareWarp" type="button" disabled>Préparer la lecture Warp</button><button id="alCancelWarp" type="button" hidden>Annuler le rendu</button><progress id="alWarpProgress" max="1" value="0" hidden aria-label="Progression du rendu Warp"></progress>
+          <output id="alWarpStatus" role="status" aria-live="polite">Confirme le tempo source et le premier temps.</output>
+        </section>
+        <section class="al-rail-section al-project-panel" aria-labelledby="alProjectTitle">
+          <div class="al-rail-heading"><span class="al-step">04</span><h3 id="alProjectTitle">Projet local</h3></div>
+          <div class="al-project-actions" role="group" aria-label="Projet Audio Lab local"><button id="alExportProject" type="button" disabled>Exporter</button><button id="alImportProject" type="button" disabled>Restaurer</button><input id="alProjectInput" type="file" accept=".json,application/json" hidden aria-label="Choisir un projet Audio Lab JSON"></div><output id="alProjectStatus" role="status" aria-live="polite">Projet sans audio · source vérifiée par métadonnées.</output>
+        </section>
+      </aside>
     </div>
     <div class="al-status-bar"><span class="al-status-pulse" aria-hidden="true"></span><output id="alStatus" role="status" aria-live="polite">Prêt. Import local sans transfert de fichier.</output><span class="al-phase">AUDIO LAB / ÉTAPE INTERFACE</span></div>
   </section>
@@ -529,7 +549,7 @@
   <script src="metronome-audio.js?v=0cba66047440"></script>
   <script src="sequence-parallel.js?v=7e849a3254eb"></script>
   <script src="metronome-core.js?v=261cdd7e6556"></script>
-  <link rel="stylesheet" href="playback-support.css?v=be7d47c55905">
+  <link rel="stylesheet" href="playback-support.css?v=87b2fe9d2986">
   <script src="playback-support.js?v=906fd4c12e7e"></script>
   <script src="metronome-transport.js?v=4f7035efc1be"></script>
   <script src="pro-sound-bank.js?v=0ca9920a8560"></script>
@@ -683,7 +703,7 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="interface-language.js?v=291439ae445e"></script>
 <script src="workspace-layout.js?v=3807bde57a79"></script>
 <script type="module" src="musician-tools.mjs?v=c16764a7017b"></script>
-<script type="module" src="audio-lab/ui/audio-lab.mjs?v=ec81d8226937"></script>
+<script type="module" src="audio-lab/ui/audio-lab.mjs?v=a5d4972834f5"></script>
 <script src="avant-garde-motion.js?v=502d1d826916"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=798a129a814c"></script>

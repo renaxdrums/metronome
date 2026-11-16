@@ -41,9 +41,17 @@ const { start, save } = require('./audio-harness.cjs');
       assert.equal(await page.locator('#alFileName').textContent(),'interface-source.wav');
       assert.equal(await page.locator('#alEmpty').isVisible(),false);
       assert((await page.locator('#alDuration').textContent()).startsWith('00:00.5'));
+      assert.equal(await page.locator('input[name=alPulseFeel]:checked').getAttribute('value'),'auto',
+        'unassisted automatic analysis remains the default');
       await page.locator('#alDetectPulse').click();
-      await page.waitForFunction(()=>document.getElementById('alPulseResult').textContent.length>0,{timeout:10000});
+      await page.waitForFunction(()=>document.getElementById('alPulseResult').textContent!=='Aucune analyse'&&
+        document.getElementById('alDetectPulse').disabled===false,{timeout:10000});
       assert.equal(await page.locator('#alDetectPulse').isDisabled(),false,'Worker analysis releases the editor controls');
+      assert.equal(await page.locator('#alTempoLevel button').count(),3,'tempo level provides detected, half and double choices');
+      await page.locator('label:has(input[name=alPulseFeel][value=ternary])').click();
+      assert((await page.locator('#alPulseResult').textContent()).includes('à recalculer'),
+        'guidance changes never silently replace the automatic result');
+      await page.locator('label:has(input[name=alPulseFeel][value=auto])').click();
       const space = await page.evaluate(() => {
         let audioClicks=0;
         document.getElementById('alPlay').addEventListener('click',()=>audioClicks++);
@@ -273,9 +281,14 @@ const { start, save } = require('./audio-harness.cjs');
       await page.screenshot({path:(process.env.TEST_OUTPUT_DIR||'tests/results')+'/audio-lab-'+size.width+'.png',animations:'disabled'});
       await page.locator('[data-al-tool=downbeat]').click();
       await page.locator('#alWaveCanvas').click({position:{x:150,y:80}});
+      assert.equal(await page.locator('#alDownbeatMarkerEditor').isVisible(),true,'Temps 1 opens its flag metric editor');
+      await page.locator('#alDownbeatMeter').selectOption('6/8');
+      assert.equal(await page.locator('#alNumerator').inputValue(),'6');
+      assert.equal(await page.locator('#alDenominator').inputValue(),'8');
       await page.locator('#alMarkerTime').fill('0.1');
       await page.locator('#alMarkerTime').dispatchEvent('change');
-      await page.locator('#alWaveCanvas').click({position:{x:210,y:80}});
+      const waveBox=await page.locator('#alWaveCanvas').boundingBox();
+      await page.locator('#alWaveCanvas').click({position:{x:Math.round(waveBox.width*.72),y:80}});
       await page.locator('#alMarkerTime').fill('0.3');
       await page.locator('#alMarkerTime').dispatchEvent('change');
       await page.locator('#alMarkerLayer .al-marker[data-kind=downbeat]').first().click();

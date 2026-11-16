@@ -191,12 +191,14 @@ async function baselineRoute(page, url) {
       // in the historical reference. Strict pixel/style checks remain unchanged.
       const now = cp.execFileSync('git', ['show', 'HEAD:index.html'], { cwd: root }).toString();
       const tabPattern = /<button type="button" data-workspace="audio-lab"[\s\S]*?<\/button>/;
-      const editorPattern = /  <!-- Audio Lab occupies[\s\S]*?<\/section>\s*/;
       const tab = now.match(tabPattern)?.[0];
-      const editor = now.match(editorPattern)?.[0];
-      assert(tab && editor, 'Approved Audio Lab markup missing');
       const navAnchor = '</nav>\n  <div class="main-grid"';
       const prefsAnchor = '  <div class="index2-settings-backdrop"';
+      const editorStart = now.indexOf('  <!-- Audio Lab occupies');
+      const editorEnd = now.indexOf(prefsAnchor, editorStart);
+      const editor =
+        editorStart >= 0 && editorEnd > editorStart ? now.slice(editorStart, editorEnd) : '';
+      assert(tab && editor, 'Approved Audio Lab markup missing');
       // The approved Audio Lab workspace is now present in main (PR #97).
       // Inject it only for older baselines; never duplicate existing markup.
       const hasAudioLab = original.includes('data-workspace="audio-lab"');
@@ -460,9 +462,16 @@ async function baselineRoute(page, url) {
             for (const [i, p] of views.entries()) {
               await p.bringToFront();
               if (i) await restoreProbe(p);
+              const settingsPanel = p.locator('#index2SettingsPanel');
               await p.locator('#index2SettingsBtn').click();
+              await settingsPanel.waitFor({ state: 'visible' });
               await p.locator('[data-appearance=' + theme + ']').click();
               await p.locator('#index2SettingsClose').click();
+              await settingsPanel.waitFor({ state: 'hidden' });
+              await p.waitForFunction(
+                (expected) => document.documentElement.dataset.theme === expected,
+                theme,
+              );
               if (!i || referenceAgainstItself) {
                 // Approved Track-only change: no play control for a new empty library.
                 // Normalize exactly this button on the reference page;

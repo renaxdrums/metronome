@@ -3,6 +3,28 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const {start,save,showMeasures}=require('./audio-harness.cjs');
 
+async function assertSettingsForeground(page,context){
+ const panel=page.locator('#index2SettingsPanel');
+ await panel.waitFor({state:'visible'});
+ await page.evaluate(()=>{
+  const obstruction=document.createElement('div');
+  obstruction.id='settings-foreground-obstruction';
+  obstruction.style.cssText='position:fixed;inset:0;z-index:11000;background:transparent;';
+  document.body.append(obstruction);
+ });
+ const result=await panel.evaluate(element=>{
+  const bounds=element.getBoundingClientRect(),blocked=[];
+  for(const fx of [.15,.5,.85])for(const fy of [.08,.25,.5,.75,.92]){
+   const x=bounds.left+bounds.width*fx,y=bounds.top+bounds.height*fy;
+   const hit=document.elementFromPoint(x,y);
+   if(!hit||!element.contains(hit))blocked.push({x,y,hit:hit?.id||hit?.className});
+  }
+  return {blocked,bounds:bounds.toJSON(),zIndex:getComputedStyle(element).zIndex};
+ });
+ await page.locator('#settings-foreground-obstruction').evaluate(element=>element.remove());
+ assert.deepEqual(result.blocked,[],JSON.stringify({context,result}));
+}
+
 (async()=>{
  const h=await start(),results=[],out=path.join(process.env.TEST_OUTPUT_DIR||'tests/results','theme-audit');
  fs.mkdirSync(out,{recursive:true});
@@ -14,11 +36,13 @@ const {start,save,showMeasures}=require('./audio-harness.cjs');
    for(const theme of ['dark','light','ivory','avant']){
     await p.locator('#index2SettingsBtn').click();
     await p.locator('[data-appearance='+theme+']').click();
+    await assertSettingsForeground(p,{width,height,theme,workspace:'appearance'});
     assert.equal(await p.locator('#index2SettingsPanel').getAttribute('aria-modal'),'false');
     assert.equal(await p.locator('[data-appearance=avant]').textContent(),'Citron');
     // A single physical click both closes preferences and opens the requested workspace.
     for(const workspace of ['metronome','polyrhythm','training','sequence','multi','tracks']){
      if(await p.locator('#index2SettingsBtn').getAttribute('aria-expanded')==='false')await p.locator('#index2SettingsBtn').click();
+     await assertSettingsForeground(p,{width,height,theme,workspace});
      const button=p.locator('#workspaceNav [data-workspace='+workspace+']');
      assert.equal(await button.evaluate(e=>!!e.closest('[inert]')),false);
      await button.click();

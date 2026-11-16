@@ -5,6 +5,7 @@ import { OriginalAudioPlayer } from '../transport/original-player.mjs';
 import { ManualClick } from '../transport/manual-click.mjs';
 import { detectOnsetsInWorker } from '../analysis/onset-client.mjs';
 import { inferTempoFromOnsets } from '../analysis/tempo-hypotheses.mjs';
+import { analyseTempo } from '../analysis/tempo-engine.mjs';
 import { inferMetricHypotheses } from '../analysis/metric-hypotheses.mjs';
 import { sourceSecondsToTick, tickToSourceSeconds, TICKS_PER_QUARTER } from '../tempo-warp-core.mjs';
 import { createMeterTimeline } from '../meter-timeline.mjs';
@@ -1002,6 +1003,32 @@ $('alLoopEnabled').addEventListener('change',event=>{
   if(!player){event.target.checked=false;return;}
   refreshLoop();commitHistory();
 });
+/** Longest window the pulse-level estimate reads, to keep the editor responsive. */
+const PULSE_LEVEL_WINDOW_SECONDS=120;
+
+/**
+ * Which metrical level of a detected rate reads as the pulse, weighed by the tempo
+ * engine on a bounded mono window. Returns null when the engine finds no usable
+ * evidence; the caller then keeps the onset estimator's own rate unchanged.
+ */
+function estimatePulseLevel(buffer,baseBpm){
+  if(!Number.isFinite(baseBpm)||baseBpm<=0)return null;
+  const length=Math.floor(Math.min(buffer.duration,PULSE_LEVEL_WINDOW_SECONDS)*buffer.sampleRate);
+  if(length<buffer.sampleRate)return null;
+  const mono=new Float32Array(length),channels=buffer.numberOfChannels;
+  for(let ch=0;ch<channels;ch++){
+    const data=buffer.getChannelData(ch);
+    for(let i=0;i<length;i++)mono[i]+=data[i]/channels;
+  }
+  try{
+    const estimate=analyseTempo([mono],buffer.sampleRate);
+    if(!Number.isFinite(estimate.bpm))return null;
+    const ratio=[.5,1,2].reduce((best,option)=>
+      Math.abs(Math.log2(baseBpm*option/estimate.bpm))<Math.abs(Math.log2(baseBpm*best/estimate.bpm))?option:best,1);
+    return {ratio,estimate};
+  }catch{return null;}
+}
+
 function chooseDetectedTempo(ratio){
   if(!Number.isFinite(detectedTempoBase))return;
   const bpm=Math.round(detectedTempoBase*ratio*10)/10;
@@ -1048,16 +1075,22 @@ $('alDetectPulse').addEventListener('click',async()=>{
     }
     const first=hypotheses.candidates[0];
     detectedTempoBase=first.bpm;
+    // The onset estimator proposes a rate but not which metrical level of it is the
+    // pulse. The tempo engine weighs that, so the buttons open on the likely reading
+    // instead of always on the raw rate. It stays a reading: the musician can switch.
+    const level=estimatePulseLevel(buffer,first.bpm);
+    const chosenRatio=level?.ratio??1;
+    const chosenBpm=Math.round(first.bpm*chosenRatio*10)/10;
     const levels=[[.5,$('alTempoHalf')],[1,$('alTempoBase')],[2,$('alTempoDouble')]];
     for(const [ratio,button] of levels){
       const value=Math.round(first.bpm*ratio*10)/10;
       button.querySelector('output').textContent=String(value);
       button.disabled=value<20||value>400;
-      button.setAttribute('aria-pressed',String(ratio===1));
+      button.setAttribute('aria-pressed',String(ratio===chosenRatio));
     }
     $('alTempoLevel').hidden=false;
-    $('alManualBpm').value=String(first.bpm);
-    $('alWarpSourceBpm').value=String(first.bpm);
+    $('alManualBpm').value=String(chosenBpm);
+    $('alWarpSourceBpm').value=String(chosenBpm);
     $('alWarpConfirmed').checked=false;
     if(warp)invalidateWarp('La nouvelle analyse demande une nouvelle validation du BPM source.');
     const heading=document.createElement('strong');heading.textContent='Hypothèses de tempo · '+
@@ -1074,6 +1107,14 @@ $('alDetectPulse').addEventListener('click',async()=>{
       const local=document.createElement('span');
       local.textContent='Tempo local variable : '+hypotheses.localTempo.length+' fenêtres mesurées.';
       alternatives.append(local);
+    }
+    if(level){
+      const reading=document.createElement('span');
+      reading.textContent='Niveau de pulsation retenu : '+chosenBpm+' BPM'+
+        (chosenRatio===.5?' (moitié du tempo détecté)':chosenRatio===2?' (double du tempo détecté)':'')+
+        ' · '+(level.estimate.octaveAmbiguity?'niveau ambigu, à vérifier':'niveau net')+
+        ' · à confirmer à l’oreille';
+      alternatives.append(reading);
     }
     const downbeat=guidedDownbeat;
     const metricOptions={tempoBpm:first.bpm,
@@ -1095,10 +1136,10 @@ $('alDetectPulse').addEventListener('click',async()=>{
       }
     }
     alternatives.hidden=false;refreshWarpControls();
-    click?.configure({bpm:first.bpm});
-    $('alPulseResult').textContent='≈ '+first.bpm+' BPM · hypothèse';
+    click?.configure({bpm:chosenBpm});
+    $('alPulseResult').textContent='≈ '+chosenBpm+' BPM · hypothèse';
     button.textContent='Recalculer la pulsation';
-    setStatus((assisted?'Analyse guidée':'Analyse automatique seule')+' : pulsation estimée à '+first.bpm+' BPM (non confirmée).');
+    setStatus((assisted?'Analyse guidée':'Analyse automatique seule')+' : pulsation estimée à '+chosenBpm+' BPM (non confirmée).');
   }catch(error){
     if(token!==pulseJob||signal.aborted)return;
     $('alPulseResult').textContent='Analyse indisponible';

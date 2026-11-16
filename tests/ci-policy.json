@@ -32,6 +32,7 @@
     "tests/audio-lab-onset-worker-test.mjs",
     "tests/audio-lab-onsets-test.mjs",
     "tests/audio-lab-peaks-test.mjs",
+    "tests/audio-lab-tempo-engine-test.mjs",
     "tests/audio-lab-tempo-hypotheses-test.mjs",
     "tests/audio-lab-transport-test.mjs",
     "tests/audio-lab-validated-warp-map-test.mjs",

@@ -90,4 +90,38 @@ assert.throws(() => onsetEnvelopeFromPcm([new Float32Array([NaN, 0, 0])], SR, {}
 assert.throws(() => inferTempoFromEnvelope([1, 2], .01), /typed array/);
 assert.throws(() => inferTempoFromEnvelope(new Float64Array(10), .01, { minBpm: 200, maxBpm: 100 }), /range/);
 
-console.log('Audio Lab: tempo engine steady, dropout, octave, drift, noise, silence and validation checks passed');
+// 8. Pulse level. A groove with eighth-note hi-hats carries as much regular energy at
+// the eighth as at the quarter: the engine must still report the quarter-note pulse.
+function groove(bpm, seconds) {
+  const beat = 60 / bpm, rnd = lcg(11);
+  const out = new Float32Array(Math.round(seconds * SR));
+  const hit = (t, gain, decay) => {
+    const start = Math.round(t * SR), len = Math.round(.05 * SR);
+    for (let i = 0; i < len && start + i < out.length; i++)
+      out[start + i] += gain * rnd() * Math.exp(-i / (decay * SR));
+  };
+  for (let k = 0; k * beat < seconds - .5; k++) {
+    const t = .5 + k * beat;
+    if (k % 4 === 0 || k % 4 === 2) hit(t, 1, .03);      // kick
+    if (k % 4 === 1 || k % 4 === 3) hit(t, .9, .012);    // snare
+    hit(t, .35, .004);                                   // hi-hat on the beat
+    hit(t + beat / 2, .3, .004);                         // hi-hat on the off-beat
+  }
+  return out;
+}
+{
+  const r = analyseTempo([groove(100, 30)], SR);
+  assert(Math.abs(r.bpm - 100) <= 4, `groove: reported ${r.bpm.toFixed(1)} instead of the quarter-note pulse`);
+  assert.equal(r.pulseUnit, 'noire');
+  // Alternatives stay available: the level is a musical reading, not a measurement.
+  assert(r.pulseLevels.length >= 2, 'alternative pulse levels must be offered');
+  assert.equal(r.pulseLevels[0].ratio, 1);
+  assert(r.pulseLevels.every((l, i, a) => i === 0 || l.relativeCost >= a[i - 1].relativeCost),
+    'pulse levels must be ranked');
+  const double = r.pulseLevels.find(l => l.ratio === 2);
+  assert(double && Math.abs(double.bpm - 200) <= 8, 'the eighth-note level must be listed');
+  assert.equal(double.unitIfQuarter, 'croche');
+  assert(r.pulseLevelConfidence >= 0 && r.pulseLevelConfidence <= 1);
+}
+
+console.log('Audio Lab: tempo engine steady, dropout, octave, drift, noise, silence, pulse level and validation checks passed');

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "4fa6ffce0dbc2819",
+  "revision": "b8188a23456dfa30",
   "resources": [
     {
       "path": "accessibility.css",
@@ -135,6 +135,11 @@
     {
       "path": "audio-lab/analysis/onsets.mjs",
       "sha256": "5d3f51e087329250ebeafc0ce43555fbcb777f4a56bdc8b25cd6145515285a18",
+      "text": true
+    },
+    {
+      "path": "audio-lab/analysis/tempo-engine.mjs",
+      "sha256": "ebb4d5760f1d684362903495ba4ced8ed5bcbf72351174b2959398e3d4009bdd",
       "text": true
     },
     {

@@ -871,7 +871,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   letter-spacing:.6px;white-space:nowrap;
 }
 .index2-settings-panel{
-  display:none;position:fixed;z-index:60;top:var(--settings-nav-top,70px);right:12px;bottom:52px;
+  display:none;position:fixed;z-index:20000;top:var(--settings-nav-top,70px);right:12px;bottom:52px;
   width:min(390px,calc(100vw - 24px));padding:16px;
   background:#111116;border:1px solid #30303a;border-radius:10px;
   box-shadow:0 20px 70px rgba(0,0,0,.55);overflow-y:auto;
@@ -908,7 +908,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   letter-spacing:.6px;color:var(--cyan);
 }
 .index2-settings-backdrop{
-  display:none;position:fixed;inset:0;z-index:59;background:rgba(0,0,0,.42);
+  display:none;position:fixed;inset:0;z-index:19990;background:rgba(0,0,0,.42);
 }
 .index2-settings-backdrop.open{display:block;}
 
@@ -940,7 +940,7 @@ header #fullscreenBtn,header #index2SettingsBtn:hover,header #index2SettingsBtn:
   #index2SettingsBtn{font-size:14px;}
   .mobile-tabs{grid-template-columns:repeat(4,1fr);}
   .index2-settings-panel{
-    position:static;inset:auto;width:auto;height:100%;max-height:none;
+    position:relative;inset:auto;width:auto;height:100%;max-height:none;
     border-radius:6px;box-shadow:none;padding:12px;
   }
   .index2-settings-panel.mobile-active{display:flex ;}

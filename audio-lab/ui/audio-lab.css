@@ -267,6 +267,141 @@ html#renaxApp:is([data-theme=light],[data-theme=avant]) #audioLabRoot .al-stop{b
 html#renaxApp:is([data-theme=light],[data-theme=avant]) #audioLabRoot #alDeleteMarker{background:var(--bg);color:#8d3039;border-color:#b8787d}
 html#renaxApp[data-theme=avant] #audioLabRoot .al-primary{background:var(--ag-lime);color:var(--ag-ink);border-color:#9cba13}
 
+/* Reorganized workstation: keep RENAX chrome, give the waveform the working space. */
+#audioLabRoot{
+ --al-surface:var(--panel,#121922);--al-surface-raised:var(--bg,#0b1016);
+ background:var(--al-bg);box-shadow:none
+}
+#audioLabRoot .al-top{min-height:58px;padding:10px 16px;background:var(--al-panel);border-color:var(--al-stroke)}
+#audioLabRoot h2{font-size:21px;letter-spacing:.07em}
+#audioLabRoot .al-primary{height:40px;background:var(--al-warm);border-color:var(--al-warm);box-shadow:none}
+#audioLabRoot .al-workspace{display:grid;grid-template-columns:minmax(0,1fr) 332px;flex:1 1 auto;min-height:0;overflow:hidden}
+#audioLabRoot .al-canvas-column{display:grid;grid-template-rows:auto auto minmax(270px,1fr) auto;min-width:0;min-height:0;overflow:hidden}
+#audioLabRoot .al-section-label{flex:0 0 auto;color:var(--al-muted);font:700 11px var(--font,system-ui);letter-spacing:.12em}
+#audioLabRoot .al-tool-strip{gap:12px;padding:6px 12px;background:var(--al-panel);border-color:var(--al-stroke)}
+#audioLabRoot .al-tools{gap:2px;scrollbar-width:thin}
+#audioLabRoot .al-tool{min-width:auto;height:40px;padding:0 9px;gap:6px;border-radius:5px;font-size:11px}
+#audioLabRoot .al-tool-icon{min-width:17px;height:20px;font-size:16px}
+#audioLabRoot .al-tool-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#audioLabRoot .al-tool.is-active{background:var(--al-surface-raised);border-color:var(--al-cyan);box-shadow:inset 0 -2px var(--al-cyan)}
+#audioLabRoot .al-tool-actions{padding-left:9px;border-left:1px solid var(--al-stroke)}
+#audioLabRoot .al-tool-actions button{min-height:40px;font-size:11px;background:var(--al-bg)}
+#audioLabRoot .al-signature-strip{min-height:48px;padding:6px 12px;gap:14px;background:var(--al-panel);border-color:var(--al-stroke)}
+#audioLabRoot .al-signature label,#audioLabRoot .al-groups,#audioLabRoot .al-signature-help{font-size:11px}
+#audioLabRoot .al-editor{min-height:270px;margin:10px 12px 0;background:var(--al-bg);box-shadow:none}
+#audioLabRoot .al-editor-top{min-height:34px;background:var(--al-panel);font-size:11px;letter-spacing:.08em}
+#audioLabRoot .al-ruler{height:32px;flex-basis:32px;background:var(--al-bg)}
+#audioLabRoot .al-wave-container{min-height:190px;background:var(--al-bg)}
+#audioLabRoot .al-empty{background:var(--al-bg);gap:8px}
+#audioLabRoot .al-empty-symbol span{background:var(--al-wave-primary);box-shadow:none}
+#audioLabRoot .al-timeline-footer{background:var(--al-panel)}
+#audioLabRoot .al-transport{display:grid;grid-template-columns:minmax(290px,1.2fr) auto minmax(270px,.9fr);align-items:center;gap:10px;margin:10px 12px 12px;padding:9px 10px;min-height:60px;border:1px solid var(--al-stroke);border-radius:6px;background:var(--al-panel);box-shadow:none}
+#audioLabRoot .al-transport-main,#audioLabRoot .al-loop-controls,#audioLabRoot .al-transport-options{display:flex;align-items:center;gap:8px;min-width:0}
+#audioLabRoot .al-loop-controls,#audioLabRoot .al-transport-options{padding-left:10px;border-left:1px solid var(--al-stroke)}
+#audioLabRoot .al-transport label,#audioLabRoot .al-loop-controls label{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:var(--al-muted);font-size:11px}
+#audioLabRoot input[type=checkbox]{width:16px;height:16px;min-width:16px;margin:0;accent-color:var(--al-cyan)}
+#audioLabRoot .al-transport input[type=number]{width:64px;height:36px;padding:4px 7px;border:1px solid var(--al-stroke);border-radius:4px;background:var(--al-bg);color:var(--al-ink)}
+#audioLabRoot .al-transport input[type=range]{width:78px;min-width:54px}
+#audioLabRoot .al-transport-main>input[type=range]{flex:1 1 100px;width:auto}
+#audioLabRoot .al-loop-controls button{min-height:36px;padding:5px 8px;border:1px solid var(--al-stroke);border-radius:4px;background:var(--al-bg);color:var(--al-ink);font-size:11px}
+#audioLabRoot .al-play,#audioLabRoot .al-stop{min-width:40px;height:40px}
+#audioLabRoot .al-side-rail{min-width:0;overflow-y:auto;overscroll-behavior:contain;border-left:1px solid var(--al-stroke);background:var(--al-panel);scrollbar-width:thin}
+#audioLabRoot .al-rail-section{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin:0;padding:15px 16px;border:0;border-bottom:1px solid var(--al-stroke);border-radius:0;background:transparent;box-shadow:none;color:var(--al-ink)}
+#audioLabRoot .al-rail-heading{display:flex;align-items:center;gap:9px}
+#audioLabRoot .al-rail-heading h3{margin:0;color:var(--al-ink);font:700 14px/1.2 var(--font,system-ui)}
+#audioLabRoot .al-step{color:var(--al-warm);font:700 11px ui-monospace,monospace}
+#audioLabRoot .al-rail-section p{margin:0;color:var(--al-muted);font-size:12px;line-height:1.45}
+#audioLabRoot .al-rail-section>button,#audioLabRoot .al-project-actions button{min-height:40px;padding:7px 10px;border:1px solid var(--al-stroke);border-radius:5px;background:var(--al-bg);color:var(--al-ink);font-weight:700}
+#audioLabRoot .al-analysis-panel>button,#audioLabRoot #alPrepareWarp{background:var(--al-ink);color:var(--al-bg);border-color:var(--al-ink)}
+#audioLabRoot .al-analysis-guide{display:flex;flex-direction:column;gap:7px;margin:0;padding:0;border:0}
+#audioLabRoot .al-analysis-guide legend{margin-bottom:7px;color:var(--al-ink);font-size:11px;font-weight:700}
+#audioLabRoot .al-choice-row{display:grid;grid-template-columns:repeat(3,1fr)}
+#audioLabRoot .al-choice-row label{position:relative;min-width:0}
+#audioLabRoot .al-choice-row input{position:absolute;opacity:0;pointer-events:none}
+#audioLabRoot .al-choice-row span{display:flex;align-items:center;justify-content:center;min-height:38px;padding:5px;border:1px solid var(--al-stroke);background:var(--al-bg);color:var(--al-muted);font-size:11px;font-weight:700}
+#audioLabRoot .al-choice-row label:first-child span{border-radius:5px 0 0 5px}
+#audioLabRoot .al-choice-row label:last-child span{border-radius:0 5px 5px 0}
+#audioLabRoot .al-choice-row label+label span{border-left:0}
+#audioLabRoot .al-choice-row input:checked+span{background:var(--al-cyan);border-color:var(--al-cyan);color:#071217}
+#audioLabRoot .al-choice-row input:focus-visible+span{outline:2px solid var(--al-warm);outline-offset:2px}
+#audioLabRoot .al-analysis-guide small,#audioLabRoot .al-tempo-level small{color:var(--al-muted);font-size:10px;line-height:1.4}
+#audioLabRoot .al-tempo-level{display:flex;flex-direction:column;gap:7px;padding:10px;border:1px solid var(--al-stroke);border-radius:5px;background:var(--al-bg)}
+#audioLabRoot .al-tempo-level[hidden]{display:none}
+#audioLabRoot .al-tempo-level>span{color:var(--al-muted);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+#audioLabRoot .al-tempo-level>div{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+#audioLabRoot .al-tempo-level button{display:flex;min-width:0;min-height:46px;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--al-stroke);border-radius:4px;background:var(--al-panel);color:var(--al-ink)}
+#audioLabRoot .al-tempo-level button[aria-pressed=true]{border-color:var(--al-cyan);box-shadow:inset 0 -2px var(--al-cyan)}
+#audioLabRoot .al-tempo-level b{font-size:10px}
+#audioLabRoot .al-tempo-level output{font:800 16px var(--font,system-ui)}
+#audioLabRoot #alPulseResult,#audioLabRoot #alWarpStatus,#audioLabRoot #alProjectStatus{display:block;color:var(--al-muted);font-size:11px;line-height:1.45}
+#audioLabRoot .al-inspector{min-height:0}
+#audioLabRoot #alMarkerInfo{flex:0 0 auto;font-size:12px}
+#audioLabRoot .al-inspector>label{justify-content:space-between;font-size:11px}
+#audioLabRoot .al-inspector input{height:36px}
+#audioLabRoot #alDeleteMarker{align-self:flex-start;height:38px}
+#audioLabRoot .al-warp-marker-editor{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:2px 0 0;padding:10px;border-radius:5px;background:var(--al-bg)}
+#audioLabRoot .al-warp-marker-editor label{justify-content:space-between}
+#audioLabRoot .al-warp-panel{display:flex;align-items:stretch;flex-wrap:nowrap;gap:10px;margin:0;padding:15px 16px;border:0;border-bottom:1px solid var(--al-stroke);border-radius:0;background:transparent}
+#audioLabRoot .al-warp-mode{display:grid;grid-template-columns:1fr 1fr;gap:0}
+#audioLabRoot .al-warp-mode button{min-height:38px;border-radius:0;background:var(--al-bg)}
+#audioLabRoot .al-warp-mode button:first-child{border-radius:5px 0 0 5px}
+#audioLabRoot .al-warp-mode button:last-child{border-radius:0 5px 5px 0}
+#audioLabRoot .al-warp-tempos{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:8px}
+#audioLabRoot .al-warp-tempos label{display:flex;flex-direction:column;align-items:stretch;gap:5px;font-size:11px}
+#audioLabRoot .al-warp-panel input[type=number]{width:100%;height:38px}
+#audioLabRoot .al-warp-confirm{max-width:none;align-items:flex-start!important;line-height:1.4}
+#audioLabRoot .al-project-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;padding:0;border:0}
+#audioLabRoot .al-tempo-alternatives{display:flex;flex-direction:column;align-items:stretch;gap:5px;margin:0;padding:8px;border-radius:4px;background:var(--al-bg)}
+#audioLabRoot .al-status-bar{min-height:30px;border-top:1px solid var(--al-stroke)}
+#audioLabRoot .al-phase{display:none}
+
+html#renaxApp[data-theme=ivory] #audioLabRoot :is(.al-side-rail,.al-rail-section,.al-transport){background:#1b4247;color:#f6f1e5;border-color:#496b76}
+html#renaxApp:is([data-theme=light],[data-theme=avant]) #audioLabRoot :is(.al-side-rail,.al-rail-section,.al-transport){background:var(--panel);color:var(--text);border-color:var(--border)}
+html#renaxApp:is([data-theme=light],[data-theme=avant]) #audioLabRoot :is(.al-rail-heading h3,.al-rail-section strong){color:var(--text)}
+html#renaxApp:is([data-theme=light],[data-theme=avant]) #audioLabRoot :is(.al-rail-section p,#alPulseResult,#alWarpStatus,#alProjectStatus){color:var(--text-muted)}
+html#renaxApp:is([data-theme=light],[data-theme=avant]) #audioLabRoot .al-analysis-panel>button,
+html#renaxApp:is([data-theme=light],[data-theme=avant]) #audioLabRoot #alPrepareWarp{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+@media(max-width:1500px){
+ #audioLabRoot .al-workspace{grid-template-columns:minmax(0,1fr) 300px}
+ #audioLabRoot .al-section-label,#audioLabRoot .al-signature-strip>.al-rail-label{display:none}
+ #audioLabRoot .al-tool{padding-inline:7px}
+ #audioLabRoot .al-transport{grid-template-columns:minmax(250px,1fr) auto}
+ #audioLabRoot .al-transport-options{grid-column:1/-1;padding:8px 0 0;border-left:0;border-top:1px solid var(--al-stroke)}
+}
+@media(max-width:1100px){
+ #audioLabRoot .al-workspace{display:flex;flex-direction:column;overflow:visible}
+ #audioLabRoot .al-canvas-column{display:flex;flex:0 0 auto;flex-direction:column;overflow:visible}
+ #audioLabRoot .al-section-label{display:none}
+ #audioLabRoot .al-tool-strip{position:sticky;top:0;z-index:4;overflow:hidden}
+ #audioLabRoot .al-tools{overflow-x:auto}
+ #audioLabRoot .al-tool-actions{border-left:0;padding-left:0}
+ #audioLabRoot .al-editor{min-height:280px;flex-basis:280px}
+ #audioLabRoot .al-transport{display:flex;flex-wrap:wrap;margin:8px 9px;min-height:0}
+ #audioLabRoot .al-transport-main{width:100%}
+ #audioLabRoot .al-loop-controls,#audioLabRoot .al-transport-options{flex:1 1 300px;padding:8px 0 0;border-left:0;border-top:1px solid var(--al-stroke)}
+ #audioLabRoot .al-side-rail{overflow:visible;border-left:0;border-top:1px solid var(--al-stroke)}
+ #audioLabRoot .al-rail-section{padding:14px}
+ #audioLabRoot .al-warp-panel{margin:0;padding:14px}
+}
+@media(max-width:640px){
+ #audioLabRoot .al-top{min-height:52px;padding:8px 10px}
+ #audioLabRoot h2{font-size:19px}
+ #audioLabRoot .al-tool{min-height:44px;height:44px}
+ #audioLabRoot .al-tool-actions button{min-width:44px;min-height:44px}
+ #audioLabRoot .al-signature-strip{overflow-x:auto}
+ #audioLabRoot .al-editor{min-height:300px;flex-basis:300px}
+ #audioLabRoot .al-transport{gap:8px}
+ #audioLabRoot .al-play,#audioLabRoot .al-stop,#audioLabRoot .al-loop-controls button{min-width:44px;min-height:44px;height:44px}
+ #audioLabRoot .al-loop-controls,#audioLabRoot .al-transport-options{flex-basis:100%;flex-wrap:wrap}
+ #audioLabRoot .al-transport-options label{min-height:44px}
+ #audioLabRoot input[type=checkbox]{width:20px;height:20px;min-width:20px}
+ #audioLabRoot .al-transport input[type=range]{flex:1 1 82px}
+ #audioLabRoot .al-rail-section>button,#audioLabRoot .al-project-actions button{min-height:44px}
+ #audioLabRoot .al-warp-mode button{min-height:44px}
+ #audioLabRoot .al-choice-row span,#audioLabRoot .al-tempo-level button{min-height:44px}
+}
+
 @media(max-width:1500px){
  #audioLabRoot .al-bottom{grid-template-columns:minmax(0,1fr)}
  #audioLabRoot .al-transport{flex-wrap:wrap}

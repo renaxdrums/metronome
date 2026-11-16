@@ -7,6 +7,12 @@ assert.equal(estimated.candidates[0].bpm, 120);
 assert(estimated.candidates.some(candidate => candidate.bpm === 60 && candidate.relation === 'half'));
 assert(estimated.candidates.some(candidate => candidate.bpm === 240 && candidate.relation === 'double'));
 assert(estimated.confidence < 1, 'attack regularity alone cannot prove the perceived pulse');
+const binaryGuided = inferTempoFromOnsets(steady, { subdivision:'binary' });
+const ternaryGuided = inferTempoFromOnsets(steady, { subdivision:'ternary' });
+assert(binaryGuided.candidates.length > 0 && ternaryGuided.candidates.length > 0,
+  'soft musician guidance preserves acoustic candidates');
+assert.throws(() => inferTempoFromOnsets(steady, { subdivision:'forced' }), /range/);
+assert.throws(() => inferTempoFromOnsets(steady, { originSeconds:-1 }), /range/);
 
 // A missing played attack must not remove the inferred periodicity entirely.
 const implicit = steady.filter((_, i) => i % 4 !== 2);

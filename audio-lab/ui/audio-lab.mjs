@@ -30,6 +30,7 @@ let warp = null, warpPeaks = null, warpMap = null, meterTimeline = null;
 let warpJob = null, playbackMode = 'original', warpGeneration = 0;
 let projectGeneration=0;
 let onsetEvidence = [];
+let detectedTempoBase = null;
 let selection = null, snapEnabled = false, gesture = null;
 const touchPointers=new Map();
 let pinch=null,suppressCanvasClickUntil=0;
@@ -219,13 +220,16 @@ function drawWave() {
   }
 }
 function markerLabel(marker) {
-  if(marker.kind==='downbeat')return 'Ⅰ';
+  if(marker.kind==='downbeat')return '⚑';
   if(marker.kind==='meter')return marker.meter.numerator+'/'+marker.meter.denominator;
   if(marker.kind==='tempo')return '♩';
   return 'W';
 }
 function markerDescription(marker) {
   let detail=kinds[marker.kind];
+  if(marker.kind==='downbeat'){
+    const meter=readMeter();detail+=' · '+meter.numerator+'/'+meter.denominator;
+  }
   if(marker.kind==='meter')detail+=' '+marker.meter.numerator+'/'+marker.meter.denominator+
     (marker.meter.groups.length>1?' · '+marker.meter.groups.join('+'):'');
   if(marker.kind==='tempo')detail+=' · '+marker.bpm+' BPM'+(marker.validated?' · validé':' · à vérifier');
@@ -241,6 +245,12 @@ function refreshInspector() {
   markerTime.value=current?current.seconds.toFixed(3):'0';
   $('alWarpMarkerEditor').hidden=current?.kind!=='warp';
   $('alTempoMarkerEditor').hidden=current?.kind!=='tempo';
+  $('alDownbeatMarkerEditor').hidden=current?.kind!=='downbeat';
+  if(current?.kind==='downbeat'){
+    const meter=readMeter(),preset=meter.numerator+'/'+meter.denominator;
+    $('alDownbeatMeter').value=[2,3,4,6,9,12].includes(meter.numerator)&&
+      ['2/4','3/4','4/4','6/8','9/8','12/8'].includes(preset)?preset:'custom';
+  }
   if(current?.kind==='warp'){
     $('alWarpMarkerBeat').value=String(current.beat);
     $('alWarpMarkerValidated').checked=current.validated===true;
@@ -480,7 +490,8 @@ function unload(){
   if(warp){warp.session.dispose();warp=null;}warpPeaks=null;warpMap=null;meterTimeline=null;playbackMode='original';
   $('alWarpConfirmed').checked=false;$('alWarpProgress').hidden=true;$('alCancelWarp').hidden=true;
   $('alWarpStatus').textContent='Validez le tempo source pour préparer Warp.';
-  onsetEvidence=[];$('alTempoAlternatives').hidden=true;$('alTempoAlternatives').replaceChildren();
+  onsetEvidence=[];detectedTempoBase=null;$('alTempoLevel').hidden=true;
+  $('alTempoAlternatives').hidden=true;$('alTempoAlternatives').replaceChildren();
   loopA=0;loopB=null;$('alLoopEnabled').checked=false;$('alLoopInfo').textContent='—';$('alPulseResult').textContent='';
   if(click){click.dispose();click=null;}
   originalClickWanted=false;$('alClickEnabled').checked=false;$('alClickEnabled').disabled=false;
@@ -843,6 +854,23 @@ for(const id of ['alWarpSourceBpm','alWarpTargetBpm']){
 for(const id of ['alNumerator','alDenominator','alGroups']){
   $(id).addEventListener('change',()=>{if(warp||warpJob)invalidateWarp();refreshOriginalGrid();paint();});
 }
+$('alDownbeatMeter').addEventListener('change',event=>{
+  if(event.target.value==='custom')return;
+  const [numerator,denominator]=event.target.value.split('/').map(Number);
+  $('alNumerator').value=String(numerator);$('alDenominator').value=String(denominator);
+  $('alGroups').value=denominator===8&&numerator%3===0?
+    Array.from({length:numerator/3},()=>3).join('+'):'';
+  if(warp||warpJob)invalidateWarp();
+  click?.configure(readMeter());refreshOriginalGrid();refreshInspector();paint();
+  $('alDetectPulse').textContent='Recalculer la pulsation';
+  setStatus('Métrique du drapeau modifiée. Relancez manuellement l’analyse guidée.');
+});
+for(const input of root.querySelectorAll('input[name=alPulseFeel]'))input.addEventListener('change',()=>{
+  if($('alPulseResult').textContent&&$('alPulseResult').textContent!=='Aucune analyse'){
+    $('alDetectPulse').textContent='Recalculer la pulsation';
+    $('alPulseResult').textContent='Indications modifiées · résultat à recalculer';
+  }
+});
 $('alPrepareWarp').addEventListener('click',prepareWarp);
 $('alCancelWarp').addEventListener('click',()=>warpJob?.abort());
 $('alOriginalMode').addEventListener('click',()=>setPlaybackMode('original'));
@@ -974,6 +1002,23 @@ $('alLoopEnabled').addEventListener('change',event=>{
   if(!player){event.target.checked=false;return;}
   refreshLoop();commitHistory();
 });
+function chooseDetectedTempo(ratio){
+  if(!Number.isFinite(detectedTempoBase))return;
+  const bpm=Math.round(detectedTempoBase*ratio*10)/10;
+  if(bpm<20||bpm>400)return;
+  $('alManualBpm').value=String(bpm);$('alWarpSourceBpm').value=String(bpm);
+  $('alWarpConfirmed').checked=false;
+  if(warp||warpJob)invalidateWarp('Le niveau du tempo a changé : préparez un nouveau rendu Warp.');
+  else refreshWarpControls();
+  click?.configure({bpm});refreshOriginalGrid();paint();
+  for(const [id,value] of [['alTempoHalf',.5],['alTempoBase',1],['alTempoDouble',2]])
+    $(id).setAttribute('aria-pressed',String(value===ratio));
+  $('alPulseResult').textContent='Tempo retenu : '+bpm+' BPM · '+
+    (ratio===.5?'moitié du tempo détecté':ratio===2?'double du tempo détecté':'hypothèse détectée');
+  setStatus('Pulsation réglée à '+bpm+' BPM, toujours à vérifier à l’oreille.');
+}
+for(const [id,ratio] of [['alTempoHalf',.5],['alTempoBase',1],['alTempoDouble',2]])
+  $(id).addEventListener('click',()=>chooseDetectedTempo(ratio));
 $('alDetectPulse').addEventListener('click',async()=>{
   if(!decoded||busy)return;
   const token=++pulseJob;
@@ -988,7 +1033,11 @@ $('alDetectPulse').addEventListener('click',async()=>{
     const result=await detectOnsetsInWorker({buffer,maxSeconds:35,maxOnsets:3000,signal});
     if(token!==pulseJob||signal.aborted)return;
     onsetEvidence=result.onsets.filter(onset=>onset.seconds>0&&onset.seconds<buffer.duration);
-    const hypotheses=inferTempoFromOnsets(result.onsets);
+    const subdivision=root.querySelector('input[name=alPulseFeel]:checked')?.value||'auto';
+    const assisted=subdivision!=='auto';
+    const guidedDownbeat=assisted?markers.find(marker=>marker.kind==='downbeat'):null;
+    const hypotheses=inferTempoFromOnsets(result.onsets,{subdivision,
+      originSeconds:guidedDownbeat?.seconds??null});
     const alternatives=$('alTempoAlternatives');alternatives.replaceChildren();
     if(!hypotheses.candidates.length){
       $('alPulseResult').textContent='Pulsation indéterminée';
@@ -998,6 +1047,15 @@ $('alDetectPulse').addEventListener('click',async()=>{
       return;
     }
     const first=hypotheses.candidates[0];
+    detectedTempoBase=first.bpm;
+    const levels=[[.5,$('alTempoHalf')],[1,$('alTempoBase')],[2,$('alTempoDouble')]];
+    for(const [ratio,button] of levels){
+      const value=Math.round(first.bpm*ratio*10)/10;
+      button.querySelector('output').textContent=String(value);
+      button.disabled=value<20||value>400;
+      button.setAttribute('aria-pressed',String(ratio===1));
+    }
+    $('alTempoLevel').hidden=false;
     $('alManualBpm').value=String(first.bpm);
     $('alWarpSourceBpm').value=String(first.bpm);
     $('alWarpConfirmed').checked=false;
@@ -1017,13 +1075,17 @@ $('alDetectPulse').addEventListener('click',async()=>{
       local.textContent='Tempo local variable : '+hypotheses.localTempo.length+' fenêtres mesurées.';
       alternatives.append(local);
     }
-    const downbeat=markers.find(marker=>marker.kind==='downbeat');
-    const metric=inferMetricHypotheses(result.onsets,{tempoBpm:first.bpm,
+    const downbeat=guidedDownbeat;
+    const metricOptions={tempoBpm:first.bpm,
       originSeconds:downbeat?.seconds??0,durationSeconds:buffer.duration,
-      confirmedTempo:false,confirmedOrigin:!!downbeat});
+      pulse:subdivision==='ternary'?{count:3,denominator:8}:{count:1,denominator:4},
+      confirmedTempo:false,confirmedOrigin:!!downbeat};
+    if(downbeat)metricOptions.candidateMeters=[readMeter()];
+    const metric=inferMetricHypotheses(result.onsets,metricOptions);
     if(metric.candidates.length){
       const label=document.createElement('strong');
-      label.textContent='Métriques possibles · indices non validés'+(metric.ambiguous?' · ambiguës':'');
+      label.textContent=(downbeat?'Métrique du drapeau':'Métriques possibles')+
+        ' · indice non validé'+(metric.ambiguous?' · ambigu':'');
       alternatives.append(label);
       for(const candidate of metric.candidates.slice(0,3)){
         const item=document.createElement('span');
@@ -1035,7 +1097,8 @@ $('alDetectPulse').addEventListener('click',async()=>{
     alternatives.hidden=false;refreshWarpControls();
     click?.configure({bpm:first.bpm});
     $('alPulseResult').textContent='≈ '+first.bpm+' BPM · hypothèse';
-    setStatus('Pulsation estimée à '+first.bpm+' BPM (non confirmée). Vérifier à l’oreille et ajuster.');
+    button.textContent='Recalculer la pulsation';
+    setStatus((assisted?'Analyse guidée':'Analyse automatique seule')+' : pulsation estimée à '+first.bpm+' BPM (non confirmée).');
   }catch(error){
     if(token!==pulseJob||signal.aborted)return;
     $('alPulseResult').textContent='Analyse indisponible';

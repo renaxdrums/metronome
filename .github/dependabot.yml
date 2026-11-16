@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # network-origins.js charge onnxruntime-web depuis le CDN a une version figee.
+      # La dependance de developpement sert cette meme version au banc de tests :
+      # tests/amorce-neural-route.cjs la retrouve par correspondance exacte de version
+      # et echoue si elle differe. Les deux doivent donc monter ensemble, apres
+      # validation des voix neuronales, jamais par une montee automatique isolee.
+      - dependency-name: onnxruntime-web
   - package-ecosystem: github-actions
     directory: /
     schedule:

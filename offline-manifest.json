@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "c5262ed660108a67",
+  "revision": "4fa6ffce0dbc2819",
   "resources": [
     {
       "path": "accessibility.css",
@@ -19,7 +19,7 @@
     },
     {
       "path": "app-base.css",
-      "sha256": "eaffaff1b6e895ac8041450f61ac2c5740ec8ce5d860aeb2183399780ca99678",
+      "sha256": "e09e7e8e53bff071dab974b5eb539e3dae343d991eb897a83f042982c2e1a37a",
       "text": true
     },
     {
@@ -484,7 +484,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "b59e446afa680343d3549c5efe2318dafdc562ff5b3e8947c660124bf2565b91",
+      "sha256": "a01c8508ad0bc547cbb372219bade975964b8b10f317a2af028ab2b9d1c8c185",
       "text": true
     },
     {
@@ -624,7 +624,7 @@
     },
     {
       "path": "playback-support.css",
-      "sha256": "be7d47c55905e193a2be2359e429434ece68a84bb67531129a83e746f3d1f18f",
+      "sha256": "87b2fe9d298636de7b2a460a0fa277ebccef180b919dbb1ccbfc11d9c3794b96",
       "text": true
     },
     {

@@ -106,6 +106,18 @@ const {start}=require('./audio-harness.cjs');
    polyrhythmMeasures=[m];measures=polyrhythmMeasures;activeMeasureIndex=0;
    renderSequencerList();renderActiveMeasure();
   });
+  await live.evaluate(()=>{
+   window.polyDiagnostic={stops:[],failures:[]};
+   const originalStop=stopMetronome,originalFailure=reportAudioFailure;
+   stopMetronome=function(...args){
+    window.polyDiagnostic.stops.push({time:performance.now(),stack:new Error('stopMetronome called').stack,arguments:args});
+    return originalStop(...args);
+   };
+   reportAudioFailure=function(error){
+    window.polyDiagnostic.failures.push({message:String(error),stack:error?.stack});
+    return originalFailure(error);
+   };
+  });
   await live.locator('#playBtn').click();await live.waitForFunction(()=>isPlaying);
   await live.waitForTimeout(60);
   await live.evaluate(()=>{
@@ -113,7 +125,16 @@ const {start}=require('./audio-harness.cjs');
    renderSequencerList();renderActiveMeasure();
   });
   await live.waitForTimeout(700);
-  assert.equal(await live.evaluate(()=>isPlaying),true,'removing two voices must not interrupt playback');
+  const liveDiagnostic=await live.evaluate(()=>({
+   playing:isPlaying,
+   appMode,
+   voiceCount:measures[0]?.polyVoices?.length,
+   position:polyEventIndex,
+   nextNoteTime,
+   now:audioCtx?.currentTime,
+   diagnostic:window.polyDiagnostic
+  }));
+  assert.equal(liveDiagnostic.playing,true,'removing two voices must not interrupt playback: '+JSON.stringify(liveDiagnostic));
   await live.evaluate(()=>{
    const m=measures[0];m.polyVoiceCount=4;ensurePolyStates(m);
    m.polyVoices[0].subdivisions[0]=4;ensurePolyStates(m);

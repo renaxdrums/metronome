@@ -85,7 +85,6 @@
 <link rel="stylesheet" href="tuner-interface.css?v=6d818b206138">
 <link rel="stylesheet" href="poly-layout.css?v=a1fe4d65f5a1">
 <link rel="stylesheet" href="tuner-fit.css?v=595254bcedb6">
-  <link rel="stylesheet" href="audio-lab/ui/audio-lab.css?v=5e1143c7c850">
 </head>
 <body>
 <div id="renaxArrival" aria-hidden="true" data-no-translate>
@@ -122,7 +121,7 @@
     <button data-tab="training"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2M12 9v4l3 2"/></svg>Entraînement</button>
   </nav>
 
-<nav id="workspaceNav" role="tablist" aria-label="Espaces de travail"><button type="button" data-workspace="metronome" role="tab" aria-controls="sequencerContainer" aria-selected="true" tabindex="0"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 20h10L14 4h-4L7 20Z M12 16l6-9 M9 20v-3h6v3"></path></svg><span data-i18n-key="workspace.metronome">Métronome</span></button><button type="button" data-workspace="polyrhythm" role="tab" aria-controls="sequencerContainer" aria-selected="false" tabindex="-1"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="12" r="6"></circle><circle cx="15" cy="12" r="6"></circle></svg><span data-i18n-key="workspace.polyrhythm">Polyrythmie</span></button><button type="button" data-workspace="training" role="tab" aria-controls="mobileTrainingHost" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M9 2h6M12 5V2M12 9v4l3 2"></path></svg><span data-i18n-key="workspace.training">Entraînement</span></button><button type="button" data-workspace="sequence" role="tab" aria-controls="sequencePane" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h4v4H4zM10 5h4v4h-4zM16 5h4v4h-4zM4 15h16M4 19h16"></path></svg><span data-i18n-key="workspace.sequence">Séquenceur</span></button><button type="button" data-workspace="multi" role="tab" aria-controls="sequencePane" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16M8 3v4M15 10v4M10 17v4"></path></svg><span data-i18n-key="workspace.multi">Multipiste</span></button><button type="button" data-workspace="tracks" role="tab" aria-controls="songsRoot" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"></path></svg><span data-i18n-key="workspace.tracks">Track</span></button><button type="button" data-workspace="audio-lab" role="tab" aria-controls="audioLabRoot" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 13v-2m4 8V5m4 14V5m4 10V9m4 10V5M2 22h20"/></svg><span>Audio Lab</span></button></nav>
+<nav id="workspaceNav" role="tablist" aria-label="Espaces de travail"><button type="button" data-workspace="metronome" role="tab" aria-controls="sequencerContainer" aria-selected="true" tabindex="0"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 20h10L14 4h-4L7 20Z M12 16l6-9 M9 20v-3h6v3"></path></svg><span data-i18n-key="workspace.metronome">Métronome</span></button><button type="button" data-workspace="polyrhythm" role="tab" aria-controls="sequencerContainer" aria-selected="false" tabindex="-1"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="12" r="6"></circle><circle cx="15" cy="12" r="6"></circle></svg><span data-i18n-key="workspace.polyrhythm">Polyrythmie</span></button><button type="button" data-workspace="training" role="tab" aria-controls="mobileTrainingHost" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M9 2h6M12 5V2M12 9v4l3 2"></path></svg><span data-i18n-key="workspace.training">Entraînement</span></button><button type="button" data-workspace="sequence" role="tab" aria-controls="sequencePane" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h4v4H4zM10 5h4v4h-4zM16 5h4v4h-4zM4 15h16M4 19h16"></path></svg><span data-i18n-key="workspace.sequence">Séquenceur</span></button><button type="button" data-workspace="multi" role="tab" aria-controls="sequencePane" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16M8 3v4M15 10v4M10 17v4"></path></svg><span data-i18n-key="workspace.multi">Multipiste</span></button><button type="button" data-workspace="tracks" role="tab" aria-controls="songsRoot" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"></path></svg><span data-i18n-key="workspace.tracks">Track</span></button></nav>
   <div class="main-grid" aria-busy="true">
     <div class="panel panel-params" data-panel="params">
       <div class="panel-title"><svg class="orange-ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg>RÉGLAGES</div>
@@ -317,99 +316,6 @@
     </div>
   </div>
 
-
-  <!-- Audio Lab occupies the central editor, leaving the historical sequencer untouched. -->
-  <section id="audioLabRoot" class="audio-lab" aria-labelledby="alTitle" hidden>
-    <div class="al-top">
-      <div class="al-identity"><h2 id="alTitle">AUDIO <em>LAB</em></h2></div>
-      <div class="al-file-actions">
-        <div class="al-source-state"><strong id="alFileName" hidden></strong><span id="alFormatInfo">WAV / MP3 / AIFF · WMA selon navigateur</span></div>
-        <button type="button" id="alOpenFile" class="al-primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg>IMPORTER</button>
-        <input id="alFileInput" type="file" accept=".wav,.wave,.mp3,.aif,.aiff,.wma,audio/wav,audio/mpeg" hidden aria-label="Choisir un fichier audio local">
-      </div>
-    </div>
-
-    <div class="al-workspace">
-      <main class="al-canvas-column" aria-label="Éditeur audio">
-    <div class="al-tool-strip" role="toolbar" aria-label="Outils de timeline musicale">
-      <span class="al-section-label">ÉDITION</span>
-      <div class="al-tools">
-        <button type="button" class="al-tool is-active" data-al-tool="cursor" aria-pressed="true" title="Placer le curseur et déplacer les repères"><span class="al-tool-icon">↖</span><span>Curseur</span></button>
-        <button type="button" class="al-tool" data-al-tool="selection" aria-pressed="false" title="Glisser pour sélectionner une région audio"><span class="al-tool-icon">▤</span><span>Sélection</span></button>
-        <button type="button" class="al-tool" data-al-tool="hand" aria-pressed="false" title="Glisser pour déplacer la vue zoomée"><span class="al-tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V6a2 2 0 0 1 4 0v4-6a2 2 0 0 1 4 0v6-4a2 2 0 0 1 4 0v8c0 4-3 7-7 7h-1c-3 0-5-1-7-4l-2-3a2 2 0 0 1 3-2l2 2"/></svg></span><span>Main</span></button>
-        <button type="button" class="al-tool" data-al-tool="downbeat" aria-pressed="false" title="Placer le drapeau du premier temps"><span class="al-tool-icon">⚑</span><span>Drapeau Temps 1</span></button>
-        <button type="button" class="al-tool" data-al-tool="meter" aria-pressed="false" title="Insérer un changement de signature rythmique"><span class="al-tool-icon">≡</span><span>Métrique</span></button>
-        <button type="button" class="al-tool" data-al-tool="tempo" aria-pressed="false" title="Insérer un repère de tempo"><span class="al-tool-icon">♩</span><span>Tempo</span></button>
-        <button type="button" class="al-tool" data-al-tool="warp" aria-pressed="false" title="Drapeau Warp : placer un ancrage musical à vérifier"><span class="al-tool-icon">⚑</span><span>Drapeau Warp</span></button>
-        <button type="button" class="al-tool" data-al-tool="loop" aria-pressed="false" title="Glisser pour définir et activer une boucle"><span class="al-tool-icon">↺</span><span>Loop</span></button>
-        <button type="button" class="al-tool" data-al-tool="zoom" aria-pressed="false" title="Glisser pour agrandir la zone choisie"><span class="al-tool-icon">⌕</span><span>Zoom</span></button>
-      </div>
-      <div class="al-tool-actions"><button id="alSnap" type="button" aria-pressed="false" title="Aimantation sur la grille validée ou les attaques proches">Snap</button><button id="alUndo" type="button" disabled aria-label="Annuler la dernière correction" title="Annuler la dernière correction">↶ <span>Undo</span></button><button id="alRedo" type="button" disabled aria-label="Rétablir la correction" title="Rétablir la correction">↷ <span>Redo</span></button></div>
-    </div>
-
-    <div class="al-signature-strip">
-      <span class="al-rail-label">GRILLE DE RÉFÉRENCE</span>
-      <div class="al-signature"><label for="alNumerator">Mesure</label><input id="alNumerator" type="number" min="1" max="999" step="1" value="4" inputmode="numeric" aria-label="Numérateur de la signature"><span class="al-signature-divider">/</span><select id="alDenominator" aria-label="Dénominateur de la signature"><option>2</option><option selected>4</option><option>8</option><option>16</option><option>32</option></select></div>
-      <label class="al-groups" for="alGroups">Groupement <input id="alGroups" type="text" inputmode="text" placeholder="ex. 2+2+3" aria-label="Groupement des temps, séparés par plus"></label>
-      <span class="al-signature-help">Outil « Métrique » → cliquer dans la forme d’onde</span>
-    </div>
-
-    <div class="al-editor">
-      <div class="al-editor-top"><span><span class="al-track-index">01</span> SOURCE AUDIO</span><span id="alEditorHint">Timeline vierge / positionnement manuel</span></div>
-      <div class="al-ruler" aria-label="Règle du temps source"><canvas id="alRulerCanvas" aria-hidden="true"></canvas></div>
-      <div class="al-wave-container" id="alWaveContainer" aria-label="Éditeur de waveform et marqueurs, source audio non destructive">
-        <canvas id="alWaveCanvas" aria-label="Forme d'onde audio. Choisir un outil puis cliquer pour ajouter un repère."></canvas>
-        <div id="alLoopRegion" class="al-loop-region" hidden aria-label="Région de boucle"><span class="al-loop-handle" data-loop-edge="start" role="slider" tabindex="0" aria-label="Début de boucle" aria-valuemin="0"></span><span class="al-loop-handle" data-loop-edge="end" role="slider" tabindex="0" aria-label="Fin de boucle" aria-valuemin="0"></span></div>
-        <div id="alSelectionRegion" class="al-selection-region" hidden aria-label="Région sélectionnée"></div>
-        <div class="al-marker-layer" id="alMarkerLayer" aria-label="Marqueurs éditables"></div>
-        <div id="alEmpty" class="al-empty">
-          <div class="al-empty-symbol" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-          <strong>FORME D’ONDE EN ATTENTE</strong>
-          <span>Importe un fichier pour afficher sa waveform et placer les repères</span>
-        </div>
-      </div>
-      <div class="al-timeline-footer"><div><span class="al-rail-label">TEMPS SOURCE</span><output id="alReadout">00:00.000</output><span class="al-slash">/</span><span id="alDuration">00:00.000</span></div><label class="al-zoom" for="alZoom"><span>ZOOM</span><input id="alZoom" type="range" min="1" max="24" step="1" value="1" aria-label="Zoom horizontal de la waveform"><output id="alZoomValue">×1</output></label></div>
-    </div>
-
-    <div class="al-transport" aria-label="Transport">
-      <div class="al-transport-main"><span class="al-transport-title">TRANSPORT</span><button id="alPlay" class="al-play" type="button" disabled aria-label="Lire l'audio original">▶</button><button id="alStop" class="al-stop" type="button" disabled aria-label="Arrêter la lecture">■</button><input id="alSeek" type="range" min="0" max="1000" value="0" step="1" disabled aria-label="Position dans le fichier audio"><span id="alPlaybackState" class="al-playback-state">À L’ARRÊT</span></div>
-      <div class="al-loop-controls"><label>Loop <input id="alLoopEnabled" type="checkbox" disabled></label><button id="alLoopA" type="button" disabled>Début A</button><button id="alLoopB" type="button" disabled>Fin B</button><output id="alLoopInfo">—</output></div>
-      <div class="al-transport-options"><label>Clic <input id="alClickEnabled" type="checkbox"></label><label>BPM <input id="alManualBpm" type="number" min="1" max="500" step="0.1" value="120"></label><label>Audio <input id="alAudioVolume" type="range" min="0" max="1" step=".01" value=".7" aria-label="Volume audio"></label><label>Clic <input id="alClickVolume" type="range" min="0" max="1" step=".01" value=".7" aria-label="Volume clic"></label></div>
-    </div>
-      </main>
-
-      <aside class="al-side-rail" aria-label="Réglages Audio Lab">
-        <section class="al-rail-section al-analysis-panel" aria-labelledby="alAnalysisTitle">
-          <div class="al-rail-heading"><span class="al-step">01</span><h3 id="alAnalysisTitle">Analyse</h3></div>
-          <p>Indique le ressenti du morceau pour guider le calcul.</p>
-          <fieldset class="al-analysis-guide"><legend>Mode d’analyse</legend><div class="al-choice-row"><label><input type="radio" name="alPulseFeel" value="auto" checked><span>Auto seul</span></label><label><input type="radio" name="alPulseFeel" value="binary"><span>Binaire</span></label><label><input type="radio" name="alPulseFeel" value="ternary"><span>Ternaire</span></label></div><small id="alAnalysisGuideHelp">Auto seul n’utilise aucun repère. Binaire ou Ternaire active l’aide du drapeau Temps 1 et de sa métrique.</small></fieldset>
-          <button id="alDetectPulse" type="button" disabled>Détecter la pulsation</button><output id="alPulseResult" aria-live="polite">Aucune analyse</output>
-          <div id="alTempoLevel" class="al-tempo-level" hidden><span>Niveau du tempo</span><div><button id="alTempoHalf" type="button" aria-label="Diviser le tempo détecté par deux"><b>÷2</b><output>—</output></button><button id="alTempoBase" type="button" aria-pressed="true" aria-label="Garder le tempo détecté"><b>Détecté</b><output>—</output></button><button id="alTempoDouble" type="button" aria-label="Multiplier le tempo détecté par deux"><b>×2</b><output>—</output></button></div><small>Choisis la pulsation que tu comptes réellement.</small></div>
-          <div id="alTempoAlternatives" class="al-tempo-alternatives" role="status" aria-live="polite" hidden></div>
-        </section>
-        <section class="al-rail-section al-inspector" aria-labelledby="alInspectorTitle">
-          <div class="al-rail-heading"><span class="al-step">02</span><h3 id="alInspectorTitle">Repère</h3></div>
-          <strong id="alMarkerInfo">Aucun repère</strong><label for="alMarkerTime">Position source <span><input id="alMarkerTime" type="number" min="0" step="0.001" value="0" disabled> s</span></label><button id="alDeleteMarker" type="button" disabled aria-label="Supprimer le repère sélectionné">Supprimer le repère</button>
-          <div id="alDownbeatMarkerEditor" class="al-warp-marker-editor" hidden><label for="alDownbeatMeter">Métrique du drapeau <select id="alDownbeatMeter"><option value="4/4">4/4</option><option value="3/4">3/4</option><option value="2/4">2/4</option><option value="6/8">6/8</option><option value="9/8">9/8</option><option value="12/8">12/8</option><option value="custom">Personnalisée</option></select></label><span>Le Temps 1 et cette métrique guident l’analyse sans la forcer.</span></div>
-          <div id="alWarpMarkerEditor" class="al-warp-marker-editor" hidden><label for="alWarpMarkerBeat">Position musicale <input id="alWarpMarkerBeat" type="number" min="0" step="0.25" value="0"></label><label for="alWarpMarkerValidated"><input id="alWarpMarkerValidated" type="checkbox"> Valider cet ancrage</label><span>Seuls les ancrages validés corrigent Warp.</span></div>
-          <div id="alTempoMarkerEditor" class="al-warp-marker-editor" hidden><label for="alTempoMarkerBpm">Tempo local <span><input id="alTempoMarkerBpm" type="number" min="20" max="400" step="0.1" value="120"> BPM</span></label><label for="alTempoMarkerValidated"><input id="alTempoMarkerValidated" type="checkbox"> Valider ce changement</label><span>Seuls les tempos validés corrigent la grille.</span></div>
-        </section>
-        <section class="al-rail-section al-warp-panel" aria-labelledby="alWarpTitle">
-          <div class="al-rail-heading"><span class="al-step">03</span><h3 id="alWarpTitle">Smart Warp</h3></div>
-          <div class="al-warp-mode" role="group" aria-label="Mode de lecture"><button id="alOriginalMode" type="button" aria-pressed="true">Original</button><button id="alWarpMode" type="button" aria-pressed="false" disabled>Warp</button></div>
-          <div class="al-warp-tempos"><label for="alWarpSourceBpm">BPM source <input id="alWarpSourceBpm" type="number" min="20" max="400" step="0.1" value="120"></label><span aria-hidden="true">→</span><label for="alWarpTargetBpm">BPM cible <input id="alWarpTargetBpm" type="number" min="20" max="400" step="0.1" value="40"></label></div>
-          <label class="al-warp-confirm"><input id="alWarpConfirmed" type="checkbox"> Tempo source et premier temps vérifiés</label>
-          <button id="alPrepareWarp" type="button" disabled>Préparer la lecture Warp</button><button id="alCancelWarp" type="button" hidden>Annuler le rendu</button><progress id="alWarpProgress" max="1" value="0" hidden aria-label="Progression du rendu Warp"></progress>
-          <output id="alWarpStatus" role="status" aria-live="polite">Confirme le tempo source et le premier temps.</output>
-        </section>
-        <section class="al-rail-section al-project-panel" aria-labelledby="alProjectTitle">
-          <div class="al-rail-heading"><span class="al-step">04</span><h3 id="alProjectTitle">Projet local</h3></div>
-          <div class="al-project-actions" role="group" aria-label="Projet Audio Lab local"><button id="alExportProject" type="button" disabled>Exporter</button><button id="alImportProject" type="button" disabled>Restaurer</button><input id="alProjectInput" type="file" accept=".json,application/json" hidden aria-label="Choisir un projet Audio Lab JSON"></div><output id="alProjectStatus" role="status" aria-live="polite">Projet sans audio · source vérifiée par métadonnées.</output>
-        </section>
-      </aside>
-    </div>
-    <div class="al-status-bar"><span class="al-status-pulse" aria-hidden="true"></span><output id="alStatus" role="status" aria-live="polite">Prêt. Import local sans transfert de fichier.</output><span class="al-phase">AUDIO LAB / ÉTAPE INTERFACE</span></div>
-  </section>
 
   <div class="index2-settings-backdrop" id="index2SettingsBackdrop"></div>
   <aside class="panel index2-settings-panel" data-panel="settings" id="index2SettingsPanel" aria-label="Paramètres techniques">
@@ -701,9 +607,8 @@ new MutationObserver(sync).observe(bpmDisplay,{childList:true});new MutationObse
 <script src="interface-locales.js?v=329b4fe182ae"></script>
 <link rel="stylesheet" href="interface-language.css?v=3995c298df9e">
 <script src="interface-language.js?v=291439ae445e"></script>
-<script src="workspace-layout.js?v=3807bde57a79"></script>
+<script src="workspace-layout.js?v=a50806c1e5ee"></script>
 <script type="module" src="musician-tools.mjs?v=c16764a7017b"></script>
-<script type="module" src="audio-lab/ui/audio-lab.mjs?v=ef8eb2c435d6"></script>
 <script src="avant-garde-motion.js?v=502d1d826916"></script>
 <!-- Wave visuelle pendant la lecture désactivée à la demande ; intro conservée. -->
 <script src="header-wave.js?v=798a129a814c"></script>

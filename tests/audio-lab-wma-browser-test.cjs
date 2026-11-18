@@ -17,7 +17,7 @@ const {start} = require('./audio-harness.cjs');
     h=await start();
     const p=await h.browser.newPage({viewport:{width:1024,height:768}});
     const errors=[];p.on('pageerror',e=>errors.push(e.message));
-    await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_WORKSPACE);
+    await p.goto(h.url+'/?audio-lab-test');await p.waitForFunction(()=>window.RENAX_WORKSPACE);
     await p.locator('#workspaceNav [data-workspace="audio-lab"]').click();
     await p.locator('#alFileInput').setInputFiles({name:'440Hz.wma',mimeType:'audio/x-ms-wma',buffer:fs.readFileSync(filename)});
     await p.waitForFunction(()=>!document.getElementById('alPlay').disabled,{timeout:30000});

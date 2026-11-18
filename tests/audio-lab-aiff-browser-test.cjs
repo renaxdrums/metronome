@@ -22,7 +22,7 @@ function fixture(){
  const h=await start();try{
   const p=await h.browser.newPage({viewport:{width:960,height:740}});
   const errors=[];p.on('pageerror',e=>errors.push(e.message));
-  await p.goto(h.url);await p.waitForFunction(()=>window.RENAX_WORKSPACE);
+  await p.goto(h.url+'/?audio-lab-test');await p.waitForFunction(()=>window.RENAX_WORKSPACE);
   await p.locator('#workspaceNav [data-workspace="audio-lab"]').click();
   await p.locator('#alFileInput').setInputFiles({
     name:'aiff-96k-24bit.aiff',mimeType:'audio/aiff',buffer:fixture(),

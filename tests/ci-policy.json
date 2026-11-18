@@ -22,6 +22,7 @@
     "tests/audio-lab-aiff-test.mjs",
     "tests/audio-lab-aiff-browser-test.cjs",
     "tests/audio-lab-browser-test.cjs",
+    "tests/audio-lab-detachment-test.cjs",
     "tests/audio-lab-core-test.mjs",
     "tests/audio-lab-import-test.mjs",
     "tests/audio-lab-local-project-test.mjs",

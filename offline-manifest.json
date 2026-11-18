@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "a54f5d0dddef742c",
+  "revision": "5ad116236ee0f694",
   "resources": [
     {
       "path": "accessibility.css",
@@ -115,211 +115,6 @@
     {
       "path": "assets/renax-logo-ivory.svg",
       "sha256": "cc89489b1b0e94b0a782c7e241138d560d1a5ed1aff6b0c79129c8bd36f5a9b6",
-      "text": true
-    },
-    {
-      "path": "audio-lab/analysis/metric-hypotheses.mjs",
-      "sha256": "4a0485311adfd04933b1d2a6fe4663b44b381cc6d70684db9221998ff4f43f06",
-      "text": true
-    },
-    {
-      "path": "audio-lab/analysis/onset-client.mjs",
-      "sha256": "9e4c09e343d0c3371b80683da3b6165a9248d246fa8415d997dd867aa0ca166c",
-      "text": true
-    },
-    {
-      "path": "audio-lab/analysis/onset-worker.mjs",
-      "sha256": "a5669c77242559f14c32e00860c0d0eb11c5af0e83f33cb18a05fab7ca76da69",
-      "text": true
-    },
-    {
-      "path": "audio-lab/analysis/onsets.mjs",
-      "sha256": "5d3f51e087329250ebeafc0ce43555fbcb777f4a56bdc8b25cd6145515285a18",
-      "text": true
-    },
-    {
-      "path": "audio-lab/analysis/tempo-engine.mjs",
-      "sha256": "ebb4d5760f1d684362903495ba4ced8ed5bcbf72351174b2959398e3d4009bdd",
-      "text": true
-    },
-    {
-      "path": "audio-lab/analysis/tempo-hypotheses.mjs",
-      "sha256": "50352dd96a96557ae0a8a94f35f820b5874c9e75febd7c4a422f26bada6fdead",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/transients.mjs",
-      "sha256": "8a0268a223a763264b5ef968731b33e3506c77d1dfb726a6ab47b4ead03b65f8",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/warp-chunk-client.mjs",
-      "sha256": "21cd369ec4e6e99325a2131d171dfd55f68030df7204054da60c918537321cc2",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/warp-chunk-worker.mjs",
-      "sha256": "508f01599f540acd681fab836d69d4e5925d0344350d89b4c40d5d8c3d0c02b4",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/warp-client.mjs",
-      "sha256": "4ff3ac6bbf5836067d0edc646509780a6242f6d18f2ae339b134cbf460caba08",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/warp-render.mjs",
-      "sha256": "2cb70a673d074da13fc309dc73413bfb6c7c329d5d86430451b2e4e694b375de",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/warp-resource-plan.mjs",
-      "sha256": "2b921fa2f4310a20eafdf274bddb6b12a7d7de7b71faa869301d7fe4e8c42288",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/warp-stream.mjs",
-      "sha256": "be9e94eb8f3c18a38d099d7fa25dfd1adb30ee7862f27fecf3326c553879ae60",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/warp-worker.mjs",
-      "sha256": "60a1051d3065554290ccb26158025cb09cbcb005dd9a8cc31ea09c4f7202fab8",
-      "text": true
-    },
-    {
-      "path": "audio-lab/dsp/wsola.mjs",
-      "sha256": "3d1774a0f62ddcb2348d262d4d168c2068765f445323353cc69fc699a47b8670",
-      "text": true
-    },
-    {
-      "path": "audio-lab/io/aiff-pcm.mjs",
-      "sha256": "4111544026cd097b775f78634e641ffde43c15baf4fb970e0fc69ff15363a64b",
-      "text": true
-    },
-    {
-      "path": "audio-lab/io/local-decode.mjs",
-      "sha256": "dcbae71f0ac5b62dee1c15ea0b04093efbd23a5e099eb6e8e9f3c01f4a190cac",
-      "text": true
-    },
-    {
-      "path": "audio-lab/io/warp-wav-export.mjs",
-      "sha256": "4acd9bcaf1520f2981b0a164c5d7c45831ffe82c389531e7f7904d7864e5a819",
-      "text": true
-    },
-    {
-      "path": "audio-lab/io/wav-export.mjs",
-      "sha256": "994287f167a3e71aaf6b6de98524e5aabb07ab3c6bf4a51aad3dbd48f94a7c21",
-      "text": true
-    },
-    {
-      "path": "audio-lab/io/wav-info.mjs",
-      "sha256": "f75846c51494e6b6d893f22bdd08c0f3226652aa04a62a446a72df3b1a022056",
-      "text": true
-    },
-    {
-      "path": "audio-lab/io/wav-stream.mjs",
-      "sha256": "ba51a46a4b94fb108770a6ebba31aea4cddf78807a909fb80dadd9067688b508",
-      "text": true
-    },
-    {
-      "path": "audio-lab/io/wma-client.mjs",
-      "sha256": "c163cc6a15de73adedd1c5fcc0155bd32abe9e879e6d1ed55419fa924991cf2e",
-      "text": true
-    },
-    {
-      "path": "audio-lab/io/wma-worker.mjs",
-      "sha256": "5d5e3869c83ea56750906d1fb8bd0d6cc0d7d0e97ec5aac6a504e3b53548a84f",
-      "text": true
-    },
-    {
-      "path": "audio-lab/meter-timeline.mjs",
-      "sha256": "06eab216b50ba8523ebbcabcfed1f8e17359b630c5ea46d23db3639c2dbdc905",
-      "text": true
-    },
-    {
-      "path": "audio-lab/musical-grid.mjs",
-      "sha256": "df46f9ab86ca346f439e0ccc743406d54615d5e2244695adfb44cb05d7bcd646",
-      "text": true
-    },
-    {
-      "path": "audio-lab/project/edit-history.mjs",
-      "sha256": "bc21a3a44958b70d148a29f5e265f2101089cafd391f88c17a828dea3b061616",
-      "text": true
-    },
-    {
-      "path": "audio-lab/project/local-project.mjs",
-      "sha256": "b568ea29309bd2fd5c6718b69f1b1a596b3e594a0ff10a4d89edd248c360f591",
-      "text": true
-    },
-    {
-      "path": "audio-lab/tempo-warp-core.mjs",
-      "sha256": "a0ce3eb4534c4278b13a33078696fbee8cb8b9b9def53ba00d055d1202624846",
-      "text": true
-    },
-    {
-      "path": "audio-lab/transport/manual-click.mjs",
-      "sha256": "da78d435ec5bf57d6348729b0c625f5d1b87342b91da5797e3ea2b3b449b80db",
-      "text": true
-    },
-    {
-      "path": "audio-lab/transport/original-player.mjs",
-      "sha256": "fbbaf505fb773b92339787e3243861139e5fccabd15f6e4269b24b5f739046a2",
-      "text": true
-    },
-    {
-      "path": "audio-lab/transport/renax-click-presets.mjs",
-      "sha256": "f521988ac5db4059de1e1785a6617d47ffe58d250c03f1169062e3c17c14c83c",
-      "text": true
-    },
-    {
-      "path": "audio-lab/transport/warp-click.mjs",
-      "sha256": "8066d4243425b78babda6bf8409103603113c1a34bffa6f5c9e2bdc4c0e425d2",
-      "text": true
-    },
-    {
-      "path": "audio-lab/transport/warp-player.mjs",
-      "sha256": "7487bf37b4825d17707025284d74fa3f66d731795e22a586d919baaa1a46f11b",
-      "text": true
-    },
-    {
-      "path": "audio-lab/transport/warp-session.mjs",
-      "sha256": "9b22917dad782ce3d8646ebc35d5badc0d243f07a74f828cc09e5ce9b3562d12",
-      "text": true
-    },
-    {
-      "path": "audio-lab/ui/audio-lab.css",
-      "sha256": "5e1143c7c8500f8fd4e14d579d0533adb054aa45abdf87f8e895fd28df5a880b",
-      "text": true
-    },
-    {
-      "path": "audio-lab/ui/audio-lab.mjs",
-      "sha256": "ef8eb2c435d6299a67d0d9b3efbbf18d1fe78292a2e29f692965ac9c8bd79b91",
-      "text": true
-    },
-    {
-      "path": "audio-lab/warp/validated-map.mjs",
-      "sha256": "15e36194a5e3f3bf439ba6696595a4419ab7513a5183f35cffce25cff02011ff",
-      "text": true
-    },
-    {
-      "path": "audio-lab/warp/warp-timeline.mjs",
-      "sha256": "da777ceab427119d5621a602f8acf108cfc345f6dddd4f774632ce6f77c511a5",
-      "text": true
-    },
-    {
-      "path": "audio-lab/waveform/peak-client.mjs",
-      "sha256": "2c3598f6d17b61c6b05808e4f83ccf2ec648c30d75a89f75ae34aa92614298ab",
-      "text": true
-    },
-    {
-      "path": "audio-lab/waveform/peak-worker.mjs",
-      "sha256": "bcfcddf2824fa31eed4d82b544138aa5cbca42e12615ddf8e3bfd8331e542630",
-      "text": true
-    },
-    {
-      "path": "audio-lab/waveform/peaks.mjs",
-      "sha256": "89970803e45fa23fcd8c2ccedc189a1f786c71c24525427d883375c259eca33d",
       "text": true
     },
     {
@@ -489,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "c9b94ae36a68b468a5c94cd218d8cc8615897f7b73381304e330969510e82c97",
+      "sha256": "00708824680c6d54f4c6b6f04926eb9f0621783c3c1d5b749209443fe1e96f4f",
       "text": true
     },
     {
@@ -829,7 +624,7 @@
     },
     {
       "path": "workspace-layout.js",
-      "sha256": "3807bde57a792740f3eead34669fcfc03ebc848a07ffa7c99207be1115c234f5",
+      "sha256": "a50806c1e5eec67f7c850903349a6d1a439b7996b3ba6f4a737d50705c455683",
       "text": true
     }
   ]

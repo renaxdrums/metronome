@@ -573,17 +573,24 @@
     function schedulerPolyrhythm() {
       const resizeAhead=performance.now()<(schedulerPolyrhythm.resizeUntil||0) ? 0.6 : scheduleAheadTime;
       const horizon=audioCtx.currentTime+(document.hidden ? 2 : resizeAhead);
-      const eventCache=new Map();
+      // Keep the event positions stable for the active cycle. Structural edits
+      // take effect on the next cycle; the Web Audio clock never stops.
       while(nextNoteTime < horizon) {
         if(playingMeasureIndex>=measures.length){playingMeasureIndex=0; polyEventIndex=0;}
         const mIdx=playingMeasureIndex, m=measures[mIdx];
         if(!m){timerID=setTimeout(schedulerSafely,lookahead);return;}
-        let events=eventCache.get(m);
-        if(!events){events=getPolyEvents(m);eventCache.set(m,events);}
+        let cycle=schedulerPolyrhythm.cycle;
+        if(!cycle || cycle.measure!==m || polyEventIndex===0){
+          cycle={measure:m,events:getPolyEvents(m)};
+          schedulerPolyrhythm.cycle=cycle;
+        }
+        const events=cycle.events;
         if(polyEventIndex>=events.length) polyEventIndex=0;
         const e=events[polyEventIndex];
         for(const hit of e.hits){
           const voice=m.polyVoices[hit.voice];
+          // A lane removed during this cycle must not crash the scheduler.
+          if(!voice)continue;
           const state=voice.states[hit.beat]?.[hit.sub]??0;
           if(!state)continue;
           const bankId=polyBankForVoice(m,hit.voice),bank=SOUND_BANKS[bankId]||SOUND_BANKS.clic;

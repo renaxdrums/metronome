@@ -191,16 +191,20 @@ async function baselineRoute(page, url) {
       // historical six-tab reference rather than reintroducing Audio Lab.
       // The detached Audio Lab editor is covered separately by its UI tests.
       assert(original.includes('</nav>\n  <div class="main-grid"'));
-      assert(original.includes('data-workspace="audio-lab"'));
-      assert(original.includes('<section id="audioLabRoot"'));
-      // The historical comparison commit predates detachment. Remove only
-      // its Audio Lab tab, stylesheet, module and self-contained editor.
-      // Every other reference byte remains subject to strict visual checks.
-      const withoutAudioLab = original
-        .replace(/<button type="button" data-workspace="audio-lab"[^]*?<\/button>/, '')
-        .replace(/^  <link rel="stylesheet" href="audio-lab\/ui\/audio-lab\.css[^\n]*\n/m, '')
-        .replace(/^<script type="module" src="audio-lab\/ui\/audio-lab\.mjs[^\n]*\n/m, '')
-        .replace(/\n\n  <!-- Audio Lab occupies the central editor, leaving the historical sequencer untouched\. -->\n  <section id="audioLabRoot"[^]*?\n  <\/section>\n/, '');
+      // PR base includes Audio Lab; the older PCM baseline predates it.
+      // Preserve both references without loosening the visual comparison.
+      let withoutAudioLab = original;
+      if (original.includes('data-workspace="audio-lab"')) {
+        assert(original.includes('<section id="audioLabRoot"'));
+        withoutAudioLab = original
+          .replace(/<button type="button" data-workspace="audio-lab"[^]*?<\/button>/, '')
+          .replace(/^  <link rel="stylesheet" href="audio-lab\/ui\/audio-lab\.css[^\n]*\n/m, '')
+          .replace(/^<script type="module" src="audio-lab\/ui\/audio-lab\.mjs[^\n]*\n/m, '')
+          .replace(
+            /\n\n  <!-- Audio Lab occupies the central editor, leaving the historical sequencer untouched\. -->\n  <section id="audioLabRoot"[^]*?\n  <\/section>\n/,
+            '',
+          );
+      }
       assert(!withoutAudioLab.includes('data-workspace="audio-lab"'));
       assert(!withoutAudioLab.includes('id="audioLabRoot"'));
       const normalized = withoutAudioLab
@@ -208,6 +212,21 @@ async function baselineRoute(page, url) {
         .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>');
       body = Buffer.from(normalized);
       correctedReferenceFiles.add('index.html:six-workspaces-without-audio-lab');
+    }
+    if (file === 'workspace-layout.js') {
+      const original = body.toString();
+      const oldItems =
+        "const items=['metronome','polyrhythm','training','sequence','multi','tracks','audio-lab'];";
+      if (original.includes(oldItems)) {
+        const newItems =
+          "const items=[...nav.querySelectorAll('[data-workspace]')].map(button=>button.dataset.workspace);";
+        const oldGo = 'function go(next){if(next===page';
+        const newGo = 'function go(next){if(!buttons.has(next))return;if(next===page';
+        assert.equal(original.split(oldItems).length, 2);
+        assert.equal(original.split(oldGo).length, 2);
+        body = Buffer.from(original.replace(oldItems, newItems).replace(oldGo, newGo));
+        correctedReferenceFiles.add('workspace-layout.js:six-tab-navigation');
+      }
     }
     if (file === 'app-base.css' && !body.toString().includes('.brand-mobile')) {
       body = Buffer.from(body.toString() + mobileBrandCSS);

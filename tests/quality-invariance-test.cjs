@@ -191,8 +191,19 @@ async function baselineRoute(page, url) {
       // historical six-tab reference rather than reintroducing Audio Lab.
       // The detached Audio Lab editor is covered separately by its UI tests.
       assert(original.includes('</nav>\n  <div class="main-grid"'));
-      assert(!original.includes('data-workspace="audio-lab"'));
-      const normalized = original
+      assert(original.includes('data-workspace="audio-lab"'));
+      assert(original.includes('<section id="audioLabRoot"'));
+      // The historical comparison commit predates detachment. Remove only
+      // its Audio Lab tab, stylesheet, module and self-contained editor.
+      // Every other reference byte remains subject to strict visual checks.
+      const withoutAudioLab = original
+        .replace(/<button type="button" data-workspace="audio-lab"[^]*?<\/button>/, '')
+        .replace(/^  <link rel="stylesheet" href="audio-lab\/ui\/audio-lab\.css[^\n]*\n/m, '')
+        .replace(/^<script type="module" src="audio-lab\/ui\/audio-lab\.mjs[^\n]*\n/m, '')
+        .replace(/\n\n  <!-- Audio Lab occupies the central editor, leaving the historical sequencer untouched\. -->\n  <section id="audioLabRoot"[^]*?\n  <\/section>\n/, '');
+      assert(!withoutAudioLab.includes('data-workspace="audio-lab"'));
+      assert(!withoutAudioLab.includes('id="audioLabRoot"'));
+      const normalized = withoutAudioLab
         .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
         .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>');
       body = Buffer.from(normalized);

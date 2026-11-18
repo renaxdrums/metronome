@@ -673,7 +673,8 @@
       try {
         await ensureVoiceMetronomeReady(currentBank);
       } catch (err) {
-        console.warn('Voice metronome preload unavailable; continuing with fallback:', err);
+        console.warn('Voice metronome preload unavailable:', err);
+        return;
       }
       if(appMode==='polyrhythm'){
         const banks=new Set();

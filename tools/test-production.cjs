@@ -36,6 +36,8 @@ const available = [
 
 (async () => {
   if (!fs.existsSync(path.join(release, 'index.html'))) throw Error('Build production first.');
+  if (fs.existsSync(path.join(release, 'audio-lab')))
+    throw Error('Audio Lab must not be bundled in the metronome release.');
   const selected = process.env.PRODUCTION_ONLY?.split(',');
   const files = selected
     ? available.filter((file) => selected.includes(path.basename(file)))

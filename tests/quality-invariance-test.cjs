@@ -8,7 +8,7 @@ const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f36309
   root = path.resolve(__dirname, '..'),
   cache = new Map();
 const referenceAgainstItself = process.env.INVARIANCE_SELF === '1';
-// A hidden seventh workspace must not alter the legacy particle overlay CSS.
+// Detaching Audio Lab must not alter the legacy particle overlay CSS.
 // The browser can report fractional used sizes for an unchanged 100% rule.
 const particleRule = (ref) =>
   cp
@@ -187,30 +187,16 @@ async function baselineRoute(page, url) {
     }
     if (file === 'index.html') {
       const original = body.toString();
-      // Approved seventh workspace: reproduce only its tab and hidden panel
-      // in the historical reference. Strict pixel/style checks remain unchanged.
-      const now = cp.execFileSync('git', ['show', 'HEAD:index.html'], { cwd: root }).toString();
-      const tabPattern = /<button type="button" data-workspace="audio-lab"[\s\S]*?<\/button>/;
-      const tab = now.match(tabPattern)?.[0];
-      const navAnchor = '</nav>\n  <div class="main-grid"';
-      const prefsAnchor = '  <div class="index2-settings-backdrop"';
-      const editorStart = now.indexOf('  <!-- Audio Lab occupies');
-      const editorEnd = now.indexOf(prefsAnchor, editorStart);
-      const editor =
-        editorStart >= 0 && editorEnd > editorStart ? now.slice(editorStart, editorEnd) : '';
-      assert(tab && editor, 'Approved Audio Lab markup missing');
-      // The approved Audio Lab workspace is now present in main (PR #97).
-      // Inject it only for older baselines; never duplicate existing markup.
-      const hasAudioLab = original.includes('data-workspace="audio-lab"');
-      assert(original.includes(navAnchor));
-      assert(original.includes(prefsAnchor));
+      // The main metronome now contains exactly six workspaces. Preserve the
+      // historical six-tab reference rather than reintroducing Audio Lab.
+      // The detached Audio Lab editor is covered separately by its UI tests.
+      assert(original.includes('</nav>\n  <div class="main-grid"'));
+      assert(!original.includes('data-workspace="audio-lab"'));
       const normalized = original
-        .replace(navAnchor, hasAudioLab ? navAnchor : tab + navAnchor)
-        .replace(prefsAnchor, hasAudioLab ? prefsAnchor : editor + prefsAnchor)
         .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
         .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>');
       body = Buffer.from(normalized);
-      correctedReferenceFiles.add('index.html:approved-audio-lab-structure');
+      correctedReferenceFiles.add('index.html:six-workspaces-without-audio-lab');
     }
     if (file === 'app-base.css' && !body.toString().includes('.brand-mobile')) {
       body = Buffer.from(body.toString() + mobileBrandCSS);

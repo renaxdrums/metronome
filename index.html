@@ -639,7 +639,7 @@
   <script src="training-numbox.js?v=5464fb23be6c"></script>
   <script src="compact-controls.js?v=24ce2f42ed2a"></script>
   <script src="navigation-history.js?v=157c31114aa0"></script>
-  <script src="rhythm-score.js?v=d1972d4fec7a"></script>
+  <script src="rhythm-score.js?v=e3f571b1fa5a"></script>
   <script src="edit-history.js?v=bca355c4b6ec"></script>
 <script>
 (()=>{const sync=()=>{const playing=playBtn.classList.contains('btn-cyan');const raw=playBtn.textContent.trim();const label=playing?'Stop':(!raw||/^(start|play)$/i.test(raw)?'Play':raw);if(/^(start|play)$/i.test(raw)&&raw!==label)playBtn.textContent=label;playBtn.dataset.transportLabel=label;playBtn.setAttribute('aria-label',label);playBtn.title=label;playBtn.setAttribute('aria-pressed',String(playing));};sync();new MutationObserver(sync).observe(playBtn,{childList:true,attributes:true,attributeFilter:['class']});})();

@@ -599,8 +599,12 @@
     }
     async function previewSequenceMeasure(m) {
       if(playbackStarting || training.engaged || window.RENAX_SONGS?.preparing)return;
-      if(isPlaying&&loopedMeasure===m){stopMetronome();return;}
-      stopMetronome();
+      if(isPlaying){
+        // Change the loop target at the next scheduling boundary without stopping audio.
+        loopedMeasure = loopedMeasure===m ? null : m;
+        renderSequencerList();
+        return;
+      }
       loopedMeasure=m;
       try { await startMetronome(); }
       catch(error){loopedMeasure=null; renderSequencerList(); console.warn('Lecture de la mesure indisponible',error);}

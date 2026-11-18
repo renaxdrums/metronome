@@ -350,7 +350,6 @@
     polyVoiceCountInput.addEventListener('change',()=>{
       if(appMode!=='polyrhythm')return;
       const m=measures[activeMeasureIndex];if(!m)return;
-      if(isPlaying)stopMetronome();
       m.polyVoiceCount=Math.max(2,Math.min(4,Number(polyVoiceCountInput.value)||2));
       ensurePolyStates(m);
       closePolyBeatEditor();renderSequencerList();renderActiveMeasure();
@@ -396,7 +395,6 @@
       for(const n of allowedSubdivisions(4)){const option=document.createElement('option');option.value=String(n);option.textContent=String(n);division.append(option);}
       division.value=String(voice.subdivisions[beat]);
       division.onchange=()=>{
-        if(isPlaying)stopMetronome();
         const length=Number(division.value),old=voice.states[beat];
         voice.subdivisions[beat]=length;voice.states[beat]=Array.from({length},(_,i)=>old[i]??0);
         refreshPolyBeatEditor();renderSequencerList();renderActiveMeasure();
@@ -408,7 +406,6 @@
         const state=voice.states[beat][sub];pad.dataset.state=String(state);pad.textContent=String(sub+1);
         pad.setAttribute('aria-label','Subdivision '+(sub+1)+' · '+(['Silence','Clic 1','Clic 2','Accent'][state]));
         pad.onclick=()=>{
-          if(isPlaying)stopMetronome();
           voice.states[beat][sub]=(voice.states[beat][sub]+1)%4;
           if(sub===0&&voiceIndex===0)m.outerStates[beat]=voice.states[beat][sub];
           if(sub===0&&voiceIndex===1)m.innerStates[beat]=voice.states[beat][sub];
@@ -422,7 +419,6 @@
       for(const option of soundBankSel.options){if(!SOUND_BANKS[option.value])continue;const copy=document.createElement('option');copy.value=option.value;copy.textContent=option.textContent;sound.append(copy);}
       sound.value=voice.bank||'';
       sound.onchange=()=>{
-        if(isPlaying)stopMetronome();
         voice.bank=sound.value||null;
         syncPolySoundLabel();
         if(voice.bank){ensureInstrumentBankReady(voice.bank).catch(()=>{});}
@@ -461,7 +457,7 @@
           dot.title='Éditer les subdivisions · voie '+(vi+1)+', temps '+(beat+1);
           dot.setAttribute('aria-label',dot.title);
           dot.onclick=ev=>{ev.stopPropagation();openPolyBeatEditor(m,vi,beat);};
-          dot.onkeydown=ev=>{if(ev.key===' '){ev.preventDefault();ev.stopPropagation();if(isPlaying)stopMetronome();voice.states[beat][0]=(voice.states[beat][0]+1)%4;if(vi===0)m.outerStates[beat]=voice.states[beat][0];if(vi===1)m.innerStates[beat]=voice.states[beat][0];dot.dataset.state=String(voice.states[beat][0]);renderSequencerList();}else if(ev.key==='Enter'){ev.preventDefault();dot.click();}};
+          dot.onkeydown=ev=>{if(ev.key===' '){ev.preventDefault();ev.stopPropagation();voice.states[beat][0]=(voice.states[beat][0]+1)%4;if(vi===0)m.outerStates[beat]=voice.states[beat][0];if(vi===1)m.innerStates[beat]=voice.states[beat][0];dot.dataset.state=String(voice.states[beat][0]);renderSequencerList();}else if(ev.key==='Enter'){ev.preventDefault();dot.click();}};
           sequencerContainer.append(dot);
           for(let sub=1;sub<voice.subdivisions[beat];sub++){
             const point=document.createElement('button');point.type='button';
@@ -506,7 +502,6 @@
           ratio.append(laneField(field,vi));
           field.addEventListener('click',stop);field.addEventListener('keydown',stop);
           field.addEventListener('change',()=>{
-            if(isPlaying)stopMetronome();
             voice.count=clampPolyValue(field.value,voice.count);ensurePolyStates(m);
             if(i===activeMeasureIndex)renderActiveMeasure();renderSequencerList();
           });
@@ -671,8 +666,7 @@
       try {
         await ensureVoiceMetronomeReady(currentBank);
       } catch (err) {
-        console.warn('Voice metronome preload unavailable:', err);
-        return;
+        console.warn('Voice metronome preload unavailable; continuing with fallback:', err);
       }
       if(appMode==='polyrhythm'){
         const banks=new Set();

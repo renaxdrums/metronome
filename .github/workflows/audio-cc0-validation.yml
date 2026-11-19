@@ -12,7 +12,9 @@ permissions:
 
 jobs:
   sampled-audio:
-    runs-on: ubuntu-latest
+    # Pin the image that passed all PR #115 audio checks; ubuntu-latest switched
+    # to 26.04 and its FFmpeg apt installation timed out on the main push.
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4

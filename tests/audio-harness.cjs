@@ -2,7 +2,18 @@ const fs=require('fs'),path=require('path'),http=require('http');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 exports.start=async({intro=false,launchArgs=[],tool='metronome'}={})=>{
  let server,url=process.env.TEST_URL;
- if(!url){server=http.createServer((req,res)=>{const root=path.resolve(__dirname,'..');let file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(file===root)file=path.join(root,'index.html');if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}if(new URL(req.url,'http://localhost').pathname==='/previous'){res.setHeader('Content-Type','text/html');res.end('<title>Previous</title>Previous');return;}fs.readFile(file,(e,b)=>{if(e){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.html')?'text/html':file.endsWith('.wav')?'audio/wav':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':(/\.(mjs|js)$/.test(file))?'text/javascript':file.endsWith('.wasm')?'application/wasm':file.endsWith('.json')?'application/json':'application/octet-stream');res.end(b);});});await new Promise(r=>server.listen(0,'127.0.0.1',r));url='http://127.0.0.1:'+server.address().port;}
+ if(!url){server=http.createServer((req,res)=>{const root=path.resolve(__dirname,'..');let file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(file===root)file=path.join(root,'index.html');if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}if(new URL(req.url,'http://localhost').pathname==='/previous'){res.setHeader('Content-Type','text/html');res.end('<title>Previous</title>Previous');return;}fs.readFile(file,(e,b)=>{if(e){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.html')?'text/html':file.endsWith('.wav')?'audio/wav':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':(/\.(mjs|js)$/.test(file))?'text/javascript':file.endsWith('.wasm')?'application/wasm':file.endsWith('.json')?'application/json':'application/octet-stream');if(file===path.join(root,'index.html')&&new URL(req.url,'http://localhost').searchParams.has('audio-lab-test')){
+  const tab=fs.readFileSync(path.join(root,'audio-lab/ui/audio-lab.tab.html'),'utf8');
+  const fragment=fs.readFileSync(path.join(root,'audio-lab/ui/audio-lab.fragment.html'),'utf8');
+  let html=b.toString('utf8');
+  const nav=html.indexOf('<nav id="workspaceNav"'),end=html.indexOf('</nav>',nav);
+  if(nav<0||end<0||!html.includes('  <div class="index2-settings-backdrop"')){res.writeHead(500).end('Audio Lab test shell unavailable');return;}
+  html=html.slice(0,end)+tab+html.slice(end);
+  html=html.replace('  <div class="index2-settings-backdrop"',fragment+'  <div class="index2-settings-backdrop"');
+  html=html.replace('</head>','<link rel="stylesheet" href="audio-lab/ui/audio-lab.css">\n</head>');
+  html=html.replace('<script src="avant-garde-motion.js','<script type="module" src="audio-lab/ui/audio-lab.mjs"></script>\n<script src="avant-garde-motion.js');
+  res.end(html);return;
+ }res.end(b);});});await new Promise(r=>server.listen(0,'127.0.0.1',r));url='http://127.0.0.1:'+server.address().port;}
  const browser=await chromium.launch({...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{channel:'chrome'}),headless:true,args:[...launchArgs,'--autoplay-policy=no-user-gesture-required']});
  // Regression suites address the existing metronome explicitly. Tool-shell tests
  // pass tool:null to exercise the general entry and its real default welcome page.

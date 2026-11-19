@@ -94,6 +94,59 @@ const {start}=require('./audio-harness.cjs');
    return {total:window.polyOscillators.length,ghosts:window.polyOscillators.filter(x=>x.start>now&&x.stops.at(-1)>now).length};
   });
   assert(stopped.total>0,JSON.stringify(stopped));assert.equal(stopped.ghosts,0,JSON.stringify(stopped));
+  // Regression: live removal/addition of lanes must not stop the clock,
+  // use stale event positions, or leave a reference to a removed voice.
+  const live=await h.browser.newPage({viewport:{width:390,height:844}});
+  live.on('pageerror',e=>errors.push(e.message));
+  await live.goto(h.url);await live.waitForFunction(()=>window.RENAX_WORKSPACE);
+  await live.evaluate(()=>{
+   RENAX_WORKSPACE.go('polyrhythm');
+   const m=createPolyMeasure(5,4,720);m.polyVoiceCount=4;ensurePolyStates(m);
+   m.polyVoices[2].count=7;m.polyVoices[3].count=11;ensurePolyStates(m);
+   polyrhythmMeasures=[m];measures=polyrhythmMeasures;activeMeasureIndex=0;
+   renderSequencerList();renderActiveMeasure();
+  });
+  await live.evaluate(()=>{
+   window.polyDiagnostic={stops:[],failures:[]};
+   const originalStop=stopMetronome,originalFailure=reportAudioFailure;
+   stopMetronome=function(...args){
+    window.polyDiagnostic.stops.push({time:performance.now(),stack:new Error('stopMetronome called').stack,arguments:args});
+    return originalStop(...args);
+   };
+   reportAudioFailure=function(error){
+    window.polyDiagnostic.failures.push({message:String(error),stack:error?.stack});
+    return originalFailure(error);
+   };
+  });
+  await live.locator('#playBtn').click();await live.waitForFunction(()=>isPlaying);
+  await live.waitForTimeout(60);
+  await live.evaluate(()=>{
+   const m=measures[0];m.polyVoiceCount=2;ensurePolyStates(m);
+   renderSequencerList();renderActiveMeasure();
+  });
+  await live.waitForTimeout(700);
+  const liveDiagnostic=await live.evaluate(()=>({
+   playing:isPlaying,
+   appMode,
+   voiceCount:measures[0]?.polyVoices?.length,
+   position:polyEventIndex,
+   nextNoteTime,
+   now:audioCtx?.currentTime,
+   diagnostic:window.polyDiagnostic
+  }));
+  assert.equal(liveDiagnostic.playing,true,'removing two voices must not interrupt playback: '+JSON.stringify(liveDiagnostic));
+  await live.evaluate(()=>{
+   const m=measures[0];m.polyVoiceCount=4;ensurePolyStates(m);
+   m.polyVoices[0].subdivisions[0]=4;ensurePolyStates(m);
+   renderSequencerList();renderActiveMeasure();
+  });
+  await live.waitForTimeout(700);
+  const liveState=await live.evaluate(()=>({
+   playing:isPlaying,voiceCount:measures[0].polyVoices.length,beats:window.RENAX_PLAYBACK.beats.length
+  }));
+  assert(liveState.playing&&liveState.voiceCount===4&&liveState.beats>=4,JSON.stringify(liveState));
+  await live.locator('#playBtn').click();await live.waitForFunction(()=>!isPlaying);
+  await live.close();
   assert.deepEqual(errors,[]);console.log('PASS two poly measures retain sound and timing across resize');
  }finally{await h.browser.close();h.server?.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

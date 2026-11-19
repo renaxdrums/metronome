@@ -160,7 +160,19 @@
  const render=renderActiveMeasure;renderActiveMeasure=function(...args){const result=render.apply(this,args);syncFreeButton();pencil.hidden=!enabled||appMode!=='metronome';editor.hidden=!enabled||!editing||appMode!=='metronome';pulse.hidden=!enabled||appMode!=='metronome';renderEditor();layout();refresh();return result;};
  const subdivisions=renderSubdivisionDots;renderSubdivisionDots=function(...args){const result=subdivisions.apply(this,args);refresh();return result;};
  const visual=scheduleVisualUpdate;scheduleVisualUpdate=function(mIdx,sIdx,time,position){const result=visual.apply(this,arguments);const m=measures[mIdx],p=position||getBeatAndSub(m,sIdx);enqueue({measure:mIdx,beat:p.beat,key:`${p.beat}:${Math.round(p.subIndex/(p.subdivisions||m.beatSubdivisions[p.beat])*m.beatSubdivisions[p.beat])}`,time,end:time+(p.durationMs||getStepDurationMs(getEffectiveTempo(m),m.denominator,m.beatSubdivisions[p.beat]))/1000,audible:isSilentCycleAudible(),pulse:p.subIndex===0&&(m.denominator>=8?(m.numerator%3===0?p.beat%3===0:m.numerator>=5&&m.numerator%2?p.beat%2===0&&p.beat<m.numerator-2:true):true)});return result;};
- const polyVisual=schedulePolyVisualUpdate;schedulePolyVisualUpdate=function(mIdx,event,time){const result=polyVisual.apply(this,arguments),m=measures[mIdx],cycle=m.numerator*60/getEffectiveTempo(m);for(const hit of event.hits||[]){const model=m.polyVoices[hit.voice];enqueue({measure:mIdx,key:`${hit.voice}:${hit.beat}:${hit.sub}`,time,end:time+cycle/model.count/model.subdivisions[hit.beat],audible:true});}return result;};
+ const polyVisual=schedulePolyVisualUpdate;
+ schedulePolyVisualUpdate=function(mIdx,event,time){
+  const result=polyVisual.apply(this,arguments),m=measures[mIdx];
+  if(!m)return result;
+  const cycle=m.numerator*60/getEffectiveTempo(m);
+  for(const hit of event.hits||[]){
+   // Keep the score safe when an event was queued before its lane was removed.
+   const model=m.polyVoices?.[hit.voice],subdivisions=model?.subdivisions?.[hit.beat];
+   if(!model || !(model.count>hit.beat) || !(subdivisions>hit.sub))continue;
+   enqueue({measure:mIdx,key:`${hit.voice}:${hit.beat}:${hit.sub}`,time,end:time+cycle/model.count/subdivisions,audible:true});
+  }
+  return result;
+ };
  const stop=stopMetronome;stopMetronome=function(...args){const result=stop.apply(this,args);cues=[];clearHeads();pulse.classList.remove('pulsing');clearBurst();cancelAnimationFrame(frame);frame=0;refresh();renderEditor();return result;};
  async function setView(next){
   if(enabled===next&&(!next||Flow))return;enabled=next;partitionButton.setAttribute('aria-pressed',String(enabled));metronomeButton.setAttribute('aria-pressed',String(!enabled));partitionButton.classList.toggle('active',enabled);metronomeButton.classList.toggle('active',!enabled);panel.classList.toggle('score-view',enabled);pencil.hidden=!enabled||appMode!=='metronome';editor.hidden=!enabled||!editing||appMode!=='metronome';pulse.hidden=!enabled||appMode!=='metronome';renderEditor();layout();

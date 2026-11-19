@@ -599,7 +599,14 @@
     }
     async function previewSequenceMeasure(m) {
       if(playbackStarting || training.engaged || window.RENAX_SONGS?.preparing)return;
-      if(isPlaying&&loopedMeasure===m){stopMetronome();return;}
+      if(isPlaying && loopedMeasure===m){stopMetronome();return;}
+      if(isPlaying && appMode==='polyrhythm'){
+        // Switch between Polyrythmie loops at the next cycle without stopping audio.
+        loopedMeasure=m;
+        renderSequencerList();
+        return;
+      }
+      // Keep the validated Stop/restart semantics for Sequencer previews.
       stopMetronome();
       loopedMeasure=m;
       try { await startMetronome(); }

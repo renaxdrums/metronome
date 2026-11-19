@@ -8,7 +8,7 @@ const baseline = process.env.INVARIANCE_REF || '396287e3a921891b27e608f2e5f36309
   root = path.resolve(__dirname, '..'),
   cache = new Map();
 const referenceAgainstItself = process.env.INVARIANCE_SELF === '1';
-// A hidden seventh workspace must not alter the legacy particle overlay CSS.
+// Detaching Audio Lab must not alter the legacy particle overlay CSS.
 // The browser can report fractional used sizes for an unchanged 100% rule.
 const particleRule = (ref) =>
   cp
@@ -187,30 +187,46 @@ async function baselineRoute(page, url) {
     }
     if (file === 'index.html') {
       const original = body.toString();
-      // Approved seventh workspace: reproduce only its tab and hidden panel
-      // in the historical reference. Strict pixel/style checks remain unchanged.
-      const now = cp.execFileSync('git', ['show', 'HEAD:index.html'], { cwd: root }).toString();
-      const tabPattern = /<button type="button" data-workspace="audio-lab"[\s\S]*?<\/button>/;
-      const tab = now.match(tabPattern)?.[0];
-      const navAnchor = '</nav>\n  <div class="main-grid"';
-      const prefsAnchor = '  <div class="index2-settings-backdrop"';
-      const editorStart = now.indexOf('  <!-- Audio Lab occupies');
-      const editorEnd = now.indexOf(prefsAnchor, editorStart);
-      const editor =
-        editorStart >= 0 && editorEnd > editorStart ? now.slice(editorStart, editorEnd) : '';
-      assert(tab && editor, 'Approved Audio Lab markup missing');
-      // The approved Audio Lab workspace is now present in main (PR #97).
-      // Inject it only for older baselines; never duplicate existing markup.
-      const hasAudioLab = original.includes('data-workspace="audio-lab"');
-      assert(original.includes(navAnchor));
-      assert(original.includes(prefsAnchor));
-      const normalized = original
-        .replace(navAnchor, hasAudioLab ? navAnchor : tab + navAnchor)
-        .replace(prefsAnchor, hasAudioLab ? prefsAnchor : editor + prefsAnchor)
+      // The main metronome now contains exactly six workspaces. Preserve the
+      // historical six-tab reference rather than reintroducing Audio Lab.
+      // The detached Audio Lab editor is covered separately by its UI tests.
+      assert(original.includes('</nav>\n  <div class="main-grid"'));
+      // PR base includes Audio Lab; the older PCM baseline predates it.
+      // Preserve both references without loosening the visual comparison.
+      let withoutAudioLab = original;
+      if (original.includes('data-workspace="audio-lab"')) {
+        assert(original.includes('<section id="audioLabRoot"'));
+        withoutAudioLab = original
+          .replace(/<button type="button" data-workspace="audio-lab"[^]*?<\/button>/, '')
+          .replace(/^  <link rel="stylesheet" href="audio-lab\/ui\/audio-lab\.css[^\n]*\n/m, '')
+          .replace(/^<script type="module" src="audio-lab\/ui\/audio-lab\.mjs[^\n]*\n/m, '')
+          .replace(
+            /\n\n  <!-- Audio Lab occupies the central editor, leaving the historical sequencer untouched\. -->\n  <section id="audioLabRoot"[^]*?\n  <\/section>\n/,
+            '',
+          );
+      }
+      assert(!withoutAudioLab.includes('data-workspace="audio-lab"'));
+      assert(!withoutAudioLab.includes('id="audioLabRoot"'));
+      const normalized = withoutAudioLab
         .replace('<h1>RENAX DRUMS</h1>', mobileBrandHTML)
         .replace('aria-pressed="false">Meixs</button>', 'aria-pressed="false">Citron</button>');
       body = Buffer.from(normalized);
-      correctedReferenceFiles.add('index.html:approved-audio-lab-structure');
+      correctedReferenceFiles.add('index.html:six-workspaces-without-audio-lab');
+    }
+    if (file === 'workspace-layout.js') {
+      const original = body.toString();
+      const oldItems =
+        "const items=['metronome','polyrhythm','training','sequence','multi','tracks','audio-lab'];";
+      if (original.includes(oldItems)) {
+        const newItems =
+          "const items=[...nav.querySelectorAll('[data-workspace]')].map(button=>button.dataset.workspace);";
+        const oldGo = 'function go(next){if(next===page';
+        const newGo = 'function go(next){if(!buttons.has(next))return;if(next===page';
+        assert.equal(original.split(oldItems).length, 2);
+        assert.equal(original.split(oldGo).length, 2);
+        body = Buffer.from(original.replace(oldItems, newItems).replace(oldGo, newGo));
+        correctedReferenceFiles.add('workspace-layout.js:six-tab-navigation');
+      }
     }
     if (file === 'app-base.css' && !body.toString().includes('.brand-mobile')) {
       body = Buffer.from(body.toString() + mobileBrandCSS);

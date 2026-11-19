@@ -9,7 +9,7 @@ const { start, save } = require('./audio-harness.cjs');
       const page = await harness.browser.newPage({ viewport:size, hasTouch:size.width<1101, reducedMotion:'reduce' });
       const errors = [];
       page.on('pageerror', e => errors.push(e.message));
-      await page.goto(harness.url);
+      await page.goto(harness.url+'/?audio-lab-test');
       await page.waitForFunction(() => window.RENAX_WORKSPACE?.current === 'metronome');
       assert.equal(await page.locator('#audioLabRoot').isVisible(),false,'Audio Lab hidden by default');
       assert.equal(await page.locator('#workspaceNav [data-workspace]').count(),7,'seven workspaces');
@@ -302,7 +302,7 @@ const { start, save } = require('./audio-harness.cjs');
     }
     for(const width of [1101,1200]){
       const page=await harness.browser.newPage({viewport:{width,height:810},reducedMotion:'reduce'});
-      await page.goto(harness.url);
+      await page.goto(harness.url+'/?audio-lab-test');
       await page.waitForFunction(()=>window.RENAX_WORKSPACE?.current==='metronome');
       const fit=await page.evaluate(()=>{
         const app=document.documentElement,original=app.dataset.theme,result={};

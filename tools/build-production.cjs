@@ -31,7 +31,7 @@ function prepareOutput() {
 
 (async () => {
   prepareOutput();
-  for (const folder of ['assets', 'vendor', 'audio-lab'])
+  for (const folder of ['assets', 'vendor'])
     fs.cpSync(path.join(root, folder), path.join(output, folder), {
       recursive: true,
       filter: (file) => !file.endsWith('.d.ts'),

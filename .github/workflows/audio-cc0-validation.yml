@@ -13,7 +13,7 @@ permissions:
 jobs:
   sampled-audio:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -150,6 +150,7 @@ jobs:
         run: |
           export CHROME_PATH="$(node -p "require('playwright').chromium.executablePath()")"
           node tests/instrument-samples-test.cjs
+          node tests/poly-playback-resize-regression-test.cjs
           node tests/audio-headroom-test.cjs
           node tests/bell-resonance-test.cjs
           node tests/track-beat-corrections-test.cjs

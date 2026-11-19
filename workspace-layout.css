@@ -1,5 +1,5 @@
 /* Original controls, reorganized across desktop and mobile workspaces. */
-#workspaceNav{display:flex;gap:6px;padding:10px 0 12px;flex-shrink:0;align-items:center}
+#workspaceNav{display:flex;gap:6px;padding:10px 0 12px;flex-shrink:0;align-items:center;justify-content:center}
 #workspaceNav button{display:flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:8px 18px;color:var(--text);background:transparent;border:1px solid transparent;border-radius:7px;font:600 12px var(--font);cursor:pointer}
 #workspaceNav button[aria-selected=true]{border-color:#009cab;background:#00cee514}
 #workspaceNav button:hover{background:#ffffff06;border-color:var(--border)}

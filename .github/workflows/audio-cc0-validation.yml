@@ -73,9 +73,9 @@ jobs:
               before = git('show', f'{base}:index.html').decode('utf-8')
               after = git('show', f'{head}:index.html').decode('utf-8')
               for asset in ('poly-layout.css', 'metronome-transport.js'):
-                  pattern = re.compile(r'(' + re.escape(asset) + r'\\?v=)[0-9a-f]{12}')
-                  before = pattern.sub(r'\\1VERSION', before)
-                  after = pattern.sub(r'\\1VERSION', after)
+                  pattern = re.compile(re.escape(asset) + r'\?v=[0-9a-f]{12}')
+                  before = pattern.sub(asset + '?v=VERSION', before)
+                  after = pattern.sub(asset + '?v=VERSION', after)
               if before != after:
                   return False
               worker_before = git('show', f'{base}:service-worker.js').decode('utf-8')

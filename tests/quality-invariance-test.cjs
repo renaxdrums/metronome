@@ -36,7 +36,7 @@ const approvedDesktopNav = {
   'console-theme.css': [
     [
       'grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(8px,.65vw,14px)',
-      'grid-template-columns:repeat(7,minmax(0,1fr));width:100%;gap:clamp(4px,.6vw,10px)',
+      'grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(4px,.6vw,10px)',
     ],
   ],
   'ivory-theme.css': [
@@ -50,7 +50,7 @@ const approvedDesktopNav = {
     ],
     [
       'grid-column:1;grid-row:2;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;',
-      'grid-column:1;grid-row:2;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));align-items:center;justify-content:stretch;',
+      'grid-column:1;grid-row:2;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;justify-content:stretch;',
     ],
     [
       'gap:10px!important;padding:16px 0 0!important;min-width:0;',

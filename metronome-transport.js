@@ -31,7 +31,7 @@
       }
     }
     function buildCircularSequencer(m) {
-      sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring').forEach(el => el.remove());
+      sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring, .poly-shapes').forEach(el => el.remove());
       totalSteps = m.numerator;
       stepsData = [];
       for (let b = 0; b < m.numerator; b++) {
@@ -434,9 +434,36 @@
       const polyRatioCaption=sequencerContainer.parentElement.querySelector('.poly-ratio-caption')||document.createElement('div');
       polyRatioCaption.className='poly-ratio-caption';sequencerContainer.parentElement.append(polyRatioCaption);
       ensurePolyStates(m);
-      sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring').forEach(el=>el.remove());
+      sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring, .poly-shapes').forEach(el=>el.remove());
       totalSteps=0;stepsData=[];clearProgressTrail();
-      const radii=[1,.76,.52,.28].map(scale=>'calc(var(--ring-radius) * '+scale+')');
+      const polyScales=[1,.76,.52,.28];
+      const radii=polyScales.map(scale=>'calc(var(--ring-radius) * '+scale+')');
+      // Purely decorative SVG: original circular guides and all editable beats are untouched.
+      const svgNS='http://www.w3.org/2000/svg';
+      const shapes=document.createElementNS(svgNS,'svg');
+      shapes.setAttribute('class','poly-shapes');
+      shapes.setAttribute('viewBox','-1 -1 2 2');
+      shapes.setAttribute('preserveAspectRatio','xMidYMid meet');
+      shapes.setAttribute('aria-hidden','true');
+      shapes.setAttribute('focusable','false');
+      m.polyVoices.forEach((voice,vi)=>{
+        const radius=polyScales[vi];
+        const vertex=beat=>{
+          const theta=beat/voice.count*2*Math.PI;
+          return [Math.sin(theta)*radius,-Math.cos(theta)*radius];
+        };
+        const figure=document.createElementNS(svgNS,voice.count===2?'line':'polygon');
+        figure.setAttribute('class','poly-shape voice-'+(vi+1));
+        if(voice.count===2){
+          const a=vertex(0),b=vertex(1);
+          figure.setAttribute('x1',String(a[0]));figure.setAttribute('y1',String(a[1]));
+          figure.setAttribute('x2',String(b[0]));figure.setAttribute('y2',String(b[1]));
+        }else{
+          figure.setAttribute('points',Array.from({length:voice.count},(_,beat)=>vertex(beat).join(',')).join(' '));
+        }
+        shapes.append(figure);
+      });
+      sequencerContainer.append(shapes);
       m.polyVoices.forEach((_voice,vi)=>{
         const ring=document.createElement('div');
         ring.className='poly-ring '+(vi===0?'outer':vi===1?'inner':'voice-'+(vi+1));

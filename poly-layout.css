@@ -102,3 +102,60 @@ body.poly-mode .rhythm-score { overflow: hidden; }
     max-width:none;
   }
 }
+
+
+/* Polygons only: four distinguishable voices, no change to active beat hit targets. */
+body.poly-mode #sequencerContainer {
+  --poly-voice-1: #ff7183;
+  --poly-voice-2: #42d5e9;
+  --poly-voice-3: #bea3ff;
+  --poly-voice-4: #d0eb72;
+}
+html:is([data-theme="light"],[data-theme="ivory"],[data-theme="avant"]) body.poly-mode #sequencerContainer {
+  --poly-voice-1: #bd3658;
+  --poly-voice-2: #057e9c;
+  --poly-voice-3: #7342b3;
+  --poly-voice-4: #587800;
+}
+body.poly-mode :is(.poly-shape.voice-1,.poly-ring.outer,.poly-dot.outer) { --poly-voice-color: var(--poly-voice-1); }
+body.poly-mode :is(.poly-shape.voice-2,.poly-ring.inner,.poly-dot.inner) { --poly-voice-color: var(--poly-voice-2); }
+body.poly-mode :is(.poly-shape.voice-3,.poly-ring.voice-3,.poly-dot.voice-3) { --poly-voice-color: var(--poly-voice-3); }
+body.poly-mode :is(.poly-shape.voice-4,.poly-ring.voice-4,.poly-dot.voice-4) { --poly-voice-color: var(--poly-voice-4); }
+body.poly-mode .poly-shapes {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--ring-radius) * 2);
+  height: calc(var(--ring-radius) * 2);
+  transform: translate(-50%, -50%);
+  overflow: visible;
+  z-index: 2;
+  pointer-events: none;
+}
+body.poly-mode .poly-shape {
+  fill: color-mix(in srgb, var(--poly-voice-color) 8%, transparent);
+  stroke: var(--poly-voice-color);
+  stroke-width: 1.8px;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+body.poly-mode .poly-shape.voice-4 { stroke-dasharray: 5px 3px; }
+body.poly-mode .poly-ring.outer,
+body.poly-mode .poly-ring.inner,
+body.poly-mode .poly-ring.voice-3,
+body.poly-mode .poly-ring.voice-4 {
+  border-color: color-mix(in srgb, var(--poly-voice-color) 52%, transparent);
+}
+body.poly-mode .poly-dot:not(.poly-subdivision)::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--poly-voice-color);
+  border-radius: 50%;
+  pointer-events: none;
+}
+body.poly-mode .poly-dot.poly-subdivision {
+  outline: 1px solid var(--poly-voice-color);
+  outline-offset: 1px;
+}

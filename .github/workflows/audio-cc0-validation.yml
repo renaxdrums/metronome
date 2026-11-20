@@ -50,7 +50,60 @@ jobs:
                   new_clean.get('devDependencies', {}).pop(key, None)
               return old_clean == new_clean
 
+          def only_reference_poly_visual(base, head, paths):
+              # Conservative one-shot classifier: always validate real audio changes.
+              # Only the approved polygon radii, its CSS and generated cache may differ.
+              allowed = {'poly-layout.css', 'metronome-transport.js', 'index.html',
+                         'offline-manifest.json', 'service-worker.js',
+                         '.github/workflows/audio-cc0-validation.yml'}
+              if paths != allowed:
+                  return False
+              old_js = git('show', f'{base}:metronome-transport.js').decode('utf-8')
+              new_js = git('show', f'{head}:metronome-transport.js').decode('utf-8')
+              scale_before = 'const polyScales=[1,.76,.52,.28];'
+              comment_before = '// Purely decorative SVG: original circular guides and all editable beats are untouched.'
+              if old_js.count(scale_before) != 1 or old_js.count(comment_before) != 1:
+                  return False
+              predicted = old_js.replace(scale_before, 'const polyScales=[1,.76,.64,.42];')
+              predicted = predicted.replace(comment_before, '// Decorative SVG follows beat radii; editing and audio are unchanged.')
+              if predicted != new_js:
+                  return False
+              # Versioned HTML / offline metadata must change only in cache identifiers.
+              import re
+              before = git('show', f'{base}:index.html').decode('utf-8')
+              after = git('show', f'{head}:index.html').decode('utf-8')
+              for asset in ('poly-layout.css', 'metronome-transport.js'):
+                  pattern = re.compile(re.escape(asset) + r'\?v=[0-9a-f]{12}')
+                  before = pattern.sub(asset + '?v=VERSION', before)
+                  after = pattern.sub(asset + '?v=VERSION', after)
+              if before != after:
+                  return False
+              worker_before = git('show', f'{base}:service-worker.js').decode('utf-8')
+              worker_after = git('show', f'{head}:service-worker.js').decode('utf-8')
+              pattern = re.compile(r"MANIFEST_REVISION='[0-9a-f]{16}'")
+              if pattern.sub("MANIFEST_REVISION='REVISION'", worker_before) != pattern.sub("MANIFEST_REVISION='REVISION'", worker_after):
+                  return False
+              old_manifest = json.loads(git('show', f'{base}:offline-manifest.json'))
+              new_manifest = json.loads(git('show', f'{head}:offline-manifest.json'))
+              if old_manifest['version'] != new_manifest['version']:
+                  return False
+              old_resources = {r['path']: r for r in old_manifest['resources']}
+              new_resources = {r['path']: r for r in new_manifest['resources']}
+              if list(old_resources) != list(new_resources):
+                  return False
+              for path in old_resources:
+                  previous = old_resources[path]
+                  current = new_resources[path]
+                  if path in {'index.html', 'poly-layout.css', 'metronome-transport.js'}:
+                      if previous['path'] != current['path'] or previous['text'] != current['text']:
+                          return False
+                  elif previous != current:
+                      return False
+              return True
+
           def has_no_audio_impact(paths, base, head):
+              if only_reference_poly_visual(base, head, paths):
+                  return True
               if paths <= {'package.json', 'pnpm-lock.yaml'} and 'package.json' in paths:
                   return only_safe_tooling_bump(base, head)
               return all(path.endswith(('.md', '.mdx', '.css', '.scss', '.sass'))

@@ -436,9 +436,9 @@
       ensurePolyStates(m);
       sequencerContainer.querySelectorAll('.step, .subdivision-dot, .beat-divider, .poly-dot, .poly-ring, .poly-shapes').forEach(el=>el.remove());
       totalSteps=0;stepsData=[];clearProgressTrail();
-      const polyScales=[1,.76,.52,.28];
+      const polyScales=[1,.76,.64,.42];
       const radii=polyScales.map(scale=>'calc(var(--ring-radius) * '+scale+')');
-      // Purely decorative SVG: original circular guides and all editable beats are untouched.
+      // Decorative SVG follows beat radii; editing and audio are unchanged.
       const svgNS='http://www.w3.org/2000/svg';
       const shapes=document.createElementNS(svgNS,'svg');
       shapes.setAttribute('class','poly-shapes');

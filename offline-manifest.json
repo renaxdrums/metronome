@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "d1a15c6c5f395735",
+  "revision": "b2b77827734a7bfc",
   "resources": [
     {
       "path": "accessibility.css",
@@ -129,7 +129,7 @@
     },
     {
       "path": "avant-garde-theme.css",
-      "sha256": "c4c3ac6ba954e3900f7ff21835fbc1f16cedc30c264c79d91a2c1452737d37d2",
+      "sha256": "0f6dc663db9f03e94db96e517ae7213d693d1d91164bbb133e6068f31388f3ae",
       "text": true
     },
     {
@@ -154,7 +154,7 @@
     },
     {
       "path": "console-theme.css",
-      "sha256": "076dde3f582d3647722bc76d489e5d6862ea06820ff1bf94f966dd3731eaf67e",
+      "sha256": "aa904410331e93e90d4b9d02ff078701bdec89cd1fd557dacd398011c70fbd9f",
       "text": true
     },
     {
@@ -284,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "b76fead8745ef2254a9c32c705ac57037233ef0e6cf1f5b045591d04f4270ca3",
+      "sha256": "1493718f90bf6b6bc477085bf12bb2e4e0a687b48e942c443d847ea3e50525d7",
       "text": true
     },
     {
@@ -309,7 +309,7 @@
     },
     {
       "path": "ivory-theme.css",
-      "sha256": "2747183df164fbd28edb45f49c1a139aa679591737d1f66303dcf69dc29512fa",
+      "sha256": "c79568119f2fa25615acd43c995e0fae764960f61cb9e57400576a9b9c69809e",
       "text": true
     },
     {
@@ -334,7 +334,7 @@
     },
     {
       "path": "metronome-audio.js",
-      "sha256": "0cba660474401f0f7bfd478083b976e9ffd9777e0c5a399d26214e1dec99cf3b",
+      "sha256": "af07130fb5e2b0d57cef15530afa74916b22db0075e28876bab8988c2cc3f891",
       "text": true
     },
     {
@@ -344,7 +344,7 @@
     },
     {
       "path": "metronome-transport.js",
-      "sha256": "ddaa4c46653ef69d31ac9b3a26906d3385991b5be9774422e3718157a71bc462",
+      "sha256": "d55f41d8d0dc26b3ab2eb7ad2f0456db74f9eaa32332d66873000df78a9182d6",
       "text": true
     },
     {
@@ -619,7 +619,7 @@
     },
     {
       "path": "workspace-layout.css",
-      "sha256": "620837cf5f2c430cfa0f6c9ca593b2eac00d605acd4f38221ee06e514e4cb484",
+      "sha256": "67c8edccbbfef95f551c7fa58e5b022ab134bfbaa4f2aa2869c446053cd82d69",
       "text": true
     },
     {

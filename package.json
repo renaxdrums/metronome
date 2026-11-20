@@ -36,7 +36,7 @@
     "globals": "17.14.0",
     "html-minifier-terser": "7.2.0",
     "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",
-    "playwright": "1.65.0",
+    "playwright": "1.65.1",
     "prettier": "3.10.1",
     "typescript": "5.9.3",
     "web-vitals": "6.2.3"

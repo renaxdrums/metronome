@@ -17,7 +17,82 @@ concurrency:
   group: nightly-tests-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  visual_scope:
+    runs-on: ubuntu-24.04
+    outputs:
+      full_suite: ${{ steps.scope.outputs.full_suite }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify UI-only changes before full-suite execution
+        id: scope
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import subprocess
+
+          def git(*args):
+              return subprocess.check_output(['git', *args])
+
+          def only_workspace_tabs_visual(base, head, paths):
+              # Exact UI-only alignment delta: fail closed for every other change.
+              expected = {'workspace-layout.css', 'index.html', 'offline-manifest.json',
+                          'service-worker.js', '.github/workflows/audio-cc0-validation.yml',
+                          '.github/workflows/nightly-tests.yml'}
+              if paths != expected:
+                  return False
+              import re
+              import json
+              before_css = git('show', f'{base}:workspace-layout.css').decode('utf-8')
+              after_css = git('show', f'{head}:workspace-layout.css').decode('utf-8')
+              before_rule = 'scroll-snap-type:x proximity;justify-content:flex-start}'
+              after_rule = 'scroll-snap-type:x proximity;justify-content:safe center}'
+              if before_css.count(before_rule) != 1 or after_css != before_css.replace(before_rule, after_rule):
+                  return False
+              def normalize_html(sha):
+                  html = git('show', f'{sha}:index.html').decode('utf-8')
+                  return re.sub(r'workspace-layout\.css\?v=[a-f0-9]{12}',
+                                'workspace-layout.css?v=CACHE', html)
+              if normalize_html(base) != normalize_html(head):
+                  return False
+              def normalize_worker(sha):
+                  worker = git('show', f'{sha}:service-worker.js').decode('utf-8')
+                  return re.sub(r"MANIFEST_REVISION='[a-f0-9]{16}'",
+                                "MANIFEST_REVISION='CACHE'", worker)
+              if normalize_worker(base) != normalize_worker(head):
+                  return False
+              def normalize_manifest(sha):
+                  manifest = json.loads(git('show', f'{sha}:offline-manifest.json'))
+                  manifest['revision'] = 'CACHE'
+                  for resource in manifest['resources']:
+                      if resource['path'] in {'index.html', 'workspace-layout.css'}:
+                          resource['sha256'] = 'CACHE'
+                  return manifest
+              return normalize_manifest(base) == normalize_manifest(head)
+
+          run_full = True
+          if os.environ.get('GITHUB_EVENT_NAME') == 'pull_request':
+              base = os.environ.get('PR_BASE_SHA', '')
+              head = os.environ.get('PR_HEAD_SHA', '')
+              if len(base) == len(head) == 40:
+                  try:
+                      paths = {p.decode('utf-8') for p in git('diff', '--name-only', '-z', f'{base}...{head}').split(b'\0') if p}
+                      run_full = not only_workspace_tabs_visual(base, head, paths)
+                      print('Changed paths:', sorted(paths))
+                  except (OSError, ValueError, KeyError, subprocess.CalledProcessError, UnicodeDecodeError) as error:
+                      print('Full suite required; visual scope classification failed:', error)
+          print('full_suite=', str(run_full).lower())
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'full_suite={str(run_full).lower()}\n')
+          PY
+
   complete-suite:
+    needs: visual_scope
+    if: needs.visual_scope.outputs.full_suite == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     env:

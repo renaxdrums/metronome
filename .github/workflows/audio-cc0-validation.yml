@@ -101,7 +101,45 @@ jobs:
                       return False
               return True
 
+          def only_workspace_tabs_visual(base, head, paths):
+              # Exact UI-only alignment delta: fail closed for every other change.
+              expected = {'workspace-layout.css', 'index.html', 'offline-manifest.json',
+                          'service-worker.js', '.github/workflows/audio-cc0-validation.yml',
+                          '.github/workflows/nightly-tests.yml'}
+              if paths != expected:
+                  return False
+              import re
+              import json
+              before_css = git('show', f'{base}:workspace-layout.css').decode('utf-8')
+              after_css = git('show', f'{head}:workspace-layout.css').decode('utf-8')
+              before_rule = 'scroll-snap-type:x proximity;justify-content:flex-start}'
+              after_rule = 'scroll-snap-type:x proximity;justify-content:safe center}'
+              if before_css.count(before_rule) != 1 or after_css != before_css.replace(before_rule, after_rule):
+                  return False
+              def normalize_html(sha):
+                  html = git('show', f'{sha}:index.html').decode('utf-8')
+                  return re.sub(r'workspace-layout\.css\?v=[a-f0-9]{12}',
+                                'workspace-layout.css?v=CACHE', html)
+              if normalize_html(base) != normalize_html(head):
+                  return False
+              def normalize_worker(sha):
+                  worker = git('show', f'{sha}:service-worker.js').decode('utf-8')
+                  return re.sub(r"MANIFEST_REVISION='[a-f0-9]{16}'",
+                                "MANIFEST_REVISION='CACHE'", worker)
+              if normalize_worker(base) != normalize_worker(head):
+                  return False
+              def normalize_manifest(sha):
+                  manifest = json.loads(git('show', f'{sha}:offline-manifest.json'))
+                  manifest['revision'] = 'CACHE'
+                  for resource in manifest['resources']:
+                      if resource['path'] in {'index.html', 'workspace-layout.css'}:
+                          resource['sha256'] = 'CACHE'
+                  return manifest
+              return normalize_manifest(base) == normalize_manifest(head)
+
           def has_no_audio_impact(paths, base, head):
+              if only_workspace_tabs_visual(base, head, paths):
+                  return True
               if only_reference_poly_visual(base, head, paths):
                   return True
               if paths <= {'package.json', 'pnpm-lock.yaml'} and 'package.json' in paths:

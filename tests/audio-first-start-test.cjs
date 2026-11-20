@@ -17,16 +17,16 @@ const { start } = require('./audio-harness.cjs');
         const bank = SOUND_BANKS.userMetroclic;
         const play = bank.play;
         bank.play = function (...args) {
-          firstSounds.push({ time: args[1], now: audioCtx.currentTime });
+          window.firstSounds.push({ time: args[1], now: audioCtx.currentTime });
           return play.apply(this, args);
         };
       });
       await page.locator('#playBtn').click();
-      await page.waitForFunction(() => isPlaying && firstSounds.length > 0);
+      await page.waitForFunction(() => isPlaying && window.firstSounds.length > 0);
       const result = await page.evaluate(() => ({
-        reusedContext: audioCtx === firstContext,
+        reusedContext: audioCtx === window.firstContext,
         state: audioCtx.state,
-        first: firstSounds[0],
+        first: window.firstSounds[0],
       }));
       assert.equal(result.reusedContext, true, `${mode}: first click created a new context`);
       assert.equal(result.state, 'running');

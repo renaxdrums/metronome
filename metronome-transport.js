@@ -691,6 +691,13 @@
       playbackStarting = true;
       updateTrainButton();
       try {
+      // Paint the pending state before a first-time AudioContext constructor
+      // blocks the main thread on devices that have not been prewarmed yet.
+      playBtn.textContent = 'Démarrage…';
+      await new Promise(resolve => {
+        const fallback = setTimeout(resolve, 100);
+        requestAnimationFrame(() => { clearTimeout(fallback); setTimeout(resolve, 0); });
+      });
       await initAudio();
       try {
         await ensureInstrumentBankReady(currentBank);
@@ -735,6 +742,7 @@
       playhead.startTime = performance.now();
       clearProgressTrail();
       } catch(error) { stopMetronome({startupFailure:true}); throw error; } finally {
+        if(!isPlaying)playBtn.textContent='Start';
         playbackStarting = false; updateTrainButton(); renderSequencerList();
         if(isPlaying){
           const generation=window.RENAX_PLAYBACK?.generation;

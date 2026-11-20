@@ -172,6 +172,20 @@
       return audioCtx;
     }
 
+    // Creating the device-backed context can block the UI for hundreds of
+    // milliseconds on its first use. Do it once while the metronome is idle,
+    // before the first transport gesture; initAudio still resumes it on Play.
+    if (document.documentElement.dataset.tool === 'metronome') {
+      window.addEventListener('load', () => {
+        const warm = () => {
+          if (audioCtx) return;
+          try { ensureAudioContextForDecode(); }
+          catch (error) { console.warn('Audio prewarm unavailable:', error); }
+        };
+        setTimeout(warm, 0);
+      }, { once: true });
+    }
+
     function setAudioLoadProgress(done, total) {
       const pct = total ? Math.round((done / total) * 100) : 0;
       if (audioReadyBar) audioReadyBar.style.width = pct + '%';

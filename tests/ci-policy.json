@@ -17,6 +17,7 @@
     "tests/amorce-syllables-test.mjs",
     "tests/amorce-un-preservation-test.mjs",
     "tests/audio-activation-test.cjs",
+    "tests/audio-first-start-test.cjs",
     "tests/audio-fast-headroom-test.cjs",
     "tests/audio-headroom-test.cjs",
     "tests/audio-lab-aiff-test.mjs",
@@ -157,6 +158,7 @@
     "tests/two-consonant-timing-test.cjs",
     "tests/voice-bank-switch-test.cjs",
     "tests/voice-subdivision-gain-test.cjs",
+    "tests/workspace-nav-fill-test.cjs",
     "tests/workspace-six-points-test.cjs"
   ],
   "excluded": {

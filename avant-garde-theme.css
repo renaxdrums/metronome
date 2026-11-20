@@ -72,7 +72,7 @@ html#renaxApp[data-theme="avant"] body #workspaceNav {
   border:1px solid var(--ag-header-border) !important;
   border-radius:8px !important;
   gap:var(--ag-nav-gap,3px) !important;
-  padding:4px !important;
+  padding:4px 0;
   box-shadow:none !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav button {
@@ -772,6 +772,7 @@ html#renaxApp[data-theme="avant"] body #songPane .song-ramp-toggle input{accent-
   --ag-nav-gap:5px;
   --ag-nav-bg:#eae9e0;
   --ag-nav-button-bg:var(--ag-header);
+  padding-inline:4px!important;
  }
 }
 

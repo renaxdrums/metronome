@@ -79,7 +79,7 @@ function main() {
       /* A new opt-in appearance may declare its initial budget only once.
          All legacy sheets and scripts must keep their existing ratchets. */
       const firstRegistration = {
-        css: new Set(['avant-garde-theme.css']),
+        css: new Set(['avant-garde-theme.css', 'poly-layout.css']),
         javascript: new Set(['avant-garde-motion.js']),
       };
       const previouslyTracked = { css: {}, javascript: {} };

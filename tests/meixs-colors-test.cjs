@@ -8,6 +8,9 @@ const approvedCSS = process.env.MEIXS_BASE_REF
       encoding: 'utf8',
     }) +
     '\n@media(max-width:1100px){html#renaxApp[data-theme="avant"] body #workspaceNav{gap:5px!important}}' +
+    // Six desktop tabs now reach both navigation edges; mirror only this
+    // padding change while comparing every measured element exactly.
+    '\n@media(min-width:1101px){html#renaxApp[data-theme="avant"] body #workspaceNav{padding:4px 0!important}}' +
     // The approved Citron markers are circular; keep every other geometry check.
     '\nhtml#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step,html#renaxApp[data-theme="avant"] body:not(.poly-mode) .visu-bottom .legend-color{border-radius:50%;}' +
     // The desktop Citron beat counter alignment is explicitly approved in this PR.

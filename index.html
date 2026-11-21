@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 12043)
-Total output lines: 657
-
 <!DOCTYPE html>
 <html lang="fr" id="renaxApp">
 <head>
@@ -249,7 +246,157 @@ Total output lines: 657
             </select>
           </div>
 
-          <…2043 tokens truncated…role="img" aria-labelledby="tunerMeterTitle">
+          <div class="poly-controls sig-group" id="polyControls">
+            <select class="poly-number" id="polyNumerator" aria-label="Pulsations extérieures">
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+            </select>
+            <span class="slash">:</span>
+            <select class="poly-number" id="polyDenominator" aria-label="Pulsations intérieures">
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+            </select>
+          </div>
+        </div>
+        <span class="train-timer" id="trainTimer">0:00</span>
+      </div>
+
+      <div class="sequencer-wrapper">
+        <div class="sequencer-container" id="sequencerContainer">
+          <svg class="visualizer-svg" viewBox="-5 -5 110 110" preserveAspectRatio="xMidYMid meet">
+            <g id="trailGroupOuter"></g>
+            <g id="trailGroup"></g>
+          </svg>
+          <div class="beat-number" id="beatDisplay">1</div>
+          <div id="voiceGroupLabel" hidden style="position:absolute;left:50%;top:calc(50% + 40px);transform:translateX(-50%);font-size:10px;color:var(--text-muted);white-space:nowrap;pointer-events:none"></div>
+          <canvas id="particleCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><div class="legend-color" style="background:var(--grey);"></div> Éteint</div>
+        <div class="legend-item"><div class="legend-color" style="background:var(--cyan);"></div> Clic 1</div>
+        <div class="legend-item"><div class="legend-color" style="background:var(--yellow);"></div> Clic 2</div>
+        <div class="legend-item"><div class="legend-color" style="background:var(--orange);"></div> Clic 3</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="index2-settings-backdrop" id="index2SettingsBackdrop"></div>
+  <aside class="panel index2-settings-panel" data-panel="settings" id="index2SettingsPanel" aria-label="Paramètres techniques">
+    <div class="index2-settings-title">
+      <strong>⚙ Paramètres</strong>
+      <button class="index2-close" id="index2SettingsClose" type="button" aria-label="Fermer">×</button>
+    </div>
+
+<section class="index2-settings-section" id="appearanceSettings">
+<h3>Apparence</h3>
+<div class="appearance-options" role="group" aria-label="Mode d’affichage">
+<button type="button" data-appearance="dark" aria-pressed="true">Sombre</button>
+<button type="button" data-appearance="light" aria-pressed="false">Clair</button>
+<button type="button" data-appearance="ivory" aria-pressed="false">Ivoire</button>
+<button type="button" data-appearance="avant" aria-pressed="false">Citron</button>
+</div>
+</section>
+    <section class="index2-settings-section">
+      <h3>MIDI & déclenchement</h3>
+      <div class="index2-setting-row">
+        <label>Déclenchement START</label>
+        <button type="button" disabled>Non actif</button>
+      </div>
+      <div class="index2-setting-row">
+        <label for="midiStartNote">Note MIDI START</label>
+        <select id="midiStartNote" disabled><option>À définir</option></select>
+      </div>
+      <div class="index2-setting-row">
+        <label for="midiChannel">Canal MIDI</label>
+        <select id="midiChannel" disabled><option>À définir</option></select>
+      </div>
+      <div class="index2-settings-note">Le déclenchement MIDI sera disponible dans une prochaine version.</div>
+    </section>
+
+    <section class="index2-settings-section">
+      <h3>Exports</h3>
+      <div class="index2-setting-row">
+        <label>Export MP3</label>
+        <span class="index2-status">Disponible</span>
+      </div>
+      <div class="index2-setting-row">
+        <label>Export MIDI</label>
+        <span class="index2-status">Disponible</span>
+      </div>
+      <div class="index2-settings-note">Dans la playlist, Exporter permet de choisir MP3 ou MIDI.</div>
+    </section>
+
+    <section class="index2-settings-section">
+      <h3>Utilisation</h3>
+      <div class="index2-settings-note">Sélectionne une mesure ou une piste pour modifier son rythme. Le crayon ouvre l’éditeur de partition ; la flèche annule la dernière modification.</div>
+    </section>
+  </aside>
+
+  <footer>
+    <div class="footer-left"></div>
+    <div class="footer-center">
+      <button class="btn btn-primary" id="playBtn">Start</button>
+      <button class="btn" id="panicBtn">Reset</button>
+    </div>
+    
+    <div class="audio-ready-wrap" id="audioReadyWrap" aria-live="polite" hidden>
+      <div class="audio-ready-label" id="audioReadyLabel">PRÉPARATION AUDIO...</div>
+      <div class="audio-ready-track"><div class="audio-ready-bar" id="audioReadyBar"></div></div>
+    </div>
+    <div class="footer-right"><span>V3.0.1</span><span class="author-credit">David Arens</span></div>
+  </footer>
+
+  <main id="tunerRoot" class="musician-tool" aria-labelledby="tunerTitle" data-ui>
+    <h1 id="tunerTitle" class="tuner-accessible-title">Accordeur</h1>
+    <div class="tuner-layout">
+      <aside class="tuner-controls" aria-label="Réglages de l’accordeur">
+        <div class="tuner-instrument-control"><label for="tunerInstrument"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v7a4 4 0 0 0 8 0V3M12 14v7M5 5h3m8 0h3"/></svg>Instrument / accordage</label><select id="tunerInstrument"></select></div>
+        <div class="tuner-target"><label for="tunerTarget"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"/><ellipse cx="6" cy="18" rx="3" ry="2"/></svg>Note cible</label><select id="tunerTarget"><option value="auto">Détection automatique</option></select></div>
+        <div class="tuner-context"><p id="tunerSummary">Chromatique · La4 = 440,0 Hz · Tempérament égal</p></div>
+        <div id="tunerStrings" class="tuner-strings" role="group" aria-label="Cordes cibles"></div>
+      </aside>
+      <section class="tuner-measurement" aria-label="Mesure de la justesse">
+        <div class="tuner-panel-tools"><button id="tunerTone" type="button" aria-pressed="false" title="Écouter la référence">Écouter la référence</button><button id="tunerSettingsOpen" class="tuner-settings-open" type="button" aria-haspopup="dialog" aria-controls="tunerSettingsDialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>Réglages</span></button></div>
+        <div class="tuner-measurement-head"><span>Diapason</span><span id="tunerSignal" class="tuner-signal-accessible">Microphone arrêté</span></div>
+        <div class="tuner-dial">
+            <svg class="tuner-meter" viewBox="0 0 360 206" role="img" aria-labelledby="tunerMeterTitle">
               <title id="tunerMeterTitle">Écart de moins 50 à plus 50 cents</title>
               <defs><linearGradient id="tunerColorGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#e95151"/><stop offset="22%" stop-color="#ff8a33"/><stop offset="38%" stop-color="#e8cf45"/><stop offset="50%" stop-color="#32bd70"/><stop offset="62%" stop-color="#e8cf45"/><stop offset="78%" stop-color="#ff8a33"/><stop offset="100%" stop-color="#e95151"/></linearGradient></defs>
               <path class="tuner-dial-track" d="M48 164A132 132 0 0 1 312 164"/>
@@ -305,7 +452,7 @@ Total output lines: 657
 
   <script src="ui-feedback.js?v=eae7d41e1fb6"></script>
 <script src="numbox-controls.js?v=6c6ad2425a48"></script>
-  <script src="metronome-audio.js?v=30fae3d947ff"></script>
+  <script src="metronome-audio.js?v=0cba66047440"></script>
   <script src="sequence-parallel.js?v=7e849a3254eb"></script>
   <script src="metronome-core.js?v=dfb52792137c"></script>
   <link rel="stylesheet" href="playback-support.css?v=87b2fe9d2986">
@@ -507,5 +654,4 @@ apply(root.dataset.selectedTheme||root.dataset.theme);
 </script>
 </body>
 </html>
-
 

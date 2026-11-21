@@ -35,7 +35,10 @@ const correctedReferenceFiles = new Set();
 const approvedDesktopNav = {
   'console-theme.css': [
     [
-      'grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(8px,.65vw,14px)',
+      [
+        'grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(8px,.65vw,14px)',
+        'grid-template-columns:repeat(7,minmax(0,1fr));width:100%;gap:clamp(4px,.6vw,10px)',
+      ],
       'grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(4px,.6vw,10px)',
     ],
   ],
@@ -275,23 +278,25 @@ async function baselineRoute(page, url) {
       let reference = body.toString();
       const current = fs.readFileSync(path.join(root, file), 'utf8');
       for (const [before, after] of approvedDesktopNav[file]) {
-        const beforeMatches = reference.split(before).length - 1;
+        const beforeForms = Array.isArray(before) ? before : [before];
+        const beforeMatches = beforeForms.map((form) => [form, reference.split(form).length - 1]);
         const afterMatches = reference.split(after).length - 1;
         // A Chromium route may be revalidated after this exact reference has
         // already been normalized.  Both forms are explicitly approved; any
         // third declaration remains a hard failure, so visual coverage is not
         // weakened by making this fixture normalization idempotent.
         assert(
-          (beforeMatches === 1 && afterMatches === 0) ||
-            (beforeMatches === 0 && afterMatches === 1),
-          `Reference navigation declaration changed: ${file}: ${before}`,
+          (beforeMatches.some(([, matches]) => matches === 1) && afterMatches === 0) ||
+            (beforeMatches.every(([, matches]) => matches === 0) && afterMatches === 1),
+          `Reference navigation declaration changed: ${file}: ${beforeForms.join(' | ')}`,
         );
         assert.equal(
           current.split(after).length,
           2,
           `Current navigation declaration changed: ${file}`,
         );
-        if (beforeMatches === 1) reference = reference.replace(before, after);
+        const matchedBefore = beforeMatches.find(([, matches]) => matches === 1)?.[0];
+        if (matchedBefore) reference = reference.replace(matchedBefore, after);
       }
       body = Buffer.from(reference);
       correctedReferenceFiles.add(file + ':approved-desktop-navigation');

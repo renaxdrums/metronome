@@ -1,3 +1,4 @@
+// This final commit triggers validation against the complete generated offline snapshot.
 const assert = require('node:assert/strict');
 const { start } = require('./audio-harness.cjs');
 

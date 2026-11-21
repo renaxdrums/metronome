@@ -1,6 +1,6 @@
 /* Atomic public application cache. Never cache account requests or library records. */
 'use strict';
-const MANIFEST_REVISION='a974f7f27bd0faaa';
+const MANIFEST_REVISION='66e84467b4b609bb';
 const base=new URL('./',self.location.href),prefix='renax-offline:'+encodeURIComponent(base.pathname)+':';
 const shellName=prefix+'shell:'+MANIFEST_REVISION,audioName=prefix+'audio';
 let manifestPromise;
@@ -24,7 +24,7 @@ self.addEventListener('fetch',event=>{
  if(request.mode==='navigate'){
   event.respondWith((async()=>{const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),2500);try{return await fetch(new Request(request,{signal:controller.signal}));}catch{return await (await caches.open(shellName)).match(new URL('index.html',base))||new Response('Application indisponible hors connexion.',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});}finally{clearTimeout(timer);}})());return;
  }
- if(audioURL(url)){event.respondWith(cacheAudio(request).catch(()=>new Response('Son non tÃ©lÃ©chargÃ©.',{status:503})));return;}
+ if(audioURL(url)){event.respondWith(cacheAudio(request).catch(()=>new Response('Son non tÃÂ©lÃÂ©chargÃÂ©.',{status:503})));return;}
  event.respondWith((async()=>{
   // The installed snapshot remains usable offline even if a newer manifest is deployed.
   const cache=await caches.open(shellName),canonical=new URL(url.pathname,base.origin),cached=await cache.match(canonical);

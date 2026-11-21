@@ -33,6 +33,15 @@ const correctedReferenceFiles = new Set();
 // layout declarations to the historical page, then keep the zero-pixel and
 // computed-style comparisons for every legacy workspace.
 const approvedDesktopNav = {
+  'workspace-layout.css': [
+    [
+      [
+        '#workspaceNav{display:flex;gap:6px;padding:10px 0 12px;flex-shrink:0;align-items:center}',
+        '#workspaceNav{display:flex;gap:6px;padding:10px 0 12px;flex-shrink:0;align-items:center;justify-content:center}',
+      ],
+      '#workspaceNav{display:flex;gap:6px;padding:10px 0 12px;flex-shrink:0;align-items:center;justify-content:space-between;width:100%;min-width:0}',
+    ],
+  ],
   'console-theme.css': [
     [
       [

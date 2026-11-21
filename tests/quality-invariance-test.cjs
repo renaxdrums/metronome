@@ -52,7 +52,10 @@ const approvedDesktopNav = {
       'column-gap:0;row-gap:10px;padding:22px 26px 12px!important',
     ],
     [
-      'grid-column:1;grid-row:2;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;',
+      [
+        'grid-column:1;grid-row:2;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;',
+        'grid-column:1;grid-row:2;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));align-items:center;justify-content:stretch;',
+      ],
       'grid-column:1;grid-row:2;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;justify-content:stretch;',
     ],
     [

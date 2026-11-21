@@ -120,7 +120,7 @@ html#renaxApp[data-theme=ivory] button:focus-visible,html#renaxApp[data-theme=iv
  html#renaxApp[data-theme=ivory] body>header{grid-column:1/-1;grid-row:1;margin:0!important;padding:0 0 10px!important;min-height:0!important}
  html#renaxApp[data-theme=ivory] .header-center{left:50%!important}
  html#renaxApp[data-theme=ivory] #workspaceNav{
-  grid-column:1;grid-row:2;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));align-items:center;justify-content:stretch;
+  grid-column:1;grid-row:2;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;justify-content:stretch;
   gap:clamp(4px,.6vw,10px)!important;padding:0!important;min-width:0;
  }
  html#renaxApp[data-theme=ivory] #workspaceNav button{justify-content:center;min-width:0;min-height:44px;font-size:12px;gap:6px;white-space:nowrap}

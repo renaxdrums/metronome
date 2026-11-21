@@ -210,8 +210,10 @@
         allVoiceAudioReady = true;
         window.dispatchEvent(new Event('renax-voices-ready'));
         Object.keys(VOICE_METRONOME_PROMISES).forEach(k => VOICE_METRONOME_PROMISES[k] = Promise.resolve());
-        playBtn.disabled = false;
-        playBtn.classList.remove('audio-loading');
+        if (playBtn) {
+          playBtn.disabled = false;
+          playBtn.classList.remove('audio-loading');
+        }
         if (audioReadyWrap) audioReadyWrap.classList.add('ready');
         if (audioReadyLabel) audioReadyLabel.textContent = 'READY';
         setTimeout(() => audioReadyWrap?.classList.add('fade-out'), 5000);

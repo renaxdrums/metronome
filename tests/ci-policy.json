@@ -156,6 +156,7 @@
     "tests/tuner-interface-test.cjs",
     "tests/two-consonant-timing-test.cjs",
     "tests/voice-bank-switch-test.cjs",
+    "tests/workspace-nav-fill-test.cjs",
     "tests/voice-subdivision-gain-test.cjs",
     "tests/workspace-six-points-test.cjs"
   ],

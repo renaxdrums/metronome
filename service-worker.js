@@ -46,3 +46,4 @@ self.addEventListener('message',event=>{
  if(event.data?.type!=='CACHE_VOICES'||!event.source?.url?.startsWith(base.href))return;
  event.waitUntil((async()=>{let saved=0;const cache=await caches.open(audioName);for(const value of (Array.isArray(event.data.urls)?event.data.urls:[]).slice(0,40)){try{const url=new URL(value,base);if(!audioURL(url))continue;await cacheAudio(new Request(url,{cache:'force-cache'}));if((await cache.match(url))?.ok)saved++;}catch{}}event.ports[0]?.postMessage({saved});})());
 });
+

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "a974f7f27bd0faaa",
+  "revision": "45e0b3a6a24d05d7",
   "resources": [
     {
       "path": "accessibility.css",
@@ -284,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "bd904517384054dbe7de3b035910c5aa4abf272c4c21f4c6f19d151c5fcd11b5",
+      "sha256": "67405dbe76848c5c8b68844622fc4fa975929a032193a4f9d647d9e30150bfcd",
       "text": true
     },
     {
@@ -334,7 +334,7 @@
     },
     {
       "path": "metronome-audio.js",
-      "sha256": "0cba660474401f0f7bfd478083b976e9ffd9777e0c5a399d26214e1dec99cf3b",
+      "sha256": "30fae3d947ff2f3984badc712c706ad5f03858166c82973335ec7ebc731a3f93",
       "text": true
     },
     {

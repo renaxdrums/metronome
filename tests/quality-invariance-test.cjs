@@ -35,7 +35,7 @@ const correctedReferenceFiles = new Set();
 const approvedDesktopNav = {
   'console-theme.css': [
     [
-      'grid-template-columns:repeat(7,minmax(0,1fr));width:100%;gap:clamp(4px,.6vw,10px)',
+      'grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(8px,.65vw,14px)',
       'grid-template-columns:repeat(6,minmax(0,1fr));width:100%;gap:clamp(4px,.6vw,10px)',
     ],
   ],

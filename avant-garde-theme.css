@@ -72,7 +72,7 @@ html#renaxApp[data-theme="avant"] body #workspaceNav {
   border:1px solid var(--ag-header-border) !important;
   border-radius:8px !important;
   gap:var(--ag-nav-gap,3px) !important;
-  padding:4px !important;
+  padding:var(--ag-nav-padding,4px) !important;
   box-shadow:none !important;
 }
 html#renaxApp[data-theme="avant"] body #workspaceNav button {
@@ -180,6 +180,9 @@ html#renaxApp[data-theme="avant"] body .panel-visu:not(.score-view) .beat-number
   text-shadow:none !important;
 }
 @media(min-width:1101px) {
+  html#renaxApp[data-theme="avant"] body #workspaceNav {
+    --ag-nav-padding:0;
+  }
   html#renaxApp[data-theme="avant"] body:not(.poly-mode) .panel-visu:not(.score-view) #beatDisplay {
     text-box-trim:trim-both;
     text-box-edge:cap alphabetic;

@@ -12,7 +12,10 @@ const approvedCSS = process.env.MEIXS_BASE_REF
     '\nhtml#renaxApp[data-theme="avant"] body:not(.poly-mode) #sequencerContainer .step,html#renaxApp[data-theme="avant"] body:not(.poly-mode) .visu-bottom .legend-color{border-radius:50%;}' +
     // The desktop Citron beat counter alignment is explicitly approved in this PR.
     // Mirror that one rule in the reference; keep all other geometry checks exact.
-    '\n@media(min-width:1101px){html#renaxApp[data-theme="avant"] body:not(.poly-mode) .panel-visu:not(.score-view) #beatDisplay{text-box-trim:trim-both;text-box-edge:cap alphabetic;padding-inline-end:.05em;}}'
+    '\n@media(min-width:1101px){html#renaxApp[data-theme="avant"] body:not(.poly-mode) .panel-visu:not(.score-view) #beatDisplay{text-box-trim:trim-both;text-box-edge:cap alphabetic;padding-inline-end:.05em;}}' +
+    // Six desktop tabs now touch both navigation edges in every theme.
+    // Mirror only that approved Citron padding removal in the reference.
+    '\n@media(min-width:1101px){html#renaxApp[data-theme="avant"] body #workspaceNav{padding:0!important;}}'
   : null;
 const { start, showMeasures, openControls, newTrack } = require('./audio-harness.cjs');
 (async () => {

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "f4c7a64e67217a62",
+  "revision": "eec6343e80447b0f",
   "resources": [
     {
       "path": "accessibility.css",
@@ -154,7 +154,7 @@
     },
     {
       "path": "console-theme.css",
-      "sha256": "aa904410331e93e90d4b9d02ff078701bdec89cd1fd557dacd398011c70fbd9f",
+      "sha256": "9f33e4f7fb3e204bec7d44181a2ee7e507f0deaa2878e362dd2df67b85a11fb2",
       "text": true
     },
     {
@@ -284,7 +284,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "c8353b821325c6c6ea8929474efa7a74069bd6472ae60fbc1dad3e8ef4113067",
+      "sha256": "9908f42ff54bd835516271348378ab1666011c10fce8ab3968753d61559b5635",
       "text": true
     },
     {
@@ -309,7 +309,7 @@
     },
     {
       "path": "ivory-theme.css",
-      "sha256": "c79568119f2fa25615acd43c995e0fae764960f61cb9e57400576a9b9c69809e",
+      "sha256": "254fa9617d84b18f72fe121fec962417849e438e75cdaf37e66560efbe7be270",
       "text": true
     },
     {

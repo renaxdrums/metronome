@@ -24,6 +24,9 @@ const approvedIvoryNavigation = [
   ],
 ];
 function normalizeReference(source, file) {
+  if (file === 'avant-garde-theme.css')
+    return source +
+      '\n@media(min-width:1101px){html#renaxApp[data-theme="avant"] body #workspaceNav{padding:0!important;}}';
   if (file !== 'renax-pulse-ivory.css') return source;
   const current = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
   for (const [before, after] of approvedIvoryNavigation) {

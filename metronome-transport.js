@@ -598,7 +598,9 @@
     }
 
     function schedulerPolyrhythm() {
-      const resizeAhead=performance.now()<(schedulerPolyrhythm.resizeUntil||0) ? 0.6 : scheduleAheadTime;
+      // Dense polyphonic grids need more than the generic 100 ms look-ahead:
+      // a normal render/layout task must not turn queued hits into a burst.
+      const resizeAhead=performance.now()<(schedulerPolyrhythm.resizeUntil||0) ? 1 : Math.max(.75,scheduleAheadTime);
       const horizon=audioCtx.currentTime+(document.hidden ? 2 : resizeAhead);
       // Keep the event positions stable for the active cycle. Structural edits
       // take effect on the next cycle; the Web Audio clock never stops.
@@ -688,9 +690,17 @@
       if(window.RENAX_MULTI?.active)return window.RENAX_MULTI.start();
       if (isPlaying || playbackStarting) return;
       const startEpoch=window.RENAX_PLAYBACK?.generation;
+      let readyToSchedule=false;
       playbackStarting = true;
       updateTrainButton();
       try {
+      // Paint the pending state before a device that missed prewarm performs
+      // a potentially blocking first AudioContext construction.
+      playBtn.textContent='Démarrage…';
+      await new Promise(resolve=>{
+        const fallback=setTimeout(resolve,100);
+        requestAnimationFrame(()=>{clearTimeout(fallback);setTimeout(resolve,0);});
+      });
       await initAudio();
       try {
         await ensureInstrumentBankReady(currentBank);
@@ -709,7 +719,6 @@
         for(const id of banks){if(id===currentBank)continue;try{await ensureInstrumentBankReady(id);await ensureVoiceMetronomeReady(id);}catch(err){console.warn('Polyrythmie: son indisponible, repli possible',id,err);}}
       }
       if (isPlaying || startEpoch!==window.RENAX_PLAYBACK?.generation) return;
-      isPlaying = true;
       window.RENAX_PLAYBACK?.start();
       playingMeasureIndex = loopedMeasure && measures.includes(loopedMeasure) ? measures.indexOf(loopedMeasure) : 0;
       sequenceRepeatIndex = 0n;
@@ -722,6 +731,10 @@
       scheduledMeasureLayouts = new WeakMap();
       renderSequencerList();
       renderActiveMeasure();
+      // Publish playback only after synchronous layout work. Prewarming makes
+      // the audio clock advance during setup, so scheduling earlier can make
+      // the first polyphonic events stale before the scheduler sees them.
+      readyToSchedule=true;
       playBtn.textContent = 'STOP';
       playBtn.classList.remove('btn-primary');
       playBtn.classList.add('btn-cyan');
@@ -734,19 +747,21 @@
       playhead.span = 0;
       playhead.startTime = performance.now();
       clearProgressTrail();
-      } catch(error) { stopMetronome({startupFailure:true}); throw error; } finally {
+      } catch(error) { readyToSchedule=false; stopMetronome({startupFailure:true}); throw error; } finally {
+        if(!readyToSchedule)playBtn.textContent='Start';
         playbackStarting = false; updateTrainButton(); renderSequencerList();
-        if(isPlaying){
+        if(readyToSchedule){
           const generation=window.RENAX_PLAYBACK?.generation;
           // Let pending control rebuilds finish before starting the audio clock,
           // but do not resolve startMetronome until scheduling has begun.
           await new Promise(resolve=>setTimeout(resolve,0));
-          if(isPlaying&&generation===window.RENAX_PLAYBACK?.generation){
+          if(readyToSchedule&&generation===window.RENAX_PLAYBACK?.generation){
            try{
+            isPlaying=true;
             const voiceLead=appMode==='metronome'&&(SOUND_BANKS[currentBank]?.isVoice||window.RENAX_AMORCE?.active)?Math.max(VOICE_MAX_ATTACK_SECONDS,window.RENAX_AMORCE?.maxAttackSeconds||0):0;
             nextNoteTime=audioCtx.currentTime+.05+voiceLead;
             window.RENAX_AMORCE?.begin(audioCtx,nextNoteTime);
-            playhead.startTime=performance.now();schedulerSafely();
+            playhead.startTime=performance.now();schedulerSafely();renderSequencerList();
            }catch(error){stopMetronome({startupFailure:true});throw error;}
           }
         }

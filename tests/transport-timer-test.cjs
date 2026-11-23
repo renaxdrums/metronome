@@ -2,7 +2,7 @@ const {start,save}=require('./audio-harness.cjs');const assert=require('assert')
 (async()=>{const r=await start(),p=await r.browser.newPage({viewport:{width:1280,height:850}}),errors=[];p.on('pageerror',e=>errors.push(e.message));try{
  await p.goto(r.url);await p.evaluate(()=>prepareAllVoiceAudio());await p.waitForFunction(()=>allVoiceAudioReady&&window.RENAX_SONGS);
  const states=[];
- async function checkStart(label){const x=await p.evaluate(()=>({playing:isPlaying,elapsed:getWorkElapsed(),stored:workElapsed,text:trainTimerEl.textContent}));assert(x.playing&&x.elapsed<500&&x.stored===0&&x.text==='0:00');states.push({label,...x});}
+ async function checkStart(label){await p.waitForFunction(()=>isPlaying);const x=await p.evaluate(()=>({playing:isPlaying,elapsed:getWorkElapsed(),stored:workElapsed,text:trainTimerEl.textContent}));assert(x.playing&&x.elapsed<500&&x.stored===0&&x.text==='0:00');states.push({label,...x});}
  async function checkStop(label){const x=await p.evaluate(()=>({playing:isPlaying,elapsed:getWorkElapsed(),stored:workElapsed,start:workStartTime,text:trainTimerEl.textContent}));assert(!x.playing&&x.elapsed===0&&x.stored===0&&x.start===0&&x.text==='0:00');states.push({label,...x});}
  for(let n=0;n<2;n++){
   await p.evaluate(()=>{workElapsed=65000;updateTimerDisplay();});await p.getByRole('button',{name:'Lire',exact:true}).click();await checkStart('metronome start '+n);

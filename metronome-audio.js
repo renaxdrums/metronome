@@ -172,6 +172,19 @@
       return audioCtx;
     }
 
+    // Creating the device-backed context can block the UI on its first use.
+    // Prepare it after load while transport is idle; initAudio still resumes
+    // the suspended context from the user's Play gesture when required.
+    if(document.documentElement.dataset.tool==='metronome'){
+      window.addEventListener('load',()=>{
+        setTimeout(()=>{
+          if(audioCtx)return;
+          try{ensureAudioContextForDecode();}
+          catch(error){console.warn('Audio prewarm unavailable:',error);}
+        },0);
+      },{once:true});
+    }
+
     function setAudioLoadProgress(done, total) {
       const pct = total ? Math.round((done / total) * 100) : 0;
       if (audioReadyBar) audioReadyBar.style.width = pct + '%';

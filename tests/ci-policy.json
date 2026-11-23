@@ -17,6 +17,7 @@
     "tests/amorce-syllables-test.mjs",
     "tests/amorce-un-preservation-test.mjs",
     "tests/audio-activation-test.cjs",
+    "tests/audio-first-start-test.cjs",
     "tests/audio-fast-headroom-test.cjs",
     "tests/audio-headroom-test.cjs",
     "tests/audio-lab-aiff-test.mjs",

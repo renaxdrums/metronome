@@ -5,6 +5,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.StatFs;
+import android.os.SystemClock;
 import android.util.Base64;
 import android.webkit.*;
 import android.view.WindowManager;
@@ -21,12 +25,18 @@ public final class MainActivity extends Activity {
   private static final String ORIGIN="https://appassets.androidplatform.net";
   private static final String SITE="https://renaxdrums.github.io/metronome/";
   private static final int OPEN_FILE=10,SAVE_FILE=11,EXPORT_CHUNK=64*1024;
+  private static final long EXPORT_IDLE_MS=60_000L,EXPORT_MAX_MS=24*60*60*1000L;
+  private final Handler exportHandler=new Handler(Looper.getMainLooper());
+  private final Runnable exportTimeout=new Runnable(){@Override public void run(){
+    if(exportId!=null&&!savingExport&&SystemClock.elapsedRealtime()-exportActivity>=EXPORT_IDLE_MS)clearExport();
+  }};
   private WebView web;
   private ValueCallback<Uri[]> fileCallback;
   private File exportFile;
   private OutputStream exportWriter;
   private String exportId,exportName,exportMime;
   private long exportSize,exportReceived;
+  private long exportStarted,exportActivity;
   private int exportSequence;
   private boolean savingExport;
   private boolean destroyed;
@@ -34,6 +44,7 @@ public final class MainActivity extends Activity {
 
   @Override public void onCreate(Bundle state){
     super.onCreate(state);
+    cleanupAbandonedExports();
     getWindow().setStatusBarColor(Color.rgb(28,33,39));
     getWindow().setNavigationBarColor(Color.rgb(28,33,39));
     web=new WebView(this);web.setBackgroundColor(Color.rgb(28,33,39));
@@ -52,7 +63,7 @@ public final class MainActivity extends Activity {
         Uri u=r.getUrl();String host=u.getHost();
         if(!"https".equals(u.getScheme()))return denied();
         if("appassets.androidplatform.net".equals(host))return asset(u);
-        if(!allowedHost(host))return denied();
+        if(!allowedRemoteUri(u))return denied();
         return null;
       }
       @Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){
@@ -77,13 +88,34 @@ public final class MainActivity extends Activity {
       }
     });
     web.setDownloadListener(new DownloadListener(){@Override public void onDownloadStart(String url,String agent,String disposition,String mime,long length){
-      if(url.startsWith("https://")&&allowedHost(Uri.parse(url).getHost()))openExternal(Uri.parse(url));
+      Uri uri=Uri.parse(url);if(allowedRemoteUri(uri))openExternal(uri);
     }});
     web.loadUrl(ORIGIN+"/app/index.html");
 
   }
-  private boolean allowedHost(String h){
-    return h!=null&&(h.equals("cdn.jsdelivr.net")||h.equals("fonts.googleapis.com")||h.equals("fonts.gstatic.com")||h.equals("huggingface.co")||h.endsWith(".huggingface.co")||h.endsWith(".hf.co"));
+  private boolean allowedRemoteUri(Uri uri){
+    if(!"https".equals(uri.getScheme())||uri.getUserInfo()!=null||uri.getPort()!=-1)return false;
+    String host=uri.getHost(),path=uri.getPath();if(host==null||path==null)return false;
+    if(host.equals("cdn.jsdelivr.net"))return !path.contains("..")&&!uri.getEncodedPath().contains("%")
+      &&(path.startsWith("/npm/@huggingface/transformers@3.8.1/")
+      ||path.startsWith("/npm/onnxruntime-web@1.22.0-dev.20250409-89f8206ba4/")
+      ||path.startsWith("/gh/echogarden-project/espeak-ng-emscripten@7ab07eba2d966ce45040c88d9be953e1d68640e7/"));
+    if(host.equals("huggingface.co"))return true;
+    // Hugging Face resolves immutable model revisions through these binary hosts.
+    return host.endsWith(".huggingface.co")||host.endsWith(".hf.co");
+  }
+  private void cleanupAbandonedExports(){
+    File[] files=getCacheDir().listFiles();if(files==null)return;
+    long cutoff=System.currentTimeMillis()-EXPORT_MAX_MS;
+    for(File file:files)if(file.isFile()&&file.getName().startsWith("renax-export-")&&file.getName().endsWith(".tmp")&&file.lastModified()<cutoff)file.delete();
+  }
+  private long usableExportBytes(){
+    long free=new StatFs(getCacheDir().getAbsolutePath()).getAvailableBytes();
+    return Math.max(0,free-Math.max(8L*1024*1024,free/20));
+  }
+  private void armExportTimeout(){
+    exportActivity=SystemClock.elapsedRealtime();exportHandler.removeCallbacks(exportTimeout);
+    exportHandler.postDelayed(exportTimeout,EXPORT_IDLE_MS);
   }
   private WebResourceResponse denied(){return new WebResourceResponse("text/plain","UTF-8",403,"Forbidden",Collections.emptyMap(),new ByteArrayInputStream(new byte[0]));}
   private WebResourceResponse asset(Uri uri){
@@ -110,11 +142,12 @@ public final class MainActivity extends Activity {
     try{port.postMessage(new WebMessage(new JSONObject().put("id",id).put("seq",seq).put("ok",ok).put("cancelled",cancelled).toString()));}catch(Exception ignored){}
   }
   private void clearExport(){
+    exportHandler.removeCallbacks(exportTimeout);
     if(exportWriter!=null)try{exportWriter.close();}catch(IOException ignored){}
     exportWriter=null;
     if(exportFile!=null)exportFile.delete();
     exportFile=null;exportId=null;exportName=null;exportMime=null;
-    exportSize=0;exportReceived=0;exportSequence=0;
+    exportSize=0;exportReceived=0;exportSequence=0;exportStarted=0;exportActivity=0;
   }
   private void receiveExport(WebMessagePort port,JSONObject data) throws Exception {
     String kind=data.optString("kind"),id=data.optString("id");int seq=data.optInt("seq",-1);
@@ -124,24 +157,28 @@ public final class MainActivity extends Activity {
       if(exportId!=null||savingExport){reply(port,id,seq,false,false);return;}
       String mime=data.getString("mime"),name=data.getString("name");
       double size=data.getDouble("size");
-      if(seq!=0||!Arrays.asList("application/json","audio/mpeg","audio/wav","audio/mp3","audio/midi").contains(mime)||!Double.isFinite(size)||size<0||size>9007199254740991d||size!=Math.floor(size))throw new IOException("Invalid export");
+      if(seq!=0||!Arrays.asList("application/json","audio/mpeg","audio/wav","audio/mp3","audio/midi").contains(mime)||!Double.isFinite(size)||size<0||size>9007199254740991d||size!=Math.floor(size)||size>usableExportBytes())throw new IOException("Invalid export or insufficient storage");
       name=name.replaceAll("[\\\\/\\p{Cntrl}]","_");if(name.length()>120)name=name.substring(0,120);if(name.isEmpty())name="renax-export";
       exportId=id;exportName=name;exportMime=mime;exportSize=(long)size;exportReceived=0;exportSequence=0;
       exportFile=File.createTempFile("renax-export-",".tmp",getCacheDir());
       exportWriter=new BufferedOutputStream(new FileOutputStream(exportFile),EXPORT_CHUNK);
+      exportStarted=SystemClock.elapsedRealtime();armExportTimeout();
       reply(port,id,seq,true,false);return;
     }
     if(!id.equals(exportId)||savingExport){reply(port,id,seq,false,false);return;}
     if(seq!=exportSequence+1||exportWriter==null)throw new IOException("Invalid transfer order");
+    if(SystemClock.elapsedRealtime()-exportStarted>EXPORT_MAX_MS)throw new IOException("Export expired");
     if("chunk".equals(kind)){
       String encoded=data.getString("data");if(encoded.length()>(EXPORT_CHUNK+2)/3*4)throw new IOException("Chunk too large");
       byte[] bytes=Base64.decode(encoded,Base64.NO_WRAP);
       if(bytes.length==0||bytes.length>EXPORT_CHUNK||bytes.length>exportSize-exportReceived)throw new IOException("Invalid chunk size");
-      exportWriter.write(bytes);exportReceived+=bytes.length;exportSequence=seq;
+      if(bytes.length>usableExportBytes())throw new IOException("Insufficient storage");
+      exportWriter.write(bytes);exportReceived+=bytes.length;exportSequence=seq;armExportTimeout();
       reply(port,id,seq,true,false);return;
     }
     if(!"finish".equals(kind)||exportReceived!=exportSize)throw new IOException("Incomplete export");
     exportWriter.close();exportWriter=null;exportSequence=seq;savingExport=true;
+    exportHandler.removeCallbacks(exportTimeout);
     // Android 15 maps audio/midi to .rtx; keep the supplied .mid filename.
     Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT);save.addCategory(Intent.CATEGORY_OPENABLE);
     save.setType("audio/midi".equals(exportMime)?"application/octet-stream":exportMime);save.putExtra(Intent.EXTRA_TITLE,exportName);

@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$AndroidToolsRoot,[Parameter(Mandatory=$true)][string]$JavaHome,[Parameter(Mandatory=$true)][string]$CompilerJar,[Parameter(Mandatory=$true)][string]$OutputApk)
+param([Parameter(Mandatory=$true)][string]$AndroidToolsRoot,[Parameter(Mandatory=$true)][string]$JavaHome,[Parameter(Mandatory=$true)][string]$CompilerJar,[Parameter(Mandatory=$true)][string]$OutputApk,[switch]$CreateSigningKey)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'apk-assets.ps1')
 . (Join-Path $PSScriptRoot 'prepare-web-assets.ps1')
@@ -47,7 +47,9 @@ Assert-ApkAssets (Join-Path $build 'unsigned.apk') (Join-Path $build 'assets')
 Run (Join-Path $sdk 'zipalign.exe') @('-f','-p','4',(Join-Path $build 'unsigned.apk'),(Join-Path $build 'aligned.apk'))
 $signing=Join-Path $PSScriptRoot 'signing';New-Item -ItemType Directory -Force $signing | Out-Null
 $keystore=Join-Path $signing 'renax-drums.jks';$passwordFile=Join-Path $signing 'password.dpapi'
+if((Test-Path $keystore) -ne (Test-Path $passwordFile)){throw 'Signing key and protected password must both exist; restore the original pair.'}
 if(!(Test-Path $keystore)){
+  if(!$CreateSigningKey){throw 'Signing key missing. Restore the original pair, or explicitly pass -CreateSigningKey for a new test identity.'}
   $random=[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
   ConvertTo-SecureString $random -AsPlainText -Force | ConvertFrom-SecureString | Set-Content $passwordFile
   $env:RENAX_STORE_PASS=$random

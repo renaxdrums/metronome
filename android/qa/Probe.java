@@ -131,9 +131,38 @@ public final class Probe extends Instrumentation {
       for(int step=1;step<=20;step++){float f=step/20f;event=MotionEvent.obtain(down,SystemClock.uptimeMillis(),MotionEvent.ACTION_MOVE,x+(tx-x)*f,y+(ty-y)*f,0);event.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);getUiAutomation().injectInputEvent(event,true);event.recycle();SystemClock.sleep(25);}
       event=MotionEvent.obtain(down,SystemClock.uptimeMillis(),MotionEvent.ACTION_UP,tx,ty,0);event.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);getUiAutomation().injectInputEvent(event,true);event.recycle();SystemClock.sleep(200);return true;
     }
+    if(action.equals("revealWorkspaceTab")) {
+      String mode=JSONObject.quote(q.getString("mode"));
+      String geometry="JSON.stringify((()=>{const rail=document.getElementById('workspaceNav'),tab=Array.from(rail.querySelectorAll('button')).find(e=>e.dataset.workspace==="+mode+");if(!tab)throw Error('Missing workspace tab');const r=rail.getBoundingClientRect(),t=tab.getBoundingClientRect(),left=Math.max(0,r.left),right=Math.min(innerWidth,r.right),y=t.y+t.height/2,x=t.x+t.width/2;return {left,right,y,w:innerWidth,direction:x<left+2?-1:x>right-2?1:0,railHit:rail.contains(document.elementFromPoint((left+right)/2,y))}})())";
+      for(int attempt=0;attempt<4;attempt++){
+        JSONObject g=new JSONObject((String)evaluate(geometry));
+        int direction=g.getInt("direction");if(direction==0)return true;
+        if(!g.getBoolean("railHit"))throw new IllegalStateException("Workspace rail is covered");
+        int[] location=new int[2];runOnMainSync(()->web.getLocationOnScreen(location));
+        double scale=web.getWidth()/g.getDouble("w");
+        double left=g.getDouble("left"),right=g.getDouble("right"),span=right-left;
+        float from=location[0]+(float)((left+span*(direction>0?.80:.20))*scale);
+        float to=location[0]+(float)((left+span*(direction>0?.25:.75))*scale);
+        float y=location[1]+(float)(g.getDouble("y")*scale);
+        long started=SystemClock.uptimeMillis();
+        for(int step=0;step<=12;step++){
+          int type=step==0?MotionEvent.ACTION_DOWN:step==12?MotionEvent.ACTION_UP:MotionEvent.ACTION_MOVE;
+          MotionEvent event=MotionEvent.obtain(started,SystemClock.uptimeMillis(),type,from+(to-from)*step/12f,y,0);
+          event.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+          try{if(!getUiAutomation().injectInputEvent(event,true))throw new IllegalStateException("Workspace swipe rejected");}
+          finally{event.recycle();}
+          SystemClock.sleep(25);
+        }
+        SystemClock.sleep(450);
+        visualReady();
+      }
+      if(new JSONObject((String)evaluate(geometry)).getInt("direction")==0)return true;
+      throw new IllegalStateException("Workspace tab still outside the rail: "+q.getString("mode"));
+    }
     if(action.equals("tapCss")) {
       String selector=JSONObject.quote(q.getString("selector"));
-      evaluate("(()=>{const e=document.querySelector("+selector+");if(e)e.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return true})()");visualReady();
+      if(q.optBoolean("scroll",true))evaluate("(()=>{const e=document.querySelector("+selector+");if(e)e.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});return true})()");
+      visualReady();
       String expression="JSON.stringify((()=>{const e=document.querySelector("+selector+");if(!e)return {h:0,hit:false};const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);return {x,y,w:innerWidth,h:r.height,hit:!!hit&&(e===hit||e.contains(hit)),visible:getComputedStyle(e).visibility!=='hidden',obstruction:hit?hit.outerHTML.slice(0,160):'outside viewport'}})())";
       Object encoded=evaluate(expression);
       if(!(encoded instanceof String))throw new IllegalStateException("Touch target unavailable");

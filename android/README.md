@@ -54,13 +54,17 @@ Pour préparer la migration Google Play, installer la plateforme API 36 dans
 la rotation, la navigation tactile, les sélecteurs de documents et l'audio hors
 ligne avant de changer la cible par défaut.
 
-Le livrable Play sera un AAB. Utiliser le même manifeste, le même DEX et les
-mêmes ressources vérifiées, lier les ressources en format protobuf avec AAPT2
-fourni par Google Maven,
-puis construire le module de base avec bundletool. Valider le bundle, générer
-les APK de test avec bundletool et comparer les ressources embarquées à l'APK
-candidat. Signer l'AAB avec la clé d'envoi déclarée dans Play Console et vérifier
-l'installation via une piste de test interne avant toute mise en production.
+Pour créer le bundle Play à partir du candidat API 36, utiliser AAPT2 fourni
+par Google Maven et bundletool. Le script convertit les ressources en protobuf,
+valide l’AAB et compare son DEX et chaque ressource embarquée à l’APK candidat.
+
+```powershell
+python android/build-bundle.py --apk metronome-api36.apk --aapt2 aapt2.exe --java java.exe --bundletool bundletool-all.jar --output metronome.aab
+```
+
+L’AAB produit est non signé. Signer une copie avec la clé d’envoi enregistrée
+dans Play Console. Vérifier l’installation via une piste de test interne avant
+toute mise en production.
 
 La clé de signature privée est dans `android/signing/`, ignoré par Git. Son mot
 de passe est chiffré avec Windows DPAPI pour le compte ayant compilé. Conserver

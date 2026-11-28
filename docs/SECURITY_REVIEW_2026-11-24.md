@@ -15,6 +15,8 @@ Cette PR prépare des protections ; elle ne constitue pas une autorisation de pu
   chemins jsDelivr aux trois dépendances figées utilisées par les voix. Les
   modèles Hugging Face restent distants ; leurs redirections et le chargement
   dynamique doivent être contrôlés sur appareil réel avant publication.
+  Le build Android applique une CSP dédiée qui retire les origines Firebase et
+  Google et interdit les cadres et images distantes.
 - La signature Android échoue si un seul des deux fichiers de signature est
   présent. La création d'une nouvelle identité exige `-CreateSigningKey`.
   La clé et son mot de passe protégé restent exclus de Git.
@@ -28,8 +30,8 @@ Cette PR prépare des protections ; elle ne constitue pas une autorisation de pu
   valide la structure avant insertion. Les samples audio sont limités à 30 Mo
   avant décodage. Une taille compressée ne borne pas la mémoire après décodage :
   un essai isolé avec fichier audio malformé reste nécessaire.
-- Le partage public est accessible par identifiant exact de 128 bits généré par
-  `crypto.randomUUID`; les règles refusent la liste anonyme et les écritures
+- Le partage public est accessible par un UUID v4 de 128 bits, dont 122 aléatoires,
+  généré par `crypto.randomUUID`. Les règles refusent la liste anonyme et les écritures
   d'autres comptes. Un lien connu donne accès à son contenu jusqu'à révocation.
 - Les règles Firestore refusent la suppression physique des sauvegardes, de leur
   historique et des partages. Un mécanisme d'effacement complet côté serveur,
@@ -74,10 +76,18 @@ Sources officielles :
 - `android/test-apk-assets.ps1` : réussite.
 - Vérification de syntaxe des scripts du pont Android et du build de production :
   réussite.
-- `pnpm install --frozen-lockfile --ignore-scripts --offline` : échec, cache
-  incomplet. L'essai réseau a rencontré une erreur de validation du certificat
-  TLS ; aucune désactivation de TLS n'a été faite. La suite PC, les émulateurs,
-  le binaire modifié et MobSF restent non vérifiés localement.
+- L'installation verrouillée a réussi avec le magasin de certificats Windows.
+  Les vérifications locales de robustesse et de rendu du texte importé ont réussi.
+  Le test manuel du sélecteur MP3 Windows n'a pas trouvé le fichier attendu.
+- Sur le premier commit de la PR, les suites production, compatibilité des
+  navigateurs, Firebase isolé, compatibilité neuronale et suite complète ont
+  réussi. CodeQL, Gitleaks et l'empaquetage Android ont réussi. Android 15 et 16
+  ont échoué sur le même test de navigation portrait, avec un onglet Multipiste
+  inaccessible au toucher du banc de test. Le job Android 14 a été annulé.
+- L'audit npm du premier commit a signalé deux alertes élevées. Les versions
+  verrouillées de `@grpc/grpc-js` et `body-parser` ont été corrigées. Le nouvel
+  audit au seuil élevé passe et compte quatre alertes modérées restantes.
+- MobSF et le comportement Android sur téléphone physique restent à vérifier.
 
 Avant fusion, examiner les résultats de la CI de cette PR, le statut CodeQL
 par défaut du dépôt pour éviter une analyse doublonnée, et exécuter les essais

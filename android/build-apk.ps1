@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$AndroidToolsRoot,[Parameter(Mandatory=$true)][string]$JavaHome,[Parameter(Mandatory=$true)][string]$CompilerJar,[Parameter(Mandatory=$true)][string]$OutputApk,[switch]$CreateSigningKey)
+param([Parameter(Mandatory=$true)][string]$AndroidToolsRoot,[Parameter(Mandatory=$true)][string]$JavaHome,[Parameter(Mandatory=$true)][string]$CompilerJar,[Parameter(Mandatory=$true)][string]$OutputApk,[ValidateSet(35,36)][int]$TargetSdk=35,[switch]$CreateSigningKey)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'apk-assets.ps1')
 . (Join-Path $PSScriptRoot 'prepare-web-assets.ps1')
@@ -6,12 +6,13 @@ $projectRoot=Split-Path $PSScriptRoot -Parent
 $build=Join-Path $PSScriptRoot 'build'
 foreach($name in @('classes','dex','res/drawable','res/values','assets/site','signing')){New-Item -ItemType Directory -Force -Path (Join-Path $build $name) | Out-Null}
 $sdk=Join-Path $AndroidToolsRoot 'build-tools-35.0.0/android-15'
-$platform=Join-Path $AndroidToolsRoot 'platforms-android-35/android-35/android.jar'
+$platform=Join-Path $AndroidToolsRoot "platforms-android-$TargetSdk/android-$TargetSdk/android.jar"
+if(!(Test-Path -LiteralPath $platform -PathType Leaf)){throw "Android SDK platform $TargetSdk is missing: $platform"}
 $java=Join-Path $JavaHome 'bin/java.exe'
 $env:JAVA_HOME=$JavaHome
 function Run([string]$program,[string[]]$arguments){& $program @arguments;if($LASTEXITCODE -ne 0){throw "Build step failed: $program ($LASTEXITCODE)"}}
 Push-Location $projectRoot
-try{Run 'node' @('tools/build-production.cjs','--csp')}finally{Pop-Location}
+try{Run 'node' @('tools/build-production.cjs','--android')}finally{Pop-Location}
 Copy-Item -Path (Join-Path $projectRoot 'dist/site/*') -Destination (Join-Path $build 'assets/site') -Recurse -Force
 Copy-Item (Join-Path $projectRoot 'assets/icons/icon-512.png') (Join-Path $build 'res/drawable/ic_launcher.png') -Force
 Copy-Item (Join-Path $PSScriptRoot 'app/src/main/res/values/strings.xml') (Join-Path $build 'res/values/strings.xml') -Force
@@ -38,7 +39,7 @@ $classes=@(Get-ChildItem (Join-Path $build 'classes') -Filter '*.class' -Recurse
 Run (Join-Path $sdk 'd8.bat') (@('--lib',$platform,'--min-api','26','--output',(Join-Path $build 'dex'))+$classes)
 Run (Join-Path $sdk 'aapt2.exe') @('compile','--dir',(Join-Path $build 'res'),'-o',(Join-Path $build 'resources.zip'))
 # Add assets below with explicit ZIP names: aapt2 -A produced Windows backslashes.
-Run (Join-Path $sdk 'aapt2.exe') @('link','-I',$platform,'--manifest',(Join-Path $PSScriptRoot 'app/src/main/AndroidManifest.xml'),'--min-sdk-version','26','--target-sdk-version','35','-o',(Join-Path $build 'unsigned.apk'),(Join-Path $build 'resources.zip'))
+Run (Join-Path $sdk 'aapt2.exe') @('link','-I',$platform,'--manifest',(Join-Path $PSScriptRoot 'app/src/main/AndroidManifest.xml'),'--min-sdk-version','26','--target-sdk-version',"$TargetSdk",'-o',(Join-Path $build 'unsigned.apk'),(Join-Path $build 'resources.zip'))
 Add-Type -AssemblyName System.IO.Compression
 $archive=[IO.Compression.ZipFile]::Open((Join-Path $build 'unsigned.apk'),[IO.Compression.ZipArchiveMode]::Update)
 try{[IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive,(Join-Path $build 'dex/classes.dex'),'classes.dex') | Out-Null}finally{$archive.Dispose()}

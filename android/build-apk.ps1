@@ -38,8 +38,14 @@ Run $java @('-jar',$CompilerJar,'-source','1.8','-target','1.8','-proc:none','-w
 $classes=@(Get-ChildItem (Join-Path $build 'classes') -Filter '*.class' -Recurse | ForEach-Object FullName)
 Run (Join-Path $sdk 'd8.bat') (@('--lib',$platform,'--min-api','26','--output',(Join-Path $build 'dex'))+$classes)
 Run (Join-Path $sdk 'aapt2.exe') @('compile','--dir',(Join-Path $build 'res'),'-o',(Join-Path $build 'resources.zip'))
+$manifest=Join-Path $build 'AndroidManifest.xml'
+[xml]$manifestXml=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'app/src/main/AndroidManifest.xml'))
+[void]$manifestXml.manifest.'uses-sdk'.SetAttribute('targetSdkVersion','http://schemas.android.com/apk/res/android',"$TargetSdk")
+$manifestXml.Save($manifest)
 # Add assets below with explicit ZIP names: aapt2 -A produced Windows backslashes.
-Run (Join-Path $sdk 'aapt2.exe') @('link','-I',$platform,'--manifest',(Join-Path $PSScriptRoot 'app/src/main/AndroidManifest.xml'),'--min-sdk-version','26','--target-sdk-version',"$TargetSdk",'-o',(Join-Path $build 'unsigned.apk'),(Join-Path $build 'resources.zip'))
+Run (Join-Path $sdk 'aapt2.exe') @('link','-I',$platform,'--manifest',$manifest,'--min-sdk-version','26','--target-sdk-version',"$TargetSdk",'-o',(Join-Path $build 'unsigned.apk'),(Join-Path $build 'resources.zip'))
+$badging=& (Join-Path $sdk 'aapt2.exe') 'dump' 'badging' (Join-Path $build 'unsigned.apk')
+if($LASTEXITCODE -ne 0 -or $badging -notcontains "targetSdkVersion:'$TargetSdk'"){throw "Compiled APK does not target API $TargetSdk"}
 Add-Type -AssemblyName System.IO.Compression
 $archive=[IO.Compression.ZipFile]::Open((Join-Path $build 'unsigned.apk'),[IO.Compression.ZipArchiveMode]::Update)
 try{[IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive,(Join-Path $build 'dex/classes.dex'),'classes.dex') | Out-Null}finally{$archive.Dispose()}

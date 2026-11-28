@@ -55,7 +55,8 @@ la rotation, la navigation tactile, les sélecteurs de documents et l'audio hors
 ligne avant de changer la cible par défaut.
 
 Le livrable Play sera un AAB. Utiliser le même manifeste, le même DEX et les
-mêmes ressources vérifiées, lier les ressources en format protobuf avec AAPT2,
+mêmes ressources vérifiées, lier les ressources en format protobuf avec AAPT2
+fourni par Google Maven,
 puis construire le module de base avec bundletool. Valider le bundle, générer
 les APK de test avec bundletool et comparer les ressources embarquées à l'APK
 candidat. Signer l'AAB avec la clé d'envoi déclarée dans Play Console et vérifier

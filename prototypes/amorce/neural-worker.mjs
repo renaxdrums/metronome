@@ -1,6 +1,8 @@
 import '../../network-origins.js';
 import {neuralAudio} from './neural-core.mjs?v=20261009-levels';
 const modelId='onnx-community/Kokoro-82M-v1.0-ONNX-timestamped',revision='dd4401a9add81ac692d20e240d22ec9dda82cc29';
+// SHA-256 of the selected voice's Git LFS object at the pinned revision.
+const voiceIntegrity='sha256-xLI1pMHyzTuTn+0IuJnOk4Vji3Y/e3OllhbE/JvWybw=';
 let initialized,model,tokenizer,runtime,backend='wasm',fallbackReason='';const voices=new Map();
 async function initialize(requested){
  self.postMessage({progress:'Chargement du moteur neuronal…'});
@@ -26,7 +28,7 @@ self.onmessage=({data})=>{queue=queue.then(async()=>{
   await initialized;
   const voice='bm_george';
   if(!voices.has(voice)){
-   const response=await fetch(`https://huggingface.co/${modelId}/resolve/${revision}/voices/${voice}.bin`);
+   const response=await fetch(`https://huggingface.co/${modelId}/resolve/${revision}/voices/${voice}.bin`,{integrity:voiceIntegrity});
    if(!response.ok)throw new Error('NEURAL_VOICE_DOWNLOAD_FAILED');
    voices.set(voice,new Float32Array(await response.arrayBuffer()));
   }

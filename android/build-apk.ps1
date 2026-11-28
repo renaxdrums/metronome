@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$AndroidToolsRoot,[Parameter(Mandatory=$true)][string]$JavaHome,[Parameter(Mandatory=$true)][string]$CompilerJar,[Parameter(Mandatory=$true)][string]$OutputApk)
+param([Parameter(Mandatory=$true)][string]$AndroidToolsRoot,[Parameter(Mandatory=$true)][string]$JavaHome,[Parameter(Mandatory=$true)][string]$CompilerJar,[Parameter(Mandatory=$true)][string]$OutputApk,[ValidateSet(35,36)][int]$TargetSdk=35,[switch]$CreateSigningKey)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'apk-assets.ps1')
 . (Join-Path $PSScriptRoot 'prepare-web-assets.ps1')
@@ -6,12 +6,13 @@ $projectRoot=Split-Path $PSScriptRoot -Parent
 $build=Join-Path $PSScriptRoot 'build'
 foreach($name in @('classes','dex','res/drawable','res/values','assets/site','signing')){New-Item -ItemType Directory -Force -Path (Join-Path $build $name) | Out-Null}
 $sdk=Join-Path $AndroidToolsRoot 'build-tools-35.0.0/android-15'
-$platform=Join-Path $AndroidToolsRoot 'platforms-android-35/android-35/android.jar'
+$platform=Join-Path $AndroidToolsRoot "platforms-android-$TargetSdk/android-$TargetSdk/android.jar"
+if(!(Test-Path -LiteralPath $platform -PathType Leaf)){throw "Android SDK platform $TargetSdk is missing: $platform"}
 $java=Join-Path $JavaHome 'bin/java.exe'
 $env:JAVA_HOME=$JavaHome
 function Run([string]$program,[string[]]$arguments){& $program @arguments;if($LASTEXITCODE -ne 0){throw "Build step failed: $program ($LASTEXITCODE)"}}
 Push-Location $projectRoot
-try{Run 'node' @('tools/build-production.cjs','--csp')}finally{Pop-Location}
+try{Run 'node' @('tools/build-production.cjs','--android')}finally{Pop-Location}
 Copy-Item -Path (Join-Path $projectRoot 'dist/site/*') -Destination (Join-Path $build 'assets/site') -Recurse -Force
 Copy-Item (Join-Path $projectRoot 'assets/icons/icon-512.png') (Join-Path $build 'res/drawable/ic_launcher.png') -Force
 Copy-Item (Join-Path $PSScriptRoot 'app/src/main/res/values/strings.xml') (Join-Path $build 'res/values/strings.xml') -Force
@@ -37,8 +38,14 @@ Run $java @('-jar',$CompilerJar,'-source','1.8','-target','1.8','-proc:none','-w
 $classes=@(Get-ChildItem (Join-Path $build 'classes') -Filter '*.class' -Recurse | ForEach-Object FullName)
 Run (Join-Path $sdk 'd8.bat') (@('--lib',$platform,'--min-api','26','--output',(Join-Path $build 'dex'))+$classes)
 Run (Join-Path $sdk 'aapt2.exe') @('compile','--dir',(Join-Path $build 'res'),'-o',(Join-Path $build 'resources.zip'))
+$manifest=Join-Path $build 'AndroidManifest.xml'
+[xml]$manifestXml=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'app/src/main/AndroidManifest.xml'))
+[void]$manifestXml.manifest.'uses-sdk'.SetAttribute('targetSdkVersion','http://schemas.android.com/apk/res/android',"$TargetSdk")
+$manifestXml.Save($manifest)
 # Add assets below with explicit ZIP names: aapt2 -A produced Windows backslashes.
-Run (Join-Path $sdk 'aapt2.exe') @('link','-I',$platform,'--manifest',(Join-Path $PSScriptRoot 'app/src/main/AndroidManifest.xml'),'--min-sdk-version','26','--target-sdk-version','35','-o',(Join-Path $build 'unsigned.apk'),(Join-Path $build 'resources.zip'))
+Run (Join-Path $sdk 'aapt2.exe') @('link','-I',$platform,'--manifest',$manifest,'--min-sdk-version','26','--target-sdk-version',"$TargetSdk",'-o',(Join-Path $build 'unsigned.apk'),(Join-Path $build 'resources.zip'))
+$badging=& (Join-Path $sdk 'aapt2.exe') 'dump' 'badging' (Join-Path $build 'unsigned.apk')
+if($LASTEXITCODE -ne 0 -or $badging -notcontains "targetSdkVersion:'$TargetSdk'"){throw "Compiled APK does not target API $TargetSdk"}
 Add-Type -AssemblyName System.IO.Compression
 $archive=[IO.Compression.ZipFile]::Open((Join-Path $build 'unsigned.apk'),[IO.Compression.ZipArchiveMode]::Update)
 try{[IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive,(Join-Path $build 'dex/classes.dex'),'classes.dex') | Out-Null}finally{$archive.Dispose()}
@@ -47,7 +54,9 @@ Assert-ApkAssets (Join-Path $build 'unsigned.apk') (Join-Path $build 'assets')
 Run (Join-Path $sdk 'zipalign.exe') @('-f','-p','4',(Join-Path $build 'unsigned.apk'),(Join-Path $build 'aligned.apk'))
 $signing=Join-Path $PSScriptRoot 'signing';New-Item -ItemType Directory -Force $signing | Out-Null
 $keystore=Join-Path $signing 'renax-drums.jks';$passwordFile=Join-Path $signing 'password.dpapi'
+if((Test-Path $keystore) -ne (Test-Path $passwordFile)){throw 'Signing key and protected password must both exist; restore the original pair.'}
 if(!(Test-Path $keystore)){
+  if(!$CreateSigningKey){throw 'Signing key missing. Restore the original pair, or explicitly pass -CreateSigningKey for a new test identity.'}
   $random=[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
   ConvertTo-SecureString $random -AsPlainText -Force | ConvertFrom-SecureString | Set-Content $passwordFile
   $env:RENAX_STORE_PASS=$random

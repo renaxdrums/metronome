@@ -3,10 +3,12 @@ import {withDurations} from './piper-model.mjs';
 import {normalizeVoice} from './voice-loudness.mjs?v=20261009-levels';
 const runtimeURL=globalThis.RENAX_NETWORK.onnx+'dist/';
 const modelURL='https://huggingface.co/rhasspy/piper-voices/resolve/c10ece1aade47bb51c153c893d14e5bf8e5b7117/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx';
+// SHA-256 of the Git LFS object at the pinned revision.
+const modelIntegrity='sha256-ZB0asJfaK4ESjAdoEO2wUrOF3syL4zgYFIAqZKc7r5k=';
 let ready,ort,session,config;
 async function initialize(){
  self.postMessage({progress:'Chargement de la voix française Piper…'});
- const [runtime,response,configuration]=await Promise.all([import(runtimeURL+'ort.min.mjs'),fetch(modelURL),fetch(new URL('./piper-config.json',import.meta.url))]);
+ const [runtime,response,configuration]=await Promise.all([import(runtimeURL+'ort.min.mjs'),fetch(modelURL,{integrity:modelIntegrity}),fetch(new URL('./piper-config.json',import.meta.url))]);
  if(!response.ok||!configuration.ok)throw new Error('PIPER_DOWNLOAD_FAILED');
  ort=runtime;config=await configuration.json();ort.env.wasm.numThreads=1;ort.env.wasm.wasmPaths=runtimeURL;
  session=await ort.InferenceSession.create(withDurations(await response.arrayBuffer()),{executionProviders:['wasm'],graphOptimizationLevel:'all'});

@@ -40,8 +40,13 @@ L’APK contient le site sur une origine HTTPS virtuelle locale. Les accès
 `file://`, les accès universels aux fichiers, le trafic HTTP clair, le débogage
 WebView et les sauvegardes automatiques Android sont désactivés. Aucun
 `JavascriptInterface` global n’est exposé. Un port de messages est transmis à
-la page principale de confiance pour les exports, limités à 20 Mo et soumis au
-sélecteur de fichiers Android. L’application n’effectue pas de synchronisation
+la page principale de confiance pour les exports. Leur taille est bornée par
+l'espace réellement disponible dans le cache privé Android, avec une réserve
+pour le système. Un transfert inactif pendant 60 secondes ou durant plus de
+24 heures est abandonné et son fichier temporaire supprimé ; les fichiers
+laissés par un arrêt brutal sont supprimés après 24 heures lors d’un démarrage. Le choix de
+destination reste soumis au sélecteur Android, sans délai pendant ce choix.
+L’application n’effectue pas de synchronisation
 cloud embarquée ; la gestion du compte ouvre le site officiel dans le navigateur.
 
 ## Limites

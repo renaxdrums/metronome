@@ -7,7 +7,7 @@ sdk=Path(os.environ.get('ANDROID_HOME') or os.environ['ANDROID_SDK_ROOT'])
 build=root/'android/build/native-qa'; output=build/'output'; output.mkdir(parents=True,exist_ok=True)
 tools=sdk/'build-tools/35.0.0'; platform=sdk/'platforms/android-35/android.jar'
 def run(*args):subprocess.run([str(x) for x in args],check=True,cwd=root)
-run('node','tools/build-production.cjs','--csp')
+run('node','tools/build-production.cjs','--android')
 assets=build/'assets';shutil.copytree(root/'dist/site',assets/'site',dirs_exist_ok=True)
 index=assets/'site/index.html';html=index.read_text()
 html=re.sub(r'<script[^>]+src="offline-cache\.js[^" ]*"[^>]*></script>','',html)

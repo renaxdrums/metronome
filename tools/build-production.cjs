@@ -7,6 +7,7 @@ const crypto = require('node:crypto');
 const { minify } = require('html-minifier-terser');
 const runtimeOrigins = require('../network-origins.js');
 const cdnSources = Object.values(runtimeOrigins).join(' ');
+const android = process.argv.includes('--android');
 const root = path.resolve(__dirname, '..');
 const parent = path.join(root, 'dist');
 const output = path.join(parent, 'site');
@@ -121,18 +122,24 @@ function prepareOutput() {
     "base-uri 'self'",
     "object-src 'none'",
     "form-action 'self'",
-    `script-src 'self' 'wasm-unsafe-eval' https://www.gstatic.com ${cdnSources} https://www.google.com https://apis.google.com ` +
+    `script-src 'self' 'wasm-unsafe-eval' ${cdnSources} ` +
+      (android ? '' : 'https://www.gstatic.com https://www.google.com https://apis.google.com ') +
       hashes.join(' '),
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https:",
+    android ? "img-src 'self' data: blob:" : "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     "media-src 'self' blob:",
     "worker-src 'self' blob:",
-    `connect-src 'self' blob: data: https://www.gstatic.com ${cdnSources} https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://huggingface.co https://*.huggingface.co https://*.hf.co`,
-    "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://recaptcha.google.com",
+    `connect-src 'self' blob: data: ${cdnSources} https://huggingface.co https://*.huggingface.co https://*.hf.co` +
+      (android
+        ? ''
+        : ' https://www.gstatic.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com'),
+    android
+      ? "frame-src 'none'"
+      : "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://recaptcha.google.com",
   ].join('; ');
   fs.writeFileSync(path.join(parent, 'csp-candidate.txt'), policy + '\n');
-  if (process.argv.includes('--csp'))
+  if (android || process.argv.includes('--csp'))
     html = html.replace(
       '<head>',
       '<head>\n<meta http-equiv="Content-Security-Policy" content="' + policy + '">',

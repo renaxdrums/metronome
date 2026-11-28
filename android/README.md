@@ -48,6 +48,24 @@ dans le workflow `android-packaging.yml`. Il ne remplace pas le test sur Android
 Fournir les paramètres `-AndroidToolsRoot`, `-JavaHome`, `-CompilerJar` et
 `-OutputApk`. Les outils sont vérifiés contre leurs métadonnées de téléchargement.
 
+Pour préparer la migration Google Play, installer la plateforme API 36 dans
+`platforms-android-36/android-36` et construire un APK candidat avec
+`-TargetSdk 36`. Vérifier la cible du manifeste compilé, les marges système,
+la rotation, la navigation tactile, les sélecteurs de documents et l'audio hors
+ligne avant de changer la cible par défaut.
+
+Pour créer le bundle Play à partir du candidat API 36, utiliser AAPT2 fourni
+par Google Maven et bundletool. Le script convertit les ressources en protobuf,
+valide l’AAB et compare son DEX et chaque ressource embarquée à l’APK candidat.
+
+```powershell
+python android/build-bundle.py --apk metronome-api36.apk --aapt2 aapt2.exe --java java.exe --bundletool bundletool-all.jar --output metronome.aab
+```
+
+L’AAB produit est non signé. Signer une copie avec la clé d’envoi enregistrée
+dans Play Console. Vérifier l’installation via une piste de test interne avant
+toute mise en production.
+
 La clé de signature privée est dans `android/signing/`, ignoré par Git. Son mot
 de passe est chiffré avec Windows DPAPI pour le compte ayant compilé. Conserver
 cette clé pour signer les futures mises à jour ; elle n’est jamais ajoutée à

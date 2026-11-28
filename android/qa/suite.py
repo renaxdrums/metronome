@@ -32,16 +32,17 @@ def wait(expression,predicate=bool,timeout=20):
   if predicate(last):return last
   time.sleep(.2)
  raise AssertionError('Timed out: '+expression+'; last='+str(last)[:400])
-def tap(selector):
+def tap(selector,scroll=True):
  dismiss_launcher_boot_dialog()
- request('tapCss',selector=selector)
+ request('tapCss',selector=selector,scroll=scroll)
 def click(selector):return js('(()=>{const e=document.querySelector('+json.dumps(selector)+');if(!e)throw Error("Missing control");e.click();return true})()')
 def set_value(selector,value,event='change'):
  return js('(()=>{const e=document.querySelector('+json.dumps(selector)+');if(!e)throw Error("Missing input");e.value='+json.dumps(str(value))+';e.dispatchEvent(new Event('+json.dumps(event)+',{bubbles:true}));return e.value})()')
 def nav(mode):
  if js('document.querySelector("#beatEditor")?.hidden===false'):
   tap('#beatEditor [aria-label="Fermer"]');wait('document.querySelector("#beatEditor").hidden')
- tap('#workspaceNav [data-workspace="'+mode+'"]');wait('document.body.dataset.workspace',lambda x:x==mode)
+ request('revealWorkspaceTab',mode=mode)
+ tap('#workspaceNav [data-workspace="'+mode+'"]',scroll=False);wait('document.body.dataset.workspace',lambda x:x==mode)
 def save_report():
  matrix=json.loads((root/'android/qa/function-matrix.json').read_text())
  by_name={t['name']:t for t in results}

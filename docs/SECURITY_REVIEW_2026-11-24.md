@@ -37,24 +37,26 @@ Cette PR prépare des protections ; elle ne constitue pas une autorisation de pu
   historique et des partages. Un mécanisme d'effacement complet côté serveur,
   avec vérification d'identité et nettoyage des sous-collections, est nécessaire
   avant de promettre la suppression définitive des données ou du compte.
-- La configuration App Check côté client ne prouve pas l'application serveur.
-  Vérifier `Enforced` pour Firestore dans la console et constater le rejet d'une
-  requête non attestée sur un projet de test. Ne pas provoquer de charge sur le
-  site public.
+- L'API d'administration confirme App Check `ENFORCED` pour Firestore et
+  `UNENFORCED` pour Authentication. Les règles Firestore déployées correspondent
+  au dépôt. La lecture des extensions renvoie 403 ; la présence d'une extension
+  d'effacement n'a pas pu être vérifiée. Aucun réglage ni compte n'a été modifié.
 - Les dépendances exécutables du moteur neuronal et les modules Firebase web
-  restent chargés à distance. Les révisions sont figées, mais l'intégrité des
-  imports dynamiques n'est pas cryptographiquement vérifiée. L'embarquement local
-  requiert la validation des workers WebView et du mode hors ligne musical.
+  restent chargés à distance. Les fichiers du modèle Piper et de la voix Kokoro
+  sont vérifiés par SHA-256 contre les objets Git LFS des révisions épinglées.
+  Les modules exécutables n'ont pas de contrôle cryptographique à l'import.
+  Embarquer eSpeak demanderait de traiter la redistribution sous GPL-3.0.
 - Aucun secret administratif ni clé de signature n'apparaît dans les noms de
   fichiers suivis ou ajoutés dans l'historique inspecté. Cela ne remplace pas une
   analyse de contenu Gitleaks complète, qui est ajoutée en CI.
 
 ## Publication Google Play : contrôle séparé
 
-- Le build actuel cible l'API 35 et ne produit qu'un APK. Google Play exige
+- Le build APK conserve l'API 35 par défaut. Google Play exige
   l'API 36 pour une nouvelle application et les mises à jour depuis le
-  31 août 2026, ainsi qu'un AAB pour une nouvelle application. La migration
-  API 36/AAB doit être testée sur Android et avec Play App Signing avant envoi.
+  31 août 2026, ainsi qu'un AAB pour une nouvelle application. La cible API 36
+  a été vérifiée dans un APK et dans un AAB de test. Le script de bundle vérifie
+  le DEX et tous les actifs. L'installation via Play App Signing reste à tester.
 - Confirmer dans Play Console l'identité de signature et la clé d'envoi, la
   déclaration Data safety, la politique de confidentialité, la fiche de
   suppression de données et les exigences de test du compte développeur.
@@ -88,6 +90,21 @@ Sources officielles :
   verrouillées de `@grpc/grpc-js` et `body-parser` ont été corrigées. Le nouvel
   audit au seuil élevé passe et compte quatre alertes modérées restantes.
 - MobSF et le comportement Android sur téléphone physique restent à vérifier.
+- Les tests navigateur et CPU de synthèse ont réussi avec les empreintes des
+  actifs vocaux. Le banc Android fait défiler le rail avec un geste natif avant
+  de toucher l'onglet hors écran. Il exige toujours le changement de mode.
+
+## Contrôle de l'effacement avant ouverture commerciale
+
+Utiliser un compte de test dédié avec une sauvegarde, son historique et au moins
+un lien public. Vérifier un parcours accessible depuis le site et depuis
+l'application Play, et vérifier l'identité du demandeur avant toute suppression.
+Tester côté serveur l'effacement récursif de `users/{uid}` et la suppression
+des documents `playlistShares` dont `ownerUid` correspond. Les partages utilisent
+des identifiants aléatoires et nécessitent cette recherche explicite.
+Contrôler que les liens connus sont refusés, que le compte Auth est supprimé et
+que les données d'un deuxième compte sont intactes. Le refus des suppressions
+physiques depuis le client Firestore doit rester en place.
 
 Avant fusion, examiner les résultats de la CI de cette PR, le statut CodeQL
 par défaut du dépôt pour éviter une analyse doublonnée, et exécuter les essais

@@ -58,6 +58,10 @@ def build(apk, aapt2, java, bundletool, output):
 
         run(java, "-jar", bundletool, "build-bundle", f"--modules={module}", f"--output={bundle}")
         run(java, "-jar", bundletool, "validate", f"--bundle={bundle}")
+        sdk = run(java, "-jar", bundletool, "dump", "manifest", f"--bundle={bundle}",
+                  "--module=base", "--xpath=/manifest/uses-sdk/@android:targetSdkVersion")
+        if sdk.strip() != "36":
+            raise ValueError("The bundle manifest does not target API 36.")
         with ZipFile(apk) as original, ZipFile(bundle) as result:
             assets = {name for name in original.namelist() if name.startswith("assets/") and not name.endswith("/")}
             bundled = {name.removeprefix("base/") for name in result.namelist() if name.startswith("base/assets/") and not name.endswith("/")}

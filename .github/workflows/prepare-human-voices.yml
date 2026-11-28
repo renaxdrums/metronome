@@ -2,9 +2,6 @@ name: Prepare human metronome voices
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/prepare-human-voices.yml'
 
 permissions:
   contents: write
